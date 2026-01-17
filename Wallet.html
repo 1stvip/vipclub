@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>محفظتي - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 🔥 إضافة Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --success: #10b981;
+            --danger: #ef4444; 
+            --dark: #1e293b; 
+            --bg: #f1f5f9; 
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        
+        /* شريط التنقل */
+        .navbar { background: #fff; height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 9999; }
+        .icon-btn { font-size: 1.4rem; color: var(--dark); cursor: pointer; position: relative; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; border: none; background: none; }
+        .icon-btn:hover { background: #f0f0f0; }
+        .badge { position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; font-size: 0.7rem; min-width: 18px; height: 18px; display: none; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid white; font-weight: bold; }
+
+        /* القوائم المنسدلة */
+        .dropdown-overlay { position: fixed; top: 70px; width: 320px; max-width: 90%; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); display: none; flex-direction: column; z-index: 10000; border: 1px solid #ddd; overflow: hidden; }
+        #profileDropdown { right: 20px; text-align: center; padding: 25px 20px; }
+        #notifDropdown { left: 20px; text-align: right; }
+        .dropdown-overlay.active { display: flex !important; animation: slideDown 0.2s ease-out; }
+        
+        /* أيقونة الملف الشخصي الكبيرة */
+        .profile-large-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 10px; display: block; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* الهيدر والرصيد */
+        .wallet-header { background: linear-gradient(135deg, #6366f1, #a855f7); color: white; padding: 30px 20px; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px; }
+        .balance-amount { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
+
+        /* زر التحديث المركزي */
+        .refresh-section { text-align: center; margin-bottom: 10px; }
+        .refresh-btn { background: white; border: 1px solid #ddd; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; color: var(--dark); transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: inline-flex; align-items: center; gap: 10px; }
+        .refresh-btn:hover { background: var(--primary); color: white; }
+
+        /* شبكة البطاقات */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
+        
+        /* تصميم البطاقة */
+        .gift-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); position: relative; }
+        .card-top { background: #f3ba2f; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.4rem; }
+        .card-body { padding: 20px; position: relative; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #fff; }
+        
+        .scratch-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #d1d5db, #9ca3af); display: flex; align-items: center; justify-content: center; color: #4b5563; font-weight: bold; cursor: crosshair; z-index: 5; transition: opacity 0.5s; user-select: none; }
+        .scratch-overlay.revealed { opacity: 0; pointer-events: none; }
+        
+        .secret-code { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: var(--primary); margin-bottom: 10px; }
+        .copy-btn { background: #f1f5f9; border: none; padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; color: var(--dark); display: none; align-items: center; gap: 8px; font-weight: bold; }
+
+        .card-info { padding: 12px 20px; background: #f8fafc; font-size: 0.8rem; color: #64748b; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .delete-btn { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 1.1rem; }
+
+        /* الإشعارات */
+        .notif-item { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
+        .notif-item.unread { background: #eef2ff; border-right: 4px solid var(--primary); }
+        .notif-text { flex: 1; }
+        .delete-notif-btn { color: #ccc; cursor: pointer; padding: 5px; transition: 0.2s; }
+        .delete-notif-btn:hover { color: var(--danger); }
+        
+        .refresh-notif { cursor: pointer; transition: 0.5s; }
+        .refreshing { transform: rotate(360deg); color: var(--primary); }
+
+        #screenOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; display: none; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
+
+        /* رسائل Firebase */
+        .firebase-alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            z-index: 10002;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-width: 400px;
+        }
+        
+        .firebase-success {
+            background: #10b981;
+            color: white;
+            border-left: 4px solid #059669;
+        }
+        
+        .firebase-error {
+            background: #ef4444;
+            color: white;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .firebase-warning {
+            background: #f59e0b;
+            color: white;
+            border-left: 4px solid #d97706;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* تأثيرات الحذف */
+        .deleting {
+            animation: deleteAnimation 0.5s forwards;
+        }
+        
+        @keyframes deleteAnimation {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; height: 0; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="screenOverlay" onclick="closeAll()"></div>
+
+<!-- رسائل Firebase -->
+<div id="firebaseAlert" class="firebase-alert" style="display: none;"></div>
+
+<nav class="navbar">
+    <button class="icon-btn" onclick="openMenu('profileDropdown')">
+        <i class="fas fa-user-circle"></i>
+    </button>
+    <div style="font-weight: bold;">محفظتي والبطاقات</div>
+    <button class="icon-btn" onclick="openMenu('notifDropdown')">
+        <i class="fas fa-bell"></i>
+        <span class="badge" id="notifBadge">0</span>
+    </button>
+</nav>
+
+<div id="profileDropdown" class="dropdown-overlay">
+    <i class="fas fa-user-circle profile-large-icon"></i>
+    <h4 id="p_nickname" style="margin: 5px 0;">المستخدم</h4>
+    <p style="margin-bottom: 15px; color: #64748b; font-size: 0.9rem;">معرف الحساب: <span id="p_id">0</span></p>
+    
+    <div style="background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+        <span style="font-size: 0.8rem; color: #64748b; display: block; margin-bottom: 4px;">الرصيد المتاح</span>
+        <b style="color: var(--success); font-size: 1.1rem;"><span id="p_egp">0</span> ج.م</b>
+        <div style="margin-top: 5px; font-size: 0.8rem;">
+            دولار: <b id="p_usd">0</b> USD
+        </div>
+    </div>
+    
+    <button onclick="logout()" style="width:100%; padding:12px; background:#fee2e2; color:var(--danger); border:none; border-radius:10px; cursor:pointer; font-weight: bold;">
+        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+    </button>
+</div>
+
+<div id="notifDropdown" class="dropdown-overlay">
+    <div style="padding:15px; font-weight:bold; border-bottom:1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span>الإشعارات</span>
+            <i class="fas fa-sync-alt refresh-notif" id="notifRefreshIcon" onclick="refreshNotifs()" title="تحديث"></i>
+        </div>
+        <button onclick="markAllRead()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size: 0.75rem;">تحديد كقروء</button>
+    </div>
+    <div id="notifList" style="max-height:300px; overflow-y:auto;"></div>
+</div>
+
+<div class="wallet-header">
+    <small>إجمالي الرصيد</small>
+    <div class="balance-amount" id="userBalance">0.00 ج.م</div>
+</div>
+
+<div class="refresh-section">
+    <button class="refresh-btn" onclick="loadWallet()">
+        <i class="fas fa-sync-alt"></i> تحديث البيانات
+    </button>
+</div>
+
+<div class="cards-grid" id="cardsGrid"></div>
+
+<script>
+// 🔥 تكوين Firebase (نفس تكوين الصفحات الأخرى)
+const firebaseConfig = {
+    apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+    authDomain: "vipclub-1d04a.firebaseapp.com",
+    databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+    projectId: "vipclub-1d04a",
+    storageBucket: "vipclub-1d04a.firebasestorage.app",
+    messagingSenderId: "120667552740",
+    appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+};
+
+// تهيئة Firebase
+let database, auth;
+
+function initializeFirebase() {
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        database = firebase.database();
+        auth = firebase.auth();
+        
+        console.log('✅ Firebase initialized for wallet');
+        
+    } catch (error) {
+        console.error('❌ Firebase initialization error:', error);
+        showFirebaseAlert('❌ خطأ في الاتصال بـ Firebase', 'error');
+    }
+}
+
+// ===== دالة التحقق من جلسة المحفظة =====
+function checkWalletSession() {
+    try {
+        // 1. التحقق من وجود بيانات المحفظة من الصفحة الرئيسية
+        const walletData = JSON.parse(localStorage.getItem('walletUserData'));
+        const walletSession = JSON.parse(localStorage.getItem('walletSession'));
+        
+        if (!walletData || !walletSession) {
+            console.log('❌ لا توجد بيانات محفظة أو جلسة منتهية');
+            return false;
+        }
+        
+        // 2. التحقق من أن الجلسة حديثة (أقل من 10 دقائق)
+        const sessionAge = Date.now() - walletSession.timestamp;
+        if (sessionAge > 10 * 60 * 1000) { // 10 دقائق
+            console.log('❌ جلسة المحفظة منتهية');
+            localStorage.removeItem('walletSession');
+            localStorage.removeItem('walletUserData');
+            return false;
+        }
+        
+        // 3. تحديث الوقت الأخير للنشاط
+        walletSession.lastActivity = Date.now();
+        localStorage.setItem('walletSession', JSON.stringify(walletSession));
+        
+        console.log('✅ جلسة المحفظة نشطة للمستخدم:', walletData.nickname);
+        return true;
+        
+    } catch (error) {
+        console.error('Error checking wallet session:', error);
+        return false;
+    }
+}
+
+// ===== متغير لتتبع الكود المحذوف مؤقتاً =====
+let deletedCards = JSON.parse(localStorage.getItem('deletedCards')) || {};
+
+// ===== دالة تحميل المحفظة من بيانات الصفحة الرئيسية =====
+async function loadWallet() {
+    try {
+        // التحقق من جلسة المحفظة أولاً
+        if (!checkWalletSession()) {
+            showFirebaseAlert('⚠️ انتهت جلسة المحفظة. يرجى العودة للصفحة الرئيسية', 'warning');
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 3000);
+            return;
+        }
+        
+        // جلب بيانات المحفظة من localStorage
+        const walletData = JSON.parse(localStorage.getItem('walletUserData'));
+        
+        if (!walletData) {
+            showFirebaseAlert('❌ لا توجد بيانات محفظة', 'error');
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 2000);
+            return;
+        }
+        
+        // تحديث واجهة المستخدم
+        document.getElementById('userBalance').innerText = `${walletData.balanceEGP || 0} ج.م`;
+        document.getElementById('p_egp').innerText = walletData.balanceEGP || 0;
+        document.getElementById('p_usd').innerText = walletData.balanceUSD || 0;
+        document.getElementById('p_nickname').innerText = walletData.nickname || walletData.username;
+        document.getElementById('p_id').innerText = walletData.numericId || walletData.id;
+        
+        // إذا كان هناك firebaseKey، يمكننا جلب البيانات المحدثة
+        if (database && walletData.firebaseKey) {
+            await loadWalletFromFirebase(walletData.firebaseKey, walletData.numericId);
+        } else {
+            // عرض البطاقات من البيانات المحفوظة بعد تصفية المحذوفات
+            const filteredCards = filterDeletedCards(walletData.purchasedCards || []);
+            renderCards(filteredCards);
+        }
+        
+        showFirebaseAlert(' تم تحميل المحفظة بنجاح✅', 'success');
+        
+    } catch (error) {
+        console.error('Error loading wallet:', error);
+        showFirebaseAlert('❌ خطأ في تحميل المحفظة', 'error');
+    }
+}
+
+// ===== دالة تصفية البطاقات المحذوفة =====
+function filterDeletedCards(cards) {
+    if (!cards || !Array.isArray(cards)) return [];
+    
+    // تحويل deletedCards من كائن إلى مصفوفة من الأكواد المحذوفة
+    const deletedCodes = Object.keys(deletedCards);
+    
+    // تصفية البطاقات: إبقاء فقط التي لم يتم حذفها
+    return cards.filter(card => {
+        // إذا كانت البطاقة تحتوي على code
+        if (card.code) {
+            return !deletedCodes.includes(card.code);
+        }
+        return true; // إذا لم يكن هناك code، نترك البطاقة
+    });
+}
+
+// ===== دالة جلب البيانات المحدثة من Firebase =====
+async function loadWalletFromFirebase(firebaseKey, numericId) {
+    try {
+        if (!database) {
+            console.log('Database not initialized');
+            return;
+        }
+        
+        // محاولة جلب البيانات من Firebase باستخدام firebaseKey
+        let userRef;
+        if (firebaseKey) {
+            userRef = database.ref('users/' + firebaseKey);
+        } else if (numericId) {
+            // البحث باستخدام numericId
+            const snapshot = await database.ref('users').orderByChild('numericId').equalTo(numericId).once('value');
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                const userId = Object.keys(users)[0];
+                userRef = database.ref('users/' + userId);
+            }
+        }
+        
+        if (!userRef) {
+            console.log('User reference not found');
+            renderCards([]);
+            return;
+        }
+        
+        const snapshot = await userRef.once('value');
+        
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            
+            // تحديث البيانات المحلية
+            const walletData = JSON.parse(localStorage.getItem('walletUserData')) || {};
+            const updatedWalletData = {
+                ...walletData,
+                balanceEGP: userData.balanceEGP || walletData.balanceEGP,
+                balanceUSD: userData.balanceUSD || walletData.balanceUSD,
+                purchasedCards: userData.purchasedCards || walletData.purchasedCards || [],
+                notifications: userData.notifications || []
+            };
+            
+            localStorage.setItem('walletUserData', JSON.stringify(updatedWalletData));
+            
+            // تحديث الواجهة
+            document.getElementById('userBalance').innerText = `${updatedWalletData.balanceEGP || 0} ج.م`;
+            document.getElementById('p_egp').innerText = updatedWalletData.balanceEGP || 0;
+            document.getElementById('p_usd').innerText = updatedWalletData.balanceUSD || 0;
+            
+            // عرض البطاقات بعد تصفية المحذوفات
+            const filteredCards = filterDeletedCards(updatedWalletData.purchasedCards || []);
+            renderCards(filteredCards);
+            
+            // تحديث الإشعارات
+            updateNotifications(updatedWalletData.notifications || []);
+            
+            console.log('✅ تم تحديث بيانات المحفظة من Firebase');
+        }
+        
+    } catch (error) {
+        console.error('Error loading wallet from Firebase:', error);
+        // استمرار العمل بالبيانات المحلية
+        const walletData = JSON.parse(localStorage.getItem('walletUserData'));
+        if (walletData) {
+            const filteredCards = filterDeletedCards(walletData.purchasedCards || []);
+            renderCards(filteredCards);
+        }
+    }
+}
+
+// ===== دالة عرض البطاقات =====
+function renderCards(cards) {
+    const grid = document.getElementById('cardsGrid');
+    
+    if (!cards || cards.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:50px; color:#888;">لا توجد بطاقات حالياً</p>';
+        return;
+    }
+    
+    grid.innerHTML = '';
+    
+    cards.forEach((card, index) => {
+        const cardDate = card.purchaseDate ? new Date(card.purchaseDate).toLocaleDateString('ar-EG') : 
+                        (card.date || 'تاريخ غير معروف');
+        const cardProduct = card.product || card.value || 'بطاقة غير معروفة';
+        const cardCode = card.code || 'XXXX-XXXX-XXXX';
+        const cardPrice = card.price || card.value || '';
+        const cardColor = card.color || '#f3ba2f';
+        
+        // التأكد من أن البطاقة ليست محذوفة
+        if (deletedCards[cardCode]) {
+            return; // تخطي هذه البطاقة
+        }
+        
+        grid.innerHTML += `
+            <div class="gift-card" id="card-${index}" data-code="${cardCode}">
+                <div class="card-top" style="background:${cardColor}">
+                    <i class="fas fa-gift"></i> ${cardProduct}
+                </div>
+                <div class="card-body">
+                    <div class="secret-code">${cardCode}</div>
+                    <button class="copy-btn" id="copy-btn-${index}" onclick="copyCode('${cardCode}', this)">
+                        <i class="fas fa-copy"></i> نسخ الكود
+                    </button>
+                    <div class="scratch-overlay" id="overlay-${index}" onclick="revealCard(${index})">
+                        اسحب لرؤية الكود
+                    </div>
+                </div>
+                <div class="card-info">
+                    <span>${cardDate}</span>
+                    ${cardPrice ? `<span style="color: var(--success); font-weight: bold;">${cardPrice}</span>` : ''}
+                    <button class="delete-btn" onclick="deleteCard(${index}, '${cardCode}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// ===== دالة حذف بطاقة بشكل نهائي =====
+async function deleteCard(index, cardCode) {
+    const warningMessage = `⚠️ تحذير هـام\nهل أنت متأكد من حذف هذه البطاقة نهائياً؟\n\n- الكود: ${cardCode}\n- سوف تفقد البطاقة نهائياً ولن تعود مرة أخرى.\n- لا يمكن التراجع عن هذا الإجراء.`;
+
+    if (!confirm(warningMessage)) return;
+    
+    try {
+        // 1. إضافة الكود إلى قائمة المحذوفات
+        deletedCards[cardCode] = {
+            deletedAt: new Date().toISOString(),
+            cardIndex: index
+        };
+        
+        // حفظ قائمة المحذوفات في localStorage
+        localStorage.setItem('deletedCards', JSON.stringify(deletedCards));
+        
+        // 2. تأثير بصري للحذف
+        const cardElement = document.getElementById(`card-${index}`);
+        if (cardElement) {
+            cardElement.classList.add('deleting');
+        }
+        
+        // 3. جلب البيانات الحالية
+        const walletData = JSON.parse(localStorage.getItem('walletUserData'));
+        if (!walletData) return;
+        
+        // 4. تصفية البطاقات المحذوفة من القائمة
+        const cards = walletData.purchasedCards || [];
+        const filteredCards = cards.filter(card => card.code !== cardCode);
+        walletData.purchasedCards = filteredCards;
+        
+        // 5. تحديث البيانات المحلية
+        localStorage.setItem('walletUserData', JSON.stringify(walletData));
+        
+        // 6. محاولة تحديث Firebase إذا كان هناك اتصال
+        if (database && walletData.firebaseKey) {
+            try {
+                await database.ref('users/' + walletData.firebaseKey).update({
+                    purchasedCards: filteredCards,
+                    updatedAt: new Date().toISOString()
+                });
+                
+                // إضافة سجل للحذف في Firebase
+                const deleteRecord = {
+                    code: cardCode,
+                    deletedAt: new Date().toISOString(),
+                    userId: walletData.numericId || walletData.id,
+                    product: cards.find(c => c.code === cardCode)?.product || 'غير معروف'
+                };
+                
+                await database.ref('deletedCards').push(deleteRecord);
+                
+            } catch (firebaseError) {
+                console.error('Firebase update error:', firebaseError);
+            }
+        }
+        
+        // 7. إزالة العنصر من الشاشة بعد انتهاء التأثير
+        setTimeout(() => {
+            // إعادة تحميل العرض مع البطاقات المتبقية
+            renderCards(filteredCards);
+            showFirebaseAlert('✅ تم حذف البطاقة نهائياً', 'success');
+        }, 500);
+        
+    } catch (error) {
+        console.error('Error deleting card:', error);
+        showFirebaseAlert('❌ خطأ في حذف البطاقة', 'error');
+    }
+}
+
+// ===== دالة تحديث الإشعارات =====
+function updateNotifications(notifications) {
+    const list = document.getElementById('notifList');
+    const badge = document.getElementById('notifBadge');
+    
+    if (!notifications || notifications.length === 0) {
+        list.innerHTML = '<div style="padding:20px; color:#888; text-align:center;">لا توجد إشعارات</div>';
+        badge.style.display = 'none';
+        return;
+    }
+    
+    // حساب الإشعارات غير المقروءة
+    const unreadCount = notifications.filter(n => !n.read).length;
+    if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+    
+    // عرض الإشعارات
+    list.innerHTML = '';
+    
+    // ترتيب الإشعارات من الأحدث للأقدم
+    const sortedNotifs = [...notifications].sort((a, b) => {
+        const idA = a.id || 0;
+        const idB = b.id || 0;
+        return idB - idA;
+    });
+    
+    sortedNotifs.forEach((n, index) => {
+        const div = document.createElement('div');
+        div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+        div.innerHTML = `
+            <div class="notif-text">
+                <div>${n.text || 'إشعار بدون نص'}</div>
+                <small style="color:#aaa;">${n.date || 'تاريخ غير معروف'}</small>
+            </div>
+            <i class="fas fa-trash-alt delete-notif-btn" onclick="deleteNotification(${n.id || index})" title="حذف"></i>
+        `;
+        list.appendChild(div);
+    });
+}
+
+// ===== دالة حذف إشعار =====
+async function deleteNotification(notifId) {
+    try {
+        // جلب البيانات الحالية
+        const walletData = JSON.parse(localStorage.getItem('walletUserData'));
+        if (!walletData) return;
+        
+        // تصفية الإشعارات
+        const notifications = (walletData.notifications || []).filter(n => n.id !== notifId);
+        walletData.notifications = notifications;
+        
+        // تحديث البيانات المحلية
+        localStorage.setItem('walletUserData', JSON.stringify(walletData));
+        
+        // محاولة تحديث Firebase
+        if (database && walletData.firebaseKey) {
+            try {
+                await database.ref('users/' + walletData.firebaseKey).update({
+                    notifications: notifications,
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (firebaseError) {
+                console.error('Firebase update error:', firebaseError);
+            }
+        }
+        
+        showFirebaseAlert('✅ تم حذف الإشعار', 'success');
+        
+        // تحديث العرض
+        setTimeout(() => {
+            updateNotifications(notifications);
+        }, 500);
+        
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+        showFirebaseAlert('❌ خطأ في حذف الإشعار', 'error');
+    }
+}
+
+// ===== دالة تعيين جميع الإشعارات كمقروءة =====
+async function markAllRead() {
+    try {
+        const walletData = JSON.parse(localStorage.getItem('walletUserData'));
+        if (!walletData) return;
+        
+        const notifications = walletData.notifications || [];
+        if (notifications.length === 0) {
+            showFirebaseAlert('⚠️ لا توجد إشعارات', 'warning');
+            return;
+        }
+        
+        // تحديث جميع الإشعارات كمقروءة
+        const updatedNotifs = notifications.map(n => ({
+            ...n,
+            read: true
+        }));
+        
+        walletData.notifications = updatedNotifs;
+        localStorage.setItem('walletUserData', JSON.stringify(walletData));
+        
+        // محاولة تحديث Firebase
+        if (database && walletData.firebaseKey) {
+            try {
+                await database.ref('users/' + walletData.firebaseKey).update({
+                    notifications: updatedNotifs,
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (firebaseError) {
+                console.error('Firebase update error:', firebaseError);
+            }
+        }
+        
+        showFirebaseAlert('✅ تم تعيين جميع الإشعارات كمقروءة', 'success');
+        
+        // تحديث العرض
+        setTimeout(() => {
+            updateNotifications(updatedNotifs);
+        }, 500);
+        
+    } catch (error) {
+        console.error('Error marking all as read:', error);
+        showFirebaseAlert('❌ خطأ في تحديث الإشعارات', 'error');
+    }
+}
+
+// ===== دوال التحكم في القوائم =====
+function openMenu(id) {
+    const target = document.getElementById(id);
+    const isOpen = target.classList.contains('active');
+    closeAll();
+    if(!isOpen) {
+        target.classList.add('active');
+        document.getElementById('screenOverlay').style.display = 'block';
+        if(id === 'notifDropdown') {
+            const walletData = JSON.parse(localStorage.getItem('walletUserData'));
+            if (walletData) {
+                updateNotifications(walletData.notifications || []);
+            }
+        }
+    }
+}
+
+function closeAll() {
+    document.querySelectorAll('.dropdown-overlay').forEach(m => m.classList.remove('active'));
+    document.getElementById('screenOverlay').style.display = 'none';
+}
+
+// ===== دوال مساعدة للبطاقات =====
+function revealCard(id) {
+    const overlay = document.getElementById(`overlay-${id}`);
+    if (overlay) {
+        overlay.classList.add('revealed');
+        const copyBtn = document.getElementById(`copy-btn-${id}`);
+        if (copyBtn) {
+            copyBtn.style.display = 'flex';
+        }
+    }
+}
+
+function copyCode(code, btn) {
+    navigator.clipboard.writeText(code);
+    const oldHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+    btn.style.background = 'var(--success)';
+    btn.style.color = 'white';
+    setTimeout(() => {
+        btn.innerHTML = oldHtml;
+        btn.style.background = '#f1f5f9';
+        btn.style.color = 'var(--dark)';
+    }, 2000);
+}
+
+// ===== دالة تسجيل الخروج =====
+function logout() {
+    // مسح بيانات جلسة المحفظة
+    localStorage.removeItem('walletSession');
+    localStorage.removeItem('walletUserData');
+    // الاحتفاظ بقائمة المحذوفات لمستخدم آخر
+    // localStorage.removeItem('deletedCards');
+    
+    showFirebaseAlert('✅ تم تسجيل الخروج من المحفظة', 'success');
+    
+    setTimeout(() => {
+        window.location.href = 'home.html';
+    }, 1500);
+}
+
+// ===== دالة مسح جميع قوائم المحذوفات =====
+function clearDeletedCards() {
+    deletedCards = {};
+    localStorage.removeItem('deletedCards');
+    showFirebaseAlert('✅ تم مسح سجل البطاقات المحذوفة', 'success');
+    
+    // إعادة تحميل البيانات
+    setTimeout(() => {
+        loadWallet();
+    }, 500);
+}
+
+// ===== عرض رسائل Firebase =====
+function showFirebaseAlert(message, type) {
+    const alertDiv = document.getElementById('firebaseAlert');
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    alertDiv.className = `firebase-alert firebase-${type}`;
+    alertDiv.style.display = 'flex';
+    
+    setTimeout(() => {
+        alertDiv.style.display = 'none';
+    }, 4000);
+}
+
+// ===== دالة تحديث الإشعارات =====
+function refreshNotifs() {
+    const icon = document.getElementById('notifRefreshIcon');
+    icon.classList.add('refreshing');
+    
+    // إعادة تحميل البيانات
+    loadWallet();
+    
+    setTimeout(() => {
+        icon.classList.remove('refreshing');
+    }, 800);
+}
+
+// ===== التهيئة عند تحميل الصفحة =====
+window.onload = async function() {
+    // تحميل قائمة البطاقات المحذوفة
+    const savedDeletedCards = localStorage.getItem('deletedCards');
+    if (savedDeletedCards) {
+        deletedCards = JSON.parse(savedDeletedCards);
+    }
+    
+    // تهيئة Firebase
+    initializeFirebase();
+    
+    // تحميل بيانات المحفظة
+    setTimeout(() => {
+        loadWallet();
+    }, 1000);
+    
+    // تحديث البيانات كل 30 ثانية (مع التصفية)
+    setInterval(() => {
+        if (checkWalletSession()) {
+            loadWallet();
+        }
+    }, 30000);
+    
+    // مراقبة تغييرات التبويب
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            // عندما يعود المستخدم للتبويب، التحقق من الجلسة
+            if (!checkWalletSession()) {
+                showFirebaseAlert('⚠️ انتهت جلسة المحفظة', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 3000);
+            }
+        }
+    });
+};
+</script>
+</body>
+</html>

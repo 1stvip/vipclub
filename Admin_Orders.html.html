@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>إدارة عمليات الإيداع - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --bg: #f8fafc;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--bg); 
+            padding: 20px; 
+            margin: 0; 
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        .stat-card i { font-size: 2rem; color: var(--primary); opacity: 0.8; }
+        .stat-info h3 { margin: 0; font-size: 1.5rem; }
+        .stat-info p { margin: 0; color: #64748b; font-size: 0.9rem; }
+
+        .header-section { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 24px; 
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .header-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+        }
+
+        .header-top h2 { margin: 0; font-weight: 800; display: flex; align-items: center; gap: 12px; }
+
+        .search-box { position: relative; width: 100%; }
+        .search-box input { 
+            width: 100%; 
+            padding: 16px 50px 16px 20px; 
+            border-radius: 16px; 
+            border: 2px solid #f1f5f9; 
+            font-size: 1rem;
+            background: #f8fafc;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+        .search-box input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        .search-box i { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+
+        .tabs-container {
+            display: flex;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: #64748b;
+            border-radius: 14px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+        .order-card { 
+            background: white; 
+            border-radius: 24px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center; 
+            gap: 20px;
+            box-shadow: var(--card-shadow);
+            transition: 0.3s;
+            border: 1px solid #f1f5f9;
+        }
+
+        .order-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+
+        .user-info-box { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 50px; height: 50px; background: #eef2ff; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; }
+
+        .order-details h4 { margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        
+        .user-id-badge {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            border: 1px solid #c7d2fe;
+            letter-spacing: 0.5px;
+        }
+
+        .order-details p { margin: 6px 0; font-size: 0.9rem; color: #64748b; }
+        .status-badge { padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; }
+
+        .receipt-preview { position: relative; cursor: zoom-in; }
+        .receipt-img { 
+            width: 100px; height: 100px; object-fit: cover; 
+            border-radius: 18px; border: 3px solid #f1f5f9;
+            transition: 0.3s;
+        }
+        .receipt-img:hover { transform: scale(1.05); border-color: var(--primary); }
+
+        .actions { display: flex; flex-direction: column; gap: 10px; }
+        .btn { 
+            border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; 
+            font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; 
+            justify-content: center; gap: 8px; transition: 0.2s;
+        }
+        .btn-approve { background: var(--success); color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
+        .btn-reject { background: #fee2e2; color: var(--danger); }
+        .btn-restore { background: #e0e7ff; color: var(--primary); }
+        .btn-delete { background: #f8fafc; color: #94a3b8; }
+        .btn:active { transform: scale(0.95); }
+
+        .empty-state { 
+            text-align: center; padding: 100px 20px; background: white; 
+            border-radius: 30px; color: #94a3b8; box-shadow: var(--card-shadow);
+        }
+
+        /* نافذة تكبير الصورة */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-image {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            animation: zoomIn 0.3s ease forwards;
+        }
+
+        @keyframes zoomIn {
+            to { transform: scale(1); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-download {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .modal-download:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .modal-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+
+        .admin-login {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            width: 90%;
+            max-width: 400px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .admin-login.active {
+            display: block;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #f1f5f9;
+            border-radius: 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .admin-navbar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: #f1f5f9;
+        }
+
+        .nav-links a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            .order-card { grid-template-columns: 1fr; text-align: center; }
+            .user-info-box { flex-direction: column; }
+            .order-details h4 { justify-content: center; flex-wrap: wrap; }
+            .actions { flex-direction: row; }
+            .btn { flex: 1; }
+            .admin-navbar { flex-direction: column; gap: 15px; }
+            .nav-links { display: flex; flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- نافذة تكبير الصورة -->
+<div id="imageModal" class="image-modal">
+    <div class="modal-close" onclick="closeImageModal()">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="modal-download" onclick="downloadImage()" title="تحميل الصورة">
+        <i class="fas fa-download"></i>
+    </div>
+    <img id="modalImage" class="modal-image" src="" alt="إيصال الدفع">
+    <div class="modal-info" id="modalInfo"></div>
+</div>
+
+<!-- شاشة تسجيل دخول الإدارة -->
+<div id="adminLogin" class="admin-login">
+    <h2 style="text-align: center; color: var(--primary);">
+        <i class="fas fa-shield-alt"></i> دخول الإدارة
+    </h2>
+    <p style="text-align: center; color: #64748b; margin-bottom: 30px;">
+        للمشرفين فقط
+    </p>
+    
+    <input type="password" id="adminPassword" class="login-input" placeholder="كلمة مرور الإدارة" autocomplete="off">
+    <button class="btn" style="background: var(--primary); color: white; width: 100%; margin-top: 15px;" onclick="checkAdminLogin()">
+        دخول
+    </button>
+    
+    <div id="loginError" style="color: var(--danger); text-align: center; margin-top: 15px; display: none;">
+        <i class="fas fa-exclamation-circle"></i> كلمة المرور غير صحيحة
+    </div>
+</div>
+
+<!-- شريط التنقل -->
+<div class="admin-navbar" id="adminNavbar" style="display: none;">
+    <h3 style="margin: 0; color: var(--primary);">
+        <i class="fas fa-crown"></i> لوحة تحكم الإيداعات
+    </h3>
+    <div class="nav-links">
+        <a href="#" class="active" onclick="showPage('deposits')">
+            <i class="fas fa-wallet"></i> الإيداعات
+        </a>
+        <a href="#" onclick="showPage('users')">
+            <i class="fas fa-users"></i> المستخدمين
+        </a>
+        <a href="#" onclick="logoutAdmin()">
+            <i class="fas fa-sign-out-alt"></i> خروج
+        </a>
+    </div>
+</div>
+
+<!-- قسم الإيداعات (الرئيسي) -->
+<div id="depositsPage" class="container" style="display: none;">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-wallet"></i>
+            <div class="stat-info">
+                <h3 id="stat-pending">0</h3>
+                <p>طلبات معلقة</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color: var(--success);">
+            <i class="fas fa-check-double" style="color: var(--success);"></i>
+            <div class="stat-info">
+                <h3 id="stat-accepted">0</h3>
+                <p>إيداعات مقبولة</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color: var(--danger);">
+            <i class="fas fa-exclamation-circle" style="color: var(--danger);"></i>
+            <div class="stat-info">
+                <h3 id="stat-rejected">0</h3>
+                <p>طلبات مرفوضة</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-section">
+        <div class="header-top">
+            <h2><i class="fas fa-shield-alt"></i> إدارة إيداعات VIP Club</h2>
+            <button class="btn" style="background:var(--dark); color:white" onclick="triggerRefresh()">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i> تحديث الطلبات
+            </button>
+        </div>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" onkeyup="renderAll()" placeholder="ابحث برقم الإيداع (DEP-)، ID المستخدم، أو الاسم...">
+        </div>
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('pending', this)">
+            <i class="fas fa-clock"></i> واردة
+        </button>
+        <button class="tab-btn" onclick="switchTab('accepted', this)">
+            <i class="fas fa-check-circle"></i> تم الشحن
+        </button>
+        <button class="tab-btn" onclick="switchTab('rejected', this)">
+            <i class="fas fa-times-circle"></i> مرفوضة
+        </button>
+    </div>
+
+    <div id="listContainer"></div>
+</div>
+
+<!-- قسم إدارة المستخدمين -->
+<div id="usersPage" class="container" style="display: none;">
+    <div class="header-section">
+        <h2><i class="fas fa-users"></i> إدارة المستخدمين</h2>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="userSearch" onkeyup="renderUsers()" placeholder="ابحث عن مستخدم بالاسم أو ID...">
+        </div>
+    </div>
+    <div id="usersContainer"></div>
+</div>
+
+<script>
+    // 🔥 تكوين Firebase (نفس التكوين في الصفحة الرئيسية)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+        authDomain: "vipclub-1d04a.firebaseapp.com",
+        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+        projectId: "vipclub-1d04a",
+        storageBucket: "vipclub-1d04a.firebasestorage.app",
+        messagingSenderId: "120667552740",
+        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    };
+
+    // تهيئة Firebase
+    let firebaseApp, database, auth;
+    let currentTab = 'pending';
+    let allOrders = [];
+    let allUsers = [];
+    let currentImageInfo = {};
+
+    function initializeFirebase() {
+        try {
+            if (!firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+            } else {
+                firebaseApp = firebase.app();
+            }
+            
+            database = firebase.database();
+            auth = firebase.auth();
+            
+            console.log('✅ Firebase Admin initialized');
+            
+        } catch (error) {
+            console.error('❌ Firebase initialization error:', error);
+        }
+    }
+
+    // ===== نافذة تكبير الصورة =====
+    function openImageModal(imageUrl, orderInfo) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalInfo = document.getElementById('modalInfo');
+        
+        modalImage.src = imageUrl;
+        currentImageInfo = orderInfo;
+        
+        // إضافة معلومات الطلب تحت الصورة
+        if (orderInfo) {
+            modalInfo.innerHTML = `
+                <div><strong>رقم الطلب:</strong> ${orderInfo.orderId || 'غير معروف'}</div>
+                <div><strong>المستخدم:</strong> ${orderInfo.nickname || orderInfo.username || 'غير معروف'}</div>
+                <div><strong>المبلغ:</strong> ${orderInfo.price || 'غير معروف'}</div>
+                <div><strong>التاريخ:</strong> ${orderInfo.time || 'غير معروف'}</div>
+            `;
+        }
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    function downloadImage() {
+        if (!currentImageInfo || !currentImageInfo.orderId) return;
+        
+        const link = document.createElement('a');
+        link.href = document.getElementById('modalImage').src;
+        link.download = `إيصال_${currentImageInfo.orderId}_${new Date().getTime()}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // إغلاق النافذة عند الضغط على ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+
+    // إغلاق النافذة عند الضغط خارج الصورة
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+        if (e.target === this || e.target.classList.contains('modal-image')) {
+            closeImageModal();
+        }
+    });
+
+    // ===== إدارة جلسة الإدارة =====
+    function checkAdminLogin() {
+        const password = document.getElementById('adminPassword').value;
+        const adminPassword = "01010100100"; // كلمة المرور الخاصة بالإدارة
+        
+        if (password === adminPassword) {
+            document.getElementById('adminLogin').classList.remove('active');
+            document.getElementById('adminNavbar').style.display = 'flex';
+            document.getElementById('depositsPage').style.display = 'block';
+            loadAllData();
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('loginError').style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    function logoutAdmin() {
+        document.getElementById('adminLogin').classList.add('active');
+        document.getElementById('adminNavbar').style.display = 'none';
+        document.getElementById('depositsPage').style.display = 'none';
+        document.getElementById('usersPage').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function showPage(page) {
+        // تحديث الروابط النشطة
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // إخفاء جميع الصفحات
+        document.getElementById('depositsPage').style.display = 'none';
+        document.getElementById('usersPage').style.display = 'none';
+        
+        // إظهار الصفحة المطلوبة
+        document.getElementById(page + 'Page').style.display = 'block';
+        
+        // تحميل بيانات الصفحة إذا لزم الأمر
+        if (page === 'deposits') {
+            loadAllData();
+        } else if (page === 'users') {
+            loadUsers();
+        }
+    }
+
+    // ===== تحميل البيانات من Firebase =====
+    async function loadAllData() {
+        try {
+            const ordersSnapshot = await database.ref('orders').once('value');
+            const usersSnapshot = await database.ref('users').once('value');
+            
+            allOrders = [];
+            allUsers = [];
+            
+            if (ordersSnapshot.exists()) {
+                const ordersData = ordersSnapshot.val();
+                for (const key in ordersData) {
+                    const order = ordersData[key];
+                    // تصفية فقط طلبات الإيداع
+                    if (order.orderId && order.orderId.startsWith('DEP-')) {
+                        allOrders.push({
+                            ...order,
+                            firebaseKey: key
+                        });
+                    }
+                }
+            }
+            
+            if (usersSnapshot.exists()) {
+                const usersData = usersSnapshot.val();
+                for (const key in usersData) {
+                    allUsers.push({
+                        ...usersData[key],
+                        firebaseKey: key
+                    });
+                }
+            }
+            
+            updateStats();
+            renderAll();
+            
+        } catch (error) {
+            console.error('Error loading data:', error);
+        }
+    }
+
+    function updateStats() {
+        const pending = allOrders.filter(o => o.status === 'قيد المراجعة').length;
+        const accepted = allOrders.filter(o => o.status === 'مقبول').length;
+        const rejected = allOrders.filter(o => o.status === 'مرفوض').length;
+        
+        document.getElementById('stat-pending').innerText = pending;
+        document.getElementById('stat-accepted').innerText = accepted;
+        document.getElementById('stat-rejected').innerText = rejected;
+    }
+
+    // ===== عرض طلبات الإيداع =====
+    function renderAll() {
+        const container = document.getElementById('listContainer');
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+        let filtered = allOrders.filter(o => 
+            o.orderId && (
+            o.orderId.toLowerCase().includes(query) || 
+            (o.userId && o.userId.toString().includes(query)) ||
+            (o.username && o.username.toLowerCase().includes(query)) ||
+            (o.nickname && o.nickname.toLowerCase().includes(query)))
+        );
+
+        // تصفية حسب الحالة
+        if (currentTab === 'pending') {
+            filtered = filtered.filter(o => o.status === 'قيد المراجعة');
+        } else if (currentTab === 'accepted') {
+            filtered = filtered.filter(o => o.status === 'مقبول');
+        } else if (currentTab === 'rejected') {
+            filtered = filtered.filter(o => o.status === 'مرفوض');
+        }
+
+        filtered.sort((a, b) => new Date(b.createdAt || b.timestamp) - new Date(a.createdAt || a.timestamp));
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-layer-group fa-3x"></i>
+                    <h3>لا توجد طلبات إيداع</h3>
+                    <p>لا توجد طلبات إيداع ${currentTab === 'pending' ? 'معلقة' : currentTab === 'accepted' ? 'مقبولة' : 'مرفوضة'} حالياً</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filtered.map(order => {
+            const user = allUsers.find(u => u.numericId == order.userId) || {};
+            const displayName = order.nickname || order.username || `مستخدم ${order.userId}`;
+            const orderTime = order.createdAt ? new Date(order.createdAt).toLocaleString('ar-EG') : (order.time || 'غير محدد');
+
+            // تحديد العملة
+            const priceStr = (order.price || '').toString().toUpperCase();
+            const productStr = (order.product || '').toUpperCase();
+            const isUsd = priceStr.includes('USD') || priceStr.includes('USDT') || priceStr.includes('$') || productStr.includes('USD');
+            const currencyLabel = isUsd ? 
+                `<span style="color: #059669; font-weight:bold;">$ دولار</span>` : 
+                `<span style="color: #4f46e5; font-weight:bold;">ج.م جنيه</span>`;
+
+            return `
+                <div class="order-card">
+                    <div class="user-info-box">
+                        <div class="user-avatar">
+                            <i class="fas fa-user${order.nickname ? '-tie' : ''}"></i>
+                        </div>
+                        <div class="order-details">
+                            <h4>
+                                ${displayName} 
+                                <span class="user-id-badge">ID: ${order.userId || 'غير معروف'}</span>
+                            </h4>
+                            <p>رقم الطلب: <b>${order.orderId}</b></p>
+                            <p><i class="far fa-clock"></i> ${orderTime}</p>
+                            <p><i class="fas fa-money-bill-wave"></i> العملة: ${currencyLabel}</p>
+                            <p><i class="fas fa-wallet"></i> المبلغ: <b style="color:var(--primary); font-size:1.15rem">${order.price}</b></p>
+                            <p>الطريقة: <b>${order.method || order.paymentMethod || 'غير محدد'}</b></p>
+                            ${order.rejectReason ? `
+                                <span class="status-badge" style="background:#fee2e2; color:var(--danger)">
+                                    سبب الرفض: ${order.rejectReason}
+                                </span>
+                            ` : ''}
+                            ${order.processedAt ? `
+                                <p><i class="fas fa-check-circle" style="color:var(--success)"></i> تمت المعالجة: ${order.processedAt}</p>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    ${order.receipt ? `
+                        <div class="receipt-preview">
+                            <img src="${order.receipt}" class="receipt-img" 
+                                 onclick="openImageModal('${order.receipt}', ${JSON.stringify({
+                                     orderId: order.orderId,
+                                     username: order.username,
+                                     nickname: order.nickname,
+                                     price: order.price,
+                                     time: orderTime
+                                 }).replace(/'/g, "\\'")})" 
+                                 title="اضغط لتكبير الإيصال">
+                        </div>
+                    ` : `
+                        <div style="text-align: center; color: #94a3b8;">
+                            <i class="fas fa-receipt fa-3x"></i>
+                            <p>لا يوجد إيصال</p>
+                        </div>
+                    `}
+
+                    <div class="actions">
+                        ${currentTab === 'pending' ? `
+                            <button class="btn btn-approve" onclick="approveOrder('${order.firebaseKey}', '${order.userId}')">
+                                <i class="fas fa-check"></i> قبول وشحن
+                            </button>
+                            <button class="btn btn-reject" onclick="rejectOrder('${order.firebaseKey}', '${order.userId}')">
+                                <i class="fas fa-times"></i> رفض
+                            </button>
+                        ` : ''}
+                        
+                        ${currentTab === 'rejected' ? `
+                            <button class="btn btn-restore" onclick="restoreOrder('${order.firebaseKey}')">
+                                <i class="fas fa-undo"></i> استعادة
+                            </button>
+                        ` : ''}
+
+                        <button class="btn btn-delete" onclick="deleteOrder('${order.firebaseKey}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ===== وظائف المعالجة =====
+    async function approveOrder(orderKey, userId) {
+        if (!confirm("تأكيد شحن الرصيد للمستخدم؟")) return;
+
+        try {
+            const orderRef = database.ref('orders/' + orderKey);
+            const orderSnapshot = await orderRef.once('value');
+            const order = orderSnapshot.val();
+            
+            if (!order) return;
+
+            // تحديد العملة والمبلغ
+            const priceStr = (order.price || '').toString().toUpperCase();
+            const productStr = (order.product || '').toUpperCase();
+            const isUsd = priceStr.includes('USD') || priceStr.includes('USDT') || priceStr.includes('$') || productStr.includes('USD');
+            const amount = parseFloat(order.price) || 0;
+            const currencyName = isUsd ? "دولار" : "جنيه مصري";
+
+            // تحديث حالة الطلب
+            await orderRef.update({
+                status: 'مقبول',
+                processedAt: new Date().toLocaleString('ar-EG'),
+                processedBy: 'الإدارة'
+            });
+
+            // العثور على المستخدم وتحديث رصيده
+            const userRef = database.ref('users').orderByChild('numericId').equalTo(parseInt(userId));
+            const userSnapshot = await userRef.once('value');
+            
+            if (userSnapshot.exists()) {
+                const users = userSnapshot.val();
+                const userKey = Object.keys(users)[0];
+                const user = users[userKey];
+                
+                // تحديث الرصيد
+                const updates = {};
+                if (isUsd) {
+                    const currentUSD = parseFloat(user.balanceUSD) || 0;
+                    updates['balanceUSD'] = (currentUSD + amount).toFixed(2);
+                } else {
+                    const currentEGP = parseFloat(user.balanceEGP) || 0;
+                    updates['balanceEGP'] = (currentEGP + amount).toFixed(2);
+                }
+                
+                await database.ref('users/' + userKey).update(updates);
+
+                // إضافة إشعار للمستخدم
+                const notification = {
+                    id: Date.now(),
+                    text: `✅ تم قبول إيداعك بمبلغ ${amount} ${currencyName} وشحن رصيدك بنجاح.`,
+                    date: new Date().toLocaleString('ar-EG'),
+                    read: false,
+                    type: 'deposit_approved',
+                    createdAt: new Date().toISOString()
+                };
+
+                await database.ref('users/' + userKey + '/notifications').push(notification);
+            }
+
+            // إعادة تحميل البيانات
+            await loadAllData();
+            
+            alert('✅ تم قبول الطلب وشحن الرصيد بنجاح');
+
+        } catch (error) {
+            console.error('Error approving order:', error);
+            alert('❌ حدث خطأ أثناء معالجة الطلب');
+        }
+    }
+
+    async function rejectOrder(orderKey, userId) {
+        const reason = prompt("سبب الرفض:");
+        if (reason === null || reason.trim() === '') return;
+
+        try {
+            const orderRef = database.ref('orders/' + orderKey);
+            
+            // تحديث حالة الطلب
+            await orderRef.update({
+                status: 'مرفوض',
+                rejectReason: reason,
+                processedAt: new Date().toLocaleString('ar-EG'),
+                processedBy: 'الإدارة'
+            });
+
+            // إرسال إشعار للمستخدم
+            const userRef = database.ref('users').orderByChild('numericId').equalTo(parseInt(userId));
+            const userSnapshot = await userRef.once('value');
+            
+            if (userSnapshot.exists()) {
+                const users = userSnapshot.val();
+                const userKey = Object.keys(users)[0];
+                
+                const notification = {
+                    id: Date.now(),
+                    text: `❌ تم رفض طلب الإيداع. السبب: ${reason}`,
+                    date: new Date().toLocaleString('ar-EG'),
+                    read: false,
+                    type: 'deposit_rejected',
+                    createdAt: new Date().toISOString()
+                };
+
+                await database.ref('users/' + userKey + '/notifications').push(notification);
+            }
+
+            // إعادة تحميل البيانات
+            await loadAllData();
+            
+            alert('✅ تم رفض الطلب وإرسال الإشعار للمستخدم');
+
+        } catch (error) {
+            console.error('Error rejecting order:', error);
+            alert('❌ حدث خطأ أثناء رفض الطلب');
+        }
+    }
+
+    async function restoreOrder(orderKey) {
+        if (!confirm("إعادة هذا الطلب إلى قائمة الواردة؟")) return;
+
+        try {
+            const orderRef = database.ref('orders/' + orderKey);
+            await orderRef.update({
+                status: 'قيد المراجعة',
+                rejectReason: null,
+                processedAt: null,
+                processedBy: null
+            });
+
+            await loadAllData();
+            
+        } catch (error) {
+            console.error('Error restoring order:', error);
+        }
+    }
+
+    async function deleteOrder(orderKey) {
+        if (!confirm("حذف هذا الطلب نهائياً؟")) return;
+
+        try {
+            await database.ref('orders/' + orderKey).remove();
+            await loadAllData();
+            
+        } catch (error) {
+            console.error('Error deleting order:', error);
+        }
+    }
+
+    function switchTab(tab, btn) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderAll();
+    }
+
+    function triggerRefresh() {
+        const icon = document.getElementById('refreshIcon');
+        icon.classList.add('fa-spin');
+        setTimeout(async () => {
+            await loadAllData();
+            icon.classList.remove('fa-spin');
+        }, 800);
+    }
+
+    // ===== إدارة المستخدمين =====
+    async function loadUsers() {
+        try {
+            const usersSnapshot = await database.ref('users').once('value');
+            allUsers = [];
+            
+            if (usersSnapshot.exists()) {
+                const usersData = usersSnapshot.val();
+                for (const key in usersData) {
+                    allUsers.push({
+                        ...usersData[key],
+                        firebaseKey: key
+                    });
+                }
+            }
+            
+            renderUsers();
+            
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+    }
+
+    function renderUsers() {
+        const container = document.getElementById('usersContainer');
+        const query = document.getElementById('userSearch')?.value.toLowerCase().trim() || '';
+        
+        let filtered = allUsers.filter(user => 
+            (user.username && user.username.toLowerCase().includes(query)) ||
+            (user.nickname && user.nickname.toLowerCase().includes(query)) ||
+            (user.numericId && user.numericId.toString().includes(query)) ||
+            (user.id && user.id.toString().includes(query))
+        );
+        
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-users fa-3x"></i>
+                    <h3>لا يوجد مستخدمين</h3>
+                    <p>لم يتم العثور على مستخدمين مطابقين للبحث</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = filtered.map(user => {
+            const created = user.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-EG') : 'غير محدد';
+            const balanceEGP = parseFloat(user.balanceEGP || 0).toFixed(2);
+            const balanceUSD = parseFloat(user.balanceUSD || 0).toFixed(2);
+            
+            return `
+                <div class="order-card">
+                    <div class="user-info-box">
+                        <div class="user-avatar" style="background: ${user.isBanned ? '#fee2e2' : '#eef2ff'}; color: ${user.isBanned ? '#ef4444' : '#4f46e5'}">
+                            <i class="fas fa-user${user.isBanned ? '-slash' : ''}"></i>
+                        </div>
+                        <div class="order-details">
+                            <h4>
+                                ${user.nickname || user.username || 'مستخدم بدون اسم'}
+                                ${user.isBanned ? '<span class="status-badge" style="background:#fee2e2; color:#ef4444">محظور</span>' : ''}
+                            </h4>
+                            <p><i class="fas fa-hashtag"></i> ID: <b class="user-id-badge">${user.numericId || user.id}</b></p>
+                            <p><i class="fas fa-wallet"></i> رصيد EGP: <b style="color:var(--primary)">${balanceEGP} ج.م</b></p>
+                            <p><i class="fas fa-dollar-sign"></i> رصيد USD: <b style="color:var(--success)">${balanceUSD} $</b></p>
+                            <p><i class="far fa-calendar"></i> تاريخ التسجيل: ${created}</p>
+                            ${user.isBanned && user.banReason ? `
+                                <p><i class="fas fa-ban"></i> سبب الحظر: ${user.banReason}</p>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <p>إجمالي الطلبات: <b>${allOrders.filter(o => o.userId == (user.numericId || user.id)).length}</b></p>
+                    </div>
+                    
+                    <div class="actions">
+                        <button class="btn ${user.isBanned ? 'btn-restore' : 'btn-reject'}" 
+                                onclick="toggleBanUser('${user.firebaseKey}', ${!user.isBanned})">
+                            <i class="fas fa-${user.isBanned ? 'check' : 'ban'}"></i>
+                            ${user.isBanned ? 'إلغاء الحظر' : 'حظر المستخدم'}
+                        </button>
+                        <button class="btn btn-delete" onclick="deleteUser('${user.firebaseKey}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function toggleBanUser(userKey, ban) {
+        const reason = ban ? prompt("سبب الحظر:") : '';
+        if (ban && (reason === null || reason.trim() === '')) return;
+        
+        try {
+            const updates = {
+                isBanned: ban,
+                banReason: ban ? reason : '',
+                banExpiry: ban ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : ''
+            };
+            
+            await database.ref('users/' + userKey).update(updates);
+            
+            // إرسال إشعار للمستخدم
+            if (ban) {
+                const notification = {
+                    id: Date.now(),
+                    text: `🚫 تم حظر حسابك من قبل الإدارة. السبب: ${reason}`,
+                    date: new Date().toLocaleString('ar-EG'),
+                    read: false,
+                    type: 'ban',
+                    createdAt: new Date().toISOString()
+                };
+                
+                await database.ref('users/' + userKey + '/notifications').push(notification);
+            }
+            
+            await loadUsers();
+            alert(ban ? '✅ تم حظر المستخدم' : '✅ تم إلغاء حظر المستخدم');
+            
+        } catch (error) {
+            console.error('Error toggling ban:', error);
+            alert('❌ حدث خطأ أثناء التحديث');
+        }
+    }
+
+    async function deleteUser(userKey) {
+        if (!confirm("حذف هذا المستخدم وكل بياناته نهائياً؟")) return;
+        
+        try {
+            // حذف المستخدم
+            await database.ref('users/' + userKey).remove();
+            
+            // حذف طلبات المستخدم
+            const ordersSnapshot = await database.ref('orders').once('value');
+            if (ordersSnapshot.exists()) {
+                const ordersData = ordersSnapshot.val();
+                const updates = {};
+                
+                for (const key in ordersData) {
+                    const order = ordersData[key];
+                    if (order.userId) {
+                        const user = allUsers.find(u => u.firebaseKey === userKey);
+                        if (user && order.userId == (user.numericId || user.id)) {
+                            updates[key] = null;
+                        }
+                    }
+                }
+                
+                if (Object.keys(updates).length > 0) {
+                    await database.ref('orders').update(updates);
+                }
+            }
+            
+            await loadUsers();
+            alert('✅ تم حذف المستخدم وبياناته');
+            
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('❌ حدث خطأ أثناء الحذف');
+        }
+    }
+
+    // ===== التهيئة عند تحميل الصفحة =====
+    window.onload = function() {
+        initializeFirebase();
+        document.getElementById('adminLogin').classList.add('active');
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>ملفي الشخصي - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --success: #10b981;
+            --danger: #ef4444; 
+            --dark: #1e293b; 
+            --bg: #f1f5f9; 
+            --gold-gradient: linear-gradient(135deg, #ffd700, #ffae00);
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            background: var(--bg); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        
+        .header { 
+            width: 100%; 
+            background: white; 
+            padding: 15px 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-sizing: border-box; 
+        }
+        
+        .back-btn { 
+            text-decoration: none; 
+            color: var(--dark); 
+            font-size: 1.2rem; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 50%; 
+            transition: 0.3s; 
+        }
+        
+        .back-btn:hover { 
+            background: #f0f0f0; 
+        }
+
+        .profile-card { 
+            width: 90%; 
+            max-width: 450px; 
+            background: white; 
+            margin: 30px 0; 
+            border-radius: 25px; 
+            padding: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            text-align: center; 
+            box-sizing: border-box; 
+        }
+        
+        .profile-avatar { 
+            font-size: 5rem; 
+            color: var(--primary); 
+            margin-bottom: 10px; 
+        }
+        
+        .user-name { 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            color: var(--dark); 
+            margin: 10px 0; 
+        }
+        
+        .id-badge { 
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6); 
+            padding: 10px 20px; 
+            border-radius: 15px; 
+            font-size: 1rem; 
+            color: white; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            font-family: 'Courier New', monospace; 
+            font-weight: bold; 
+            letter-spacing: 2px; 
+        }
+
+        .balance-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+        }
+        
+        .balance-box { 
+            background: #f8fafc; 
+            padding: 15px; 
+            border-radius: 15px; 
+            border: 1px solid #e2e8f0; 
+            transition: 0.3s; 
+        }
+        
+        .balance-box:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+        }
+        
+        .balance-amount { 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            margin-top: 5px; 
+        }
+        
+        .egp { 
+            color: var(--success); 
+        } 
+        
+        .usd { 
+            color: var(--primary); 
+        }
+
+        .btn { 
+            width: 100%; 
+            max-width: 300px; 
+            padding: 14px; 
+            border-radius: 50px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            margin: 10px auto; 
+            text-decoration: none; 
+        }
+        
+        .btn-deposit { 
+            background: var(--gold-gradient); 
+            color: #1a1a1a; 
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); 
+        }
+        
+        .btn-deposit:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4); 
+        }
+        
+        .btn-logout { 
+            background: #fee2e2; 
+            color: var(--danger); 
+        }
+        
+        .btn-logout:hover { 
+            background: #fecaca; 
+        }
+
+        /* المودالات */
+        .modal { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 380px; 
+            max-width: 90%; 
+            background: white; 
+            border-radius: 25px; 
+            padding: 25px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            display: none; 
+            flex-direction: column; 
+            z-index: 1001; 
+            box-sizing: border-box; 
+        }
+        
+        .modal.active { 
+            display: flex; 
+            animation: popIn 0.3s ease; 
+        }
+        
+        @keyframes popIn { 
+            from { 
+                opacity:0; 
+                transform: translate(-50%, -45%) scale(0.9); 
+            } 
+            to { 
+                opacity:1; 
+                transform: translate(-50%, -50%) scale(1); 
+            } 
+        }
+        
+        .overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(4px); 
+            display: none; 
+            z-index: 1000; 
+        }
+        
+        select, input { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px solid #ddd; 
+            margin-top: 8px; 
+            margin-bottom: 15px; 
+            box-sizing: border-box; 
+            font-family: inherit; 
+        }
+        
+        .info-box { 
+            background: #fffbeb; 
+            border: 1px solid #fef3c7; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            font-size: 0.9rem; 
+        }
+        
+        .copy-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #f1f5f9; 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-top: 5px; 
+            border: 1px dashed var(--primary); 
+        }
+        
+        /* رسائل Firebase */
+        .firebase-alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            z-index: 1002;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-width: 400px;
+        }
+        
+        .firebase-success {
+            background: #10b981;
+            color: white;
+            border-left: 4px solid #059669;
+        }
+        
+        .firebase-error {
+            background: #ef4444;
+            color: white;
+            border-left: 4px solid #dc2626;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* تحذير عدم الاتصال */
+        .offline-warning {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid #fde68a;
+            font-size: 0.9rem;
+        }
+        
+        /* مؤشر التحميل */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="overlay" onclick="closeAll()"></div>
+    
+    <!-- رسائل Firebase -->
+    <div id="firebaseAlert" class="firebase-alert" style="display: none;"></div>
+
+    <!-- مودال اختيار العملة -->
+    <div class="modal" id="currencyModal">
+        <h3 style="text-align:center; margin-top:0;">إيداع رصيد</h3>
+        <p style="text-align:center; color:#666;">اختر العملة المراد شحنها:</p>
+        <button class="btn" style="background:var(--primary); color:white;" onclick="openTopUp('EGP')">الجنيه المصري (EGP)</button>
+        <button class="btn" style="background:var(--success); color:white;" onclick="openTopUp('USD')">الدولار الأمريكي (USD)</button>
+        <button class="btn" style="background:#eee;" onclick="closeAll()">إلغاء</button>
+    </div>
+
+    <!-- مودال الشحن -->
+    <div class="modal" id="topUpModal">
+        <h3 id="topUpTitle" style="margin-top:0;">شحن رصيد</h3>
+        
+        <label>طريقة الدفع:</label>
+        <select id="paymentMethod" onchange="updatePaymentDetails()"></select>
+
+        <label id="amountLabel">المبلغ:</label>
+        <input type="number" id="topUpAmount" placeholder="أدخل المبلغ هنا">
+
+        <div id="paymentDetails" class="info-box">
+            <span id="methodHint"></span>
+            <div class="copy-row" id="walletRow">
+                <b id="walletNumber">01022797043</b>
+                <button onclick="copyText('walletNumber')" style="background:var(--primary); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">نسخ</button>
+            </div>
+            <div id="binanceRow" style="display:none; line-height:1.8;">
+                ID: <b id="binanceID">803045359</b> <button onclick="copyText('binanceID')" style="background:var(--primary); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-left:5px;">نسخ</button><br>
+                الاسم: <b>iMrJoe</b>
+            </div>
+        </div>
+
+        <label>إيصال التحويل (صورة):</label>
+        <input type="file" id="topUpReceipt" accept="image/*">
+
+        <button class="btn btn-deposit" style="max-width:100%" onclick="submitTopUp()">إرسال الطلب للمراجعة</button>
+        <button class="btn" style="background:#eee; max-width:100%" onclick="closeAll()">تراجع</button>
+    </div>
+
+    <!-- الهيدر -->
+    <div class="header">
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+        <div style="font-weight:bold;">حسابي</div>
+        <div style="width:40px;"></div>
+    </div>
+
+    <!-- البطاقة الرئيسية -->
+    <div class="profile-card">
+        <i class="fas fa-user-circle profile-avatar"></i>
+        <div class="user-name" id="p_name">جاري تحميل...</div>
+        <div class="id-badge">
+            ID: <b id="p_id">000000</b>
+            <i class="fas fa-copy" style="cursor:pointer; color:white" onclick="copyText('p_id')" title="نسخ المعرف"></i>
+        </div>
+        
+        <!-- تحذير إذا كان هناك مشكلة في Firebase -->
+        <div id="firebaseWarning" class="offline-warning" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="warningText"></span>
+        </div>
+
+        <div class="balance-grid">
+            <div class="balance-box">
+                <div style="font-size:0.8rem; color:#666;">رصيد EGP</div>
+                <div class="balance-amount egp"><span id="p_egp">0</span> ج.م</div>
+            </div>
+            <div class="balance-box">
+                <div style="font-size:0.8rem; color:#666;">رصيد USD</div>
+                <div class="balance-amount usd"><span id="p_usd">0</span> $</div>
+            </div>
+        </div>
+
+        <button class="btn btn-deposit" onclick="openCurrencyModal()">
+            <i class="fas fa-plus-circle"></i> إيداع رصيد جديد
+        </button>
+        <button class="btn btn-logout" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+        </button>
+    </div>
+
+    <script>
+        // 🔥 تكوين Firebase (نفس تكوين الصفحة الرئيسية)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+            authDomain: "vipclub-1d04a.firebaseapp.com",
+            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+            projectId: "vipclub-1d04a",
+            storageBucket: "vipclub-1d04a.firebasestorage.app",
+            messagingSenderId: "120667552740",
+            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        };
+
+        // تهيئة Firebase
+        let firebaseApp, database, auth;
+        let selectedCurrency = 'EGP';
+        let currentUserData = null;
+        let isFirebaseConnected = false;
+
+        // ===== دالة عرض رسائل Firebase =====
+        function showFirebaseAlert(message, type) {
+            const alertDiv = document.getElementById('firebaseAlert');
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            alertDiv.className = `firebase-alert firebase-${type}`;
+            alertDiv.style.display = 'flex';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 4000);
+        }
+
+        // ===== دالة التحقق من تسجيل الدخول (المعدلة) =====
+        function checkLogin() {
+            const userData = getCurrentUserFromStorage();
+            
+            if (!userData) {
+                // لا يوجد بيانات في localStorage
+                console.log('❌ No user data in localStorage');
+                window.location.href = 'Login.html';
+                return false;
+            }
+            
+            console.log('✅ User found in localStorage:', userData.username);
+            
+            // عرض البيانات المحلية فوراً
+            displayLocalUserData(userData);
+            
+            return true;
+        }
+
+        // ===== دالة عرض البيانات من localStorage (فورية) =====
+        function displayLocalUserData(userData) {
+            document.getElementById('p_name').innerText = userData.nickname || userData.username || 'مستخدم';
+            document.getElementById('p_id').innerText = formatNumericId(userData.numericId);
+            document.getElementById('p_egp').innerText = userData.balanceEGP || "0";
+            document.getElementById('p_usd').innerText = userData.balanceUSD || "0";
+            
+            // حفظ البيانات للاستخدام لاحقاً
+            currentUserData = userData;
+        }
+
+        // ===== دالة التهيئة المعدلة =====
+        function initializeFirebase() {
+            try {
+                if (!firebase.apps.length) {
+                    firebaseApp = firebase.initializeApp(firebaseConfig);
+                } else {
+                    firebaseApp = firebase.app();
+                }
+                
+                database = firebase.database();
+                auth = firebase.auth();
+                
+                console.log('✅ Firebase initialized successfully');
+                isFirebaseConnected = true;
+                
+                // محاولة ربط المستخدم بـ Firebase Auth تلقائياً
+                attemptFirebaseLogin();
+                
+                // الآن جلب البيانات من Firebase (إذا كانت متاحة)
+                loadFirebaseData();
+                
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                showWarning('يتم عرض البيانات المحلية فقط', 'info');
+            }
+        }
+
+        // ===== محاولة تسجيل الدخول تلقائياً إلى Firebase =====
+        async function attemptFirebaseLogin() {
+            const userData = getCurrentUserFromStorage();
+            if (!userData || !userData.email) return;
+            
+            try {
+                // محاولة تسجيل الدخول باستخدام البريد الإلكتروني وكلمة المرور
+                if (userData.email && userData.password) {
+                    await auth.signInWithEmailAndPassword(userData.email, userData.password);
+                    console.log('✅ Auto-login to Firebase successful');
+                }
+            } catch (error) {
+                console.log('⚠️ Auto-login failed, continuing with local data:', error.message);
+                // لا تظهر رسالة خطأ للمستخدم، فقط تابع مع البيانات المحلية
+            }
+        }
+
+        // ===== دالة جلب البيانات من Firebase (غير متزامنة) =====
+        async function loadFirebaseData() {
+            if (!isFirebaseConnected || !database) {
+                console.log('⚠️ Firebase not connected, using local data only');
+                return;
+            }
+            
+            const userData = getCurrentUserFromStorage();
+            if (!userData) return;
+            
+            try {
+                // الحصول على ID الرقمي
+                const numericId = userData.numericId || getOrCreateNumericId(userData);
+                
+                // البحث عن المستخدم في Firebase
+                const userRef = database.ref('users').orderByChild('numericId').equalTo(numericId);
+                const snapshot = await userRef.once('value');
+                
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    const userId = Object.keys(users)[0];
+                    const firebaseUserData = users[userId];
+                    
+                    // دمج البيانات المحلية مع بيانات Firebase
+                    currentUserData = {
+                        ...userData,
+                        ...firebaseUserData,
+                        numericId: numericId,
+                        firebaseKey: userId,
+                        id: userId
+                    };
+                    
+                    // تحديث LocalStorage بالبيانات المدمجة
+                    localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+                    
+                    // تحديث واجهة المستخدم بالبيانات المحدثة
+                    updateProfileUI();
+                    
+                    console.log('✅ Firebase data loaded and merged');
+                    
+                } else {
+                    console.log('⚠️ User not found in Firebase, using local data');
+                    showWarning('البيانات تعرض من النسخة المحلية', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Error loading Firebase data:', error);
+                showWarning('لا يمكن الاتصال بالسيرفر، يتم عرض البيانات المحلية', 'warning');
+            }
+        }
+
+        // ===== دالة إنشاء ID رقمي =====
+        function getOrCreateNumericId(user) {
+            if (user.numericId) {
+                return user.numericId;
+            }
+            
+            // إنشاء ID مكون من 6 أرقام
+            const newNumericId = Math.floor(100000 + Math.random() * 900000);
+            user.numericId = newNumericId;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            return newNumericId;
+        }
+
+        // ===== دالة تنسيق ID للعرض =====
+        function formatNumericId(id) {
+            if (!id) return "000000";
+            const numId = parseInt(id);
+            if (isNaN(numId)) return "000000";
+            return numId.toString().padStart(6, '0');
+        }
+
+        // ===== دالة مساعدة =====
+        function getCurrentUserFromStorage() {
+            try {
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                if (!user || !user.id) {
+                    // حاول جلب البيانات من التخزين القديم
+                    const oldUserData = JSON.parse(localStorage.getItem('userData'));
+                    if (oldUserData) {
+                        // تحويل البيانات القديمة للصيغة الجديدة
+                        const newUserData = {
+                            id: oldUserData.id,
+                            username: oldUserData.username,
+                            nickname: oldUserData.nickname || oldUserData.username,
+                            password: oldUserData.password,
+                            balanceEGP: oldUserData.balanceEGP || "0",
+                            balanceUSD: oldUserData.balanceUSD || "0"
+                        };
+                        localStorage.setItem('currentUser', JSON.stringify(newUserData));
+                        return newUserData;
+                    }
+                    return null;
+                }
+                return user;
+            } catch (error) {
+                console.error('Error getting user from storage:', error);
+                return null;
+            }
+        }
+
+        // ===== دالة تحديث واجهة الملف الشخصي =====
+        function updateProfileUI() {
+            if (!currentUserData) return;
+            
+            document.getElementById('p_name').innerText = currentUserData.nickname || currentUserData.username || 'مستخدم';
+            document.getElementById('p_id').innerText = formatNumericId(currentUserData.numericId);
+            document.getElementById('p_egp').innerText = currentUserData.balanceEGP || "0";
+            document.getElementById('p_usd').innerText = currentUserData.balanceUSD || "0";
+        }
+
+        // ===== دالة عرض التحذيرات =====
+        function showWarning(message, type = 'warning') {
+            const warningDiv = document.getElementById('firebaseWarning');
+            const warningText = document.getElementById('warningText');
+            
+            warningText.innerHTML = `<span class="loading-spinner"></span> ${message}`;
+            warningDiv.style.display = 'block';
+            
+            // تغيير اللون حسب النوع
+            if (type === 'error') {
+                warningDiv.style.background = '#fee2e2';
+                warningDiv.style.color = '#dc2626';
+                warningDiv.style.borderColor = '#fecaca';
+            } else if (type === 'info') {
+                warningDiv.style.background = '#dbeafe';
+                warningDiv.style.color = '#1e40af';
+                warningDiv.style.borderColor = '#bfdbfe';
+            }
+            
+            // إخفاء التحذير بعد 5 ثواني
+            setTimeout(() => {
+                warningDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // ===== دوال المودالات =====
+        function openCurrencyModal() {
+            document.getElementById('currencyModal').classList.add('active');
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function openTopUp(curr) {
+            selectedCurrency = curr;
+            closeAll();
+            document.getElementById('topUpModal').classList.add('active');
+            document.getElementById('overlay').style.display = 'block';
+            
+            const methodSelect = document.getElementById('paymentMethod');
+            methodSelect.innerHTML = '';
+            
+            if(curr === 'USD') {
+                document.getElementById('topUpTitle').innerText = "شحن دولار (USD)";
+                const opts = [
+                    {v:'binance', t:'Binance Pay'},
+                    {v:'vodafone', t:'فودافون كاش (سعر الصرف)'}
+                ];
+                opts.forEach(o => { 
+                    let el = document.createElement('option'); 
+                    el.value = o.v; 
+                    el.innerText = o.t; 
+                    methodSelect.appendChild(el); 
+                });
+            } else {
+                document.getElementById('topUpTitle').innerText = "شحن جنيه (EGP)";
+                const opts = [
+                    {v:'vodafone', t:'فودافون كاش'},
+                    {v:'instapay', t:'إنستا باي'}
+                ];
+                opts.forEach(o => { 
+                    let el = document.createElement('option'); 
+                    el.value = o.v; 
+                    el.innerText = o.t; 
+                    methodSelect.appendChild(el); 
+                });
+            }
+            updatePaymentDetails();
+        }
+
+        function updatePaymentDetails() {
+            const method = document.getElementById('paymentMethod').value;
+            document.getElementById('walletRow').style.display = (method === 'binance') ? 'none' : 'flex';
+            document.getElementById('binanceRow').style.display = (method === 'binance') ? 'block' : 'none';
+            document.getElementById('methodHint').innerText = (method === 'binance') ? "بيانات Binance Pay:" : "حول للرقم التالي:";
+        }
+
+        // ===== دالة إرسال طلب الإيداع (مع دعم وضع عدم الاتصال) =====
+        async function submitTopUp() {
+            const amount = document.getElementById('topUpAmount').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const fileInput = document.getElementById('topUpReceipt');
+            
+            if (!amount || amount <= 0) {
+                showFirebaseAlert("أدخل مبلغاً صحيحاً", 'error');
+                return;
+            }
+            
+            if (fileInput.files.length === 0) {
+                showFirebaseAlert("يرجى رفع صورة الإيصال", 'error');
+                return;
+            }
+            
+            if (!currentUserData) {
+                showFirebaseAlert("يجب تسجيل الدخول أولاً", 'error');
+                window.location.href = 'Login.html';
+                return;
+            }
+            
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const orderId = "DEP-" + Date.now();
+                    
+                    // اسم وسيلة الدفع
+                    const methodNames = {
+                        'vodafone': 'فودافون كاش',
+                        'instapay': 'إنستا باي',
+                        'binance': 'Binance Pay'
+                    };
+                    const methodName = methodNames[paymentMethod] || paymentMethod;
+                    
+                    if (isFirebaseConnected && database) {
+                        // حفظ طلب الإيداع في Firebase
+                        const orderData = {
+                            orderId: orderId,
+                            userId: currentUserData.numericId,
+                            username: currentUserData.username,
+                            nickname: currentUserData.nickname || currentUserData.username,
+                            product: `إيداع ${selectedCurrency} عبر ${methodName}`,
+                            price: `${amount} ${selectedCurrency}`,
+                            paymentMethod: paymentMethod,
+                            method: methodName,
+                            currency: selectedCurrency,
+                            receipt: e.target.result,
+                            status: 'قيد المراجعة',
+                            type: 'deposit',
+                            createdAt: new Date().toISOString(),
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        };
+                        
+                        await database.ref('orders').push(orderData);
+                        
+                        // إضافة إشعار للمستخدم
+                        const notification = {
+                            id: Date.now(),
+                            text: `⏳ تم استلام إيصال الإيداع عبر ${methodName}. معرف الطلب: ${orderId}. برجاء الانتظار لحين اكتمال الطلب من قبل الإدارة.`,
+                            read: false,
+                            date: new Date().toLocaleString('ar-EG'),
+                            type: 'deposit',
+                            createdAt: new Date().toISOString()
+                        };
+                        
+                        if (currentUserData.firebaseKey) {
+                            await database.ref('users/' + currentUserData.firebaseKey + '/notifications').push(notification);
+                        }
+                        
+                        showFirebaseAlert(`✅ تم إرسال طلب الشحن عبر ${methodName} بنجاح`, 'success');
+                        
+                    } else {
+                        // حفظ محلي إذا لم يكن هناك اتصال بـ Firebase
+                        const localOrder = {
+                            orderId: orderId,
+                            userId: currentUserData.id,
+                            amount: amount,
+                            currency: selectedCurrency,
+                            method: methodName,
+                            receipt: e.target.result,
+                            timestamp: new Date().toLocaleString('ar-EG'),
+                            status: 'قيد المراجعة (محلي)'
+                        };
+                        
+                        let localOrders = JSON.parse(localStorage.getItem('localOrders')) || [];
+                        localOrders.push(localOrder);
+                        localStorage.setItem('localOrders', JSON.stringify(localOrders));
+                        
+                        showFirebaseAlert(`⚠️ تم حفظ الطلب محلياً. سيتم إرساله عند الاتصال بالسيرفر.`, 'warning');
+                    }
+                    
+                    closeAll();
+                    
+                    // تنظيف الحقول
+                    document.getElementById('topUpAmount').value = '';
+                    document.getElementById('topUpReceipt').value = '';
+                    
+                };
+                
+                reader.readAsDataURL(fileInput.files[0]);
+                
+            } catch (error) {
+                console.error('Top-up error:', error);
+                showFirebaseAlert("❌ حدث خطأ أثناء إرسال الطلب", 'error');
+            }
+        }
+
+        // ===== دوال مساعدة =====
+        function closeAll() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showFirebaseAlert("تم نسخ النص: " + text, 'success');
+            });
+        }
+
+        // ===== دالة تسجيل الخروج (المعدلة) =====
+        async function logout() {
+            if (confirm("هل تريد تسجيل الخروج؟")) {
+                try {
+                    if (auth && isFirebaseConnected) {
+                        await auth.signOut();
+                    }
+                    
+                    // تنظيف كافة بيانات المستخدم
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('userData');
+                    
+                    window.location.href = 'Login.html';
+                    
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    
+                    // إذا فشل تسجيل الخروج من Firebase، قم بتنظيف البيانات المحلية فقط
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('userData');
+                    
+                    window.location.href = 'Login.html';
+                }
+            }
+        }
+
+        // ===== التهيئة عند تحميل الصفحة =====
+        window.onload = function() {
+            // الخطوة 1: التحقق من تسجيل الدخول أولاً (من localStorage)
+            const isLoggedIn = checkLogin();
+            
+            if (isLoggedIn) {
+                // الخطوة 2: تهيئة Firebase (غير متزامنة)
+                setTimeout(() => {
+                    initializeFirebase();
+                }, 100);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>الدعم الفني - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root {
+            --whatsapp-dark: #0c1317;
+            --whatsapp-dark-2: #111b21;
+            --whatsapp-dark-3: #202c33;
+            --whatsapp-dark-4: #2a3942;
+            --whatsapp-green: #005c4b;
+            --whatsapp-green-light: #008069;
+            --whatsapp-blue: #53bdeb;
+            --text-primary: #e9edef;
+            --text-secondary: #8696a0;
+            --text-muted: #667781;
+            --border-color: #303d45;
+            --online: #00a884;
+            --away: #ffb347;
+            --offline: #8696a0;
+            --danger: #f15c6d;
+            --warning: #ffb347;
+            --success: #00a884;
+        }
+
+        body, html { 
+            height: 100%; 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
+            background-color: var(--whatsapp-dark);
+            color: var(--text-primary);
+        }
+
+        .chat-container { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: var(--whatsapp-dark-2); 
+            position: relative; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .chat-header { 
+            background: var(--whatsapp-dark-3); 
+            color: var(--text-primary); 
+            padding: 15px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            z-index: 10; 
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header-main { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        
+        .header-actions { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+        }
+        
+        .esc-container { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px; 
+        }
+        
+        .action-btn { 
+            background: var(--whatsapp-dark-4); 
+            border: 1px solid var(--border-color); 
+            color: var(--text-primary); 
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            transition: all 0.3s; 
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .action-btn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            background: var(--whatsapp-dark-3);
+        }
+        
+        #escTimer { 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            color: var(--text-primary); 
+            background: var(--whatsapp-dark-4); 
+            padding: 4px 12px; 
+            border-radius: 12px; 
+            min-width: 60px; 
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .escalation-countdown {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .esc-time {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--warning);
+        }
+        
+        .esc-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .messages-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-color: var(--whatsapp-dark-2);
+            background-blend-mode: overlay;
+        }
+        
+        .messages-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .messages-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .messages-area::-webkit-scrollbar-thumb {
+            background: var(--whatsapp-dark-4);
+            border-radius: 3px;
+        }
+
+        .msg-wrapper { 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 8px; 
+            max-width: 80%; 
+            position: relative; 
+            margin-bottom: 5px; 
+        }
+        
+        .user-wrap { 
+            align-self: flex-end; 
+            flex-direction: row-reverse;
+        }
+        
+        .admin-wrap { 
+            align-self: flex-start; 
+            flex-direction: row;
+        }
+
+        .message { 
+            padding: 10px 14px; 
+            border-radius: 12px; 
+            font-size: 0.95rem; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
+            position: relative; 
+            z-index: 2; 
+            word-wrap: break-word; 
+            line-height: 1.4;
+        }
+        
+        .msg-user { 
+            background: var(--whatsapp-green); 
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .msg-admin { 
+            background: var(--whatsapp-dark-4); 
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .msg-footer { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-top: 4px; 
+            gap: 10px; 
+        }
+        
+        .msg-time { 
+            font-size: 0.7rem; 
+            color: rgba(255,255,255,0.6); 
+            white-space: nowrap; 
+        }
+        
+        .msg-status-tag { 
+            font-size: 0.65rem; 
+            color: rgba(255,255,255,0.6); 
+            font-style: italic; 
+            margin-left: 5px;
+        }
+        
+        .read-icon { 
+            color: var(--whatsapp-blue) !important; 
+            font-size: 0.75rem !important;
+            margin-right: 3px !important;
+            animation: readFade 0.3s ease;
+        }
+        
+        .unread-icon {
+            color: var(--text-secondary) !important;
+            font-size: 0.75rem !important;
+            margin-right: 3px !important;
+        }
+        
+        @keyframes readFade {
+            from { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            to { transform: scale(1); }
+        }
+        
+        .msg-admin .read-icon,
+        .msg-admin .unread-icon {
+            display: none !important;
+        }
+
+        .dots-btn { 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            padding: 8px; 
+            visibility: hidden; 
+            transition: all 0.2s; 
+            font-size: 1rem;
+            background: var(--whatsapp-dark-3);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+        }
+        
+        .msg-wrapper:hover .dots-btn { 
+            visibility: visible; 
+            opacity: 1;
+        }
+        
+        .dots-btn:hover {
+            background: var(--whatsapp-dark-4);
+            color: var(--whatsapp-blue);
+        }
+
+        .msg-options-menu {
+            position: fixed;
+            background: var(--whatsapp-dark-4);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            z-index: 1000;
+            min-width: 160px;
+            overflow: hidden;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+        
+        .msg-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+        
+        .msg-option:hover {
+            background: var(--whatsapp-dark-3);
+        }
+        
+        .msg-option.edit { color: var(--warning); }
+        .msg-option.delete { color: var(--danger); }
+
+        .chat-input-area { 
+            background: var(--whatsapp-dark-3); 
+            padding: 15px 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            border-top: 1px solid var(--border-color); 
+            position: relative;
+        }
+        
+        #messageInput { 
+            flex: 1; 
+            border: none; 
+            padding: 12px 18px; 
+            border-radius: 25px; 
+            outline: none; 
+            font-size: 0.95rem; 
+            background: var(--whatsapp-dark-4);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        
+        #messageInput::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .input-btn { 
+            color: var(--text-secondary); 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .input-btn:hover { 
+            transform: scale(1.1); 
+            color: var(--whatsapp-blue); 
+            background: var(--whatsapp-dark-4);
+        }
+        
+        .send-btn {
+            background: var(--whatsapp-green-light);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+        
+        .send-btn:hover {
+            background: var(--whatsapp-green);
+            transform: scale(1.05);
+        }
+
+        .emoji-panel { 
+            position: absolute; 
+            bottom: 85px; 
+            right: 20px; 
+            left: 20px;
+            background: var(--whatsapp-dark-4); 
+            border-radius: 15px; 
+            display: none; 
+            padding: 15px; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 10px; 
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); 
+            max-height: 200px; 
+            overflow-y: auto; 
+            z-index: 100; 
+            border: 1px solid var(--border-color);
+        }
+        
+        .emoji-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .emoji-panel::-webkit-scrollbar-thumb {
+            background: var(--whatsapp-dark-3);
+            border-radius: 3px;
+        }
+        
+        .quick-upload-panel {
+            position: absolute;
+            bottom: 85px;
+            right: 20px;
+            left: 20px;
+            background: var(--whatsapp-dark-4);
+            border-radius: 15px;
+            padding: 20px;
+            display: none;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+            z-index: 100;
+            border: 1px solid var(--border-color);
+        }
+        
+        .upload-site-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--whatsapp-dark-3);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        
+        .upload-site-btn:hover {
+            background: var(--whatsapp-blue);
+            color: white;
+            border-color: var(--whatsapp-blue);
+            transform: translateY(-2px);
+        }
+        
+        .upload-site-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .upload-site-btn span {
+            flex: 1;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .external-link-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .external-link-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: var(--whatsapp-dark-3);
+            color: var(--text-primary);
+            outline: none;
+        }
+        
+        .external-link-input input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .external-link-input button {
+            background: var(--whatsapp-green-light); 
+            color: white; 
+            border: none; 
+            padding: 0 20px; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .external-link-input button:hover {
+            background: var(--whatsapp-green);
+        }
+        
+        video { 
+            border-radius: 8px; 
+            background: #000; 
+            max-width: 100%;
+            max-height: 300px;
+        }
+        
+        .message span a {
+            color: var(--whatsapp-blue);
+            text-decoration: underline;
+            word-break: break-all;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--whatsapp-green-light);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .edit-mode {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(245, 158, 11, 0.1) !important;
+            border: 1px solid var(--warning) !important;
+        }
+        
+        .edit-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+            flex-direction: column;
+        }
+        
+        .edit-input textarea {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid var(--warning);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            background: var(--whatsapp-dark-3);
+            color: var(--text-primary);
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+        
+        .edit-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .edit-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .edit-save {
+            background: var(--success);
+            color: white;
+        }
+        
+        .edit-save:hover {
+            background: #008069;
+        }
+        
+        .edit-cancel {
+            background: var(--whatsapp-dark-4);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .edit-cancel:hover {
+            background: var(--whatsapp-dark-3);
+        }
+        
+        /* Admin typing indicator */
+        .admin-typing-indicator {
+            background: var(--whatsapp-dark-3);
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin: 5px 0;
+            align-self: flex-start;
+            max-width: 200px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .typing-dots {
+            display: inline-flex;
+            gap: 3px;
+        }
+        
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--whatsapp-blue);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+        
+        /* Escalation notification */
+        .escalation-notification {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--danger);
+        }
+        
+        /* File attachment styles */
+        .file-msg {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px dashed var(--border-color);
+            transition: 0.2s;
+            margin-top: 5px;
+        }
+        
+        .file-msg:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--whatsapp-blue);
+        }
+        
+        .file-icon {
+            font-size: 1.5rem;
+            color: var(--whatsapp-blue);
+        }
+        
+        .file-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+<div id="notification" class="notification"></div>
+
+<audio id="msgSound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
+
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="header-main">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <a href="ChargGames.html" style="color:var(--text-primary); text-decoration:none;">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <b style="font-size:1.1rem;">دعم VipClub المباشر</b>
+            </div>
+            <div class="header-actions">
+                <div class="esc-container">
+                    <div class="escalation-countdown">
+                        <span class="esc-label">متبقي:</span>
+                        <div id="escTimer" class="esc-time">05:00</div>
+                    </div>
+                    <button id="escBtn" class="action-btn" disabled onclick="escalateChat()">
+                        <i class="fas fa-level-up-alt"></i>
+                        <span>تصعيد</span>
+                    </button>
+                </div>
+                <button class="action-btn" style="background:var(--danger); border-color:var(--danger);" onclick="confirmEndChat()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>إنهاء</span>
+                </button>
+            </div>
+        </div>
+        <div id="adminTypingIndicator" class="admin-typing-indicator" style="display:none;">
+            <span class="typing-dots">
+                <span></span><span></span><span></span>
+            </span>
+            <span>فريق الدعم يكتب الآن...</span>
+        </div>
+    </div>
+
+    <div class="messages-area" id="messagesArea"></div>
+    
+    <div class="emoji-panel" id="emojiPanel"></div>
+    
+    <div class="quick-upload-panel" id="quickUploadPanel">
+        <h4 style="margin-bottom: 15px; text-align: center; color:var(--text-primary);">📁 رفع ملفات خارجية</h4>
+        <a href="https://ufile.io/" target="_blank" class="upload-site-btn">
+            <i class="fas fa-cloud-upload-alt" style="color: #4CAF50;"></i>
+            <span>رفع على UFile.io</span>
+            <i class="fas fa-external-link-alt"></i>
+        </a>
+        <a href="https://gofile.io/" target="_blank" class="upload-site-btn">
+            <i class="fas fa-file-upload" style="color: #2196F3;"></i>
+            <span>رفع على GoFile.io</span>
+            <i class="fas fa-external-link-alt"></i>
+        </a>
+        <div class="external-link-input">
+            <input type="text" id="externalLinkInput" placeholder="ضع رابط الملف الخارجي هنا...">
+            <button onclick="sendExternalLink()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="chat-input-area" id="inputBar">
+        <i class="far fa-smile input-btn" title="إيموجي" onclick="toggleEmoji()"></i>
+        <i class="fas fa-cloud-upload-alt input-btn" title="رفع ملف خارجي" onclick="toggleUploadPanel()"></i>
+        <label for="fileUpload" style="cursor:pointer;">
+            <i class="fas fa-paperclip input-btn" title="إرفاق ملف أو فيديو"></i>
+        </label>
+        <input type="file" id="fileUpload" hidden accept="image/*,video/*,.pdf,.doc,.docx" onchange="handleFileUpload()">
+        <input type="text" id="messageInput" placeholder="اكتب رسالة..." onkeypress="handleInputKeyPress(event)">
+        <button class="send-btn" onclick="sendMessage()" title="إرسال">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+        authDomain: "vipclub-1d04a.firebaseapp.com",
+        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+        projectId: "vipclub-1d04a",
+        storageBucket: "vipclub-1d04a.firebasestorage.app",
+        messagingSenderId: "120667552740",
+        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    };
+
+    // Initialize Firebase
+    let database;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    database = firebase.database();
+
+    // Variables
+    const msgArea = document.getElementById('messagesArea');
+    const msgInput = document.getElementById('messageInput');
+    const msgSound = document.getElementById('msgSound');
+    const adminTypingIndicator = document.getElementById('adminTypingIndicator');
+    
+    // Generate or retrieve user data
+    let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        const randomNum = Math.floor(100000 + Math.random() * 900000);
+        currentUser = { 
+            numericId: randomNum, 
+            username: `User_${randomNum}`,
+            nickname: `زائر_${randomNum}`,
+            isOnline: true
+        };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+    
+    const userId = `user_${currentUser.numericId}`;
+    const userName = currentUser.nickname || currentUser.username || "زائر";
+    let editingMessageId = null;
+    let messagesMap = new Map();
+    let messagesListener = null;
+    let chatListener = null;
+    let adminTypingListener = null;
+    let readStatusListener = null;
+    
+    // Escalation variables
+    let escalationTimer = null;
+    let timeLeft = 300; // 5 minutes in seconds
+    let isEscalated = false;
+    let escalationStartTime = null;
+
+    // Ensure user exists in Firebase and set online status
+    async function ensureUserInFirebase() {
+        try {
+            // Update user online status
+            currentUser.isOnline = true;
+            currentUser.lastSeen = new Date().toISOString();
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Save user data in both /users and /chats
+            const userRef = database.ref('users').child(currentUser.numericId.toString());
+            await userRef.set({
+                numericId: currentUser.numericId,
+                username: currentUser.username,
+                nickname: currentUser.nickname,
+                isOnline: true,
+                lastSeen: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                ...(currentUser.createdAt ? {} : { createdAt: new Date().toISOString() })
+            });
+            
+            // Initialize chat if not exists
+            const chatRef = database.ref('chats').child(userId);
+            const chatSnapshot = await chatRef.once('value');
+            
+            if (!chatSnapshot.exists()) {
+                await chatRef.set({
+                    username: userName,
+                    nickname: currentUser.nickname,
+                    isEscalated: false,
+                    isArchived: false,
+                    isHidden: false,
+                    unreadCount: 0,
+                    lastActivity: new Date().toISOString(),
+                    isOnline: true,
+                    lastSeen: new Date().toISOString(),
+                    isTyping: false,
+                    adminTyping: false,
+                    userId: currentUser.numericId
+                });
+            } else {
+                // Update online status and username
+                await chatRef.update({
+                    isOnline: true,
+                    lastSeen: new Date().toISOString(),
+                    username: userName,
+                    nickname: currentUser.nickname
+                });
+            }
+            
+            // Start tracking user activity
+            startActivityTracking();
+            
+            console.log('User initialized in Firebase:', userId);
+            
+        } catch (error) {
+            console.error('Error ensuring user in Firebase:', error);
+        }
+    }
+
+    // Track user activity (online/offline)
+    function startActivityTracking() {
+        // Update online status every 10 seconds for faster response
+        const onlineInterval = setInterval(async () => {
+            try {
+                if (document.visibilityState === 'visible') {
+                    await database.ref('chats').child(userId).update({
+                        isOnline: true,
+                        lastSeen: new Date().toISOString()
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating online status:', error);
+            }
+        }, 10000);
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', async () => {
+            if (document.hidden) {
+                // User left the page
+                try {
+                    await database.ref('chats').child(userId).update({
+                        isOnline: false,
+                        lastSeen: new Date().toISOString(),
+                        isTyping: false
+                    });
+                } catch (error) {
+                    console.error('Error setting offline status:', error);
+                }
+            } else {
+                // User returned to the page
+                try {
+                    await database.ref('chats').child(userId).update({
+                        isOnline: true,
+                        lastSeen: new Date().toISOString()
+                    });
+                } catch (error) {
+                    console.error('Error setting online status:', error);
+                }
+            }
+        });
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', async () => {
+            try {
+                await database.ref('chats').child(userId).update({
+                    isOnline: false,
+                    lastSeen: new Date().toISOString(),
+                    isTyping: false
+                });
+                clearInterval(onlineInterval);
+            } catch (error) {
+                console.error('Error on page unload:', error);
+            }
+        });
+    }
+
+    // Typing status
+    let typingTimeout;
+    msgInput.addEventListener('input', () => {
+        setTypingStatus(true);
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            setTypingStatus(false);
+        }, 2000);
+    });
+
+    async function setTypingStatus(isTyping) {
+        try {
+            await database.ref('chats').child(userId).update({
+                isTyping: isTyping,
+                lastActivity: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Error setting typing status:', error);
+        }
+    }
+
+    // Listen for admin typing
+    function listenForAdminTyping() {
+        if (adminTypingListener) {
+            database.ref('chats').child(userId).off('value', adminTypingListener);
+        }
+        
+        adminTypingListener = database.ref('chats').child(userId).on('value', (snapshot) => {
+            const chatData = snapshot.val();
+            if (chatData && chatData.adminTyping) {
+                // Show admin typing indicator
+                adminTypingIndicator.style.display = 'flex';
+                
+                // Hide after 3 seconds if no update
+                setTimeout(() => {
+                    if (chatData.adminTyping) {
+                        database.ref('chats').child(userId).once('value').then((newSnapshot) => {
+                            const newData = newSnapshot.val();
+                            if (!newData || !newData.adminTyping) {
+                                adminTypingIndicator.style.display = 'none';
+                            }
+                        });
+                    }
+                }, 3000);
+            } else {
+                adminTypingIndicator.style.display = 'none';
+            }
+        });
+    }
+
+    // Send message
+    async function sendMessage(content = null, type = 'text', sender = 'user', fileName = '') {
+        const text = content || msgInput.value.trim();
+        if(!text && type === 'text') return;
+
+        const msgObj = { 
+            id: Date.now(), 
+            sender: sender, 
+            text: text, 
+            type: type, 
+            fileName: fileName, 
+            time: new Date().toISOString(),
+            isEdited: false,
+            isDeleted: false,
+            isRead: false, // رسائل المستخدم تكون غير مقروءة عند الإرسال
+            hiddenForAdmin: false
+        };
+
+        try {
+            // Save to Firebase
+            const msgRef = database.ref('chats').child(userId).child('messages').push();
+            const messageKey = msgRef.key;
+            await msgRef.set({
+                ...msgObj,
+                firebaseKey: messageKey
+            });
+            
+            // Update chat metadata
+            await database.ref('chats').child(userId).update({
+                lastActivity: new Date().toISOString(),
+                unreadCount: firebase.database.ServerValue.increment(1),
+                isOnline: true,
+                lastSeen: new Date().toISOString(),
+                isTyping: false
+            });
+
+            playNotificationSound();
+            msgInput.value = '';
+            setTypingStatus(false);
+            emojiPanel.style.display = 'none';
+            document.getElementById('quickUploadPanel').style.display = 'none';
+            
+        } catch (error) {
+            console.error('Error sending message:', error);
+            showNotification('❌ خطأ في إرسال الرسالة', 'error');
+        }
+    }
+
+    // Send external link
+    async function sendExternalLink() {
+        const linkInput = document.getElementById('externalLinkInput');
+        const link = linkInput.value.trim();
+        
+        if (!link) {
+            showNotification('⚠️ يرجى إدخال رابط صحيح', 'warning');
+            return;
+        }
+        
+        if (!link.startsWith('http')) {
+            showNotification('⚠️ يرجى إدخال رابط صحيح يبدأ بـ http أو https', 'warning');
+            return;
+        }
+        
+        await sendMessage(link, 'text', 'user');
+        linkInput.value = '';
+        document.getElementById('quickUploadPanel').style.display = 'none';
+    }
+
+    // Load messages from Firebase
+    async function loadMessages() {
+        try {
+            if (messagesListener) {
+                database.ref('chats').child(userId).child('messages').off('value', messagesListener);
+                messagesListener = null;
+            }
+            
+            messagesListener = database.ref('chats').child(userId).child('messages').on('value', (snapshot) => {
+                try {
+                    const messages = [];
+                    if (snapshot.exists()) {
+                        snapshot.forEach((childSnapshot) => {
+                            const msgData = childSnapshot.val();
+                            messages.push({
+                                firebaseKey: childSnapshot.key,
+                                ...msgData
+                            });
+                        });
+                    }
+                    
+                    // Sort by time
+                    messages.sort((a, b) => new Date(a.time) - new Date(b.time));
+                    
+                    // Render messages with special handling for editing
+                    renderMessages(messages);
+                } catch (error) {
+                    console.error('Error processing messages:', error);
+                    showNotification('❌ خطأ في معالجة الرسائل', 'error');
+                }
+            }, (error) => {
+                console.error('Error listening to messages:', error);
+                showNotification('❌ خطأ في تحميل المحادثة', 'error');
+            });
+        } catch (error) {
+            console.error('Error loading messages:', error);
+            showNotification('❌ خطأ في تحميل المحادثة', 'error');
+        }
+    }
+
+    // Render messages
+    function renderMessages(messages) {
+        if (!msgArea) return;
+        
+        // Check if chat is escalated
+        if (isEscalated) {
+            showEscalationNotification();
+        }
+        
+        if (!messages || messages.length === 0) {
+            msgArea.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fas fa-comments fa-3x" style="opacity: 0.2;"></i>
+                    <p style="margin-top: 15px; font-size: 1rem;">مرحباً بك في دعم VipClub!</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">كيف يمكننا مساعدتك اليوم؟</p>
+                </div>
+            `;
+            messagesMap.clear();
+            return;
+        }
+        
+        // If we're editing a message, preserve its edit state
+        if (editingMessageId !== null) {
+            // Save the editing message state
+            const editingWrapper = document.getElementById(`msg-${editingMessageId}`);
+            if (editingWrapper) {
+                const editingClone = editingWrapper.cloneNode(true);
+                
+                // Clear and rebuild the messages
+                msgArea.innerHTML = '';
+                messagesMap.clear();
+                
+                // Add all messages, preserving the editing one
+                messages.forEach((msg) => {
+                    if (!msg || msg.hiddenForAdmin) return;
+                    
+                    if (msg.firebaseKey === editingMessageId) {
+                        // Use the preserved editing wrapper
+                        msgArea.appendChild(editingClone);
+                        messagesMap.set(msg.firebaseKey, { wrapper: editingClone, msg });
+                    } else {
+                        const wrapper = createMessageElement(msg);
+                        msgArea.appendChild(wrapper);
+                        messagesMap.set(msg.firebaseKey, { wrapper, msg });
+                    }
+                });
+                
+                msgArea.scrollTop = msgArea.scrollHeight;
+                return;
+            }
+        }
+        
+        // Normal rendering (no message being edited)
+        msgArea.innerHTML = '';
+        messagesMap.clear();
+        
+        messages.forEach((msg) => {
+            if (!msg || msg.hiddenForAdmin) return;
+            
+            const wrapper = createMessageElement(msg);
+            msgArea.appendChild(wrapper);
+            messagesMap.set(msg.firebaseKey, { wrapper, msg });
+        });
+        
+        msgArea.scrollTop = msgArea.scrollHeight;
+    }
+
+    // Create a single message element
+    function createMessageElement(msg) {
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-wrapper ${msg.sender === 'user' ? 'user-wrap' : 'admin-wrap'}`;
+        wrapper.id = `msg-${msg.firebaseKey}`;
+
+        let contentHTML = "";
+        if (msg.isDeleted) {
+            contentHTML = `<i style="color:var(--text-secondary); font-size:0.9rem; font-style:italic;">
+                <i class="fas fa-ban"></i> تم حذف هذه الرسالة
+            </i>`;
+        } else {
+            if(msg.type === 'image') {
+                contentHTML = `<img src="${msg.text}" style="max-width:100%; max-height:300px; border-radius:8px; cursor: pointer;" 
+                       onclick="window.open('${msg.text}', '_blank')">`;
+            } else if(msg.type === 'video') {
+                contentHTML = `<video src="${msg.text}" controls style="max-width:100%; max-height:300px; border-radius:8px;"></video>`;
+            } else if(msg.type === 'file') {
+                contentHTML = `
+                    <a href="${msg.text}" download="${msg.fileName || 'file'}" class="file-msg">
+                        <div class="file-icon">
+                            <i class="fas fa-file-download"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">${msg.fileName || 'تحميل الملف'}</div>
+                            <div class="file-size">اضغط للتحميل</div>
+                        </div>
+                    </a>`;
+            } else {
+                const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+                const linkedText = msg.text.replace(urlPattern, function(url) {
+                    return `<a href="${url}" target="_blank" style="color:inherit; text-decoration:underline;">${url}</a>`;
+                });
+                contentHTML = `<span>${linkedText}</span>`;
+            }
+        }
+
+        const editTag = (msg.isEdited && !msg.isDeleted) ? `<span class="msg-status-tag">(معدلة)</span>` : "";
+        
+        // علامات القراءة للمستخدم
+        let readIcon = '';
+        if (msg.sender === 'user') {
+            // رسائل المستخدم: تظهر علامة زرقاء إذا قرأها الأدمن
+            if (msg.isRead) {
+                readIcon = '<i class="fas fa-check-double read-icon"></i>';
+            } else {
+                readIcon = '<i class="fas fa-check unread-icon"></i>';
+            }
+        } 
+        // لا نضع علامات قراءة لرسائل الأدمن
+        
+        // Add options button for user messages only
+        let optionsButton = '';
+        
+        if (msg.sender === 'user' && !msg.isDeleted && msg.type === 'text') {
+            optionsButton = `
+                <div class="dots-btn" onclick="showMessageMenu(event, '${msg.firebaseKey}', '${msg.text ? msg.text.replace(/'/g, "\\'") : ''}')">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            `;
+        }
+
+        wrapper.innerHTML = `
+            ${msg.sender === 'user' ? optionsButton : ''}
+            <div class="message msg-${msg.sender}" id="message-content-${msg.firebaseKey}">
+                <div id="message-text-${msg.firebaseKey}">
+                    ${contentHTML}
+                </div>
+                <div class="msg-footer">
+                    <span class="msg-time">
+                        ${new Date(msg.time).toLocaleTimeString('ar-EG',{hour:'2-digit', minute:'2-digit'})}
+                        ${editTag}
+                    </span>
+                    ${readIcon}
+                </div>
+            </div>
+            ${msg.sender === 'admin' ? optionsButton : ''}
+        `;
+        
+        return wrapper;
+    }
+
+    // Show message options menu
+    function showMessageMenu(event, messageId, messageText) {
+        event.stopPropagation();
+        
+        // Close any existing menu
+        const existingMenu = document.querySelector('.msg-options-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+        
+        // Create new menu
+        const menu = document.createElement('div');
+        menu.className = 'msg-options-menu';
+        menu.style.left = event.clientX + 'px';
+        menu.style.top = event.clientY + 'px';
+        
+        menu.innerHTML = `
+            <div class="msg-option edit" onclick="editUserMessage('${messageId}', '${messageText.replace(/'/g, "\\'")}')">
+                <i class="fas fa-edit"></i>
+                <span>تعديل الرسالة</span>
+            </div>
+            <div class="msg-option delete" onclick="deleteUserMessage('${messageId}')">
+                <i class="fas fa-trash-alt"></i>
+                <span>حذف الرسالة</span>
+            </div>
+        `;
+        
+        document.body.appendChild(menu);
+        menu.style.display = 'block';
+        
+        // Close menu when clicking elsewhere
+        setTimeout(() => {
+            document.addEventListener('click', function closeMenu(e) {
+                if (!menu.contains(e.target)) {
+                    menu.remove();
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }, 10);
+    }
+
+    // Edit user message
+    function editUserMessage(messageId, currentText) {
+        // Close any open menu
+        const existingMenu = document.querySelector('.msg-options-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+        
+        // Cancel any existing edit
+        if (editingMessageId && editingMessageId !== messageId) {
+            cancelEditMessage(editingMessageId);
+        }
+        
+        editingMessageId = messageId;
+        
+        const messageContent = document.getElementById(`message-content-${messageId}`);
+        const messageTextDiv = document.getElementById(`message-text-${messageId}`);
+        
+        if (!messageContent || !messageTextDiv) return;
+        
+        // حفظ النص الأصلي
+        const originalText = messageTextDiv.innerHTML;
+        
+        // تبديل إلى وضع التعديل
+        messageContent.classList.add('edit-mode');
+        messageTextDiv.innerHTML = `
+            <div class="edit-input">
+                <textarea id="editInput_${messageId}" rows="2">${currentText}</textarea>
+                <div class="edit-buttons">
+                    <button class="edit-btn edit-save" onclick="saveMessageEdit('${messageId}')">
+                        <i class="fas fa-check"></i> حفظ
+                    </button>
+                    <button class="edit-btn edit-cancel" onclick="cancelEditMessage('${messageId}', \`${originalText.replace(/`/g, '\\`')}\`)">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Focus on edit input
+        setTimeout(() => {
+            const editInput = document.getElementById(`editInput_${messageId}`);
+            if (editInput) {
+                editInput.focus();
+                editInput.select();
+                
+                // Allow saving with Enter key (with Ctrl/Cmd)
+                editInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                        saveMessageEdit(messageId);
+                    }
+                });
+            }
+        }, 100);
+    }
+
+    // Cancel edit and restore original message
+    function cancelEditMessage(messageId, originalHTML) {
+        const messageContent = document.getElementById(`message-content-${messageId}`);
+        const messageTextDiv = document.getElementById(`message-text-${messageId}`);
+        
+        if (messageContent && messageTextDiv) {
+            messageContent.classList.remove('edit-mode');
+            messageTextDiv.innerHTML = originalHTML;
+        }
+        
+        editingMessageId = null;
+    }
+
+    // Save message edit
+    async function saveMessageEdit(messageId) {
+        const editInput = document.getElementById(`editInput_${messageId}`);
+        if (!editInput) return;
+        
+        const newText = editInput.value.trim();
+        
+        if (!newText) {
+            showNotification('⚠️ لا يمكن ترك الرسالة فارغة', 'warning');
+            return;
+        }
+        
+        try {
+            // تحديث في Firebase - مع الحفاظ على التوقيت القديم للحفاظ على الموقع
+            const msgData = messagesMap.get(messageId);
+            const originalTime = msgData?.msg?.time || new Date().toISOString();
+            
+            await database.ref('chats').child(userId).child('messages').child(messageId).update({
+                text: newText,
+                isEdited: true,
+                time: originalTime
+            });
+            
+            // تحديث الواجهة مباشرة دون إعادة تحميل
+            const messageContent = document.getElementById(`message-content-${messageId}`);
+            const messageTextDiv = document.getElementById(`message-text-${messageId}`);
+            
+            if (messageContent && messageTextDiv) {
+                messageContent.classList.remove('edit-mode');
+                
+                // عرض النص الجديد مع الروابط
+                const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+                const linkedText = newText.replace(urlPattern, function(url) {
+                    return `<a href="${url}" target="_blank" style="color:inherit; text-decoration:underline;">${url}</a>`;
+                });
+                
+                messageTextDiv.innerHTML = `<span>${linkedText}</span>`;
+                
+                // إضافة علامة "معدلة" إلى الوقت
+                const timeElement = messageContent.querySelector('.msg-time');
+                if (timeElement) {
+                    timeElement.innerHTML = `
+                        ${new Date().toLocaleTimeString('ar-EG',{hour:'2-digit', minute:'2-digit'})}
+                        <span class="msg-status-tag">(معدلة)</span>
+                    `;
+                }
+            }
+            
+            // تحديث بيانات الرسالة في الـ Map
+            if (messagesMap.has(messageId)) {
+                const msg = messagesMap.get(messageId).msg;
+                msg.text = newText;
+                msg.isEdited = true;
+            }
+            
+            editingMessageId = null;
+            showNotification('✅ تم تعديل الرسالة بنجاح', 'success');
+            
+        } catch (error) {
+            console.error('Error saving edit:', error);
+            showNotification('❌ خطأ في تعديل الرسالة', 'error');
+        }
+    }
+
+    // Delete user message (soft delete - mark as deleted)
+    async function deleteUserMessage(messageId) {
+        if (!confirm('هل تريد حذف هذه الرسالة؟')) return;
+        
+        try {
+            await database.ref('chats').child(userId).child('messages').child(messageId).update({
+                isDeleted: true,
+                text: "تم حذف هذه الرسالة"
+            });
+            
+            // تحديث الواجهة مباشرة
+            const messageTextDiv = document.getElementById(`message-text-${messageId}`);
+            if (messageTextDiv) {
+                messageTextDiv.innerHTML = `
+                    <i style="color:var(--text-secondary); font-size:0.9rem; font-style:italic;">
+                        <i class="fas fa-ban"></i> تم حذف هذه الرسالة
+                    </i>`;
+            }
+            
+            showNotification('✅ تم حذف الرسالة بنجاح', 'success');
+        } catch (error) {
+            showNotification('❌ خطأ في حذف الرسالة', 'error');
+        }
+    }
+
+    // Handle file upload
+    function handleFileUpload() {
+        const file = document.getElementById('fileUpload').files[0];
+        if(!file) return;
+        if(file.size > 50 * 1024 * 1024) {
+            showNotification('❌ حجم الملف كبير جداً (الأقصى 50 ميجابايت)', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            let type = file.type.includes('image') ? 'image' : (file.type.includes('video') ? 'video' : 'file');
+            sendMessage(e.target.result, type, 'user', file.name);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Handle input key press
+    function handleInputKeyPress(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        } else {
+            setTypingStatus(true);
+        }
+    }
+
+    // Toggle panels
+    function toggleEmoji() { 
+        emojiPanel.style.display = emojiPanel.style.display === 'grid' ? 'none' : 'grid';
+        document.getElementById('quickUploadPanel').style.display = 'none';
+    }
+
+    function toggleUploadPanel() { 
+        document.getElementById('quickUploadPanel').style.display = 
+            document.getElementById('quickUploadPanel').style.display === 'block' ? 'none' : 'block';
+        emojiPanel.style.display = 'none';
+    }
+
+    // Emoji panel
+    const emojis = ["😊","😂","❤️","😍","🔥","✅","👍","🙌","🌹","🎉","✨","🤔","😎","😢","🙏","💰","🚀","😁","😉","😘","🥰","😅","🤣","🥲","😇","🥳","😭","😡","🤬","🤯","😳","🥺","😨","🤗","🤭","🤫","😬","🫣","🤥","😶","🫠","😐","😑","🫤","🙄","😮","😯","😦","😧","😵","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","💀","💩","🤡","👻","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾"];
+    const emojiPanel = document.getElementById('emojiPanel');
+    emojis.forEach(e => {
+        let div = document.createElement('div');
+        div.innerText = e;
+        div.style.cursor = 'pointer';
+        div.style.fontSize = '1.5rem';
+        div.style.textAlign = 'center';
+        div.style.padding = '5px';
+        div.style.borderRadius = '8px';
+        div.style.transition = '0.2s';
+        div.onmouseover = () => { 
+            div.style.background = 'var(--whatsapp-dark-3)';
+            div.style.transform = 'scale(1.1)';
+        };
+        div.onmouseout = () => { 
+            div.style.background = 'transparent';
+            div.style.transform = 'scale(1)';
+        };
+        div.onclick = () => { 
+            msgInput.value += e; 
+            msgInput.focus();
+            msgInput.dispatchEvent(new Event('input'));
+        };
+        emojiPanel.appendChild(div);
+    });
+
+    // Escalation timer with persistence
+    function initializeEscalationTimer() {
+        // Check if already escalated
+        database.ref('chats').child(userId).once('value').then(snapshot => {
+            const chatData = snapshot.val();
+            if (chatData && chatData.isEscalated) {
+                // Already escalated
+                isEscalated = true;
+                document.getElementById('escBtn').disabled = true;
+                document.getElementById('escTimer').textContent = 'مصعد';
+                document.getElementById('escTimer').style.background = 'var(--danger)';
+                
+                // Show escalation notification
+                showEscalationNotification();
+                return;
+            }
+            
+            // Check for existing escalation timer in localStorage
+            const savedTimer = localStorage.getItem(`escalation_${userId}`);
+            if (savedTimer) {
+                const timerData = JSON.parse(savedTimer);
+                const now = Date.now();
+                const elapsedSeconds = Math.floor((now - timerData.startTime) / 1000);
+                timeLeft = Math.max(0, timerData.timeLeft - elapsedSeconds);
+                
+                if (timeLeft > 0) {
+                    escalationStartTime = timerData.startTime;
+                    startEscalationTimer();
+                } else {
+                    // Timer expired
+                    document.getElementById('escBtn').disabled = false;
+                    localStorage.removeItem(`escalation_${userId}`);
+                }
+            } else {
+                // Start new timer
+                startEscalationTimer();
+            }
+        });
+    }
+
+    function startEscalationTimer() {
+        if (escalationTimer) {
+            clearInterval(escalationTimer);
+        }
+        
+        if (!escalationStartTime) {
+            escalationStartTime = Date.now();
+            saveTimerState();
+        }
+        
+        escalationTimer = setInterval(() => {
+            let min = Math.floor(timeLeft / 60);
+            let sec = timeLeft % 60;
+            document.getElementById('escTimer').textContent = `${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+            
+            if(timeLeft <= 0) { 
+                clearInterval(escalationTimer); 
+                document.getElementById('escBtn').disabled = false; 
+                document.getElementById('escTimer').style.background = "var(--success)"; 
+                document.getElementById('escTimer').textContent = "متاح";
+                localStorage.removeItem(`escalation_${userId}`);
+            }
+            
+            timeLeft--;
+            
+            // Save timer state every 10 seconds
+            if (timeLeft % 10 === 0) {
+                saveTimerState();
+            }
+        }, 1000);
+    }
+
+    function saveTimerState() {
+        const timerData = {
+            timeLeft: timeLeft,
+            startTime: escalationStartTime
+        };
+        localStorage.setItem(`escalation_${userId}`, JSON.stringify(timerData));
+    }
+
+    function resetEscalationTimer() {
+        timeLeft = 300;
+        escalationStartTime = null;
+        localStorage.removeItem(`escalation_${userId}`);
+        if (escalationTimer) {
+            clearInterval(escalationTimer);
+        }
+        document.getElementById('escTimer').textContent = '05:00';
+        document.getElementById('escTimer').style.background = 'var(--whatsapp-dark-4)';
+        document.getElementById('escBtn').disabled = true;
+        startEscalationTimer();
+    }
+
+    function showEscalationNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'escalation-notification';
+        notification.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong> تم تصعيد محادثتك للإدارة العليا</strong>
+            <p style="margin:5px 0 0 0; font-size:0.8rem; opacity:0.9;">سيتم الرد عليك بأولوية قصوى</p>
+        `;
+        
+        // Insert at the beginning of messages area
+        const msgArea = document.getElementById('messagesArea');
+        if (msgArea.firstChild) {
+            msgArea.insertBefore(notification, msgArea.firstChild);
+        } else {
+            msgArea.appendChild(notification);
+        }
+    }
+
+    // Escalate chat
+    async function escalateChat() {
+        try {
+            // Mark as escalated in Firebase
+            await database.ref('chats').child(userId).update({
+                isEscalated: true,
+                escalatedAt: new Date().toISOString()
+            });
+            
+            // Send escalation notification
+            await sendMessage("⚠️ تم تصعيد محادثتك للإدارة العليا. سيتم الرد عليك بأولوية قصوى.", 'text', 'admin');
+            
+            // Update UI
+            isEscalated = true;
+            document.getElementById('escBtn').disabled = true;
+            document.getElementById('escTimer').textContent = 'مصعد';
+            document.getElementById('escTimer').style.background = 'var(--danger)';
+            
+            // Clear timer
+            if (escalationTimer) {
+                clearInterval(escalationTimer);
+            }
+            localStorage.removeItem(`escalation_${userId}`);
+            
+            // Show notification
+            showEscalationNotification();
+            showNotification('✅ تم إرسال طلب تصعيد للإدارة', 'success');
+            
+        } catch (error) {
+            showNotification('❌ خطأ في تصعيد المحادثة', 'error');
+        }
+    }
+
+    // End chat
+    async function confirmEndChat() {
+        if(confirm("هل تريد إنهاء الجلسة والعودة للرئيسية؟ سيتم حفظ سجل المحادثة.")) {
+            setTypingStatus(false);
+            
+            // Update online status
+            await database.ref('chats').child(userId).update({
+                isOnline: false,
+                lastSeen: new Date().toISOString()
+            });
+            
+            // Send end chat notification
+            await sendMessage("🔴 تم إنهاء المحادثة من قبل العميل", 'text', 'admin');
+            
+            setTimeout(() => {
+                location.href = 'charggames.html';
+            }, 1000);
+        }
+    }
+
+    // Play notification sound
+    function playNotificationSound() {
+        msgSound.currentTime = 0;
+        msgSound.play().catch(e => console.log("خطأ في تشغيل الصوت: ", e));
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        
+        notification.textContent = message;
+        notification.style.background = type === 'error' ? 'var(--danger)' : 
+                                      type === 'warning' ? 'var(--warning)' : 
+                                      type === 'success' ? 'var(--success)' : 'var(--whatsapp-green-light)';
+        notification.style.display = 'block';
+        
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    // ====== الإضافة الجديدة: مراقبة تحديثات حالة القراءة ======
+    function listenForReadStatusUpdates() {
+        readStatusListener = database.ref('chats').child(userId).child('messages').on('child_changed', (snapshot) => {
+            const msg = snapshot.val();
+            if (msg && msg.sender === 'user' && msg.isRead) {
+                // تحديث واجهة المستخدم عندما تقرأ الرسائل
+                const messageWrapper = document.getElementById(`msg-${snapshot.key}`);
+                if (messageWrapper) {
+                    const readIcon = messageWrapper.querySelector('.unread-icon');
+                    if (readIcon) {
+                        readIcon.className = 'fas fa-check-double read-icon';
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize
+    window.onload = async function() {
+        await ensureUserInFirebase();
+        await loadMessages();
+        initializeEscalationTimer();
+        listenForAdminTyping();
+        listenForReadStatusUpdates(); // إضافة مراقبة تحديثات حالة القراءة
+        showNotification('✅ تم الاتصال بنظام الدعم', 'success');
+        
+        // Close panels when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!emojiPanel.contains(e.target) && !e.target.closest('.fa-smile')) {
+                emojiPanel.style.display = 'none';
+            }
+            if (!quickUploadPanel.contains(e.target) && !e.target.closest('.fa-cloud-upload-alt')) {
+                quickUploadPanel.style.display = 'none';
+            }
+        });
+    };
+
+    // Cleanup on unload
+    window.onbeforeunload = async function() {
+        // Update offline status
+        try {
+            await database.ref('chats').child(userId).update({
+                isOnline: false,
+                lastSeen: new Date().toISOString(),
+                isTyping: false
+            });
+        } catch (error) {
+            console.error('Error updating offline status:', error);
+        }
+        
+        // Clean up listeners
+        if (messagesListener) {
+            database.ref('chats').child(userId).child('messages').off('value', messagesListener);
+        }
+        if (adminTypingListener) {
+            database.ref('chats').child(userId).off('value', adminTypingListener);
+        }
+        if (readStatusListener) {
+            database.ref('chats').child(userId).child('messages').off('child_changed', readStatusListener);
+        }
+        
+        // Save timer state
+        if (timeLeft > 0 && !isEscalated) {
+            saveTimerState();
+        }
+    };
+</script>
+</body>
+</html>

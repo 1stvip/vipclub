@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>الرئيسية - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --success: #10b981;
+            --danger: #ef4444; 
+            --dark: #1e293b; 
+            --bg: #f1f5f9; 
+            --footer-bg: #ffffff;
+        }
+        
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; min-height: 100vh; }
+        .main-content { flex: 1; padding-bottom: 50px; }
+
+        .navbar { background: #fff; height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 9999; }
+        .logo-profile-section { display: flex; align-items: center; gap: 15px; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: var(--dark); margin-left: 5px; }
+
+        .icon-btn { font-size: 1.5rem; color: var(--dark); cursor: pointer; position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; text-decoration: none; }
+        .icon-btn:hover { background: #f0f0f0; }
+        .badge { position: absolute; top: 2px; right: 2px; background: var(--danger); color: white; font-size: 0.65rem; padding: 2px 5px; border-radius: 50%; }
+
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .product-card { background: white; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #eee; }
+        .product-card:hover { transform: translateY(-10px); }
+        .product-card i { font-size: 3rem; color: #f3ba2f; margin-bottom: 15px; }
+        .product-card h3 { margin: 10px 0; color: var(--dark); }
+        .price-tag { font-size: 1.2rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
+
+        .dropdown-overlay { position: fixed; top: 70px; width: 320px; max-width: 90%; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); display: none; flex-direction: column; z-index: 10000; border: 1px solid #ddd; overflow: hidden; }
+        #profileDropdown { right: 20px; left: auto; padding: 20px; text-align: center; }
+        #notifDropdown { left: 20px; right: auto; background: #1a1a1a; color: white; border: 1px solid #333; }
+
+        .dropdown-overlay.active { display: flex !important; animation: slideDown 0.2s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #purchaseModal, #topUpModal, #currencyModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; max-width: 90%; z-index: 10001; padding: 25px; display: none; flex-direction: column; background: white; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+
+        .modal-active { display: flex !important; animation: popIn 0.2s ease-out; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9) translate(-50%, -50%); } to { opacity: 1; transform: scale(1) translate(-50%, -50%); } }
+
+        .notif-header { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .refresh-btn { cursor: pointer; font-size: 1rem; color: #aaa; transition: 0.3s; margin-right: auto; margin-left: 10px; padding: 5px; }
+        .refresh-btn:hover { color: var(--primary); transform: rotate(180deg); }
+        .refreshing { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        #notifList { max-height: 350px; overflow-y: auto; }
+        .notif-item { padding: 12px 15px; border-bottom: 1px solid #2a2a2a; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; gap: 10px; position: relative; text-align: right; }
+        .notif-item.unread { background: #252525; border-right: 4px solid var(--primary); }
+        .delete-single-notif { color: #666; cursor: pointer; transition: 0.2s; padding: 5px; }
+        .delete-single-notif:hover { color: var(--danger); }
+
+        .balance-card { background: #f8fafc; padding: 12px; border-radius: 10px; margin: 15px 0; border: 1px solid #e2e8f0; }
+        .balance-row { display: flex; justify-content: space-between; font-weight: bold; margin: 5px 0; font-size: 0.9rem; color: var(--dark); }
+        .action-btn { width: 100%; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-logout { background: #fee2e2; color: var(--danger); }
+        
+        .copy-box { background: #f1f5f9; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin: 10px 0; border: 1px dashed var(--primary); }
+        .copy-btn { background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
+        
+        .modern-footer { background: var(--footer-bg); padding: 30px 20px; text-align: center; border-top: 1px solid #e2e8f0; margin-top: 40px; }
+        .footer-socials { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .social-link { text-decoration: none; font-size: 1.3rem; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+        .youtube { color: #ff0000; background: #ffebeb; }
+        .facebook { color: #1877f2; background: #e7f3ff; }
+        .whatsapp { color: #25d366; background: #e8faef; }
+        .discord  { color: #5865f2 !important; background: #eeefff !important; }
+        
+        #screenOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; display: none; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+        
+        select, input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px; box-sizing: border-box; font-family: inherit; }
+        .payment-info-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 10px; border-radius: 10px; margin: 10px 0; display: none; }
+        .calculation-box { background: #e0e7ff; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px solid #c7d2fe; display: none; }
+
+        /* إضافة جديدة لعرض وسيلة الدفع المختارة */
+        #selectedPaymentInfo { background: #e0f2fe; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: none; text-align: center; border: 1px solid #bae6fd; }
+        #selectedPaymentInfo strong { color: var(--primary); }
+
+        .floating-support {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+            cursor: pointer;
+            z-index: 999;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+        }
+        .floating-support:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+            color: #fff;
+        }
+        .support-tooltip {
+            position: absolute;
+            right: 75px;
+            background: var(--dark);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            transform: translateX(10px);
+        }
+        .floating-support:hover .support-tooltip {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .pulse-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: #ff4757;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: pulse-ring 2s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        .hidden-guest { display: none !important; }
+        
+        /* رسائل Firebase */
+        .firebase-alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            z-index: 10002;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-width: 400px;
+        }
+        
+        .firebase-success {
+            background: #10b981;
+            color: white;
+            border-left: 4px solid #059669;
+        }
+        
+        .firebase-error {
+            background: #ef4444;
+            color: white;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .firebase-warning {
+            background: #f59e0b;
+            color: white;
+            border-left: 4px solid #d97706;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* تنسيق الـ ID الرقمي */
+        .user-id-numeric {
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 10px auto;
+            display: inline-block;
+            min-width: 120px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 2px solid white;
+        }
+        
+        .id-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        /* إشعارات سطح المكتب */
+        .desktop-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 15px;
+            z-index: 10003;
+            display: none;
+            max-width: 350px;
+            border-left: 5px solid var(--primary);
+            animation: slideInRight 0.3s ease;
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+        
+        .notification-success .notification-icon {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .notification-error .notification-icon {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .notification-warning .notification-icon {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        /* تنسيق جديد للكود في الإشعارات */
+        .code-in-notification {
+            background: linear-gradient(45deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin: 5px 0;
+            display: inline-block;
+            direction: ltr;
+            text-align: center;
+            word-break: break-all;
+            border: 2px solid #c7d2fe;
+        }
+    </style>
+</head>
+<body>
+
+<div id="screenOverlay" onclick="closeAll()"></div>
+
+<!-- إشعار سطح المكتب -->
+<div id="desktopNotification" class="desktop-notification" style="display: none;">
+    <div style="display: flex; align-items: center;">
+        <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div style="flex: 1;">
+            <div style="font-weight: bold; margin-bottom: 5px;" id="notificationTitle">إشعار جديد</div>
+            <div style="font-size: 0.9rem;" id="notificationMessage"></div>
+        </div>
+        <button onclick="closeDesktopNotification()" style="background: none; border: none; color: #999; cursor: pointer; font-size: 1.2rem;">×</button>
+    </div>
+</div>
+
+<div onclick="handleSupportClick()" class="floating-support" title="الدعم الفني">
+    <i class="fas fa-headset"></i>
+    <span class="pulse-dot"></span>
+    <div class="support-tooltip">تحدث مع الدعم الفني</div>
+</div>
+
+<!-- رسائل Firebase -->
+<div id="firebaseAlert" class="firebase-alert" style="display: none;"></div>
+
+<div class="main-content">
+    <nav class="navbar">
+        <div class="logo-profile-section">
+            <div class="logo">👑 VipClub 👑</div>
+            <div class="icon-btn" onclick="handleProfileClick()" title="الملف الشخصي">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <a href="Wallet.html" class="icon-btn auth-only hidden-guest" title="المحفظة" onclick="prepareForWallet()">
+                <i class="fas fa-wallet"></i>
+            </a>
+            <a href="settings.html" class="icon-btn auth-only hidden-guest" title="الإعدادات">
+                <i class="fas fa-cog"></i>
+            </a>
+        </div>
+        <div class="nav-icons">
+            <div class="icon-btn auth-only hidden-guest" onclick="openMenu('notifDropdown')" title="الإشعارات">
+                <i class="fas fa-bell"></i>
+                <span class="badge" id="notifBadge">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <div style="padding: 30px; text-align: center;">
+        <h2>منصة نادي كبار الشخصيات</h2>
+        <p style="color: #64748b;">اختر الفئة المناسبة لك وقم بالشراء فوراً</p>
+    </div>
+
+    <div class="cards-container">
+        <!-- المنتجات تبقى كما هي -->
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 1$</h3>
+            <div class="price-tag">50 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 1$', 50)">شراء الآن</button>
+        </div>
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 5$</h3>
+            <div class="price-tag">250 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 5$', 250)">شراء الآن</button>
+        </div>
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 10$</h3>
+            <div class="price-tag">500 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 10$', 500)">شراء الآن</button>
+        </div>
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 20$</h3>
+            <div class="price-tag">1000 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 20$', 1000)">شراء الآن</button>
+        </div>
+
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 35$</h3>
+            <div class="price-tag">1750 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 35$', 1750)">شراء الآن</button>
+        </div>
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 50$</h3>
+            <div class="price-tag">2500 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 50$', 2500)">شراء الآن</button>
+        </div>
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 70$</h3>
+            <div class="price-tag">3500 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 70$', 3500)">شراء الآن</button>
+        </div>
+        <div class="product-card">
+            <i class="fab fa-bitcoin"></i>
+            <h3>Red Packet 150$</h3>
+            <div class="price-tag">7500 جنيه</div>
+            <button class="action-btn btn-primary" onclick="openPurchase('Binance Red Packet 150$', 7500)">شراء الآن</button>
+        </div>
+    </div>
+</div>
+
+<!-- المودالات مع تعديل عرض الـ ID -->
+<div id="profileDropdown" class="dropdown-overlay">
+    <i class="fas fa-user-circle" style="font-size: 3rem; color: var(--primary); margin: 15px auto 5px auto;"></i>
+    <h4 id="p_nickname" style="margin: 5px 0;">تحميل...</h4>
+    <span class="id-label">المعرف الخاص بك</span>
+    <div class="user-id-numeric" id="p_id">000000</div>
+    <small>
+        <i class="fas fa-copy" onclick="copyText('p_id')" style="cursor:pointer; color:var(--primary);" title="نسخ المعرف"></i>
+        انقر على الأيقونة لنسخ المعرف
+    </small>
+    <div class="balance-card">
+        <div class="balance-row"><span>رصيد ج.م: [EGP]</span> <span id="p_egp" style="color:green;">0</span></div>
+        <div class="balance-row"><span>رصيد دولار: [USD]</span> <span id="p_usd" style="color:blue;">0</span></div>
+    </div>
+    <div style="padding: 0 10px 15px 10px;">
+        <button class="action-btn btn-success" onclick="openCurrencySelection()">شحن الرصيد (إيداع)</button>
+        <button class="action-btn btn-logout" onclick="logout()">تسجيل الخروج</button>
+    </div>
+</div>
+
+<div id="currencyModal">
+    <h3 style="margin-top:0; text-align: center;">إيداع رصيد</h3>
+    <p style="text-align: center; color: #64748b;">اختر العملة التي تود الإيداع بها:</p>
+    <button class="action-btn btn-primary" onclick="handleCurrencyChoice('EGP')">إيداع بالجنيه المصري (EGP)</button>
+    <button class="action-btn btn-success" onclick="handleCurrencyChoice('USD')">إيداع بالدولار (USD)</button>
+    <button class="action-btn" style="background:#f1f5f9;" onclick="closeAll()">إلغاء</button>
+</div>
+
+<div id="topUpModal">
+    <h3 id="topUpTitle" style="margin-top:0;">شحن رصيد</h3>
+    
+    <div id="selectedPaymentInfo">
+        <strong>وسيلة الدفع المختارة: <span id="paymentMethodName">---</span></strong>
+    </div>
+    
+    <div style="text-align: right; margin-bottom: 15px;">
+        <label style="font-weight: bold; font-size: 0.85rem;">اختر طريقة الدفع:</label>
+        <select id="paymentMethod" onchange="updatePaymentDetails(); updatePaymentMethodDisplay()"></select>
+    </div>
+    <div style="text-align: right; margin-bottom: 15px;">
+        <label id="amountLabel" style="font-weight: bold; font-size: 0.85rem;">المبلغ المراد إيداعه:</label>
+        <input type="number" id="topUpAmount" placeholder="أدخل المبلغ هنا" oninput="calculateRequiredAmount()">
+    </div>
+    <div id="calculationDisplay" class="calculation-box">
+        <span style="font-size: 0.85rem; font-weight: bold;">المبلغ المطلوب تحويله: </span>
+        <b id="finalRequiredAmount">0</b>
+    </div>
+    <div id="paymentDetails" class="payment-info-box" style="display: block;">
+        <p id="methodHint" style="font-size: 0.8rem; margin-bottom: 5px; color: #92400e;"></p>
+        <div class="copy-box" id="walletBox">
+            <b id="walletNumber">01022797043</b>
+            <button class="copy-btn" onclick="copyText('walletNumber')">نسخ</button>
+        </div>
+        <div id="binanceDetails" style="display:none; font-size: 0.85rem; line-height: 1.6;">
+            <div>المعرف: <b id="binanceID">803045359</b> <button class="copy-btn" style="padding: 2px 5px;" onclick="copyText('binanceID')">نسخ</button></div>
+            <div>الاسم المستعار: <b id="binanceName">iMrJoe</b></div>
+        </div>
+    </div>
+    <div style="text-align: right; margin-bottom: 15px;">
+        <label style="font-weight: bold; font-size: 0.85rem;">ارفع إيصال التحويل:</label>
+        <input type="file" id="topUpReceipt" accept="image/*">
+    </div>
+    <button class="action-btn btn-primary" onclick="submitTopUp()">تأكيد وإرسال الإيصال</button>
+    <button class="action-btn" style="background:#f1f5f9;" onclick="closeAll()">إلغاء</button>
+</div>
+
+<div id="purchaseModal">
+    <h3 id="m_title" style="margin-top:0;">تأكيد الشراء</h3>
+    <div id="m_info" style="font-size: 0.9rem; margin-bottom: 15px; color: #475569;"></div>
+    <p id="purchaseWarning" style="font-size: 0.85rem; color: #475569; background: #fff7ed; padding: 10px; border-radius: 10px; border: 1px solid #ffedd5;">
+        سيتم خصم المبلغ من رصيدك الحالي وإرسال الطلب للمراجعة.
+    </p>
+    <button id="confirmPurchaseBtn" class="action-btn btn-primary">تأكيد الخصم والشراء</button>
+    <button class="action-btn" style="background:#f1f5f9;" onclick="closeAll()">إلغاء</button>
+</div>
+
+<div id="notifDropdown" class="dropdown-overlay">
+    <div class="notif-header">
+        <span>الإشعارات</span>
+        <i class="fas fa-sync-alt refresh-btn" id="refreshIcon" onclick="refreshData()"></i>
+        <span id="unreadCount" style="background:var(--danger); font-size:0.7rem; padding:2px 7px; border-radius:10px;">0</span>
+    </div>
+    <div id="notifList"></div>
+    <div style="padding: 10px; display: flex; gap: 5px; background: #111;">
+        <button onclick="markAllRead()" style="flex:1; font-size:0.7rem; padding:8px; background:#333; color:white; border:none; border-radius:5px;">قراءة الكل</button>
+        <button onclick="deleteAllNotifs()" style="flex:1; font-size:0.7rem; padding:8px; background:#444; color:white; border:none; border-radius:5px;">حذف الكل</button>
+    </div>
+</div>
+
+<footer class="modern-footer">
+    <div>جميع الحقوق محفوظة &copy; <span id="currentYear"></span> - <b> VipClub </b></div>
+    <div class="footer-socials">
+        <a href="https://www.youtube.com/@VipCIub" class="social-link youtube" title="يوتيوب"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.facebook.com/groups/1123845664925685/?ref=share&mibextid=NSMWBT" class="social-link facebook" title="فيسبوك"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://wa.me/+201022797043" class="social-link whatsapp" title="واتساب"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://discord.gg/mqzeqsYzcR" class="social-link discord" title="ديسكورد"><i class="fab fa-discord"></i></a>
+    </div>
+</footer>
+
+<script>
+    // 🔥 تكوين Firebase (نفس صفحة الإدارة)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+        authDomain: "vipclub-1d04a.firebaseapp.com",
+        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+        projectId: "vipclub-1d04a",
+        storageBucket: "vipclub-1d04a.firebasestorage.app",
+        messagingSenderId: "120667552740",
+        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    };
+
+    // تهيئة Firebase
+    let firebaseApp, database, auth;
+    
+    // ===== متغيرات التحكم في الإشعارات =====
+    let lastNotificationId = localStorage.getItem('lastNotificationId') || null;
+    let notificationCooldown = false;
+    let notificationTimers = {};
+    let desktopNotificationShown = false;
+    
+    // ===== دالة إنشاء ID رقمي =====
+    function generateNumericId() {
+        // إنشاء ID مكون من 6 أرقام
+        return Math.floor(100000 + Math.random() * 900000);
+    }
+    
+    // ===== دالة الحصول على ID رقمي للمستخدم =====
+    function getOrCreateNumericId() {
+        let currentUser = getCurrentUserFromStorage();
+        
+        if (!currentUser) {
+            return generateNumericId();
+        }
+        
+        // إذا كان لدى المستخدم ID مسبقاً، استخدمه
+        if (currentUser.numericId) {
+            return currentUser.numericId;
+        }
+        
+        // إذا كان المستخدم لديه ID من Firebase، حوله إلى رقم
+        if (currentUser.id && !isNaN(currentUser.id)) {
+            return parseInt(currentUser.id);
+        }
+        
+        // إنشاء ID جديد
+        const newNumericId = generateNumericId();
+        currentUser.numericId = newNumericId;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        return newNumericId;
+    }
+    
+    // ===== دالة التنسيق الرقمي للعرض =====
+    function formatNumericId(id) {
+        if (!id) return "000000";
+        
+        // تحويل إلى رقم
+        const numId = parseInt(id);
+        if (isNaN(numId)) return "000000";
+        
+        // تنسيق بـ 6 أرقام مع إضافة أصفار من اليسار إذا لزم الأمر
+        return numId.toString().padStart(6, '0');
+    }
+    
+    // ===== دالة إخفاء الكود في نص الإشعار =====
+    function hideCodeInNotification(text) {
+        // إذا كان النص يحتوي على كود، نخفيه
+        const codeMatch = text.match(/الكود:\s*([A-Z0-9\-]+)/i);
+        if (codeMatch && codeMatch[1]) {
+            const code = codeMatch[1];
+            // نستبدل الكود بنص "الكود: ***" مع إضافة زر للكشف عنه
+            return text.replace(/الكود:\s*[A-Z0-9\-]+/i, `الكود: <span class="code-in-notification" onclick="showCodeInNotification(this, '${code}')">اضغط للكشف</span>`);
+        }
+        return text;
+    }
+    
+    // ===== دالة للكشف عن الكود في الإشعار =====
+    function showCodeInNotification(element, code) {
+        // تغيير النص للكود الحقيقي
+        element.innerHTML = code;
+        element.style.background = 'linear-gradient(45deg, #10b981, #059669)';
+        element.style.cursor = 'default';
+        
+        // إضافة زر نسخ بجانب الكود
+        const copyBtn = document.createElement('button');
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+        copyBtn.style.background = 'white';
+        copyBtn.style.color = '#059669';
+        copyBtn.style.border = 'none';
+        copyBtn.style.borderRadius = '5px';
+        copyBtn.style.padding = '3px 6px';
+        copyBtn.style.marginRight = '5px';
+        copyBtn.style.cursor = 'pointer';
+        copyBtn.style.fontSize = '0.8rem';
+        copyBtn.title = 'نسخ الكود';
+        copyBtn.onclick = function(e) {
+            e.stopPropagation();
+            navigator.clipboard.writeText(code).then(() => {
+                showFirebaseAlert('✅ تم نسخ الكود', 'success');
+            });
+        };
+        
+        element.insertBefore(copyBtn, element.firstChild);
+        
+        // منع إعادة النقر
+        element.onclick = null;
+    }
+
+    function initializeFirebase() {
+        try {
+            if (!firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+            } else {
+                firebaseApp = firebase.app();
+            }
+            
+            database = firebase.database();
+            auth = firebase.auth();
+            
+            console.log('✅ Firebase initialized successfully');
+            showFirebaseAlert('تم تحميل الصفحة بنجاح ✅', 'success');
+            
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log('👤 User logged in:', user.uid);
+                    updateUI();
+                    // طلب إذن الإشعارات
+                    requestNotificationPermission();
+                } else {
+                    console.log('👤 No user logged in');
+                    updateUI();
+                }
+            });
+            
+        } catch (error) {
+            console.error('❌ Firebase initialization error:', error);
+            showFirebaseAlert('❌ خطأ في الاتصال بـ Firebase', 'error');
+        }
+    }
+
+    // ===== طلب إذن إشعارات سطح المكتب =====
+    function requestNotificationPermission() {
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission().then(permission => {
+                console.log('Notification permission:', permission);
+            });
+        }
+    }
+
+    // ===== عرض رسائل Firebase =====
+    function showFirebaseAlert(message, type) {
+        const alertDiv = document.getElementById('firebaseAlert');
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        alertDiv.className = `firebase-alert firebase-${type}`;
+        alertDiv.style.display = 'flex';
+        
+        setTimeout(() => {
+            alertDiv.style.display = 'none';
+        }, 4000);
+    }
+
+    // ===== عرض إشعار سطح المكتب مرة واحدة فقط =====
+    function showDesktopNotification(title, message, type = 'info') {
+        // التحقق من وجود إشعار نشط
+        if (desktopNotificationShown) return;
+        
+        // التحقق من وجود كود في الإشعار
+        if (message.includes('الكود:')) {
+            // إخفاء الكود في إشعار سطح المكتب
+            message = message.replace(/الكود:\s*[A-Z0-9\-]+/i, 'الكود: ***');
+        }
+        
+        const notification = document.getElementById('desktopNotification');
+        const titleEl = document.getElementById('notificationTitle');
+        const messageEl = document.getElementById('notificationMessage');
+        
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        
+        // تعيين النوع
+        notification.className = `desktop-notification notification-${type}`;
+        
+        // تغيير الأيقونة حسب النوع
+        const icon = notification.querySelector('.notification-icon i');
+        icon.className = type === 'success' ? 'fas fa-check-circle' : 
+                        type === 'error' ? 'fas fa-exclamation-circle' : 
+                        type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-bell';
+        
+        notification.style.display = 'block';
+        desktopNotificationShown = true;
+        
+        // تشغيل صوت الإشعار
+        playNotificationSound();
+        
+        // إغلاق تلقائي بعد 5 ثواني
+        setTimeout(() => {
+            closeDesktopNotification();
+        }, 5000);
+    }
+
+    // ===== إغلاق إشعار سطح المكتب =====
+    function closeDesktopNotification() {
+        document.getElementById('desktopNotification').style.display = 'none';
+        desktopNotificationShown = false;
+    }
+
+    // ===== تشغيل صوت الإشعار =====
+    function playNotificationSound() {
+        try {
+            // استخدام Web Audio API لإنشاء صوت بسيط
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            
+            // هزة خفيفة للصفحة
+            if ('vibrate' in navigator) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
+        } catch (error) {
+            console.log('Sound not available:', error);
+        }
+    }
+
+    // ===== التحقق من الحظر =====
+    async function checkBanStatus() {
+        const currentUser = getCurrentUserFromStorage();
+        if (!currentUser) return;
+        
+        try {
+            if (!database) {
+                console.log('Database not initialized');
+                return;
+            }
+            
+            const userRef = database.ref('users').orderByChild('numericId').equalTo(currentUser.numericId);
+            const snapshot = await userRef.once('value');
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                const userId = Object.keys(users)[0];
+                const userData = users[userId];
+                
+                if (userData.isBanned) {
+                    if(window.isBanAlerting) return;
+                    window.isBanAlerting = true;
+                    
+                    let banDuration = "دائم";
+                    if (userData.banExpiry && userData.banExpiry !== 'permanent') {
+                        const expiryDate = new Date(userData.banExpiry);
+                        const now = new Date();
+                        if (expiryDate > now) {
+                            const diffMs = expiryDate - now;
+                            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            banDuration = `${diffDays} يوم و ${diffHours} ساعة`;
+                        } else {
+                            banDuration = "منتهي";
+                        }
+                    }
+                    
+                    alert(`🚫 تم حظر حسابك من قبل الإدارة!\n\nالسبب: ${userData.banReason || "غير محدد"}\nالمدة: ${banDuration}\n\nيرجى مراجعة الدعم الفني.`);
+                    
+                    await logout();
+                }
+            }
+        } catch (error) {
+            console.error('Error checking ban status:', error);
+        }
+    }
+
+    // ===== دالة جلب بيانات المستخدم من Firebase =====
+    async function getCurrentUserFullData() {
+        try {
+            const currentUser = getCurrentUserFromStorage();
+            if (!currentUser) return null;
+            
+            if (!database) {
+                console.log('Database not initialized');
+                return currentUser;
+            }
+            
+            // الحصول على ID الرقمي
+            const numericId = getOrCreateNumericId();
+            
+            // البحث عن المستخدم باستخدام numericId
+            const userRef = database.ref('users').orderByChild('numericId').equalTo(numericId);
+            const snapshot = await userRef.once('value');
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                const userId = Object.keys(users)[0];
+                const userData = users[userId];
+                
+                // دمج البيانات
+                const mergedUser = {
+                    ...currentUser,
+                    ...userData,
+                    numericId: numericId,
+                    firebaseKey: userId,
+                    id: userId // الحفاظ على ID الأصلي من Firebase
+                };
+                
+                // تأكيد وجود numericId
+                if (!mergedUser.numericId) {
+                    mergedUser.numericId = numericId;
+                }
+                
+                // تحديث LocalStorage
+                localStorage.setItem('currentUser', JSON.stringify(mergedUser));
+                
+                return mergedUser;
+            }
+            
+            // إذا لم يتم العثور على المستخدم في Firebase، قم بإنشائه
+            const newUser = await createUserInFirebase(currentUser, numericId);
+            return newUser;
+            
+        } catch (error) {
+            console.error('Error fetching user from Firebase:', error);
+            return getCurrentUserFromStorage();
+        }
+    }
+
+    // ===== دالة إنشاء مستخدم في Firebase =====
+    async function createUserInFirebase(localUser, numericId) {
+        try {
+            if (!database) return localUser;
+            
+            const newUserRef = database.ref('users').push();
+            const firebaseKey = newUserRef.key;
+            
+            const userData = {
+                numericId: numericId,
+                username: localUser.username || `user_${numericId}`,
+                nickname: localUser.nickname || localUser.username || `user_${numericId}`,
+                password: localUser.password || '123456',
+                email: localUser.email || '',
+                phone: localUser.phone || '',
+                isBanned: false,
+                banReason: '',
+                banExpiry: '',
+                balanceEGP: localUser.balanceEGP || '0.00',
+                balanceUSD: localUser.balanceUSD || '0.00',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            await newUserRef.set(userData);
+            
+            const mergedUser = {
+                ...localUser,
+                ...userData,
+                firebaseKey: firebaseKey,
+                id: firebaseKey
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(mergedUser));
+            
+            return mergedUser;
+            
+        } catch (error) {
+            console.error('Error creating user in Firebase:', error);
+            return localUser;
+        }
+    }
+
+    // ===== دالة مساعدة لجلب المستخدم من LocalStorage =====
+    function getCurrentUserFromStorage() {
+        try {
+            return JSON.parse(localStorage.getItem('currentUser'));
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // ===== دالة تسجيل الدخول =====
+    function isLoggedIn() {
+        const user = getCurrentUserFromStorage();
+        return user !== null;
+    }
+
+    // ===== دالة تحديث واجهة المستخدم المعدلة =====
+    async function updateUI() {
+        await checkBanStatus();
+        
+        const logged = isLoggedIn();
+        document.querySelectorAll('.auth-only').forEach(el => {
+            if (logged) el.classList.remove('hidden-guest');
+            else el.classList.add('hidden-guest');
+        });
+
+        if (!logged) {
+            document.getElementById('p_nickname').innerText = "زائر";
+            document.getElementById('p_id').innerText = "000000";
+            document.getElementById('p_egp').innerText = "0";
+            document.getElementById('p_usd').innerText = "0";
+            document.getElementById('notifBadge').innerText = "0";
+            return;
+        }
+
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user) return;
+
+            // تحديث بيانات الملف الشخصي
+            document.getElementById('p_nickname').innerText = user.nickname || user.username;
+            
+            // عرض ID رقمي منسق
+            const numericId = user.numericId || getOrCreateNumericId();
+            document.getElementById('p_id').innerText = formatNumericId(numericId);
+            
+            document.getElementById('p_egp').innerText = user.balanceEGP || "0";
+            document.getElementById('p_usd').innerText = user.balanceUSD || "0";
+            
+            // جلب الإشعارات من Firebase - الطريقة المعدلة
+            if (database && user.firebaseKey) {
+                const notifRef = database.ref('users/' + user.firebaseKey + '/notifications');
+                
+                // الاستماع للتحديثات في الوقت الحقيقي
+                notifRef.on('value', (snapshot) => {
+                    let notifications = [];
+                    let unreadCount = 0;
+                    
+                    if (snapshot.exists()) {
+                        const notifData = snapshot.val();
+                        for (const key in notifData) {
+                            const notif = notifData[key];
+                            // إخفاء الكود في نص الإشعار
+                            const safeText = hideCodeInNotification(notif.text || '');
+                            
+                            notifications.push({
+                                id: notif.id || key,
+                                text: safeText,
+                                read: notif.read || false,
+                                date: notif.date || new Date().toLocaleString('ar-EG'),
+                                type: notif.type || 'general',
+                                originalText: notif.text || ''
+                            });
+                            if (!notif.read) unreadCount++;
+                        }
+                        
+                        // ترتيب من الأحدث للأقدم
+                        notifications.sort((a, b) => {
+                            const idA = parseInt(a.id) || 0;
+                            const idB = parseInt(b.id) || 0;
+                            return idB - idA;
+                        });
+                    }
+                    
+                    // تحديث العداد (بدون تذبذب)
+                    const badge = document.getElementById('notifBadge');
+                    const unreadEl = document.getElementById('unreadCount');
+                    
+                    // استخدم debounce لمنع التحديث السريع
+                    if (notificationTimers.badgeUpdate) {
+                        clearTimeout(notificationTimers.badgeUpdate);
+                    }
+                    
+                    notificationTimers.badgeUpdate = setTimeout(() => {
+                        badge.innerText = unreadCount;
+                        unreadEl.innerText = unreadCount;
+                    }, 100);
+                    
+                    // تحديث قائمة الإشعارات
+                    const list = document.getElementById('notifList');
+                    if (notifications.length === 0) {
+                        list.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">لا توجد إشعارات</div>';
+                    } else {
+                        list.innerHTML = '';
+                        notifications.forEach(n => {
+                            const div = document.createElement('div');
+                            div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+                            div.innerHTML = `
+                                <div style="flex:1;">
+                                    <div style="display: flex; align-items: flex-start; gap: 10px;">
+                                        <i class="fas fa-${n.type === 'purchase_approved' ? 'check-circle' : n.type === 'purchase_rejected' ? 'times-circle' : n.type === 'deposit' ? 'money-bill-wave' : 'info-circle'}" 
+                                           style="color: ${n.type === 'purchase_approved' ? '#10b981' : n.type === 'purchase_rejected' ? '#ef4444' : n.type === 'deposit' ? '#6366f1' : '#94a3b8'}; margin-top: 2px;"></i>
+                                        <div style="flex: 1;">
+                                            ${n.text}<br>
+                                            <small style="opacity:0.6;">${n.date}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <i class="fas fa-trash-alt delete-single-notif" onclick="deleteSingleNotif('${user.firebaseKey}', '${n.id}')" title="حذف"></i>
+                            `;
+                            list.appendChild(div);
+                        });
+                    }
+                }, (error) => {
+                    console.error('Notifications error:', error);
+                });
+            }
+            
+        } catch (error) {
+            console.error('UI update error:', error);
+        }
+    }
+
+    // ===== الاستماع للإشعارات الفورية - معدل لمنع التكرار =====
+    async function listenForRealTimeNotifications() {
+        const user = await getCurrentUserFullData();
+        if (!user || !database || !user.firebaseKey) return;
+        
+        const notifRef = database.ref('users/' + user.firebaseKey + '/notifications');
+        let lastProcessedId = localStorage.getItem('lastProcessedNotificationId') || null;
+        
+        // الاستماع للإشعارات الجديدة فقط
+        notifRef.orderByChild('createdAt').limitToLast(1).on('child_added', (snapshot) => {
+            const newNotif = snapshot.val();
+            const notifId = snapshot.key;
+            
+            // التحقق مما إذا تم معالجة هذا الإشعار مسبقاً
+            if (lastProcessedId === notifId) return;
+            
+            if (newNotif && !newNotif.read) {
+                // حفظ ID الإشعار الأخير
+                localStorage.setItem('lastProcessedNotificationId', notifId);
+                lastProcessedId = notifId;
+                
+                // إخفاء الكود في الإشعار
+                let safeMessage = newNotif.text;
+                if (safeMessage.includes('الكود:')) {
+                    safeMessage = safeMessage.replace(/الكود:\s*[A-Z0-9\-]+/i, 'الكود: *** (متاح في المحفظة)');
+                }
+                
+                // التحقق من cooldown
+                if (notificationCooldown) return;
+                
+                notificationCooldown = true;
+                
+                // عرض إشعار سطح المكتب مرة واحدة فقط
+                if (newNotif.type === 'purchase_approved') {
+                    showDesktopNotification('✅ تم قبول طلبك', safeMessage, 'success');
+                    showFirebaseAlert('🎉 تم قبول طلبك! الكود متاح في المحفظة', 'success');
+                } else if (newNotif.type === 'purchase_rejected') {
+                    showDesktopNotification('❌ تم رفض طلبك', safeMessage, 'error');
+                    showFirebaseAlert('⚠️ تم رفض طلبك. تحقق من الإشعارات للتفاصيل', 'warning');
+                } else if (newNotif.type === 'deposit') {
+                    showDesktopNotification('💰 تحديث في الإيداع', safeMessage, 'success');
+                }
+                
+                // إعادة تعيين cooldown بعد ثانيتين
+                setTimeout(() => {
+                    notificationCooldown = false;
+                }, 2000);
+            }
+        });
+    }
+
+    // ===== دوال التعامل مع الإشعارات =====
+    async function deleteSingleNotif(userKey, notifId) {
+        try {
+            if (!database) return;
+            
+            const notifRef = database.ref('users/' + userKey + '/notifications');
+            const snapshot = await notifRef.once('value');
+            
+            if (snapshot.exists()) {
+                const notifData = snapshot.val();
+                for (const key in notifData) {
+                    const notif = notifData[key];
+                    // البحث بالإشعار ID أو بالمفتاح
+                    if ((notif.id && notif.id.toString() === notifId.toString()) || key === notifId) {
+                        await database.ref('users/' + userKey + '/notifications/' + key).remove();
+                        showFirebaseAlert("تم حذف الإشعار", 'success');
+                        break;
+                    }
+                }
+            }
+            
+        } catch (error) {
+            console.error('Delete notification error:', error);
+            showFirebaseAlert("❌ خطأ في حذف الإشعار", 'error');
+        }
+    }
+
+    async function markAllRead() {
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user || !database || !user.firebaseKey) return;
+            
+            const notifRef = database.ref('users/' + user.firebaseKey + '/notifications');
+            const snapshot = await notifRef.once('value');
+            
+            if (snapshot.exists()) {
+                const updates = {};
+                const notifData = snapshot.val();
+                for (const key in notifData) {
+                    updates[key + '/read'] = true;
+                }
+                await notifRef.update(updates);
+                showFirebaseAlert("تم تعيين جميع الإشعارات كمقروءة", 'success');
+            }
+            
+        } catch (error) {
+            console.error('Mark all read error:', error);
+        }
+    }
+
+    async function deleteAllNotifs() {
+        if (!confirm("هل تريد حذف جميع الإشعارات؟")) return;
+        
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user || !database || !user.firebaseKey) return;
+            
+            await database.ref('users/' + user.firebaseKey + '/notifications').remove();
+            showFirebaseAlert("تم حذف جميع الإشعارات", 'success');
+            
+        } catch (error) {
+            console.error('Delete all notifications error:', error);
+        }
+    }
+
+    // ===== دالة الشراء المعدلة للعمل مع Firebase =====
+    async function confirmDirectPurchase() {
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user) {
+                alert("يجب تسجيل الدخول أولاً");
+                window.location.href = 'Login.html';
+                return;
+            }
+            
+            if ((user.balanceEGP || 0) < activeProduct.price) {
+                alert(`رصيدك غير كافٍ. تحتاج إلى ${activeProduct.price} ج.م`);
+                openCurrencySelection();
+                return;
+            }
+            
+            // تحديث الرصيد في Firebase
+            await database.ref('users/' + user.firebaseKey).update({
+                balanceEGP: (parseFloat(user.balanceEGP) || 0) - activeProduct.price,
+                updatedAt: new Date().toISOString()
+            });
+            
+            // إنشاء طلب جديد في Firebase
+            const transactionId = "TRX-" + Math.floor(Math.random() * 1000000);
+            const orderData = {
+                orderId: transactionId,
+                userId: user.numericId,
+                username: user.username,
+                nickname: user.nickname || user.username,
+                product: activeProduct.name,
+                price: activeProduct.price + " ج.م",
+                status: 'قيد المراجعة',
+                type: 'purchase',
+                createdAt: new Date().toISOString(),
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            // حفظ الطلب في Firebase
+            await database.ref('orders').push(orderData);
+            
+            // إضافة إشعار للمستخدم في Firebase (بدون كود)
+            const notification = {
+                id: Date.now(),
+                text: `✅ تم طلب ${activeProduct.name}. تم خصم الرصيد. رقم العملية: ${transactionId}`,
+                read: false,
+                date: new Date().toLocaleString('ar-EG'),
+                type: 'purchase',
+                createdAt: new Date().toISOString()
+            };
+            
+            await database.ref('users/' + user.firebaseKey + '/notifications').push(notification);
+            
+            alert("✅ تم إرسال طلبك بنجاح!");
+            closeAll();
+            await updateUI();
+            
+        } catch (error) {
+            console.error('Purchase error:', error);
+            alert("❌ حدث خطأ أثناء عملية الشراء. حاول مرة أخرى.");
+        }
+    }
+
+    // ===== دالة إرسال طلب الشحن المعدلة للعمل مع Firebase =====
+    async function submitTopUp() {
+        const amount = document.getElementById('topUpAmount').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const fileInput = document.getElementById('topUpReceipt');
+        
+        if (!amount || amount <= 0) {
+            showFirebaseAlert("أدخل مبلغاً صحيحاً", 'error');
+            return;
+        }
+        
+        if (!paymentMethod) {
+            showFirebaseAlert("يرجى اختيار وسيلة الدفع", 'error');
+            return;
+        }
+        
+        if (fileInput.files.length === 0) {
+            showFirebaseAlert("يرجى رفع صورة الإيصال", 'error');
+            return;
+        }
+        
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user) {
+                showFirebaseAlert("يجب تسجيل الدخول أولاً", 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const generatedId = "DEP-" + Date.now();
+                
+                // اسم وسيلة الدفع
+                const methodNames = {
+                    'vodafone': 'فودافون كاش',
+                    'instapay': 'إنستا باي',
+                    'binance': 'Binance Pay'
+                };
+                const methodName = methodNames[paymentMethod] || paymentMethod;
+                
+                // حفظ طلب الإيداع في Firebase
+                const orderData = {
+                    orderId: generatedId,
+                    userId: user.numericId,
+                    username: user.username,
+                    nickname: user.nickname || user.username,
+                    product: `إيداع ${selectedCurrency} عبر ${methodName}`,
+                    price: `${amount} ${selectedCurrency}`,
+                    paymentMethod: paymentMethod,
+                    method: methodName,
+                    currency: selectedCurrency,
+                    receipt: e.target.result,
+                    status: 'قيد المراجعة',
+                    type: 'deposit',
+                    createdAt: new Date().toISOString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+                
+                await database.ref('orders').push(orderData);
+                
+                // إضافة إشعار للمستخدم
+                const notification = {
+                    id: Date.now(),
+                    text: `⏳ تم استلام إيصال الإيداع عبر ${methodName}. معرف الطلب: ${generatedId}. برجاء الانتظار لحين اكتمال الطلب من قبل الإدارة.`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'deposit',
+                    createdAt: new Date().toISOString()
+                };
+                
+                await database.ref('users/' + user.firebaseKey + '/notifications').push(notification);
+                
+                showFirebaseAlert(`تم إرسال طلب الشحن عبر ${methodName} بنجاح`, 'success');
+                closeAll();
+                await updateUI();
+            };
+            
+            reader.readAsDataURL(fileInput.files[0]);
+            
+        } catch (error) {
+            console.error('Top-up error:', error);
+            showFirebaseAlert("❌ حدث خطأ أثناء إرسال الطلب", 'error');
+        }
+    }
+
+    // ===== دوال أخرى =====
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    let selectedCurrency = 'EGP';
+    let activeProduct = {};
+
+    function handleProfileClick() {
+        if (!isLoggedIn()) window.location.href = 'Login.html';
+        else openMenu('profileDropdown');
+    }
+
+    function handleSupportClick() {
+        if (!isLoggedIn()) window.location.href = 'Login.html';
+        else window.location.href = 'support.html';
+    }
+
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => { 
+            showFirebaseAlert("تم نسخ المعرف: " + text, 'success'); 
+        });
+    }
+
+    function openMenu(id) {
+        if (!isLoggedIn()) { window.location.href = 'Login.html'; return; }
+        const target = document.getElementById(id);
+        const isOpen = target.classList.contains('active');
+        closeAll();
+        if(!isOpen) {
+            target.classList.add('active');
+            document.getElementById('screenOverlay').style.display = 'block';
+            updateUI();
+        }
+    }
+
+    function closeAll() {
+        document.querySelectorAll('.dropdown-overlay').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('#purchaseModal, #topUpModal, #currencyModal').forEach(m => {
+            m.style.display = 'none'; m.classList.remove('modal-active');
+        });
+        document.getElementById('screenOverlay').style.display = 'none';
+        closeDesktopNotification();
+    }
+
+    function openCurrencySelection() {
+        if (!isLoggedIn()) { window.location.href = 'Login.html'; return; }
+        closeAll();
+        const m = document.getElementById('currencyModal');
+        m.style.display = 'flex'; m.classList.add('modal-active');
+        document.getElementById('screenOverlay').style.display = 'block';
+    }
+
+    function updatePaymentMethodDisplay() {
+        const method = document.getElementById('paymentMethod').value;
+        const display = document.getElementById('selectedPaymentInfo');
+        const nameSpan = document.getElementById('paymentMethodName');
+        
+        const methodNames = {
+            'vodafone': 'فودافون كاش',
+            'instapay': 'إنستا باي',
+            'binance': 'Binance Pay'
+        };
+        
+        if(method && methodNames[method]) {
+            nameSpan.textContent = methodNames[method];
+            display.style.display = 'block';
+        } else {
+            display.style.display = 'none';
+        }
+    }
+
+    function handleCurrencyChoice(currency) {
+        selectedCurrency = currency;
+        closeAll();
+        const methodSelect = document.getElementById('paymentMethod');
+        methodSelect.innerHTML = '';
+        document.getElementById('topUpAmount').value = '';
+        document.getElementById('finalRequiredAmount').innerText = '0';
+        document.getElementById('calculationDisplay').style.display = 'none';
+        document.getElementById('selectedPaymentInfo').style.display = 'none';
+        
+        if(currency === 'USD') {
+            document.getElementById('topUpTitle').innerText = "شحن رصيد (دولار)";
+            document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (USD):";
+            const options = [{val: 'binance', text: 'Binance Pay'}, {val: 'vodafone', text: 'فودافون كاش'}, {val: 'instapay', text: 'إنستا باي'}];
+            options.forEach(opt => { let el = document.createElement('option'); el.value = opt.val; el.innerText = opt.text; methodSelect.appendChild(el); });
+        } else {
+            document.getElementById('topUpTitle').innerText = "شحن رصيد (جنيه مصري)";
+            document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (EGP):";
+            const options = [{val: 'vodafone', text: 'فودافون كاش'}, {val: 'instapay', text: 'إنستا باي'}];
+            options.forEach(opt => { let el = document.createElement('option'); el.value = opt.val; el.innerText = opt.text; methodSelect.appendChild(el); });
+        }
+        updatePaymentDetails();
+        updatePaymentMethodDisplay();
+        document.getElementById('topUpModal').style.display = 'flex';
+        document.getElementById('topUpModal').classList.add('modal-active');
+        document.getElementById('screenOverlay').style.display = 'block';
+    }
+
+    function calculateRequiredAmount() {
+        const amount = parseFloat(document.getElementById('topUpAmount').value) || 0;
+        const method = document.getElementById('paymentMethod').value;
+        const display = document.getElementById('calculationDisplay');
+        const finalLabel = document.getElementById('finalRequiredAmount');
+        if(amount <= 0) { display.style.display = 'none'; return; }
+        display.style.display = 'block';
+        if(selectedCurrency === 'USD') {
+            if(method === 'binance') finalLabel.innerText = amount + " USDT";
+            else finalLabel.innerText = (amount * 50) + " جنيه مصري";
+        } else { finalLabel.innerText = amount + " جنيه مصري"; }
+    }
+
+    function updatePaymentDetails() {
+        const method = document.getElementById('paymentMethod').value;
+        const walletBox = document.getElementById('walletBox');
+        const binanceDetails = document.getElementById('binanceDetails');
+        const hint = document.getElementById('methodHint');
+        walletBox.style.display = 'none'; binanceDetails.style.display = 'none';
+        if(method === 'binance') { binanceDetails.style.display = 'block'; hint.innerText = "بيانات الدفع عبر Binance Pay:"; }
+        else { walletBox.style.display = 'flex'; hint.innerText = "حول للرقم التالي:"; document.getElementById('walletNumber').innerText = "01022797043"; }
+        calculateRequiredAmount();
+        updatePaymentMethodDisplay();
+    }
+
+    function openPurchase(name, price) {
+        if (!isLoggedIn()) { window.location.href = 'Login.html'; return; }
+        closeAll();
+        
+        getCurrentUserFullData().then(user => {
+            if (!user) {
+                window.location.href = 'Login.html';
+                return;
+            }
+            
+            activeProduct = { name, price };
+            if ((user.balanceEGP || 0) < price) {
+                alert(`رصيدك غير كافٍ. تحتاج إلى ${price} ج.م`);
+                openCurrencySelection();
+                return;
+            }
+            
+            document.getElementById('m_info').innerHTML = `شراء: <b>${name}</b><br>التكلفة: <b>${price} ج.م</b>`;
+            document.getElementById('confirmPurchaseBtn').onclick = confirmDirectPurchase;
+            document.getElementById('purchaseModal').style.display = 'flex';
+            document.getElementById('purchaseModal').classList.add('modal-active');
+            document.getElementById('screenOverlay').style.display = 'block';
+        });
+    }
+
+    async function refreshData() {
+        const icon = document.getElementById('refreshIcon');
+        icon.classList.add('refreshing');
+        await updateUI();
+        icon.classList.remove('refreshing');
+    }
+
+    // ===== دالة تسجيل الخروج =====
+    async function logout() {
+        try {
+            if (auth) {
+                await auth.signOut();
+            }
+            
+            localStorage.removeItem('currentUser');
+            window.location.reload();
+            
+        } catch (error) {
+            console.error('Logout error:', error);
+            localStorage.removeItem('currentUser');
+            window.location.reload();
+        }
+    }
+
+    // ===== دوال دعم المحفظة =====
+    
+    // 1. دالة لتحضير بيانات المستخدم للمحفظة
+    async function prepareForWallet() {
+        try {
+            if (!isLoggedIn()) {
+                window.location.href = 'Login.html';
+                return false;
+            }
+            
+            const user = await getCurrentUserFullData();
+            if (!user) {
+                alert("يجب تسجيل الدخول أولاً");
+                window.location.href = 'Login.html';
+                return false;
+            }
+            
+            // إنشاء كائن بيانات مبسط للمحفظة
+            const walletData = {
+                id: user.numericId || user.id,
+                nickname: user.nickname || user.username,
+                balanceEGP: user.balanceEGP || "0",
+                balanceUSD: user.balanceUSD || "0",
+                numericId: user.numericId,
+                username: user.username,
+                email: user.email || '',
+                phone: user.phone || '',
+                firebaseKey: user.firebaseKey,
+                // بيانات البطاقات من Firebase إذا كانت موجودة
+                purchasedCards: user.purchasedCards || []
+            };
+            
+            // حفظ بيانات المحفظة في localStorage
+            localStorage.setItem('walletUserData', JSON.stringify(walletData));
+            
+            // حفظ رمز لجلسة المحفظة
+            const walletSession = {
+                timestamp: Date.now(),
+                userId: user.numericId,
+                sessionId: 'wallet_' + Date.now()
+            };
+            localStorage.setItem('walletSession', JSON.stringify(walletSession));
+            
+            console.log('✅ تم تحضير بيانات المحفظة للمستخدم:', user.nickname);
+            showFirebaseAlert('✅ تم تحضير بيانات المحفظة', 'success');
+            
+            return true;
+            
+        } catch (error) {
+            console.error('Error preparing wallet data:', error);
+            showFirebaseAlert('❌ خطأ في تحضير بيانات المحفظة', 'error');
+            return false;
+        }
+    }
+    
+    // 2. دالة التحقق من جلسة المحفظة
+    function checkWalletSession() {
+        const session = JSON.parse(localStorage.getItem('walletSession'));
+        if (!session) return false;
+        
+        // التحقق من أن الجلسة حديثة (أقل من 5 دقائق)
+        const sessionAge = Date.now() - session.timestamp;
+        if (sessionAge > 5 * 60 * 1000) { // 5 دقائق
+            localStorage.removeItem('walletSession');
+            localStorage.removeItem('walletUserData');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // 3. دالة تحديث بيانات المحفظة بانتظام
+    async function refreshWalletData() {
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user) return false;
+            
+            // تحديث بيانات المحفظة
+            const walletData = {
+                id: user.numericId || user.id,
+                nickname: user.nickname || user.username,
+                balanceEGP: user.balanceEGP || "0",
+                balanceUSD: user.balanceUSD || "0",
+                numericId: user.numericId,
+                username: user.username,
+                email: user.email || '',
+                phone: user.phone || '',
+                firebaseKey: user.firebaseKey,
+                purchasedCards: user.purchasedCards || []
+            };
+            
+            localStorage.setItem('walletUserData', JSON.stringify(walletData));
+            
+            // تحديث الجلسة
+            const walletSession = {
+                timestamp: Date.now(),
+                userId: user.numericId,
+                sessionId: 'wallet_' + Date.now()
+            };
+            localStorage.setItem('walletSession', JSON.stringify(walletSession));
+            
+            console.log('🔄 تم تحديث بيانات المحفظة');
+            return true;
+            
+        } catch (error) {
+            console.error('Error refreshing wallet data:', error);
+            return false;
+        }
+    }
+
+    // ===== التهيئة عند تحميل الصفحة =====
+    window.onload = async function() {
+        initializeFirebase();
+        await updateUI();
+        
+        // تحديث بيانات المحفظة تلقائياً
+        setTimeout(async () => {
+            await refreshWalletData();
+        }, 1000);
+        
+        // تحديث بيانات المحفظة كل دقيقة
+        setInterval(async () => {
+            await refreshWalletData();
+        }, 60000);
+        
+        // الاستماع للإشعارات الفورية
+        setTimeout(async () => {
+            await listenForRealTimeNotifications();
+        }, 2000);
+        
+        setInterval(checkBanStatus, 30000); // كل 30 ثانية
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>الدخول والاشتراك</title>
+    <!-- إضافة Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        :root { --primary: #6366f1; --secondary: #a855f7; --bg: #f8fafc; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            width: 100%; 
+            max-width: 400px; 
+        }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85em; }
+        input, select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            transition: 0.3s; 
+        }
+        input:focus { border-color: var(--primary); outline: none; }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: linear-gradient(to right, var(--primary), var(--secondary)); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 15px; 
+        }
+        .switch-btn { text-align: center; margin-top: 15px; font-size: 0.9em; color: #64748b; }
+        .switch-link { color: var(--primary); cursor: pointer; text-decoration: underline; font-weight: bold; }
+        .hidden { display: none; }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="formCard">
+    <div id="registerSection">
+        <h2>إنشاء حساب جديد</h2>
+        <div id="messageDiv"></div>
+        <form id="regForm">
+            <div class="form-group"><label>اسم المستخدم</label><input type="text" id="regUser" required></div>
+            <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPass" required></div>
+            <div class="form-group"><label>البريد (اختياري)</label><input type="email" id="regEmail"></div>
+            <div class="form-group"><label>الهاتف (اختياري)</label><input type="tel" id="regPhone"></div>
+            <div class="form-group">
+                <label>الكود السري</label>
+                <select id="regQuestion">
+                    <option value="صديق الطفولة">اسم صديق الطفولة</option>
+                    <option value="الاسم المستعار">اسمك المستعار</option>
+                    <option value="المدرسة">اسم المدرسة</option>
+                </select>
+                <input type="text" id="regAnswer" placeholder="الإجابة" required style="margin-top:8px;">
+            </div>
+            <button type="submit">تسجيل الحساب</button>
+        </form>
+        <div class="switch-btn">لديك حساب؟ <span class="switch-link" onclick="toggleForm()">سجل دخولك هنا</span></div>
+    </div>
+
+    <div id="loginSection" class="hidden">
+        <h2>تسجيل الدخول</h2>
+        <div id="loginMessage"></div>
+        <form id="loginForm">
+            <div class="form-group"><label>اسم المستخدم</label><input type="text" id="loginUser" required></div>
+            <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPass" required></div>
+            <button type="submit" style="background: #10b981;">دخول</button>
+        </form>
+        <div class="switch-btn">ليس لديك حساب؟ <span class="switch-link" onclick="toggleForm()">إنشاء حساب جديد</span></div>
+    </div>
+</div>
+
+<script>
+// 🔥 إعدادات Firebase - نفس إعدادات صفحة الإدارة
+const firebaseConfig = {
+    apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+    authDomain: "vipclub-1d04a.firebaseapp.com",
+    databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+    projectId: "vipclub-1d04a",
+    storageBucket: "vipclub-1d04a.firebasestorage.app",
+    messagingSenderId: "120667552740",
+    appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+};
+
+// تهيئة Firebase
+let database;
+try {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    database = firebase.database();
+    console.log('✅ Firebase متصل بنجاح');
+} catch (error) {
+    console.error('❌ خطأ في الاتصال:', error);
+    showMessage('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
+}
+
+function toggleForm() {
+    document.getElementById('registerSection').classList.toggle('hidden');
+    document.getElementById('loginSection').classList.toggle('hidden');
+    clearMessages();
+}
+
+function showMessage(text, type, elementId = 'messageDiv') {
+    const div = document.getElementById(elementId);
+    div.innerHTML = `<div class="message ${type}">${text}</div>`;
+    setTimeout(() => div.innerHTML = '', 5000);
+}
+
+function clearMessages() {
+    document.getElementById('messageDiv').innerHTML = '';
+    document.getElementById('loginMessage').innerHTML = '';
+}
+
+// ===== دالة إنشاء ID رقمي (مطابق للصفحة الرئيسية والإدارة) =====
+function generateNumericId() {
+    // إنشاء ID مكون من 6 أرقام
+    return Math.floor(100000 + Math.random() * 900000);
+}
+
+// ===== دالة التحقق من اسم المستخدم المحذوف =====
+async function checkDeletedUser(username, numericId = null) {
+    if (!database) return false;
+    
+    try {
+        // التحقق من جدول المستخدمين المحذوفين
+        const snapshot = await database.ref('deleted_users').orderByChild('username').equalTo(username).once('value');
+        
+        if (snapshot.exists()) {
+            // اسم المستخدم محذوف من قبل
+            return true;
+        }
+        
+        // التحقق باستخدام numericId إذا كان موجوداً
+        if (numericId) {
+            const idSnapshot = await database.ref('deleted_users').orderByChild('numericId').equalTo(numericId).once('value');
+            if (idSnapshot.exists()) {
+                return true;
+            }
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Error checking deleted user:', error);
+        return false;
+    }
+}
+
+// 1. إنشاء حساب جديد في Firebase (محسّن ومتوافق)
+document.getElementById('regForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!database) {
+        showMessage('❌ قاعدة البيانات غير متصلة', 'error');
+        return;
+    }
+    
+    const username = document.getElementById('regUser').value.trim();
+    const password = document.getElementById('regPass').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const question = document.getElementById('regQuestion').value;
+    const answer = document.getElementById('regAnswer').value.trim();
+    
+    if (!username || !password) {
+        showMessage('⚠️ يرجى إدخال اسم المستخدم وكلمة المرور', 'error');
+        return;
+    }
+    
+    try {
+        // ===== التحقق من اسم المستخدم المحذوف =====
+        const isDeleted = await checkDeletedUser(username);
+        if (isDeleted) {
+            showMessage('❌ تم حذف هذا الحساب أو حظره مسبقاً ❌', 'error');
+            return;
+        }
+        
+        // التحقق من عدم وجود المستخدم مسبقاً في المستخدمين النشطين
+        const snapshot = await database.ref('users').orderByChild('username').equalTo(username).once('value');
+        
+        if (snapshot.exists()) {
+            showMessage('❌ اسم المستخدم موجود بالفعل', 'error');
+            return;
+        }
+        
+        // إنشاء معرف رقمي فريد
+        let numericId;
+        let isUnique = false;
+        let attempts = 0;
+        
+        // التأكد من أن الـ ID فريد
+        while (!isUnique && attempts < 10) {
+            numericId = generateNumericId();
+            const idCheck = await database.ref('users').orderByChild('numericId').equalTo(numericId).once('value');
+            const deletedCheck = await database.ref('deleted_users').orderByChild('numericId').equalTo(numericId).once('value');
+            
+            if (!idCheck.exists() && !deletedCheck.exists()) {
+                isUnique = true;
+            }
+            attempts++;
+        }
+        
+        if (!isUnique) {
+            showMessage('❌ حدث خطأ في إنشاء الحساب. حاول مرة أخرى', 'error');
+            return;
+        }
+        
+        // بيانات المستخدم الجديد - مع جميع الحقول المطلوبة
+        const newUser = {
+            numericId: numericId,
+            username: username,
+            password: password,
+            nickname: username,
+            email: email || '',
+            email2: '',
+            phone: phone || '',
+            phone2: '',
+            gender: '',
+            age: '',
+            country: '',
+            bio: '',
+            question: question,
+            answer: answer,
+            balanceEGP: 0.00,
+            balanceUSD: 0.00,
+            isBanned: false,
+            banReason: "",
+            banExpiry: "",
+            notifications: [],
+            lastNicknameChange: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        // حفظ في Firebase
+        const newUserRef = database.ref('users').push();
+        await newUserRef.set(newUser);
+        
+        const userId = newUserRef.key;
+        
+        showMessage(`✅ تم إنشاء الحساب بنجاح!<br>معرفك: <b>${numericId}</b>`, 'success');
+        
+        // ===== حفظ بيانات المستخدم في localStorage بشكل متوافق مع صفحة الإعدادات =====
+        localStorage.setItem('currentUser', JSON.stringify({
+            id: numericId, // 🔴 مهم: نستخدم numericId بدلاً من userId
+            numericId: numericId,
+            username: username,
+            nickname: username,
+            email: email || '',
+            phone: phone || '',
+            firebaseKey: userId,
+            balanceEGP: 0.00,
+            balanceUSD: 0.00,
+            isBanned: false,
+            createdAt: new Date().toISOString()
+        }));
+        
+        // ===== حذف بيانات المستخدم من الجدول المحذوفين إذا كان موجوداً =====
+        const deletedSnapshot = await database.ref('deleted_users').orderByChild('username').equalTo(username).once('value');
+        if (deletedSnapshot.exists()) {
+            deletedSnapshot.forEach(async (childSnapshot) => {
+                await database.ref('deleted_users/' + childSnapshot.key).remove();
+            });
+        }
+        
+        // الانتقال للصفحة الرئيسية بعد 2 ثانية
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 2000);
+        
+    } catch (error) {
+        showMessage('❌ خطأ في التسجيل: ' + error.message, 'error');
+        console.error('Registration error:', error);
+    }
+});
+
+// 2. تسجيل الدخول من Firebase (محسّن ومتوافق)
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!database) {
+        showMessage('❌ قاعدة البيانات غير متصلة', 'error', 'loginMessage');
+        return;
+    }
+    
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value.trim();
+    
+    if (!username || !password) {
+        showMessage('⚠️ يرجى إدخال بيانات الدخول', 'error', 'loginMessage');
+        return;
+    }
+    
+    try {
+        // ===== التحقق من أن المستخدم ليس محذوفاً =====
+        const isDeleted = await checkDeletedUser(username);
+        if (isDeleted) {
+            showMessage('❌ هذا الحساب تم حذفه أو حظره نهائياً ❌', 'error', 'loginMessage');
+            return;
+        }
+        
+        // البحث عن المستخدم في Firebase
+        const snapshot = await database.ref('users').orderByChild('username').equalTo(username).once('value');
+        
+        if (!snapshot.exists()) {
+            showMessage('❌ اسم المستخدم غير صحيح', 'error', 'loginMessage');
+            return;
+        }
+        
+        let foundUser = null;
+        let userId = null;
+        
+        snapshot.forEach((childSnapshot) => {
+            const user = childSnapshot.val();
+            if (user.password === password) {
+                foundUser = user;
+                userId = childSnapshot.key;
+            }
+        });
+        
+        if (!foundUser) {
+            showMessage('❌ كلمة المرور غير صحيحة', 'error', 'loginMessage');
+            return;
+        }
+        
+        // فحص الحظر
+        if (foundUser.isBanned) {
+            let message = `🚫 حسابك محظور!\nالسبب: ${foundUser.banReason || 'غير محدد'}`;
+            
+            if (foundUser.banExpiry && foundUser.banExpiry !== "permanent") {
+                const expiry = new Date(foundUser.banExpiry);
+                const now = new Date();
+                
+                if (expiry > now) {
+                    const diff = expiry - now;
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    message += `\nينتهي بعد: ${days} يوم و ${hours} ساعة`;
+                    
+                    alert(message);
+                    return;
+                } else {
+                    // فك الحظر التلقائي لأن المدة انتهت
+                    await database.ref('users/' + userId).update({
+                        isBanned: false,
+                        banExpiry: "",
+                        banReason: "",
+                        updatedAt: new Date().toISOString()
+                    });
+                    foundUser.isBanned = false;
+                }
+            } else if (foundUser.banExpiry === "permanent") {
+                message += "\nالحظر دائم!";
+                alert(message);
+                return;
+            }
+        }
+        
+        // ===== حفظ بيانات المستخدم في localStorage بشكل متوافق مع صفحة الإعدادات =====
+        localStorage.setItem('currentUser', JSON.stringify({
+            id: foundUser.numericId, // 🔴 مهم: نستخدم numericId بدلاً من userId
+            numericId: foundUser.numericId,
+            username: foundUser.username,
+            nickname: foundUser.nickname || foundUser.username,
+            email: foundUser.email || '',
+            phone: foundUser.phone || '',
+            firebaseKey: userId,
+            balanceEGP: foundUser.balanceEGP || 0.00,
+            balanceUSD: foundUser.balanceUSD || 0.00,
+            isBanned: foundUser.isBanned || false,
+            createdAt: foundUser.createdAt || new Date().toISOString()
+        }));
+        
+        showMessage('✅ تم تسجيل الدخول بنجاح', 'success', 'loginMessage');
+        
+        // توجيه للصفحة الرئيسية
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1500);
+        
+    } catch (error) {
+        showMessage('❌ خطأ في الدخول: ' + error.message, 'error', 'loginMessage');
+        console.error('Login error:', error);
+    }
+});
+
+// ===== دالة مزامنة البيانات (محسنة لمنع التكرار) =====
+async function syncWithLocalStorage() {
+    try {
+        if (!database) return;
+        
+        const localUsers = JSON.parse(localStorage.getItem('app_users')) || [];
+        
+        if (localUsers.length === 0) return;
+        
+        console.log(`📦 جاري مزامنة ${localUsers.length} مستخدم من localStorage`);
+        
+        let syncedCount = 0;
+        let skippedCount = 0;
+        
+        for (const user of localUsers) {
+            try {
+                // التحقق إذا كان المستخدم محذوفاً
+                if (await checkDeletedUser(user.username, user.numericId)) {
+                    console.log(`⏭️ تخطي مستخدم محذوف: ${user.username}`);
+                    skippedCount++;
+                    continue;
+                }
+                
+                // التحقق إذا كان المستخدم موجود بالفعل في Firebase
+                const snapshot = await database.ref('users').orderByChild('username').equalTo(user.username).once('value');
+                
+                if (snapshot.exists()) {
+                    console.log(`✅ المستخدم موجود بالفعل: ${user.username}`);
+                    skippedCount++;
+                    continue;
+                }
+                
+                // إنشاء ID رقمي جديد إذا لم يكن موجوداً
+                let numericId = user.numericId;
+                if (!numericId || numericId.toString().length < 6) {
+                    numericId = generateNumericId();
+                }
+                
+                // التأكد من أن الـ ID فريد
+                const idCheck = await database.ref('users').orderByChild('numericId').equalTo(numericId).once('value');
+                if (idCheck.exists()) {
+                    numericId = generateNumericId(); // إنشاء ID جديد
+                }
+                
+                // إضافة المستخدم إلى Firebase
+                const newUserRef = database.ref('users').push();
+                await newUserRef.set({
+                    numericId: numericId,
+                    username: user.username || `user_${Date.now()}`,
+                    password: user.password || '123456',
+                    nickname: user.nickname || user.username,
+                    email: user.email || '',
+                    email2: '',
+                    phone: user.phone || '',
+                    phone2: '',
+                    gender: '',
+                    age: '',
+                    country: '',
+                    bio: '',
+                    question: user.question || 'المدرسة',
+                    answer: user.answer || '',
+                    balanceEGP: parseFloat(user.balanceEGP) || 0.00,
+                    balanceUSD: parseFloat(user.balanceUSD) || 0.00,
+                    isBanned: user.isBanned === true,
+                    banReason: user.banReason || '',
+                    banExpiry: user.banExpiry || '',
+                    notifications: user.notifications || [],
+                    lastNicknameChange: user.lastNicknameChange || 0,
+                    createdAt: user.createdAt || new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                });
+                
+                console.log(`✅ تمت مزامنة: ${user.username} (ID: ${numericId})`);
+                syncedCount++;
+                
+                // حذف المستخدم من localStorage بعد المزامنة الناجحة
+                localUsers.splice(localUsers.indexOf(user), 1);
+                
+            } catch (error) {
+                console.error(`❌ خطأ في مزامنة ${user.username}:`, error);
+            }
+        }
+        
+        // تحديث localStorage بدون المستخدمين الذين تمت مزامنتهم
+        localStorage.setItem('app_users', JSON.stringify(localUsers));
+        
+        if (syncedCount > 0) {
+            console.log(`🎉 تمت مزامنة ${syncedCount} مستخدم بنجاح (تم تخطي ${skippedCount})`);
+        }
+        
+    } catch (error) {
+        console.error('❌ خطأ في مزامنة البيانات:', error);
+    }
+}
+
+// ===== دالة تنظيف المستخدمين المكررين من Firebase =====
+async function cleanDuplicateUsers() {
+    if (!database) return;
+    
+    try {
+        const snapshot = await database.ref('users').once('value');
+        
+        if (!snapshot.exists()) return;
+        
+        const users = snapshot.val();
+        const usernames = new Set();
+        const duplicates = [];
+        
+        // اكتشاف المستخدمين المكررين
+        for (const userId in users) {
+            const user = users[userId];
+            const username = user.username;
+            
+            if (usernames.has(username)) {
+                duplicates.push({ userId, username });
+            } else {
+                usernames.add(username);
+            }
+        }
+        
+        // حذف المكررات (باستثناء أول ظهور)
+        for (const dup of duplicates) {
+            console.log(`🗑️ حذف مستخدم مكرر: ${dup.username} (${dup.userId})`);
+            await database.ref('users/' + dup.userId).remove();
+        }
+        
+        if (duplicates.length > 0) {
+            console.log(`✅ تم حذف ${duplicates.length} مستخدم مكرر`);
+        }
+        
+    } catch (error) {
+        console.error('❌ خطأ في تنظيف المستخدمين المكررين:', error);
+    }
+}
+
+// ===== تهيئة الصفحة =====
+window.onload = async function() {
+    try {
+        if (database) {
+            console.log('🔄 جاري تهيئة الصفحة...');
+            
+            // تنظيف المستخدمين المكررين (مرة واحدة)
+            await cleanDuplicateUsers();
+            
+            // مزامنة البيانات من localStorage
+            await syncWithLocalStorage();
+            
+            // تحميل بيانات المزامنة
+            loadSyncStats();
+        }
+    } catch (error) {
+        console.error('❌ خطأ في تهيئة الصفحة:', error);
+    }
+};
+
+// ===== تحميل إحصائيات المزامنة =====
+function loadSyncStats() {
+    try {
+        const syncStats = JSON.parse(localStorage.getItem('sync_stats')) || { lastSync: null, syncedCount: 0 };
+        
+        if (syncStats.lastSync) {
+            const lastSyncDate = new Date(syncStats.lastSync);
+            const now = new Date();
+            const diffHours = Math.floor((now - lastSyncDate) / (1000 * 60 * 60));
+            
+            if (diffHours > 24) {
+                console.log('🔄 جاهز للمزامنة (آخر مزامنة قبل أكثر من 24 ساعة)');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading sync stats:', error);
+    }
+}
+
+// ===== اختصارات لوحة المفاتيح =====
+document.addEventListener('keydown', function(e) {
+    // Ctrl+Shift+L لتسجيل الدخول كمسؤول (للاختبار)
+    if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        document.getElementById('loginUser').value = 'admin';
+        document.getElementById('loginPass').value = 'admin123';
+        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+    }
+    
+    // Ctrl+Shift+R للانتقال للتسجيل
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        if (document.getElementById('registerSection').classList.contains('hidden')) {
+            toggleForm();
+        }
+    }
+});
+
+// ===== دالة للتحقق من حالة الاتصال =====
+setInterval(() => {
+    if (!database) {
+        console.warn('⚠️ فقد الاتصال بقاعدة البيانات');
+        showMessage('⚠️ فقد الاتصال بقاعدة البيانات. يرجى تحديث الصفحة', 'error');
+    }
+}, 30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>إدارة الأرصدة والإشعارات - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h1 i {
+            font-size: 2rem;
+        }
+
+        /* البحث */
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 50px 12px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem;
+            color: var(--dark);
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            background: white;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* الأزرار */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: var(--primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* الجدول */
+        .table-container {
+            overflow-x: auto;
+            margin: 0 30px 30px;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+        }
+
+        th {
+            color: white;
+            padding: 18px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        th:not(:last-child):after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: #f1f5f9;
+        }
+
+        td {
+            padding: 15px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* البادجات */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .badge-primary {
+            background: #e0e7ff;
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .badge-dark {
+            background: #f1f5f9;
+            color: var(--dark);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* أزرار الإجراءات */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        /* رسائل التنبيه */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+
+        .alert-success {
+            background: var(--success);
+            color: white;
+            border-left: 5px solid #059669;
+        }
+
+        .alert-error {
+            background: var(--danger);
+            color: white;
+            border-left: 5px solid #dc2626;
+        }
+
+        .alert-warning {
+            background: var(--warning);
+            color: white;
+            border-left: 5px solid #d97706;
+        }
+
+        .alert-info {
+            background: var(--primary);
+            color: white;
+            border-left: 5px solid #4f46e5;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* شاشة التحميل */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* رسالة فارغة */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #475569;
+        }
+
+        /* العداد */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 15px 30px;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* متجاوب */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            
+            .search-container {
+                max-width: 100%;
+            }
+            
+            .controls {
+                margin: 15px;
+                justify-content: center;
+            }
+            
+            .table-container {
+                margin: 0 15px 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+        }
+
+        /* تعديلات إضافية */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .balance-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .egp-balance {
+            color: var(--success);
+        }
+
+        .usd-balance {
+            color: var(--primary);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-active {
+            background: var(--success);
+        }
+
+        .dot-banned {
+            background: var(--danger);
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div style="color: var(--primary); font-weight: bold; font-size: 1.1rem;">جاري تحميل بيانات المستخدمين...</div>
+</div>
+
+<div id="alert" class="alert" style="display: none;"></div>
+
+<div class="container">
+    <div class="header">
+        <h1>
+            <i class="fas fa-users-cog"></i>
+            لوحة تحكم VipClub
+        </h1>
+        <div class="search-container">
+            <input type="text" 
+                   class="search-box" 
+                   id="searchInput" 
+                   placeholder="ابحث عن مستخدم بالاسم، البريد، أو المعرف..."
+                   onkeyup="filterUsers()">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" onclick="refreshData()">
+            <i class="fas fa-sync-alt"></i> تحديث البيانات
+        </button>
+        <button class="btn btn-success" onclick="exportToExcel()">
+            <i class="fas fa-file-export"></i> تصدير بيانات
+        </button>
+        <button class="btn btn-secondary" onclick="goToHome()">
+            <i class="fas fa-home"></i> الصفحة الرئيسية
+        </button>
+        <div style="flex: 1"></div>
+        <select class="btn btn-secondary" id="filterSelect" onchange="filterUsers()" style="min-width: 150px;">
+            <option value="all">جميع المستخدمين</option>
+            <option value="active">النشطين فقط</option>
+            <option value="banned">المحظورين فقط</option>
+            <option value="admin">المديرين فقط</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>المعرف</th>
+                    <th>المستخدم</th>
+                    <th>الرصيد (EGP)</th>
+                    <th>الرصيد (USD)</th>
+                    <th>الحالة</th>
+                    <th>الدور</th>
+                    <th>تاريخ التسجيل</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <h3>جاري تحميل البيانات...</h3>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+            <span class="stat-value" id="totalUsers">0</span>
+            <span class="stat-label">إجمالي المستخدمين</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="activeUsers">0</span>
+            <span class="stat-label">المستخدمين النشطين</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="bannedUsers">0</span>
+            <span class="stat-label">المستخدمين المحظورين</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="totalBalanceEGP">0</span>
+            <span class="stat-label">إجمالي الأرصدة (ج.م)</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 🔥 تكوين Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+        authDomain: "vipclub-1d04a.firebaseapp.com",
+        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+        projectId: "vipclub-1d04a",
+        storageBucket: "vipclub-1d04a.firebasestorage.app",
+        messagingSenderId: "120667552740",
+        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    };
+
+    // تهيئة Firebase
+    let firebaseApp, database, auth;
+    let allUsers = [];
+    let currentUsers = [];
+
+    // ===== دوال المساعدة =====
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.getElementById('alert');
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                             type === 'error' ? 'exclamation-circle' : 
+                             type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.style.display = 'flex';
+        
+        setTimeout(() => {
+            alertDiv.style.display = 'none';
+        }, 4000);
+    }
+
+    function showLoading(show) {
+        document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+    }
+
+    function goToHome() {
+        window.location.href = 'index.html';
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'غير معروف';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ar-EG', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    function formatNumericId(id) {
+        if (!id) return "000000";
+        const numId = parseInt(id);
+        if (isNaN(numId)) return "000000";
+        return numId.toString().padStart(6, '0');
+    }
+
+    // ===== تهيئة Firebase =====
+    function initializeFirebase() {
+        try {
+            if (!firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+            } else {
+                firebaseApp = firebase.app();
+            }
+            
+            database = firebase.database();
+            auth = firebase.auth();
+            
+            console.log('✅ تم تهيئة Firebase بنجاح');
+            
+            // تحميل بيانات المستخدمين
+            loadUsers();
+            
+        } catch (error) {
+            console.error('❌ خطأ في تهيئة Firebase:', error);
+            showAlert('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
+        }
+    }
+
+    // ===== تحميل المستخدمين من Firebase =====
+    async function loadUsers() {
+        showLoading(true);
+        
+        try {
+            const usersRef = database.ref('users');
+            const snapshot = await usersRef.once('value');
+            
+            if (snapshot.exists()) {
+                allUsers = [];
+                const usersData = snapshot.val();
+                
+                for (const userId in usersData) {
+                    const user = usersData[userId];
+                    allUsers.push({
+                        firebaseKey: userId,
+                        id: user.numericId || userId,
+                        numericId: user.numericId,
+                        username: user.username || 'غير معروف',
+                        nickname: user.nickname || user.username || 'غير معروف',
+                        email: user.email || 'غير متوفر',
+                        phone: user.phone || 'غير متوفر',
+                        balanceEGP: user.balanceEGP || '0',
+                        balanceUSD: user.balanceUSD || '0',
+                        isBanned: user.isBanned || false,
+                        banReason: user.banReason || '',
+                        banExpiry: user.banExpiry || '',
+                        createdAt: user.createdAt || new Date().toISOString(),
+                        updatedAt: user.updatedAt || '',
+                        role: user.role || 'user',
+                        lastLogin: user.lastLogin || ''
+                    });
+                }
+                
+                console.log(`✅ تم تحميل ${allUsers.length} مستخدم`);
+                showAlert(`تم تحميل ${allUsers.length} مستخدم بنجاح`, 'success');
+                
+                // تحديث الإحصائيات
+                updateStats();
+                
+                // عرض المستخدمين
+                filterUsers();
+                
+            } else {
+                document.getElementById('usersTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="fas fa-users-slash"></i>
+                                <h3>لا يوجد مستخدمين مسجلين بعد</h3>
+                                <p>ابدأ بإضافة أول مستخدم إلى النظام</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                showAlert('لا يوجد مستخدمين مسجلين في النظام', 'warning');
+            }
+            
+        } catch (error) {
+            console.error('❌ خطأ في تحميل المستخدمين:', error);
+            showAlert('❌ فشل في تحميل بيانات المستخدمين', 'error');
+            
+            document.getElementById('usersTableBody').innerHTML = `
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>خطأ في الاتصال</h3>
+                            <p>تأكد من اتصال الإنترنت وحاول مرة أخرى</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===== تحديث الإحصائيات =====
+    function updateStats() {
+        const totalUsers = allUsers.length;
+        const activeUsers = allUsers.filter(user => !user.isBanned).length;
+        const bannedUsers = allUsers.filter(user => user.isBanned).length;
+        
+        const totalBalanceEGP = allUsers.reduce((sum, user) => {
+            return sum + (parseFloat(user.balanceEGP) || 0);
+        }, 0);
+        
+        document.getElementById('totalUsers').textContent = totalUsers;
+        document.getElementById('activeUsers').textContent = activeUsers;
+        document.getElementById('bannedUsers').textContent = bannedUsers;
+        document.getElementById('totalBalanceEGP').textContent = totalBalanceEGP.toFixed(2);
+    }
+
+    // ===== فلترة المستخدمين =====
+    function filterUsers() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const filterType = document.getElementById('filterSelect').value;
+        
+        currentUsers = allUsers.filter(user => {
+            // البحث
+            const matchesSearch = 
+                (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+                (user.nickname && user.nickname.toLowerCase().includes(searchTerm)) ||
+                (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+                (user.numericId && user.numericId.toString().includes(searchTerm));
+            
+            // الفلترة حسب النوع
+            let matchesFilter = true;
+            switch (filterType) {
+                case 'active':
+                    matchesFilter = !user.isBanned;
+                    break;
+                case 'banned':
+                    matchesFilter = user.isBanned === true;
+                    break;
+                case 'admin':
+                    matchesFilter = user.role === 'admin';
+                    break;
+            }
+            
+            return matchesSearch && matchesFilter;
+        });
+        
+        displayUsers();
+    }
+
+    // ===== عرض المستخدمين في الجدول =====
+    function displayUsers() {
+        const tbody = document.getElementById('usersTableBody');
+        
+        if (currentUsers.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>لا توجد نتائج</h3>
+                            <p>جرب مصطلحات بحث أخرى أو غير الفلتر</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        
+        currentUsers.forEach(user => {
+            const row = document.createElement('tr');
+            
+            // حالة المستخدم
+            const statusBadge = user.isBanned ? 
+                `<span class="badge badge-danger">
+                    <span class="dot dot-banned"></span> محظور
+                </span>` : 
+                `<span class="badge badge-success">
+                    <span class="dot dot-active"></span> نشط
+                </span>`;
+            
+            // دور المستخدم
+            const roleBadge = user.role === 'admin' ? 
+                `<span class="badge badge-primary"><i class="fas fa-crown"></i> مدير</span>` :
+                `<span class="badge badge-dark"><i class="fas fa-user"></i> مستخدم</span>`;
+            
+            row.innerHTML = `
+                <td>
+                    <span class="badge badge-dark">${formatNumericId(user.numericId)}</span>
+                </td>
+                <td>
+                    <div class="user-info">
+                        <div class="user-name">${user.nickname}</div>
+                        <div class="user-email">${user.email}</div>
+                        <small style="color: #94a3b8; font-size: 0.8rem;">@${user.username}</small>
+                    </div>
+                </td>
+                <td>
+                    <span class="balance-amount egp-balance">${parseFloat(user.balanceEGP).toFixed(2)} ج.م</span>
+                </td>
+                <td>
+                    <span class="balance-amount usd-balance">${parseFloat(user.balanceUSD).toFixed(2)} $</span>
+                </td>
+                <td>${statusBadge}</td>
+                <td>${roleBadge}</td>
+                <td>
+                    <span style="font-size: 0.9rem;">${formatDate(user.createdAt)}</span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn" style="background: var(--success); color: white;" 
+                                onclick="updateBalance('${user.firebaseKey}', '${user.username}')">
+                            <i class="fas fa-wallet"></i> رصيد
+                        </button>
+                        <button class="action-btn" style="background: var(--warning); color: white;" 
+                                onclick="sendNotification('${user.firebaseKey}', '${user.username}')">
+                            <i class="fas fa-bell"></i> إشعار
+                        </button>
+                        <button class="action-btn" style="background: var(--danger); color: white;" 
+                                onclick="toggleBan('${user.firebaseKey}', '${user.username}', ${user.isBanned})">
+                            <i class="fas ${user.isBanned ? 'fa-unlock' : 'fa-ban'}"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+    }
+
+    // ===== تحديث رصيد المستخدم =====
+    async function updateBalance(firebaseKey, username) {
+        const user = allUsers.find(u => u.firebaseKey === firebaseKey);
+        if (!user) return;
+        
+        const currentEGP = parseFloat(user.balanceEGP) || 0;
+        const currentUSD = parseFloat(user.balanceUSD) || 0;
+        
+        const newEGP = prompt(`تعديل رصيد ${username}\n\nالرصيد الحالي EGP: ${currentEGP.toFixed(2)}`, currentEGP);
+        if (newEGP === null) return;
+        
+        const newUSD = prompt(`تعديل رصيد ${username}\n\nالرصيد الحالي USD: ${currentUSD.toFixed(2)}`, currentUSD);
+        if (newUSD === null) return;
+        
+        try {
+            showLoading(true);
+            
+            await database.ref(`users/${firebaseKey}`).update({
+                balanceEGP: parseFloat(newEGP) || 0,
+                balanceUSD: parseFloat(newUSD) || 0,
+                updatedAt: new Date().toISOString()
+            });
+            
+            // إرسال إشعار للمستخدم
+            const notification = {
+                id: Date.now(),
+                text: `💰 تم تحديث رصيدك\nالجديد: ${parseFloat(newEGP).toFixed(2)} ج.م | ${parseFloat(newUSD).toFixed(2)} $`,
+                read: false,
+                date: new Date().toLocaleString('ar-EG'),
+                type: 'balance_update',
+                createdAt: new Date().toISOString()
+            };
+            
+            await database.ref(`users/${firebaseKey}/notifications`).push(notification);
+            
+            // إعادة تحميل البيانات
+            await loadUsers();
+            
+            showAlert(`✅ تم تحديث رصيد ${username} بنجاح`, 'success');
+            
+        } catch (error) {
+            console.error('❌ خطأ في تحديث الرصيد:', error);
+            showAlert('❌ فشل في تحديث الرصيد', 'error');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===== إرسال إشعار للمستخدم =====
+    async function sendNotification(firebaseKey, username) {
+        const message = prompt(`إرسال إشعار إلى ${username}\n\nاكتب نص الإشعار:`);
+        if (!message || message.trim() === '') return;
+        
+        try {
+            showLoading(true);
+            
+            const notification = {
+                id: Date.now(),
+                text: `📢 ${message.trim()}`,
+                read: false,
+                date: new Date().toLocaleString('ar-EG'),
+                type: 'admin_message',
+                createdAt: new Date().toISOString()
+            };
+            
+            await database.ref(`users/${firebaseKey}/notifications`).push(notification);
+            
+            showAlert(`✅ تم إرسال الإشعار إلى ${username}`, 'success');
+            
+        } catch (error) {
+            console.error('❌ خطأ في إرسال الإشعار:', error);
+            showAlert('❌ فشل في إرسال الإشعار', 'error');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===== حظر/فك حظر المستخدم =====
+    async function toggleBan(firebaseKey, username, isBanned) {
+        const action = isBanned ? 'فك الحظر عن' : 'حظر';
+        
+        if (!confirm(`هل أنت متأكد من ${action} ${username}؟`)) {
+            return;
+        }
+        
+        try {
+            showLoading(true);
+            
+            if (!isBanned) {
+                // حظر المستخدم
+                const reason = prompt(`سبب حظر ${username}:`);
+                if (!reason || reason.trim() === '') {
+                    showAlert('يجب إدخال سبب الحظر', 'warning');
+                    return;
+                }
+                
+                const duration = prompt(`مدة الحظر بالأيام (0 للحظر الدائم):`);
+                if (duration === null) return;
+                
+                const banExpiry = duration === "0" ? 'permanent' : 
+                    new Date(Date.now() + (parseInt(duration) * 24 * 60 * 60 * 1000)).toISOString();
+                
+                await database.ref(`users/${firebaseKey}`).update({
+                    isBanned: true,
+                    banReason: reason,
+                    banExpiry: banExpiry,
+                    bannedAt: new Date().toISOString()
+                });
+                
+                // إرسال إشعار الحظر
+                const notification = {
+                    id: Date.now(),
+                    text: `🚫 تم حظر حسابك\nالسبب: ${reason}\n${duration === "0" ? 'الحظر: دائم' : `المدة: ${duration} يوم`}`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'ban',
+                    createdAt: new Date().toISOString()
+                };
+                
+                await database.ref(`users/${firebaseKey}/notifications`).push(notification);
+                
+                showAlert(`✅ تم حظر ${username} بنجاح`, 'success');
+                
+            } else {
+                // فك الحظر
+                await database.ref(`users/${firebaseKey}`).update({
+                    isBanned: false,
+                    banReason: '',
+                    banExpiry: '',
+                    unbannedAt: new Date().toISOString()
+                });
+                
+                // إرسال إشعار فك الحظر
+                const notification = {
+                    id: Date.now(),
+                    text: `✅ تم فك حظر حسابك\nمرحباً بعودتك!`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'unban',
+                    createdAt: new Date().toISOString()
+                };
+                
+                await database.ref(`users/${firebaseKey}/notifications`).push(notification);
+                
+                showAlert(`✅ تم فك حظر ${username} بنجاح`, 'success');
+            }
+            
+            // إعادة تحميل البيانات
+            await loadUsers();
+            
+        } catch (error) {
+            console.error('❌ خطأ في تغيير حالة الحظر:', error);
+            showAlert('❌ فشل في تغيير الحالة', 'error');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===== تصدير البيانات =====
+    function exportToExcel() {
+        if (allUsers.length === 0) {
+            showAlert('لا توجد بيانات للتصدير', 'warning');
+            return;
+        }
+        
+        let csv = 'المعرف,اسم المستخدم,الاسم المستعار,البريد الإلكتروني,رصيد EGP,رصيد USD,الحالة,الدور,تاريخ التسجيل\n';
+        
+        allUsers.forEach(user => {
+            csv += `"${formatNumericId(user.numericId)}",`;
+            csv += `"${user.username}",`;
+            csv += `"${user.nickname}",`;
+            csv += `"${user.email}",`;
+            csv += `"${user.balanceEGP}",`;
+            csv += `"${user.balanceUSD}",`;
+            csv += `"${user.isBanned ? 'محظور' : 'نشط'}",`;
+            csv += `"${user.role === 'admin' ? 'مدير' : 'مستخدم'}",`;
+            csv += `"${formatDate(user.createdAt)}"\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `users_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showAlert('✅ تم تصدير البيانات بنجاح', 'success');
+    }
+
+    // ===== تحديث البيانات =====
+    function refreshData() {
+        showAlert('🔄 جاري تحديث البيانات...', 'info');
+        loadUsers();
+    }
+
+    // ===== التهيئة عند تحميل الصفحة =====
+    window.onload = function() {
+        initializeFirebase();
+    };
+</script>
+</body>
+</html>

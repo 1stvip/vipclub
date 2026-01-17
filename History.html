@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>سجل العمليات - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --dark: #0f172a;
+            --bg: #f8fafc;
+        }
+        
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--dark); }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .header-panel {
+            background: white; padding: 25px; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .btn-back {
+            background: var(--dark); color: white; border: none; padding: 10px 20px;
+            border-radius: 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 8px;
+        }
+
+        .filter-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab { 
+            padding: 10px 20px; background: white; border-radius: 10px; cursor: pointer;
+            border: 1px solid #e2e8f0; font-weight: 600; transition: 0.3s; white-space: nowrap;
+        }
+        .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .history-card {
+            background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #eef2f6;
+        }
+
+        .status-badge { padding: 5px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; text-align: center; width: fit-content; }
+        .status-تم-القبول { background: #dcfce7; color: #166534; }
+        .status-تم-الرفض { background: #fee2e2; color: #991b1b; }
+
+        .action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-icon { width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-restore { background: #f0f4ff; color: var(--primary); }
+        .btn-delete { background: #fff1f2; color: var(--danger); }
+        .btn-restore:hover { background: var(--primary); color: white; }
+        .btn-delete:hover { background: var(--danger); color: white; }
+
+        @media (max-width: 768px) {
+            .history-card { grid-template-columns: 1fr; gap: 15px; }
+            .action-btns { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-panel">
+        <div>
+            <h2 style="margin:0"><i class="fas fa-history"></i> سجل جميع الطلبات</h2>
+            <p style="color: #64748b; margin: 5px 0 0 0;">إدارة الأرشيف والطلبات السابقة</p>
+        </div>
+        <a href="Admin_Orders.html" class="btn-back"><i class="fas fa-arrow-right"></i> العودة للطلبات</a>
+    </div>
+
+    <div class="filter-tabs" id="filterTabs">
+        <div class="tab active" onclick="filterHistory('الكل', this)">الكل</div>
+        <div class="tab" onclick="filterHistory('تم القبول', this)">مقبولة</div>
+        <div class="tab" onclick="filterHistory('تم الرفض', this)">مرفوضة</div>
+    </div>
+
+    <div id="historyList">
+        </div>
+</div>
+
+<script>
+    let currentFilter = 'الكل';
+
+    function renderHistory() {
+        const listWrapper = document.getElementById('historyList');
+        const orders = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        
+        // استبعاد طلبات "قيد المراجعة" لأنها في الصفحة الرئيسية
+        let filtered = orders.filter(o => o.status !== 'قيد المراجعة');
+
+        if (currentFilter !== 'الكل') {
+            filtered = filtered.filter(o => o.status === currentFilter);
+        }
+
+        if (filtered.length === 0) {
+            listWrapper.innerHTML = `<div style="text-align:center; padding:50px; color:#94a3b8;">
+                <i class="fas fa-folder-open" style="font-size:3rem; margin-bottom:15px;"></i>
+                <p>لا توجد بيانات في السجل حالياً</p>
+            </div>`;
+            return;
+        }
+
+        listWrapper.innerHTML = '';
+        filtered.reverse().forEach(order => {
+            listWrapper.innerHTML += `
+                <div class="history-card">
+                    <div>
+                        <strong style="display:block;">${order.product}</strong>
+                        <small style="color:#64748b;">العميل: ${order.username} | ${order.time}</small>
+                    </div>
+                    <div>
+                        <span class="status-badge status-${order.status.replace(' ', '-')}">${order.status}</span>
+                    </div>
+                    <div style="font-weight: bold; color: var(--primary);">${order.price}</div>
+                    <div class="action-btns">
+                        <button class="btn-icon btn-restore" onclick="restoreOrder('${order.orderId}')" title="إعادة لطلبات المراجعة">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="btn-icon btn-delete" onclick="deletePermanent('${order.orderId}')" title="حذف نهائي">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function filterHistory(type, el) {
+        currentFilter = type;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        renderHistory();
+    }
+
+    // وظيفة الإعادة لصفحة Admin_Orders
+    function restoreOrder(orderId) {
+        if (!confirm('هل تريد إعادة هذا الطلب لحالة "قيد المراجعة"؟')) return;
+
+        let orders = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        const idx = orders.findIndex(o => o.orderId === orderId);
+
+        if (idx !== -1) {
+            orders[idx].status = 'قيد المراجعة';
+            localStorage.setItem('admin_orders', JSON.stringify(orders));
+            renderHistory();
+            alert('تم إعادة الطلب بنجاح.');
+        }
+    }
+
+    // وظيفة الحذف النهائي
+    function deletePermanent(orderId) {
+        if (!confirm('تحذير: سيتم حذف هذا السجل نهائياً. هل أنت متأكد؟')) return;
+
+        let orders = JSON.parse(localStorage.getItem('admin_orders')) || [];
+        const newOrders = orders.filter(o => o.orderId !== orderId);
+        
+        localStorage.setItem('admin_orders', JSON.stringify(newOrders));
+        renderHistory();
+    }
+
+    window.onload = renderHistory;
+</script>
+
+</body>
+</html>
