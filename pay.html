@@ -631,12 +631,12 @@
                         <div class="detail-item">
                             <span class="detail-label">معرف الحساب:</span>
                             <span class="detail-value">803045359</span>
-                            <button class="copy-btn" onclick="copyToClipboard('803045359')">نسخ</button>
+                            <button class="copy-btn" onclick="copyToClipboard('803045359', event)">نسخ</button>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">الاسم المستعار:</span>
                             <span class="detail-value">iMrJoe</span>
-                            <button class="copy-btn" onclick="copyToClipboard('iMrJoe')">نسخ</button>
+                            <button class="copy-btn" onclick="copyToClipboard('iMrJoe', event)">نسخ</button>
                         </div>
                     </div>
                     
@@ -657,12 +657,12 @@
                         <div class="detail-item">
                             <span class="detail-label">رقم الهاتف:</span>
                             <span class="detail-value">01022797043</span>
-                            <button class="copy-btn" onclick="copyToClipboard('01022797043')">نسخ</button>
+                            <button class="copy-btn" onclick="copyToClipboard('01022797043', event)">نسخ</button>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">اسم الحساب:</span>
                             <span class="detail-value">يوسف ي*** ع*** م***</span>
-                            <button class="copy-btn" onclick="copyToClipboard('VipClub')">نسخ</button>
+                            <button class="copy-btn" onclick="copyToClipboard('يوسف ي*** ع*** م***', event)">نسخ</button>
                         </div>
                     </div>
                     
@@ -812,10 +812,13 @@
     }
 
     // ===== نسخ النص =====
-    function copyToClipboard(text) {
+    function copyToClipboard(text, event) {
+        // استخدام event الممرر أو window.event للتوافق مع المتصفحات القديمة
+        const clickEvent = event || window.event;
+        const originalButton = clickEvent.target || clickEvent.srcElement;
+        
         navigator.clipboard.writeText(text).then(() => {
             // إظهار رسالة نجاح
-            const originalButton = event.target;
             const originalText = originalButton.textContent;
             
             originalButton.textContent = 'تم النسخ!';
@@ -829,6 +832,12 @@
             console.error('Error copying text: ', err);
             alert('حدث خطأ في نسخ النص');
         });
+        
+        // منع السلوك الافتراضي إن وجد
+        if (clickEvent.preventDefault) {
+            clickEvent.preventDefault();
+        }
+        return false;
     }
 
     // ===== إعداد المستمعين للأحداث =====
@@ -854,5 +863,4 @@
     };
 </script>
 </body>
-
 </html>
