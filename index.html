@@ -511,25 +511,47 @@
     </footer>
 
     <script>
-        // 🔥 تكوين Firebase
+        // 🔥 تكوين Firebase - مشروع stvipclub الجديد
         const firebaseConfig = {
-            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-            authDomain: "vipclub-1d04a.firebaseapp.com",
-            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-            projectId: "vipclub-1d04a",
-            storageBucket: "vipclub-1d04a.firebasestorage.app",
-            messagingSenderId: "120667552740",
-            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
         };
 
-        // تهيئة Firebase
+        // تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
         let database;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            console.log('✅ Firebase connected');
-        } catch (error) {
-            console.error('❌ Firebase error:', error);
+
+        async function initializeFirebase() {
+            try {
+                // حذف أي نسخة قديمة من Firebase
+                if (firebase.apps.length > 0) {
+                    console.log('🔄 جاري حذف Firebase القديم...');
+                    await firebase.app().delete();
+                }
+                
+                // تهيئة Firebase من جديد بالمشروع الصحيح
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                
+                console.log('✅ Firebase connected with project:', firebaseConfig.projectId);
+                
+                // اختبار الاتصال بكتابة بسيطة
+                await database.ref('connection_test').set({
+                    timestamp: new Date().toISOString(),
+                    message: 'اتصال ناجح من الصفحة الرئيسية'
+                });
+                
+                // تحديث واجهة المستخدم
+                updateUI();
+                
+            } catch (error) {
+                console.error('❌ Firebase error:', error);
+            }
         }
 
         // دالة لجلب بيانات المستخدم الحالي
@@ -544,7 +566,7 @@
                 title: "VipMacro Application 2026 For AnyMouse",
                 description: "Working Safe 100% and you can import ur bloody & logitech scripts / files into the app",
                 url: "videos/video1.mp4",
-                thumbnail: "images/videoslogo/vipclub.png", // ← ضع مسار الصورة هنا
+                thumbnail: "images/videoslogo/vipclub.png",
                 views: 39,
                 date: "15 مارس 2026"
             },
@@ -553,13 +575,10 @@
                 title: "VipCrossHair Application 2026",
                 description: "Working Safe 100% / Fast & Easy Aim",
                 url: "videos/video2.mp4",
-                thumbnail: "images/videoslogo/vipclub.png", // ← ضع مسار الصورة هنا
+                thumbnail: "images/videoslogo/vipclub.png",
                 views: 42,
                 date: "15 مارس 2026"
             },
-
-            // يمكنك إضافة المزيد من الفيديوهات هنا
-            // أو ترك فيديو واحد فقط لتجربة العرض الفردي
         ];
 
         // دالة لتحميل وعرض الفيديوهات
@@ -575,17 +594,21 @@
             `;
             
             try {
-                // في المستقبل: تحميل الفيديوهات من Firebase
-                // const videosRef = database.ref('videos');
-                // const snapshot = await videosRef.once('value');
-                // const videos = snapshot.val() || defaultVideos;
+                // محاولة تحميل الفيديوهات من Firebase
+                let videos = [];
                 
-                // للآن نستخدم البيانات الافتراضية
-                const videos = defaultVideos;
+                if (database) {
+                    const videosRef = database.ref('videos');
+                    const snapshot = await videosRef.once('value');
+                    if (snapshot.exists()) {
+                        const videosData = snapshot.val();
+                        videos = Object.values(videosData);
+                    }
+                }
                 
+                // إذا لم تكن هناك فيديوهات في Firebase، نستخدم الافتراضية
                 if (videos.length === 0) {
-                    showNoVideosMessage();
-                    return;
+                    videos = defaultVideos;
                 }
                 
                 // عرض الفيديوهات بناءً على عددها
@@ -606,9 +629,11 @@
             if (videos.length === 1) {
                 // إذا كان هناك فيديو واحد فقط
                 displaySingleVideo(videos[0]);
-            } else {
+            } else if (videos.length > 1) {
                 // إذا كان هناك أكثر من فيديو
                 displayMultipleVideos(videos);
+            } else {
+                showNoVideosMessage();
             }
         }
 
@@ -712,7 +737,9 @@
             
             // إخفاء زر التشغيل
             const playButton = thumbnail.nextElementSibling;
-            playButton.style.display = 'none';
+            if (playButton) {
+                playButton.style.display = 'none';
+            }
             
             // زيادة عدد المشاهدات (محاكاة)
             video.views++;
@@ -742,6 +769,12 @@
                 const user = getCurrentUser();
                 if (!user || !user.numericId) {
                     showNoUserMessage();
+                    return;
+                }
+
+                if (!database) {
+                    console.log('Database not initialized');
+                    showNoNotifications();
                     return;
                 }
 
@@ -990,7 +1023,8 @@
         };
 
         // عند تحميل الصفحة
-        window.onload = function() {
+        window.onload = async function() {
+            await initializeFirebase();
             updateUI();
             loadVideos(); // تحميل الفيديوهات عند تحميل الصفحة
         };
@@ -998,5 +1032,3 @@
 </body>
 
 </html>
-
-
