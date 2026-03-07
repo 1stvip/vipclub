@@ -439,15 +439,16 @@ function searchOrders() {
     fetchAndRender();
 }
 
-// عرض الطلبات
+// ===== الإصلاح الرئيسي هنا =====
+// عرض الطلبات - معدلة لتقبل جميع أنواع الطلبات
 function fetchAndRender() {
     const wrapper = document.getElementById('ordersWrapper');
     const searchInput = document.getElementById('orderSearch').value.toLowerCase();
     
-    // فلترة الطلبات حسب الحالة والنوع
+    // فلترة الطلبات حسب الحالة - معدلة لتقبل جميع أنواع الطلبات
     let purchaseOrders = allOrders.filter(o => 
         o.status === currentStatus && 
-        o.type === 'purchase'
+        (o.type === 'purchase' || o.type === 'macros_purchase' || !o.type) // إذا لم يكن هناك نوع، نعتبره طلب عادي
     );
     
     if (searchInput) {
@@ -492,6 +493,14 @@ function fetchAndRender() {
         let displayPrice = order.price;
         if (!displayPrice.includes('USD') && !displayPrice.includes('ج.م')) {
             displayPrice += ' ج.م';
+        }
+        
+        // تحديد نوع الطلب لعرضه
+        let orderTypeBadge = '';
+        if (order.type === 'macros_purchase') {
+            orderTypeBadge = '<span style="background: var(--warning); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; margin-left: 5px;">ماكروهات</span>';
+        } else if (order.type === 'deposit') {
+            orderTypeBadge = '<span style="background: var(--success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; margin-left: 5px;">إيداع</span>';
         }
         
         let actionButtons = '';
@@ -540,7 +549,7 @@ function fetchAndRender() {
         wrapper.innerHTML += `
             <div class="order-card" id="row-${order.firebaseKey}">
                 <div class="card-header">
-                    <span class="user-badge">${displayName} (ID: ${order.userId})</span>
+                    <span class="user-badge">${displayName} (ID: ${order.userId}) ${orderTypeBadge}</span>
                     <span class="trx-id">${order.orderId}</span>
                 </div>
                 <div class="card-body">
