@@ -948,15 +948,16 @@
 </footer>
 
 <script>
-    // ===== تكوين Firebase =====
+    // ===== تكوين Firebase - مشروع stvipclub الجديد =====
     const firebaseConfig = {
-        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-        authDomain: "vipclub-1d04a.firebaseapp.com",
-        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-        projectId: "vipclub-1d04a",
-        storageBucket: "vipclub-1d04a.firebasestorage.app",
-        messagingSenderId: "120667552740",
-        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+        authDomain: "stvipclub.firebaseapp.com",
+        databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "stvipclub",
+        storageBucket: "stvipclub.firebasestorage.app",
+        messagingSenderId: "526607326044",
+        appId: "1:526607326044:web:6af53db123ae02c7193f99",
+        measurementId: "G-QZQMQCH9N9"
     };
 
     // ===== متغيرات Firebase =====
@@ -1055,20 +1056,28 @@
         element.onclick = null;
     }
 
-    // ===== تهيئة Firebase =====
-    function initializeFirebase() {
+    // ===== تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة =====
+    async function initializeFirebase() {
         try {
-            if (!firebase.apps.length) {
-                firebaseApp = firebase.initializeApp(firebaseConfig);
-            } else {
-                firebaseApp = firebase.app();
+            // حذف أي نسخة قديمة من Firebase
+            if (firebase.apps.length > 0) {
+                console.log('🔄 جاري حذف Firebase القديم...');
+                await firebase.app().delete();
             }
             
+            // تهيئة Firebase من جديد بالمشروع الصحيح
+            firebaseApp = firebase.initializeApp(firebaseConfig);
             database = firebase.database();
             auth = firebase.auth();
             
-            console.log('✅ Firebase initialized successfully');
-            showFirebaseAlert('تم تحميل الصفحة بنجاح ✅', 'success');
+            console.log('✅ Firebase initialized successfully with project:', firebaseConfig.projectId);
+            showFirebaseAlert('✅ تم الاتصال بالمشروع الجديد stvipclub', 'success');
+            
+            // اختبار الاتصال بكتابة بسيطة
+            await database.ref('connection_test').set({
+                timestamp: new Date().toISOString(),
+                message: 'اتصال ناجح من الصفحة الرئيسية'
+            });
             
             auth.onAuthStateChanged((user) => {
                 if (user) {
@@ -1083,7 +1092,7 @@
             
         } catch (error) {
             console.error('❌ Firebase initialization error:', error);
-            showFirebaseAlert('❌ خطأ في الاتصال بـ Firebase', 'error');
+            showFirebaseAlert('❌ خطأ في الاتصال بـ Firebase: ' + error.message, 'error');
         }
     }
 
@@ -2321,7 +2330,7 @@
         localStorage.removeItem('store_products');
         
         renderProducts();
-        initializeFirebase();
+        await initializeFirebase();
         await updateUI();
         
         setTimeout(async () => {
@@ -2341,36 +2350,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
