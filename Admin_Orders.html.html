@@ -337,6 +337,55 @@
             color: white;
         }
 
+        /* رسائل Firebase */
+        .firebase-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 10001;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .firebase-success {
+            background: #10b981;
+            color: white;
+            border-left: 5px solid #059669;
+        }
+        
+        .firebase-error {
+            background: #ef4444;
+            color: white;
+            border-left: 5px solid #dc2626;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* زر إرسال الكود */
+        .btn-send-code {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .btn-send-code:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
         @media (max-width: 900px) {
             .order-card { grid-template-columns: 1fr; text-align: center; }
             .user-info-box { flex-direction: column; }
@@ -362,22 +411,37 @@
     <div class="modal-info" id="modalInfo"></div>
 </div>
 
-<!-- شاشة تسجيل دخول الإدارة -->
+<!-- شاشة تسجيل دخول الإدارة عبر رقم الهاتف -->
 <div id="adminLogin" class="admin-login">
     <h2 style="text-align: center; color: var(--primary);">
         <i class="fas fa-shield-alt"></i> دخول الإدارة
     </h2>
     <p style="text-align: center; color: #64748b; margin-bottom: 30px;">
-        للمشرفين فقط
+        تسجيل الدخول عبر رقم الهاتف
     </p>
     
-    <input type="password" id="adminPassword" class="login-input" placeholder="كلمة مرور الإدارة" autocomplete="off">
-    <button class="btn" style="background: var(--primary); color: white; width: 100%; margin-top: 15px;" onclick="checkAdminLogin()">
-        دخول
-    </button>
+    <div id="phoneAuthSection">
+        <input type="tel" id="adminPhone" class="login-input" placeholder="رقم الهاتف (+201022797043)" value="+201022797043" autocomplete="off">
+        <button class="btn btn-primary" id="sendCodeBtn" onclick="sendVerificationCode()" style="background: var(--primary); color: white; width: 100%; margin-top: 10px;">
+            إرسال رمز التحقق
+        </button>
+    </div>
     
-    <div id="loginError" style="color: var(--danger); text-align: center; margin-top: 15px; display: none;">
-        <i class="fas fa-exclamation-circle"></i> كلمة المرور غير صحيحة
+    <div id="codeVerificationSection" style="display: none;">
+        <p style="text-align: center; color: #64748b; margin: 15px 0;">تم إرسال رمز التحقق إلى هاتفك</p>
+        <input type="text" id="verificationCode" class="login-input" placeholder="أدخل رمز التحقق" autocomplete="off">
+        <button class="btn btn-success" onclick="verifyCode()" style="background: var(--success); color: white; width: 100%; margin-top: 10px;">
+            <i class="fas fa-check"></i> تحقق
+        </button>
+        <button class="btn" onclick="resetPhoneAuth()" style="background: #f1f5f9; color: var(--dark); width: 100%; margin-top: 10px;">
+            <i class="fas fa-arrow-right"></i> تغيير رقم الهاتف
+        </button>
+    </div>
+    
+    <div id="loginError" style="color: var(--danger); text-align: center; margin-top: 15px; padding: 10px; border-radius: 8px; background: #fee2e2; display: none;"></div>
+    
+    <div style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #94a3b8;">
+        <i class="fas fa-lock"></i> اتصال آمن عبر Firebase Phone Authentication
     </div>
 </div>
 
@@ -484,6 +548,44 @@
     let allOrders = [];
     let allUsers = [];
     let currentImageInfo = {};
+    
+    // متغيرات المصادقة عبر الهاتف
+    let confirmationResult = null;
+    let isPhoneVerified = false;
+    let adminPhoneNumber = '+201022797043'; // رقم هاتف الإدارة المسجل
+
+    // عرض رسائل Firebase
+    function showFirebaseAlert(message, type) {
+        const alertDiv = document.getElementById('firebaseAlert');
+        if (!alertDiv) {
+            // إنشاء عنصر التنبيه إذا لم يكن موجوداً
+            const newAlert = document.createElement('div');
+            newAlert.id = 'firebaseAlert';
+            newAlert.className = `firebase-alert firebase-${type}`;
+            newAlert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            newAlert.style.display = 'flex';
+            document.body.appendChild(newAlert);
+            
+            setTimeout(() => {
+                newAlert.style.display = 'none';
+            }, 3000);
+            return;
+        }
+        
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        alertDiv.className = `firebase-alert firebase-${type}`;
+        alertDiv.style.display = 'flex';
+        
+        setTimeout(() => {
+            alertDiv.style.display = 'none';
+        }, 3000);
+    }
 
     // تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
     async function initializeFirebase() {
@@ -499,8 +601,12 @@
             
             console.log('✅ Firebase Admin initialized with project:', firebaseConfig.projectId);
             
+            // التحقق من جلسة الإدارة الحالية
+            checkAdminSession();
+            
         } catch (error) {
             console.error('❌ Firebase initialization error:', error);
+            showFirebaseAlert('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
         }
     }
 
@@ -557,30 +663,167 @@
         }
     });
 
-    // ===== إدارة جلسة الإدارة =====
-    function checkAdminLogin() {
-        const password = document.getElementById('adminPassword').value;
-        const adminPassword = "01010100100"; // كلمة المرور الخاصة بالإدارة
+    // ===== إدارة جلسة الإدارة عبر رقم الهاتف =====
+
+    // إرسال رمز التحقق
+    function sendVerificationCode() {
+        const phoneNumber = document.getElementById('adminPhone').value.trim();
         
-        if (password === adminPassword) {
-            document.getElementById('adminLogin').classList.remove('active');
-            document.getElementById('adminNavbar').style.display = 'flex';
-            document.getElementById('depositsPage').style.display = 'block';
-            loadAllData();
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('loginError').style.display = 'none';
-            }, 3000);
+        if (!phoneNumber) {
+            showAdminError('⚠️ يرجى إدخال رقم الهاتف');
+            return;
         }
+        
+        // التحقق من أن الرقم هو رقم الإدارة المسجل
+        if (phoneNumber !== adminPhoneNumber) {
+            showAdminError('❌ هذا الرقم غير مصرح له بالدخول');
+            return;
+        }
+        
+        // تعطيل الزر
+        const sendBtn = document.getElementById('sendCodeBtn');
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+        
+        // إعداد reCAPTCHA
+        const appVerifier = new firebase.auth.RecaptchaVerifier('sendCodeBtn', {
+            'size': 'invisible',
+            'callback': (response) => {
+                console.log('reCAPTCHA verified');
+            }
+        });
+        
+        // إرسال رمز التحقق
+        auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((result) => {
+                confirmationResult = result;
+                console.log('✅ Verification code sent');
+                
+                // إظهار قسم إدخال الكود
+                document.getElementById('phoneAuthSection').style.display = 'none';
+                document.getElementById('codeVerificationSection').style.display = 'block';
+                
+                showFirebaseAlert('✅ تم إرسال رمز التحقق إلى هاتفك', 'success');
+            })
+            .catch((error) => {
+                console.error('❌ Error sending code:', error);
+                showAdminError('❌ خطأ في إرسال الرمز: ' + error.message);
+                
+                // إعادة تمكين الزر
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'إرسال رمز التحقق';
+            });
     }
 
+    // التحقق من الرمز
+    function verifyCode() {
+        const code = document.getElementById('verificationCode').value.trim();
+        
+        if (!code) {
+            showAdminError('⚠️ يرجى إدخال رمز التحقق');
+            return;
+        }
+        
+        if (!confirmationResult) {
+            showAdminError('❌ يرجى إرسال رمز التحقق أولاً');
+            return;
+        }
+        
+        // تأكيد الرمز
+        confirmationResult.confirm(code)
+            .then((result) => {
+                const user = result.user;
+                console.log('✅ Phone verified:', user.phoneNumber);
+                
+                // التحقق من أن الرقم هو رقم الإدارة
+                if (user.phoneNumber !== adminPhoneNumber) {
+                    showAdminError('❌ هذا الرقم غير مصرح له بالدخول');
+                    auth.signOut();
+                    return;
+                }
+                
+                isPhoneVerified = true;
+                
+                // إخفاء شاشة الدخول
+                document.getElementById('adminLogin').classList.remove('active');
+                document.getElementById('adminNavbar').style.display = 'flex';
+                document.getElementById('depositsPage').style.display = 'block';
+                
+                // تحميل البيانات
+                loadAllData();
+                
+                // حفظ حالة تسجيل الدخول في localStorage
+                localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminPhone', user.phoneNumber);
+                
+                showFirebaseAlert('✅ مرحباً بك أيها المشرف', 'success');
+            })
+            .catch((error) => {
+                console.error('❌ Error verifying code:', error);
+                showAdminError('❌ رمز التحقق غير صحيح');
+            });
+    }
+
+    // إعادة تعيين مصادقة الهاتف
+    function resetPhoneAuth() {
+        document.getElementById('phoneAuthSection').style.display = 'block';
+        document.getElementById('codeVerificationSection').style.display = 'none';
+        document.getElementById('verificationCode').value = '';
+        document.getElementById('sendCodeBtn').disabled = false;
+        document.getElementById('sendCodeBtn').innerHTML = 'إرسال رمز التحقق';
+        confirmationResult = null;
+    }
+
+    // عرض أخطاء تسجيل الدخول
+    function showAdminError(message) {
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.innerHTML = message;
+        errorDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    // ===== التحقق من جلسة الإدارة عند تحميل الصفحة =====
+    function checkAdminSession() {
+        auth.onAuthStateChanged((user) => {
+            if (user && user.phoneNumber === adminPhoneNumber) {
+                // المستخدم مسجل دخول ورقمه هو رقم الإدارة
+                console.log('✅ Admin session active:', user.phoneNumber);
+                
+                document.getElementById('adminLogin').classList.remove('active');
+                document.getElementById('adminNavbar').style.display = 'flex';
+                document.getElementById('depositsPage').style.display = 'block';
+                
+                loadAllData();
+            } else {
+                // لا توجد جلسة نشطة
+                console.log('👤 No admin session');
+                document.getElementById('adminLogin').classList.add('active');
+                resetPhoneAuth();
+            }
+        });
+    }
+
+    // ===== تسجيل الخروج الآمن =====
     function logoutAdmin() {
-        document.getElementById('adminLogin').classList.add('active');
-        document.getElementById('adminNavbar').style.display = 'none';
-        document.getElementById('depositsPage').style.display = 'none';
-        document.getElementById('usersPage').style.display = 'none';
-        document.getElementById('adminPassword').value = '';
+        auth.signOut().then(() => {
+            console.log('✅ Admin logged out');
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminPhone');
+            
+            document.getElementById('adminLogin').classList.add('active');
+            document.getElementById('adminNavbar').style.display = 'none';
+            document.getElementById('depositsPage').style.display = 'none';
+            document.getElementById('usersPage').style.display = 'none';
+            
+            resetPhoneAuth();
+            
+            showFirebaseAlert('✅ تم تسجيل الخروج بنجاح', 'success');
+        }).catch((error) => {
+            console.error('❌ Logout error:', error);
+        });
     }
 
     function showPage(page) {
@@ -643,6 +886,7 @@
             
         } catch (error) {
             console.error('Error loading data:', error);
+            showFirebaseAlert('❌ خطأ في تحميل البيانات', 'error');
         }
     }
 
@@ -837,11 +1081,11 @@
             // إعادة تحميل البيانات
             await loadAllData();
             
-            alert('✅ تم قبول الطلب وشحن الرصيد بنجاح');
+            showFirebaseAlert('✅ تم قبول الطلب وشحن الرصيد بنجاح', 'success');
 
         } catch (error) {
             console.error('Error approving order:', error);
-            alert('❌ حدث خطأ أثناء معالجة الطلب');
+            showFirebaseAlert('❌ حدث خطأ أثناء معالجة الطلب', 'error');
         }
     }
 
@@ -883,11 +1127,11 @@
             // إعادة تحميل البيانات
             await loadAllData();
             
-            alert('✅ تم رفض الطلب وإرسال الإشعار للمستخدم');
+            showFirebaseAlert('✅ تم رفض الطلب وإرسال الإشعار للمستخدم', 'success');
 
         } catch (error) {
             console.error('Error rejecting order:', error);
-            alert('❌ حدث خطأ أثناء رفض الطلب');
+            showFirebaseAlert('❌ حدث خطأ أثناء رفض الطلب', 'error');
         }
     }
 
@@ -904,9 +1148,11 @@
             });
 
             await loadAllData();
+            showFirebaseAlert('✅ تم استعادة الطلب بنجاح', 'success');
             
         } catch (error) {
             console.error('Error restoring order:', error);
+            showFirebaseAlert('❌ خطأ في استعادة الطلب', 'error');
         }
     }
 
@@ -916,9 +1162,11 @@
         try {
             await database.ref('orders/' + orderKey).remove();
             await loadAllData();
+            showFirebaseAlert('✅ تم حذف الطلب بنجاح', 'success');
             
         } catch (error) {
             console.error('Error deleting order:', error);
+            showFirebaseAlert('❌ خطأ في حذف الطلب', 'error');
         }
     }
 
@@ -958,6 +1206,7 @@
             
         } catch (error) {
             console.error('Error loading users:', error);
+            showFirebaseAlert('❌ خطأ في تحميل المستخدمين', 'error');
         }
     }
 
@@ -1056,11 +1305,11 @@
             }
             
             await loadUsers();
-            alert(ban ? '✅ تم حظر المستخدم' : '✅ تم إلغاء حظر المستخدم');
+            showFirebaseAlert(ban ? '✅ تم حظر المستخدم' : '✅ تم إلغاء حظر المستخدم', 'success');
             
         } catch (error) {
             console.error('Error toggling ban:', error);
-            alert('❌ حدث خطأ أثناء التحديث');
+            showFirebaseAlert('❌ حدث خطأ أثناء التحديث', 'error');
         }
     }
 
@@ -1093,21 +1342,19 @@
             }
             
             await loadUsers();
-            alert('✅ تم حذف المستخدم وبياناته');
+            showFirebaseAlert('✅ تم حذف المستخدم وبياناته', 'success');
             
         } catch (error) {
             console.error('Error deleting user:', error);
-            alert('❌ حدث خطأ أثناء الحذف');
+            showFirebaseAlert('❌ حدث خطأ أثناء الحذف', 'error');
         }
     }
 
     // ===== التهيئة عند تحميل الصفحة =====
     window.onload = async function() {
         await initializeFirebase();
-        document.getElementById('adminLogin').classList.add('active');
     };
 </script>
 </body>
 
 </html>
-
