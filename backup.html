@@ -124,6 +124,11 @@
             color: white;
         }
         
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+        
         /* إحصائيات */
         .stats-grid {
             display: grid;
@@ -478,6 +483,26 @@
             background: #fef3c7;
             color: #92400e;
         }
+        
+        /* بادج الحذف */
+        .delete-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .delete-by-admin {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .delete-by-user {
+            background: #fef3c7;
+            color: #92400e;
+        }
     </style>
 </head>
 <body>
@@ -507,7 +532,7 @@
                 <button class="btn btn-success" onclick="showAddModal()">
                     <span>➕</span> إضافة مستخدم
                 </button>
-                <button class="btn btn-warning" onclick="showDeletedUsersSection()">
+                <button class="btn btn-warning" onclick="toggleDeletedUsersSection()">
                     <span>🗑️</span> عرض المحذوفين
                 </button>
                 <button class="btn btn-danger" onclick="goToHome()">
@@ -551,7 +576,7 @@
         </div>
         
         <!-- الجدول الرئيسي للمستخدمين -->
-        <div class="table-container">
+        <div class="table-container" id="usersTableContainer">
             <table id="usersTable">
                 <thead>
                     <tr>
@@ -592,16 +617,15 @@
                     <tr>
                         <th width="80">المعرف</th>
                         <th>اسم المستخدم</th>
-                        <th width="150">التواصل</th>
+                        <th>البيانات</th>
                         <th width="120">تاريخ الحذف</th>
-                        <th width="100">سبب الحذف</th>
-                        <th width="100">نوع الحذف</th>
+                        <th width="100">طرف الحذف</th>
                         <th width="200">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="deletedUsersBody">
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 20px;">
+                        <td colspan="6" style="text-align: center; padding: 20px;">
                             جاري تحميل المستخدمين المحذوفين...
                         </td>
                     </tr>
@@ -708,7 +732,7 @@
     </div>
 
 <script>
-// 🔥 إعدادات Firebase الجديدة - مشروع stvipclub
+// 🔥 إعدادات Firebase - مشروع stvipclub
 const firebaseConfig = {
     apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
     authDomain: "stvipclub.firebaseapp.com",
@@ -723,6 +747,7 @@ const firebaseConfig = {
 // المتغيرات العامة
 let database;
 let allUsers = [];
+let allDeletedUsers = [];
 let currentEditingUser = null;
 
 // دالة لإنشاء ID رقمي
@@ -733,7 +758,7 @@ function generateNumericId() {
 // تهيئة Firebase - نسخة جديدة ومطورة
 async function initializeFirebase() {
     try {
-        // 🔴 مهم جداً: حذف أي Firebase قديم
+        // حذف أي Firebase قديم
         if (firebase.apps.length > 0) {
             console.log('🔄 جاري حذف Firebase القديم...');
             await firebase.app().delete();
@@ -753,6 +778,7 @@ async function initializeFirebase() {
         
         // تحميل البيانات
         await loadUsers();
+        await loadDeletedUsers();
         
         // الاستماع للمستخدمين الجدد
         listenForNewUsers();
@@ -1028,6 +1054,262 @@ function displayUsers(users) {
     tbody.innerHTML = html;
 }
 
+// تحميل المستخدمين المحذوفين
+async function loadDeletedUsers() {
+    const deletedBody = document.getElementById('deletedUsersBody');
+    
+    if (!database) {
+        deletedBody.innerHTML = '<tr><td colspan="6">❌ Firebase غير متصل</td></tr>';
+        return;
+    }
+    
+    try {
+        const snapshot = await database.ref('deleted_users').once('value');
+        allDeletedUsers = [];
+        
+        if (snapshot.exists()) {
+            const deletedData = snapshot.val();
+            for (const key in deletedData) {
+                allDeletedUsers.push({
+                    ...deletedData[key],
+                    deletedKey: key
+                });
+            }
+            
+            // ترتيب من الأحدث للأقدم
+            allDeletedUsers.sort((a, b) => {
+                const timeA = a.deletedAt ? new Date(a.deletedAt).getTime() : 0;
+                const timeB = b.deletedAt ? new Date(b.deletedAt).getTime() : 0;
+                return timeB - timeA;
+            });
+        }
+        
+        renderDeletedUsers();
+        
+    } catch (error) {
+        console.error('Error loading deleted users:', error);
+        deletedBody.innerHTML = `<tr><td colspan="6">❌ خطأ في التحميل: ${error.message}</td></tr>`;
+    }
+}
+
+// عرض المستخدمين المحذوفين
+function renderDeletedUsers() {
+    const deletedBody = document.getElementById('deletedUsersBody');
+    
+    if (allDeletedUsers.length === 0) {
+        deletedBody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">🗑️</div>
+                    <h4 style="color: #666;">لا يوجد مستخدمين محذوفين</h4>
+                    <p style="color: #999;">المستخدمين المحذوفين سيظهرون هنا</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    allDeletedUsers.forEach(user => {
+        // تحديد طرف الحذف
+        let deleteBy = '';
+        let deleteClass = '';
+        
+        if (user.deletedBy === 'admin') {
+            deleteBy = 'بواسطة الأدمن';
+            deleteClass = 'delete-by-admin';
+        } else if (user.deletedBy === 'user') {
+            deleteBy = 'بواسطة المستخدم';
+            deleteClass = 'delete-by-user';
+        } else {
+            deleteBy = 'غير معروف';
+            deleteClass = '';
+        }
+        
+        // تنسيق التاريخ
+        let dateDisplay = '---';
+        if (user.deletedAt) {
+            try {
+                dateDisplay = new Date(user.deletedAt).toLocaleString('ar-EG');
+            } catch (e) {
+                dateDisplay = user.deletedAt;
+            }
+        }
+        
+        // تجميع البيانات لعرضها
+        const userData = [
+            `👤 ${user.username || 'غير معروف'}`,
+            `📧 ${user.email || '---'}`,
+            `📱 ${user.phone || '---'}`,
+            `💰 EGP: ${user.balanceEGP || 0}`,
+            `💰 USD: ${user.balanceUSD || 0}`,
+            `📅 مسجل: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-EG') : '---'}`
+        ].join('<br>');
+        
+        html += `
+            <tr>
+                <td>
+                    <div style="font-family: monospace; font-size: 12px; background: #f1f5f9; padding: 5px; border-radius: 5px;">
+                        ${user.numericId || '---'}
+                    </div>
+                </td>
+                <td>
+                    <div style="font-weight: bold;">${user.nickname || user.username || '---'}</div>
+                </td>
+                <td style="text-align: right; font-size: 11px;">
+                    ${userData}
+                </td>
+                <td>
+                    <div style="font-size: 11px;">${dateDisplay}</div>
+                </td>
+                <td>
+                    <span class="delete-badge ${deleteClass}">${deleteBy}</span>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 5px; justify-content: center;">
+                        <button class="action-btn" style="background: #10b981; color: white;" onclick="restoreUser('${user.deletedKey}')" title="استعادة المستخدم">
+                            🔄 استعادة
+                        </button>
+                        <button class="action-btn" style="background: #ef4444; color: white;" onclick="permanentDelete('${user.deletedKey}')" title="حذف نهائي">
+                            🗑️ حذف
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    deletedBody.innerHTML = html;
+}
+
+// استعادة مستخدم محذوف
+async function restoreUser(deletedKey) {
+    if (!confirm('هل تريد استعادة هذا المستخدم؟')) return;
+    
+    try {
+        // جلب بيانات المستخدم المحذوف
+        const snapshot = await database.ref('deleted_users/' + deletedKey).once('value');
+        const deletedUser = snapshot.val();
+        
+        if (!deletedUser) {
+            showAlert('❌ لم يتم العثور على بيانات المستخدم', 'error');
+            return;
+        }
+        
+        // التأكد من عدم وجود المستخدم مسبقاً
+        const existingUser = await database.ref('users').orderByChild('numericId').equalTo(deletedUser.numericId).once('value');
+        if (existingUser.exists()) {
+            showAlert('⚠️ المستخدم موجود بالفعل في قاعدة البيانات', 'warning');
+            return;
+        }
+        
+        // إعادة المستخدم مع جميع بياناته
+        const newUserRef = database.ref('users').push();
+        const newFirebaseKey = newUserRef.key;
+        
+        // تحضير بيانات المستخدم للاستعادة
+        const restoredUser = {
+            numericId: deletedUser.numericId,
+            username: deletedUser.username,
+            password: deletedUser.password || '123456',
+            nickname: deletedUser.nickname || deletedUser.username,
+            email: deletedUser.email || '',
+            email2: deletedUser.email2 || '',
+            phone: deletedUser.phone || '',
+            phone2: deletedUser.phone2 || '',
+            gender: deletedUser.gender || '',
+            age: deletedUser.age || '',
+            country: deletedUser.country || '',
+            bio: deletedUser.bio || '',
+            question: deletedUser.question || 'المدرسة',
+            answer: deletedUser.answer || '',
+            balanceEGP: deletedUser.balanceEGP || 0,
+            balanceUSD: deletedUser.balanceUSD || 0,
+            isBanned: deletedUser.isBanned || false,
+            banReason: deletedUser.banReason || '',
+            banExpiry: deletedUser.banExpiry || '',
+            notifications: deletedUser.notifications || [],
+            lastNicknameChange: deletedUser.lastNicknameChange || 0,
+            purchasedCards: deletedUser.purchasedCards || [],
+            createdAt: deletedUser.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        await newUserRef.set(restoredUser);
+        
+        // إضافة سجل استعادة
+        await database.ref('restored_users').push({
+            numericId: deletedUser.numericId,
+            username: deletedUser.username,
+            restoredAt: new Date().toISOString(),
+            restoredBy: 'admin',
+            originalDeletedKey: deletedKey
+        });
+        
+        // حذف من جدول المحذوفين
+        await database.ref('deleted_users/' + deletedKey).remove();
+        
+        showAlert(`✅ تم استعادة المستخدم ${deletedUser.username || 'غير معروف'} بنجاح`, 'success');
+        
+        // إعادة تحميل القوائم
+        await loadUsers();
+        await loadDeletedUsers();
+        
+        // إظهار الجدول الرئيسي
+        document.getElementById('usersTableContainer').style.display = 'block';
+        document.getElementById('deletedUsersSection').style.display = 'none';
+        
+    } catch (error) {
+        console.error('Error restoring user:', error);
+        showAlert('❌ خطأ في استعادة المستخدم: ' + error.message, 'error');
+    }
+}
+
+// حذف نهائي للمستخدم من جدول المحذوفين
+async function permanentDelete(deletedKey) {
+    if (!confirm('⚠️ هل أنت متأكد من حذف هذا المستخدم نهائياً؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+    
+    try {
+        const snapshot = await database.ref('deleted_users/' + deletedKey).once('value');
+        const user = snapshot.val();
+        
+        // نقل إلى جدول الحذف النهائي للتوثيق
+        await database.ref('permanent_deleted_users').push({
+            ...user,
+            permanentlyDeletedAt: new Date().toISOString(),
+            permanentlyDeletedBy: 'admin'
+        });
+        
+        // حذف من جدول المحذوفين المؤقت
+        await database.ref('deleted_users/' + deletedKey).remove();
+        
+        showAlert('✅ تم حذف المستخدم نهائياً', 'success');
+        
+        // إعادة تحميل قائمة المحذوفين
+        await loadDeletedUsers();
+        
+    } catch (error) {
+        console.error('Error permanently deleting user:', error);
+        showAlert('❌ خطأ في الحذف النهائي: ' + error.message, 'error');
+    }
+}
+
+// تبديل عرض قسم المحذوفين
+function toggleDeletedUsersSection() {
+    const deletedSection = document.getElementById('deletedUsersSection');
+    const usersTable = document.getElementById('usersTableContainer');
+    
+    if (deletedSection.style.display === 'none') {
+        deletedSection.style.display = 'block';
+        usersTable.style.display = 'none';
+        loadDeletedUsers();
+    } else {
+        deletedSection.style.display = 'none';
+        usersTable.style.display = 'block';
+    }
+}
+
 // تحديث الإحصائيات
 function updateStats(total, active, banned, today) {
     document.getElementById('totalUsers').textContent = total;
@@ -1250,31 +1532,60 @@ async function unbanUser(userId) {
     }
 }
 
-// حذف مستخدم
+// حذف مستخدم مع إمكانية الاستعادة
 async function deleteUser(userId) {
     const user = allUsers.find(u => u.id === userId);
     if (!user) return;
     
-    if (!confirm(`هل أنت متأكد من حذف المستخدم ${user.username}؟`)) return;
+    const deleteType = prompt(`نوع الحذف للمستخدم ${user.username}:\n\n1. حذف مؤقت (يمكن استعادته)\n2. حذف نهائي (لا يمكن استعادته)\n\nأدخل 1 أو 2:`, '1');
     
-    try {
-        await database.ref('users/' + userId).remove();
-        showAlert(`✅ تم حذف المستخدم ${user.username}`, 'success');
-        loadUsers();
+    if (!deleteType) return;
+    
+    if (deleteType === '2') {
+        // حذف نهائي
+        if (!confirm(`⚠️ هل أنت متأكد من حذف المستخدم ${user.username} نهائياً؟ لا يمكن التراجع عن هذا الإجراء!`)) return;
         
-    } catch (error) {
-        showAlert('❌ خطأ: ' + error.message, 'error');
+        try {
+            // نقل إلى جدول الحذف النهائي
+            await database.ref('permanent_deleted_users').push({
+                ...user,
+                deletedAt: new Date().toISOString(),
+                deletedBy: 'admin',
+                originalFirebaseKey: userId
+            });
+            
+            // حذف من المستخدمين النشطين
+            await database.ref('users/' + userId).remove();
+            
+            showAlert(`✅ تم حذف المستخدم ${user.username} نهائياً`, 'success');
+            await loadUsers();
+            
+        } catch (error) {
+            showAlert('❌ خطأ في الحذف: ' + error.message, 'error');
+        }
+    } else if (deleteType === '1') {
+        // حذف مؤقت (يمكن استعادته)
+        if (!confirm(`هل تريد حذف المستخدم ${user.username} مؤقتاً؟ (يمكن استعادته لاحقاً)`)) return;
+        
+        try {
+            // حفظ في جدول المحذوفين
+            await database.ref('deleted_users').push({
+                ...user,
+                deletedAt: new Date().toISOString(),
+                deletedBy: 'admin',
+                originalFirebaseKey: userId
+            });
+            
+            // حذف من المستخدمين النشطين
+            await database.ref('users/' + userId).remove();
+            
+            showAlert(`✅ تم حذف المستخدم ${user.username} مؤقتاً (يمكن استعادته)`, 'success');
+            await loadUsers();
+            
+        } catch (error) {
+            showAlert('❌ خطأ في الحذف: ' + error.message, 'error');
+        }
     }
-}
-
-// عرض المستخدمين المحذوفين
-function showDeletedUsersSection() {
-    alert('هذه الميزة قيد التطوير');
-}
-
-// تحميل المستخدمين المحذوفين
-async function loadDeletedUsers() {
-    alert('هذه الميزة قيد التطوير');
 }
 
 // عرض الرسائل
@@ -1316,4 +1627,3 @@ window.onload = function() {
 </script>
 </body>
 </html>
-
