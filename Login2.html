@@ -103,28 +103,67 @@
 </div>
 
 <script>
-// 🔥 إعدادات Firebase - نفس إعدادات صفحة الإدارة
+// 🔥 إعدادات Firebase - مشروع stvipclub الجديد
 const firebaseConfig = {
-    apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-    authDomain: "vipclub-1d04a.firebaseapp.com",
-    databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-    projectId: "vipclub-1d04a",
-    storageBucket: "vipclub-1d04a.firebasestorage.app",
-    messagingSenderId: "120667552740",
-    appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+    authDomain: "stvipclub.firebaseapp.com",
+    databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+    projectId: "stvipclub",
+    storageBucket: "stvipclub.firebasestorage.app",
+    messagingSenderId: "526607326044",
+    appId: "1:526607326044:web:6af53db123ae02c7193f99",
+    measurementId: "G-QZQMQCH9N9"
 };
 
 // تهيئة Firebase
 let database;
-try {
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+let firebaseApp;
+
+// تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
+async function initializeFirebase() {
+    try {
+        // حذف أي نسخة قديمة من Firebase
+        if (firebase.apps.length > 0) {
+            console.log('🔄 جاري حذف Firebase القديم...');
+            await firebase.app().delete();
+        }
+        
+        // تهيئة Firebase من جديد بالمشروع الصحيح
+        firebaseApp = firebase.initializeApp(firebaseConfig);
+        database = firebase.database();
+        
+        console.log('✅ Firebase متصل بنجاح بالمشروع الجديد:', firebaseConfig.projectId);
+        
+        // اختبار الاتصال بكتابة بسيطة
+        await database.ref('connection_test').set({
+            timestamp: new Date().toISOString(),
+            message: 'اتصال ناجح من صفحة تسجيل الدخول'
+        });
+        
+        // تهيئة الصفحة بعد الاتصال
+        initializePage();
+        
+    } catch (error) {
+        console.error('❌ خطأ في الاتصال:', error);
+        showMessage('❌ خطأ في الاتصال بقاعدة البيانات: ' + error.message, 'error');
     }
-    database = firebase.database();
-    console.log('✅ Firebase متصل بنجاح');
-} catch (error) {
-    console.error('❌ خطأ في الاتصال:', error);
-    showMessage('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
+}
+
+// تهيئة الصفحة بعد الاتصال
+function initializePage() {
+    try {
+        // تنظيف المستخدمين المكررين (مرة واحدة)
+        cleanDuplicateUsers();
+        
+        // مزامنة البيانات من localStorage
+        syncWithLocalStorage();
+        
+        // تحميل بيانات المزامنة
+        loadSyncStats();
+        
+    } catch (error) {
+        console.error('❌ خطأ في تهيئة الصفحة:', error);
+    }
 }
 
 function toggleForm() {
@@ -551,26 +590,6 @@ async function cleanDuplicateUsers() {
     }
 }
 
-// ===== تهيئة الصفحة =====
-window.onload = async function() {
-    try {
-        if (database) {
-            console.log('🔄 جاري تهيئة الصفحة...');
-            
-            // تنظيف المستخدمين المكررين (مرة واحدة)
-            await cleanDuplicateUsers();
-            
-            // مزامنة البيانات من localStorage
-            await syncWithLocalStorage();
-            
-            // تحميل بيانات المزامنة
-            loadSyncStats();
-        }
-    } catch (error) {
-        console.error('❌ خطأ في تهيئة الصفحة:', error);
-    }
-};
-
 // ===== تحميل إحصائيات المزامنة =====
 function loadSyncStats() {
     try {
@@ -616,6 +635,12 @@ setInterval(() => {
         showMessage('⚠️ فقد الاتصال بقاعدة البيانات. يرجى تحديث الصفحة', 'error');
     }
 }, 30000);
+
+// ===== التهيئة عند تحميل الصفحة =====
+window.onload = async function() {
+    await initializeFirebase();
+};
 </script>
 </body>
+
 </html>
