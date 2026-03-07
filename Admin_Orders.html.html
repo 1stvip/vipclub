@@ -337,38 +337,6 @@
             color: white;
         }
 
-        /* رسائل Firebase */
-        .firebase-alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 10px;
-            z-index: 10001;
-            animation: slideInRight 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .firebase-success {
-            background: #10b981;
-            color: white;
-            border-left: 5px solid #059669;
-        }
-        
-        .firebase-error {
-            background: #ef4444;
-            color: white;
-            border-left: 5px solid #dc2626;
-        }
-        
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
         @media (max-width: 900px) {
             .order-card { grid-template-columns: 1fr; text-align: center; }
             .user-info-box { flex-direction: column; }
@@ -394,26 +362,22 @@
     <div class="modal-info" id="modalInfo"></div>
 </div>
 
-<!-- شاشة تسجيل دخول الإدارة - محسنة بأمان Firebase -->
+<!-- شاشة تسجيل دخول الإدارة -->
 <div id="adminLogin" class="admin-login">
     <h2 style="text-align: center; color: var(--primary);">
         <i class="fas fa-shield-alt"></i> دخول الإدارة
     </h2>
     <p style="text-align: center; color: #64748b; margin-bottom: 30px;">
-        المشرفين فقط - vipclub1st@gmail.com
+        للمشرفين فقط
     </p>
     
-    <input type="email" id="adminEmail" class="login-input" placeholder="البريد الإلكتروني" value="vipclub1st@gmail.com" autocomplete="email">
-    <input type="password" id="adminPassword" class="login-input" placeholder="كلمة المرور" autocomplete="current-password">
-    
-    <button class="btn btn-primary" onclick="checkAdminLogin()" style="background: var(--primary); color: white; width: 100%; margin-top: 15px;">
+    <input type="password" id="adminPassword" class="login-input" placeholder="كلمة مرور الإدارة" autocomplete="off">
+    <button class="btn" style="background: var(--primary); color: white; width: 100%; margin-top: 15px;" onclick="checkAdminLogin()">
         دخول
     </button>
     
-    <div id="loginError" style="color: var(--danger); text-align: center; margin-top: 15px; padding: 10px; border-radius: 8px; background: #fee2e2; display: none;"></div>
-    
-    <div style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #94a3b8;">
-        <i class="fas fa-lock"></i> اتصال آمن عبر Firebase Authentication
+    <div id="loginError" style="color: var(--danger); text-align: center; margin-top: 15px; display: none;">
+        <i class="fas fa-exclamation-circle"></i> كلمة المرور غير صحيحة
     </div>
 </div>
 
@@ -521,23 +485,6 @@
     let allUsers = [];
     let currentImageInfo = {};
 
-    // عرض رسائل Firebase
-    function showFirebaseAlert(message, type) {
-        const alertDiv = document.getElementById('firebaseAlert');
-        if (!alertDiv) return;
-        
-        alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
-        `;
-        alertDiv.className = `firebase-alert firebase-${type}`;
-        alertDiv.style.display = 'flex';
-        
-        setTimeout(() => {
-            alertDiv.style.display = 'none';
-        }, 3000);
-    }
-
     // تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
     async function initializeFirebase() {
         try {
@@ -551,9 +498,6 @@
             auth = firebase.auth();
             
             console.log('✅ Firebase Admin initialized with project:', firebaseConfig.projectId);
-            
-            // التحقق من جلسة الإدارة الحالية
-            checkAdminSession();
             
         } catch (error) {
             console.error('❌ Firebase initialization error:', error);
@@ -613,128 +557,30 @@
         }
     });
 
-    // ===== إدارة جلسة الإدارة مع Firebase Authentication =====
+    // ===== إدارة جلسة الإدارة =====
     function checkAdminLogin() {
-        const email = document.getElementById('adminEmail').value.trim();
         const password = document.getElementById('adminPassword').value;
+        const adminPassword = "01010100100"; // كلمة المرور الخاصة بالإدارة
         
-        if (!email || !password) {
-            showAdminError('⚠️ يرجى إدخال البريد الإلكتروني وكلمة المرور');
-            return;
+        if (password === adminPassword) {
+            document.getElementById('adminLogin').classList.remove('active');
+            document.getElementById('adminNavbar').style.display = 'flex';
+            document.getElementById('depositsPage').style.display = 'block';
+            loadAllData();
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('loginError').style.display = 'none';
+            }, 3000);
         }
-        
-        // التحقق من أن البريد هو بريد الإدارة فقط
-        if (email !== 'vipclub1st@gmail.com') {
-            showAdminError('❌ هذا البريد غير مصرح له بالدخول');
-            return;
-        }
-        
-        // إظهار مؤشر التحميل
-        const loginBtn = document.querySelector('#adminLogin .btn-primary');
-        const originalText = loginBtn.innerHTML;
-        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
-        loginBtn.disabled = true;
-        
-        // تسجيل الدخول عبر Firebase Authentication
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                console.log('✅ Admin logged in:', userCredential.user.email);
-                
-                // إخفاء شاشة الدخول
-                document.getElementById('adminLogin').classList.remove('active');
-                document.getElementById('adminNavbar').style.display = 'flex';
-                document.getElementById('depositsPage').style.display = 'block';
-                
-                // تحميل البيانات
-                loadAllData();
-                
-                // حفظ حالة تسجيل الدخول في localStorage
-                localStorage.setItem('adminLoggedIn', 'true');
-                localStorage.setItem('adminEmail', email);
-                
-                // رسالة ترحيب
-                alert('✅ مرحباً بك أيها المشرف');
-            })
-            .catch((error) => {
-                console.error('❌ Login error:', error.code);
-                
-                let errorMessage = '';
-                switch(error.code) {
-                    case 'auth/invalid-email':
-                        errorMessage = '❌ البريد الإلكتروني غير صالح';
-                        break;
-                    case 'auth/user-not-found':
-                        errorMessage = '❌ لا يوجد حساب بهذا البريد';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = '❌ كلمة المرور غير صحيحة';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = '❌ تم حظر الدخول مؤقتاً بسبب محاولات كثيرة فاشلة. حاول لاحقاً';
-                        break;
-                    default:
-                        errorMessage = '❌ خطأ في تسجيل الدخول: ' + error.message;
-                }
-                
-                showAdminError(errorMessage);
-            })
-            .finally(() => {
-                // إعادة تمكين الزر
-                loginBtn.innerHTML = originalText;
-                loginBtn.disabled = false;
-            });
     }
 
-    // عرض أخطاء تسجيل الدخول
-    function showAdminError(message) {
-        const errorDiv = document.getElementById('loginError');
-        errorDiv.innerHTML = message;
-        errorDiv.style.display = 'block';
-        
-        setTimeout(() => {
-            errorDiv.style.display = 'none';
-        }, 5000);
-    }
-
-    // ===== التحقق من جلسة الإدارة عند تحميل الصفحة =====
-    function checkAdminSession() {
-        // التحقق من وجود جلسة نشطة في Firebase
-        auth.onAuthStateChanged((user) => {
-            if (user && user.email === 'vipclub1st@gmail.com') {
-                // المستخدم مسجل دخول وبريده هو بريد الإدارة
-                console.log('✅ Admin session active:', user.email);
-                
-                document.getElementById('adminLogin').classList.remove('active');
-                document.getElementById('adminNavbar').style.display = 'flex';
-                document.getElementById('depositsPage').style.display = 'block';
-                
-                loadAllData();
-            } else {
-                // لا توجد جلسة نشطة
-                console.log('👤 No admin session');
-                document.getElementById('adminLogin').classList.add('active');
-            }
-        });
-    }
-
-    // ===== تسجيل الخروج الآمن =====
     function logoutAdmin() {
-        auth.signOut().then(() => {
-            console.log('✅ Admin logged out');
-            localStorage.removeItem('adminLoggedIn');
-            localStorage.removeItem('adminEmail');
-            
-            document.getElementById('adminLogin').classList.add('active');
-            document.getElementById('adminNavbar').style.display = 'none';
-            document.getElementById('depositsPage').style.display = 'none';
-            document.getElementById('usersPage').style.display = 'none';
-            document.getElementById('adminEmail').value = 'vipclub1st@gmail.com';
-            document.getElementById('adminPassword').value = '';
-            
-            alert('✅ تم تسجيل الخروج بنجاح');
-        }).catch((error) => {
-            console.error('❌ Logout error:', error);
-        });
+        document.getElementById('adminLogin').classList.add('active');
+        document.getElementById('adminNavbar').style.display = 'none';
+        document.getElementById('depositsPage').style.display = 'none';
+        document.getElementById('usersPage').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
     }
 
     function showPage(page) {
@@ -1258,8 +1104,10 @@
     // ===== التهيئة عند تحميل الصفحة =====
     window.onload = async function() {
         await initializeFirebase();
+        document.getElementById('adminLogin').classList.add('active');
     };
 </script>
 </body>
 
 </html>
+
