@@ -398,15 +398,16 @@
     </div>
 
     <script>
-        // 🔥 تكوين Firebase (نفس تكوين الصفحة الرئيسية)
+        // 🔥 تكوين Firebase - مشروع stvipclub الجديد
         const firebaseConfig = {
-            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-            authDomain: "vipclub-1d04a.firebaseapp.com",
-            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-            projectId: "vipclub-1d04a",
-            storageBucket: "vipclub-1d04a.firebasestorage.app",
-            messagingSenderId: "120667552740",
-            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
         };
 
         // تهيئة Firebase
@@ -461,25 +462,33 @@
         }
 
         // ===== دالة التهيئة المعدلة =====
-        function initializeFirebase() {
+        async function initializeFirebase() {
             try {
-                if (!firebase.apps.length) {
-                    firebaseApp = firebase.initializeApp(firebaseConfig);
-                } else {
-                    firebaseApp = firebase.app();
+                // حذف أي نسخة قديمة من Firebase
+                if (firebase.apps.length > 0) {
+                    console.log('🔄 جاري حذف Firebase القديم...');
+                    await firebase.app().delete();
                 }
                 
+                // تهيئة Firebase من جديد بالمشروع الصحيح
+                firebaseApp = firebase.initializeApp(firebaseConfig);
                 database = firebase.database();
                 auth = firebase.auth();
                 
-                console.log('✅ Firebase initialized successfully');
+                console.log('✅ Firebase initialized successfully with project:', firebaseConfig.projectId);
                 isFirebaseConnected = true;
+                
+                // اختبار الاتصال بكتابة بسيطة
+                await database.ref('connection_test').set({
+                    timestamp: new Date().toISOString(),
+                    message: 'اتصال ناجح من صفحة الملف الشخصي'
+                });
                 
                 // محاولة ربط المستخدم بـ Firebase Auth تلقائياً
                 attemptFirebaseLogin();
                 
                 // الآن جلب البيانات من Firebase (إذا كانت متاحة)
-                loadFirebaseData();
+                await loadFirebaseData();
                 
             } catch (error) {
                 console.error('❌ Firebase initialization error:', error);
@@ -852,4 +861,5 @@
         };
     </script>
 </body>
+
 </html>
