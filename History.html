@@ -6,6 +6,9 @@
     <link rel="shortcut icon" href="images//videoslogo/vip.png">
     <title>سجل العمليات - VipClub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root { 
             --primary: #6366f1; 
@@ -22,6 +25,8 @@
             background: white; padding: 25px; border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 30px;
             display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .btn-back {
@@ -29,10 +34,24 @@
             border-radius: 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 8px;
         }
 
-        .filter-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            overflow-x: auto; 
+            padding-bottom: 5px; 
+            -webkit-overflow-scrolling: touch;
+        }
+        
         .tab { 
-            padding: 10px 20px; background: white; border-radius: 10px; cursor: pointer;
-            border: 1px solid #e2e8f0; font-weight: 600; transition: 0.3s; white-space: nowrap;
+            padding: 10px 20px; 
+            background: white; 
+            border-radius: 10px; 
+            cursor: pointer;
+            border: 1px solid #e2e8f0; 
+            font-weight: 600; 
+            transition: 0.3s; 
+            white-space: nowrap;
         }
         .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
@@ -40,26 +59,128 @@
             background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px;
             display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #eef2f6;
+            transition: 0.3s;
+        }
+        
+        .history-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
-        .status-badge { padding: 5px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; text-align: center; width: fit-content; }
+        .order-type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .type-purchase { background: #e0e7ff; color: #4338ca; }
+        .type-macros_purchase { background: #fef3c7; color: #92400e; }
+        .type-deposit { background: #d1fae5; color: #065f46; }
+
+        .status-badge { 
+            padding: 5px 12px; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+            text-align: center; 
+            width: fit-content; 
+        }
         .status-تم-القبول { background: #dcfce7; color: #166534; }
+        .status-مقبول { background: #dcfce7; color: #166534; }
         .status-تم-الرفض { background: #fee2e2; color: #991b1b; }
+        .status-مرفوض { background: #fee2e2; color: #991b1b; }
 
         .action-btns { display: flex; gap: 8px; justify-content: flex-end; }
-        .btn-icon { width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-icon { 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 8px; 
+            border: none; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.2s; 
+        }
         .btn-restore { background: #f0f4ff; color: var(--primary); }
         .btn-delete { background: #fff1f2; color: var(--danger); }
         .btn-restore:hover { background: var(--primary); color: white; }
         .btn-delete:hover { background: var(--danger); color: white; }
 
+        /* رسائل Firebase */
+        .firebase-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .firebase-success {
+            background: #10b981;
+            color: white;
+            border-left: 5px solid #059669;
+        }
+        
+        .firebase-error {
+            background: #ef4444;
+            color: white;
+            border-left: 5px solid #dc2626;
+        }
+        
+        .firebase-warning {
+            background: #f59e0b;
+            color: white;
+            border-left: 5px solid #d97706;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
-            .history-card { grid-template-columns: 1fr; gap: 15px; }
-            .action-btns { justify-content: flex-start; }
+            .history-card { 
+                grid-template-columns: 1fr; 
+                gap: 15px; 
+            }
+            .action-btns { 
+                justify-content: flex-start; 
+            }
+            .header-panel {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
+
+<!-- رسائل Firebase -->
+<div id="firebaseAlert" class="firebase-alert" style="display: none;"></div>
 
 <div class="container">
     <div class="header-panel">
@@ -73,52 +194,208 @@
     <div class="filter-tabs" id="filterTabs">
         <div class="tab active" onclick="filterHistory('الكل', this)">الكل</div>
         <div class="tab" onclick="filterHistory('تم القبول', this)">مقبولة</div>
+        <div class="tab" onclick="filterHistory('مقبول', this)">مقبولة</div>
         <div class="tab" onclick="filterHistory('تم الرفض', this)">مرفوضة</div>
+        <div class="tab" onclick="filterHistory('مرفوض', this)">مرفوضة</div>
     </div>
 
     <div id="historyList">
-        </div>
+        <!-- سيتم تعبئتها عبر JavaScript -->
+    </div>
 </div>
 
 <script>
+    // 🔥 تكوين Firebase - مشروع stvipclub الجديد
+    const firebaseConfig = {
+        apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+        authDomain: "stvipclub.firebaseapp.com",
+        databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "stvipclub",
+        storageBucket: "stvipclub.firebasestorage.app",
+        messagingSenderId: "526607326044",
+        appId: "1:526607326044:web:6af53db123ae02c7193f99",
+        measurementId: "G-QZQMQCH9N9"
+    };
+
+    // تهيئة Firebase
+    let database;
+    let allOrders = [];
     let currentFilter = 'الكل';
 
+    // عرض رسائل Firebase
+    function showFirebaseAlert(message, type) {
+        const alertDiv = document.getElementById('firebaseAlert');
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        alertDiv.className = `firebase-alert firebase-${type}`;
+        alertDiv.style.display = 'flex';
+        
+        setTimeout(() => {
+            alertDiv.style.display = 'none';
+        }, 3000);
+    }
+
+    // تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
+    async function initializeFirebase() {
+        try {
+            // حذف أي نسخة قديمة من Firebase
+            if (firebase.apps.length > 0) {
+                console.log('🔄 جاري حذف Firebase القديم...');
+                await firebase.app().delete();
+            }
+            
+            // تهيئة Firebase من جديد بالمشروع الصحيح
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            
+            console.log('✅ Firebase متصل بالمشروع الجديد:', firebaseConfig.projectId);
+            
+            // تحميل البيانات
+            await loadOrders();
+            
+        } catch (error) {
+            console.error('❌ خطأ في الاتصال:', error);
+            document.getElementById('historyList').innerHTML = `
+                <div style="text-align:center; padding:50px; color:#94a3b8;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#ef4444; margin-bottom:15px;"></i>
+                    <p style="color:#ef4444; font-weight:bold;">خطأ في الاتصال بقاعدة البيانات</p>
+                    <p style="font-size:0.9rem;">${error.message}</p>
+                    <button onclick="initializeFirebase()" style="margin-top:20px; padding:10px 20px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">
+                        🔄 إعادة المحاولة
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // تحميل الطلبات من Firebase
+    async function loadOrders() {
+        try {
+            const snapshot = await database.ref('orders').once('value');
+            allOrders = [];
+            
+            if (snapshot.exists()) {
+                const ordersData = snapshot.val();
+                for (const key in ordersData) {
+                    allOrders.push({
+                        ...ordersData[key],
+                        firebaseKey: key
+                    });
+                }
+                console.log(`📦 تم تحميل ${allOrders.length} طلب`);
+            }
+            
+            // عرض الطلبات
+            renderHistory();
+            
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            showFirebaseAlert('❌ خطأ في تحميل الطلبات', 'error');
+        }
+    }
+
+    // عرض سجل الطلبات
     function renderHistory() {
         const listWrapper = document.getElementById('historyList');
-        const orders = JSON.parse(localStorage.getItem('admin_orders')) || [];
         
-        // استبعاد طلبات "قيد المراجعة" لأنها في الصفحة الرئيسية
-        let filtered = orders.filter(o => o.status !== 'قيد المراجعة');
+        // استبعاد طلبات "قيد المراجعة"
+        let filtered = allOrders.filter(o => 
+            o.status !== 'قيد المراجعة' && 
+            o.status !== 'معلق' && 
+            o.status !== 'pending'
+        );
 
+        // تطبيق الفلتر
         if (currentFilter !== 'الكل') {
             filtered = filtered.filter(o => o.status === currentFilter);
         }
 
         if (filtered.length === 0) {
-            listWrapper.innerHTML = `<div style="text-align:center; padding:50px; color:#94a3b8;">
-                <i class="fas fa-folder-open" style="font-size:3rem; margin-bottom:15px;"></i>
-                <p>لا توجد بيانات في السجل حالياً</p>
-            </div>`;
+            listWrapper.innerHTML = `
+                <div style="text-align:center; padding:50px; color:#94a3b8;">
+                    <i class="fas fa-folder-open" style="font-size:3rem; margin-bottom:15px;"></i>
+                    <p>لا توجد بيانات في السجل حالياً</p>
+                </div>
+            `;
             return;
         }
 
+        // ترتيب من الأحدث للأقدم
+        filtered.sort((a, b) => {
+            const timeA = a.timestamp || (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+            const timeB = b.timestamp || (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+            return timeB - timeA;
+        });
+
         listWrapper.innerHTML = '';
-        filtered.reverse().forEach(order => {
+        
+        filtered.forEach(order => {
+            // تنسيق التاريخ
+            let dateDisplay = '---';
+            if (order.createdAt) {
+                try {
+                    dateDisplay = new Date(order.createdAt).toLocaleString('ar-EG');
+                } catch (e) {
+                    dateDisplay = order.createdAt;
+                }
+            }
+            
+            // تحديد نوع الطلب
+            let orderType = '';
+            let typeClass = '';
+            if (order.type === 'macros_purchase') {
+                orderType = 'ماكروهات';
+                typeClass = 'type-macros_purchase';
+            } else if (order.type === 'deposit') {
+                orderType = 'إيداع';
+                typeClass = 'type-deposit';
+            } else {
+                orderType = 'شراء';
+                typeClass = 'type-purchase';
+            }
+            
+            // تنسيق اسم الحالة (للتأكد من تطابقها مع التبويبات)
+            let statusText = order.status;
+            if (statusText === 'مقبول' || statusText === 'تم القبول') {
+                statusText = 'تم القبول';
+            } else if (statusText === 'مرفوض' || statusText === 'تم الرفض') {
+                statusText = 'تم الرفض';
+            }
+            
+            // اسم المستخدم
+            const displayName = order.nickname || order.username || `مستخدم ${order.userId}`;
+            
             listWrapper.innerHTML += `
                 <div class="history-card">
                     <div>
-                        <strong style="display:block;">${order.product}</strong>
-                        <small style="color:#64748b;">العميل: ${order.username} | ${order.time}</small>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px;">
+                            <strong style="font-size: 1rem;">${order.product}</strong>
+                            <span class="order-type-badge ${typeClass}">${orderType}</span>
+                        </div>
+                        <small style="color:#64748b; display: block; line-height: 1.5;">
+                            <i class="fas fa-user"></i> ${displayName} (ID: ${order.userId})<br>
+                            <i class="fas fa-clock"></i> ${dateDisplay}
+                        </small>
+                        <small style="color:#94a3b8; font-size:0.7rem;">
+                            <i class="fas fa-hashtag"></i> ${order.orderId}
+                        </small>
                     </div>
                     <div>
-                        <span class="status-badge status-${order.status.replace(' ', '-')}">${order.status}</span>
+                        <span class="status-badge status-${statusText.replace(' ', '-')}">${statusText}</span>
+                        ${order.rejectReason ? `
+                            <div style="margin-top: 5px; font-size: 0.75rem; color: var(--danger);">
+                                <i class="fas fa-exclamation-circle"></i> ${order.rejectReason}
+                            </div>
+                        ` : ''}
                     </div>
                     <div style="font-weight: bold; color: var(--primary);">${order.price}</div>
                     <div class="action-btns">
-                        <button class="btn-icon btn-restore" onclick="restoreOrder('${order.orderId}')" title="إعادة لطلبات المراجعة">
+                        <button class="btn-icon btn-restore" onclick="restoreOrder('${order.firebaseKey}', '${order.orderId}')" title="إعادة للطلبات النشطة">
                             <i class="fas fa-undo"></i>
                         </button>
-                        <button class="btn-icon btn-delete" onclick="deletePermanent('${order.orderId}')" title="حذف نهائي">
+                        <button class="btn-icon btn-delete" onclick="deletePermanent('${order.firebaseKey}', '${order.orderId}')" title="حذف نهائي">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -127,6 +404,7 @@
         });
     }
 
+    // فلترة السجل
     function filterHistory(type, el) {
         currentFilter = type;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -134,33 +412,63 @@
         renderHistory();
     }
 
-    // وظيفة الإعادة لصفحة Admin_Orders
-    function restoreOrder(orderId) {
-        if (!confirm('هل تريد إعادة هذا الطلب لحالة "قيد المراجعة"؟')) return;
-
-        let orders = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        const idx = orders.findIndex(o => o.orderId === orderId);
-
-        if (idx !== -1) {
-            orders[idx].status = 'قيد المراجعة';
-            localStorage.setItem('admin_orders', JSON.stringify(orders));
-            renderHistory();
-            alert('تم إعادة الطلب بنجاح.');
+    // إعادة الطلب للحالة النشطة
+    async function restoreOrder(firebaseKey, orderId) {
+        if (!confirm('هل تريد إعادة هذا الطلب إلى حالة "قيد المراجعة" في صفحة الطلبات النشطة؟')) return;
+        
+        try {
+            // تحديث حالة الطلب في Firebase
+            await database.ref('orders/' + firebaseKey).update({
+                status: 'قيد المراجعة',
+                restoredAt: new Date().toISOString(),
+                restoredBy: 'admin'
+            });
+            
+            showFirebaseAlert('✅ تم إعادة الطلب بنجاح', 'success');
+            
+            // إعادة تحميل البيانات
+            await loadOrders();
+            
+        } catch (error) {
+            console.error('Error restoring order:', error);
+            showFirebaseAlert('❌ خطأ في إعادة الطلب: ' + error.message, 'error');
         }
     }
 
-    // وظيفة الحذف النهائي
-    function deletePermanent(orderId) {
-        if (!confirm('تحذير: سيتم حذف هذا السجل نهائياً. هل أنت متأكد؟')) return;
-
-        let orders = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        const newOrders = orders.filter(o => o.orderId !== orderId);
+    // حذف الطلب نهائياً
+    async function deletePermanent(firebaseKey, orderId) {
+        if (!confirm('⚠️ تحذير: سيتم حذف هذا السجل نهائياً. هل أنت متأكد؟')) return;
         
-        localStorage.setItem('admin_orders', JSON.stringify(newOrders));
-        renderHistory();
+        try {
+            // نقل الطلب إلى أرشيف الحذف النهائي
+            const order = allOrders.find(o => o.firebaseKey === firebaseKey);
+            
+            if (order) {
+                await database.ref('deleted_orders').push({
+                    ...order,
+                    permanentlyDeletedAt: new Date().toISOString(),
+                    permanentlyDeletedBy: 'admin'
+                });
+            }
+            
+            // حذف الطلب من جدول الطلبات
+            await database.ref('orders/' + firebaseKey).remove();
+            
+            showFirebaseAlert('✅ تم حذف الطلب نهائياً', 'success');
+            
+            // إعادة تحميل البيانات
+            await loadOrders();
+            
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            showFirebaseAlert('❌ خطأ في حذف الطلب: ' + error.message, 'error');
+        }
     }
 
-    window.onload = renderHistory;
+    // التهيئة عند تحميل الصفحة
+    window.onload = function() {
+        initializeFirebase();
+    };
 </script>
 
 </body>
