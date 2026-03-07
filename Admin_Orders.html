@@ -261,15 +261,16 @@
 </div>
 
 <script>
-// 🔥 تكوين Firebase
+// 🔥 تكوين Firebase - مشروع stvipclub الجديد
 const firebaseConfig = {
-    apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-    authDomain: "vipclub-1d04a.firebaseapp.com",
-    databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-    projectId: "vipclub-1d04a",
-    storageBucket: "vipclub-1d04a.firebasestorage.app",
-    messagingSenderId: "120667552740",
-    appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+    authDomain: "stvipclub.firebaseapp.com",
+    databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+    projectId: "stvipclub",
+    storageBucket: "stvipclub.firebasestorage.app",
+    messagingSenderId: "526607326044",
+    appId: "1:526607326044:web:6af53db123ae02c7193f99",
+    measurementId: "G-QZQMQCH9N9"
 };
 
 // المتغيرات العامة
@@ -317,26 +318,50 @@ function showProcessing(orderKey, show) {
     }
 }
 
-// تهيئة Firebase
-function initializeFirebase() {
+// تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
+async function initializeFirebase() {
     try {
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        // حذف أي نسخة قديمة من Firebase
+        if (firebase.apps.length > 0) {
+            console.log('🔄 جاري حذف Firebase القديم...');
+            await firebase.app().delete();
         }
+        
+        // تهيئة Firebase من جديد بالمشروع الصحيح
+        firebase.initializeApp(firebaseConfig);
         database = firebase.database();
         
-        document.getElementById('connectionInfo').innerHTML = '✅ متصل بـ Firebase';
+        document.getElementById('connectionInfo').innerHTML = '✅ متصل بـ Firebase (مشروع stvipclub)';
         document.getElementById('loadingText').textContent = 'جاري التحميل...';
         
-        // تحميل البيانات
-        loadAllData();
+        // اختبار الاتصال بكتابة بسيطة
+        await database.ref('connection_test').set({
+            timestamp: new Date().toISOString(),
+            message: 'اتصال ناجح من صفحة إدارة البطاقات'
+        });
         
-        showAlert('✅ تم الاتصال بقاعدة البيانات بنجاح', 'success');
+        console.log('✅ Firebase متصل بالمشروع الجديد:', firebaseConfig.projectId);
+        showAlert('✅ تم الاتصال بقاعدة البيانات الجديدة بنجاح', 'success');
+        
+        // تحميل البيانات
+        await loadAllData();
         
     } catch (error) {
         console.error('Firebase init error:', error);
-        document.getElementById('connectionInfo').innerHTML = '❌ خطأ في الاتصال';
-        showAlert('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
+        document.getElementById('connectionInfo').innerHTML = '❌ خطأ في الاتصال: ' + error.message;
+        showAlert('❌ خطأ في الاتصال بقاعدة البيانات: ' + error.message, 'error');
+        
+        // عرض رسالة خطأ للمستخدم
+        document.getElementById('ordersWrapper').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle" style="font-size:4rem; color:#ef4444;"></i>
+                <p style="color:#ef4444; font-weight:bold;">حدث خطأ في الاتصال بقاعدة البيانات</p>
+                <p style="font-size:0.9rem; color:#64748b;">${error.message}</p>
+                <button class="btn btn-primary" onclick="initializeFirebase()" style="margin-top:20px; padding:12px 30px; background:var(--primary); color:white; border:none; border-radius:10px; cursor:pointer;">
+                    🔄 إعادة المحاولة
+                </button>
+            </div>
+        `;
     }
 }
 
@@ -357,6 +382,9 @@ async function loadAllData() {
                     firebaseKey: key
                 });
             }
+            console.log(`📦 تم تحميل ${allOrders.length} طلب`);
+        } else {
+            console.log('📦 لا توجد طلبات في قاعدة البيانات');
         }
         
         // جلب المستخدمين من Firebase
@@ -371,6 +399,7 @@ async function loadAllData() {
                     firebaseKey: key
                 });
             }
+            console.log(`👥 تم تحميل ${allUsers.length} مستخدم`);
         }
         
         // عرض البيانات
@@ -378,7 +407,7 @@ async function loadAllData() {
         
     } catch (error) {
         console.error('Load data error:', error);
-        showAlert('❌ خطأ في تحميل البيانات', 'error');
+        showAlert('❌ خطأ في تحميل البيانات: ' + error.message, 'error');
     }
 }
 
