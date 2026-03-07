@@ -2,13 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <link rel="shortcut icon" href="images//videoslogo/vip.png">
     <title>الدعم الفني - VipClub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
+        /* تحسينات متقدمة للهواتف المحمولة */
         :root {
             --whatsapp-dark: #0c1317;
             --whatsapp-dark-2: #111b21;
@@ -29,18 +30,29 @@
             --success: #00a884;
         }
 
+        /* تحسينات للهواتف */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            box-sizing: border-box;
+        }
+
         body, html { 
             height: 100%; 
             margin: 0; 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
             background-color: var(--whatsapp-dark);
             color: var(--text-primary);
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
 
         .chat-container { 
             display: flex; 
             flex-direction: column; 
-            height: 100vh; 
+            height: 100%; 
             max-width: 600px; 
             margin: 0 auto; 
             background: var(--whatsapp-dark-2); 
@@ -48,13 +60,14 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
         }
 
+        /* تحسين الهيدر للهواتف */
         .chat-header { 
             background: var(--whatsapp-dark-3); 
             color: var(--text-primary); 
-            padding: 15px 20px; 
+            padding: 10px 12px; 
             display: flex; 
             flex-direction: column; 
-            gap: 12px; 
+            gap: 8px; 
             z-index: 10; 
             border-bottom: 1px solid var(--border-color);
         }
@@ -67,30 +80,43 @@
         
         .header-actions { 
             display: flex; 
-            gap: 12px; 
+            gap: 6px; 
             align-items: center; 
         }
         
+        /* تحسين شاشة الـ ESC للهواتف */
         .esc-container { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            gap: 6px; 
+            gap: 4px; 
         }
         
         .action-btn { 
             background: var(--whatsapp-dark-4); 
             border: 1px solid var(--border-color); 
             color: var(--text-primary); 
-            padding: 8px 16px; 
-            border-radius: 8px; 
+            padding: 6px 10px; 
+            border-radius: 6px; 
             cursor: pointer; 
-            font-size: 0.8rem; 
+            font-size: 0.75rem; 
             font-weight: 600; 
             transition: all 0.3s; 
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        
+        /* تحسينات للهواتف الصغيرة */
+        @media (max-width: 380px) {
+            .action-btn {
+                padding: 4px 6px;
+                font-size: 0.7rem;
+            }
+            .header-main b {
+                font-size: 0.9rem;
+            }
         }
         
         .action-btn:disabled { 
@@ -103,13 +129,13 @@
         }
         
         #escTimer { 
-            font-size: 0.8rem; 
+            font-size: 0.75rem; 
             font-weight: bold; 
             color: var(--text-primary); 
             background: var(--whatsapp-dark-4); 
-            padding: 4px 12px; 
-            border-radius: 12px; 
-            min-width: 60px; 
+            padding: 3px 8px; 
+            border-radius: 10px; 
+            min-width: 50px; 
             text-align: center;
             border: 1px solid var(--border-color);
         }
@@ -117,34 +143,37 @@
         .escalation-countdown {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
         
         .esc-time {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: bold;
             color: var(--warning);
         }
         
         .esc-label {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
         }
 
+        /* تحسين منطقة الرسائل للهواتف */
         .messages-area { 
             flex: 1; 
             overflow-y: auto; 
-            padding: 20px; 
+            -webkit-overflow-scrolling: touch;
+            padding: 12px; 
             display: flex; 
             flex-direction: column; 
-            gap: 12px; 
+            gap: 8px; 
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             background-color: var(--whatsapp-dark-2);
             background-blend-mode: overlay;
+            background-size: cover;
         }
         
         .messages-area::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         
         .messages-area::-webkit-scrollbar-track {
@@ -153,16 +182,23 @@
         
         .messages-area::-webkit-scrollbar-thumb {
             background: var(--whatsapp-dark-4);
-            border-radius: 3px;
+            border-radius: 2px;
         }
 
+        /* تحسين الرسائل للهواتف */
         .msg-wrapper { 
             display: flex; 
             align-items: flex-end; 
-            gap: 8px; 
-            max-width: 80%; 
+            gap: 4px; 
+            max-width: 90%; 
             position: relative; 
-            margin-bottom: 5px; 
+            margin-bottom: 4px; 
+        }
+        
+        @media (min-width: 480px) {
+            .msg-wrapper {
+                max-width: 80%;
+            }
         }
         
         .user-wrap { 
@@ -176,14 +212,21 @@
         }
 
         .message { 
-            padding: 10px 14px; 
+            padding: 8px 12px; 
             border-radius: 12px; 
-            font-size: 0.95rem; 
+            font-size: 0.9rem; 
             box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
             position: relative; 
             z-index: 2; 
             word-wrap: break-word; 
             line-height: 1.4;
+        }
+        
+        @media (max-width: 380px) {
+            .message {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
         }
         
         .msg-user { 
@@ -202,34 +245,34 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            margin-top: 4px; 
-            gap: 10px; 
+            margin-top: 2px; 
+            gap: 6px; 
         }
         
         .msg-time { 
-            font-size: 0.7rem; 
+            font-size: 0.65rem; 
             color: rgba(255,255,255,0.6); 
             white-space: nowrap; 
         }
         
         .msg-status-tag { 
-            font-size: 0.65rem; 
+            font-size: 0.6rem; 
             color: rgba(255,255,255,0.6); 
             font-style: italic; 
-            margin-left: 5px;
+            margin-left: 3px; 
         }
         
         .read-icon { 
             color: var(--whatsapp-blue) !important; 
-            font-size: 0.75rem !important;
-            margin-right: 3px !important;
+            font-size: 0.7rem !important;
+            margin-right: 2px !important;
             animation: readFade 0.3s ease;
         }
         
         .unread-icon {
             color: var(--text-secondary) !important;
-            font-size: 0.75rem !important;
-            margin-right: 3px !important;
+            font-size: 0.7rem !important;
+            margin-right: 2px !important;
         }
         
         @keyframes readFade {
@@ -243,25 +286,27 @@
             display: none !important;
         }
 
+        /* تحسين زر الخيارات للهواتف */
         .dots-btn { 
             color: var(--text-secondary); 
             cursor: pointer; 
-            padding: 8px; 
-            visibility: hidden; 
+            padding: 6px; 
+            visibility: visible; 
+            opacity: 0.5;
             transition: all 0.2s; 
-            font-size: 1rem;
+            font-size: 0.9rem;
             background: var(--whatsapp-dark-3);
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
+            flex-shrink: 0;
         }
         
-        .msg-wrapper:hover .dots-btn { 
-            visibility: visible; 
+        .msg-wrapper:hover .dots-btn,
+        .dots-btn:active { 
             opacity: 1;
         }
         
@@ -270,20 +315,21 @@
             color: var(--whatsapp-blue);
         }
 
+        /* تحسين قائمة الخيارات للهواتف */
         .msg-options-menu {
             position: fixed;
             background: var(--whatsapp-dark-4);
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
             z-index: 1000;
-            min-width: 160px;
+            min-width: 150px;
             overflow: hidden;
             display: none;
             border: 1px solid var(--border-color);
         }
         
         .msg-option {
-            padding: 10px 15px;
+            padding: 12px 15px;
             cursor: pointer;
             transition: 0.2s;
             display: flex;
@@ -291,36 +337,47 @@
             gap: 10px;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+        }
+        
+        .msg-option:last-child {
+            border-bottom: none;
         }
         
         .msg-option:hover {
             background: var(--whatsapp-dark-3);
         }
         
+        .msg-option:active {
+            background: var(--whatsapp-dark-2);
+        }
+        
         .msg-option.edit { color: var(--warning); }
         .msg-option.delete { color: var(--danger); }
 
+        /* تحسين شريط الإدخال للهواتف */
         .chat-input-area { 
             background: var(--whatsapp-dark-3); 
-            padding: 15px 20px; 
+            padding: 8px 10px; 
             display: flex; 
             align-items: center; 
-            gap: 15px; 
+            gap: 8px; 
             border-top: 1px solid var(--border-color); 
             position: relative;
+            flex-wrap: wrap;
         }
         
         #messageInput { 
             flex: 1; 
             border: none; 
-            padding: 12px 18px; 
+            padding: 10px 14px; 
             border-radius: 25px; 
             outline: none; 
-            font-size: 0.95rem; 
+            font-size: 0.9rem; 
             background: var(--whatsapp-dark-4);
             color: var(--text-primary);
             font-family: inherit;
+            min-width: 120px;
         }
         
         #messageInput::placeholder {
@@ -329,18 +386,20 @@
         
         .input-btn { 
             color: var(--text-secondary); 
-            font-size: 1.5rem; 
+            font-size: 1.3rem; 
             cursor: pointer; 
             transition: all 0.2s; 
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+            flex-shrink: 0;
         }
         
-        .input-btn:hover { 
+        .input-btn:hover,
+        .input-btn:active { 
             transform: scale(1.1); 
             color: var(--whatsapp-blue); 
             background: var(--whatsapp-dark-4);
@@ -351,58 +410,75 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             transition: 0.3s;
+            flex-shrink: 0;
         }
         
-        .send-btn:hover {
+        .send-btn:hover,
+        .send-btn:active {
             background: var(--whatsapp-green);
             transform: scale(1.05);
         }
 
+        /* تحسين لوحة الإيموجي للهواتف */
         .emoji-panel { 
             position: absolute; 
-            bottom: 85px; 
-            right: 20px; 
-            left: 20px;
+            bottom: 70px; 
+            right: 10px; 
+            left: 10px;
             background: var(--whatsapp-dark-4); 
             border-radius: 15px; 
             display: none; 
-            padding: 15px; 
-            grid-template-columns: repeat(7, 1fr); 
-            gap: 10px; 
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); 
-            max-height: 200px; 
+            grid-template-columns: repeat(6, 1fr); 
+            gap: 6px; 
+            padding: 12px; 
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.4); 
+            max-height: 250px; 
             overflow-y: auto; 
             z-index: 100; 
             border: 1px solid var(--border-color);
         }
         
-        .emoji-panel::-webkit-scrollbar {
-            width: 6px;
+        @media (min-width: 480px) {
+            .emoji-panel {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 8px;
+            }
         }
         
-        .emoji-panel::-webkit-scrollbar-thumb {
+        .emoji-panel div {
+            font-size: 1.8rem;
+            padding: 6px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .emoji-panel div:active {
             background: var(--whatsapp-dark-3);
-            border-radius: 3px;
+            transform: scale(1.1);
         }
         
+        /* تحسين لوحة الرفع للهواتف */
         .quick-upload-panel {
             position: absolute;
-            bottom: 85px;
-            right: 20px;
-            left: 20px;
+            bottom: 70px;
+            right: 10px;
+            left: 10px;
             background: var(--whatsapp-dark-4);
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             display: none;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
             z-index: 100;
             border: 1px solid var(--border-color);
         }
@@ -410,43 +486,35 @@
         .upload-site-btn {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
+            gap: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
             background: var(--whatsapp-dark-3);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-decoration: none;
             color: var(--text-primary);
         }
         
-        .upload-site-btn:hover {
+        .upload-site-btn:active {
             background: var(--whatsapp-blue);
             color: white;
             border-color: var(--whatsapp-blue);
             transform: translateY(-2px);
         }
         
-        .upload-site-btn i {
-            font-size: 1.5rem;
-        }
-        
-        .upload-site-btn span {
-            flex: 1;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
         .external-link-input {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
         }
         
         .external-link-input input {
             flex: 1;
+            min-width: 150px;
             padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -456,79 +524,110 @@
             outline: none;
         }
         
-        .external-link-input input::placeholder {
-            color: var(--text-secondary);
-        }
-        
         .external-link-input button {
             background: var(--whatsapp-green-light); 
             color: white; 
             border: none; 
-            padding: 0 20px; 
+            padding: 10px 16px; 
             border-radius: 8px; 
             cursor: pointer;
-            font-size: 1rem;
-            transition: 0.3s;
+            font-size: 0.9rem;
+            transition: 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         
-        .external-link-input button:hover {
+        .external-link-input button:active {
             background: var(--whatsapp-green);
         }
         
-        video { 
+        /* تحسينات الملفات والصور */
+        video, img { 
             border-radius: 8px; 
             background: #000; 
             max-width: 100%;
-            max-height: 300px;
+            max-height: 250px;
         }
         
-        .message span a {
+        .file-msg {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px dashed var(--border-color);
+            transition: 0.2s;
+            margin-top: 5px;
+        }
+        
+        .file-msg:active {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--whatsapp-blue);
+        }
+        
+        .file-icon {
+            font-size: 1.3rem;
             color: var(--whatsapp-blue);
-            text-decoration: underline;
-            word-break: break-all;
         }
         
+        .file-name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        
+        /* تحسين الإشعارات للهواتف */
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
+            top: 10px;
+            right: 10px;
+            left: 10px;
+            padding: 12px 16px;
             background: var(--whatsapp-green-light);
             color: white;
-            border-radius: 8px;
+            border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             z-index: 1000;
             display: none;
             animation: slideIn 0.3s ease;
             max-width: 350px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 0.9rem;
         }
         
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
+        /* تحسين وضع التعديل للهواتف */
         .edit-mode {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             background: rgba(245, 158, 11, 0.1) !important;
             border: 1px solid var(--warning) !important;
         }
         
         .edit-input {
             display: flex;
-            gap: 8px;
-            margin-top: 5px;
+            gap: 6px;
+            margin-top: 4px;
             flex-direction: column;
         }
         
         .edit-input textarea {
             flex: 1;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border: 2px solid var(--warning);
             border-radius: 8px;
             font-size: 0.9rem;
@@ -536,18 +635,20 @@
             background: var(--whatsapp-dark-3);
             color: var(--text-primary);
             resize: vertical;
-            min-height: 60px;
+            min-height: 50px;
+            max-height: 120px;
             font-family: inherit;
         }
         
         .edit-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             justify-content: flex-end;
+            flex-wrap: wrap;
         }
         
         .edit-btn {
-            padding: 8px 16px;
+            padding: 8px 14px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -556,7 +657,10 @@
             transition: 0.2s;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            flex: 1;
+            justify-content: center;
+            min-width: 80px;
         }
         
         .edit-save {
@@ -564,7 +668,7 @@
             color: white;
         }
         
-        .edit-save:hover {
+        .edit-save:active {
             background: #008069;
         }
         
@@ -574,23 +678,23 @@
             border: 1px solid var(--border-color);
         }
         
-        .edit-cancel:hover {
+        .edit-cancel:active {
             background: var(--whatsapp-dark-3);
         }
         
-        /* Admin typing indicator */
+        /* تحسين مؤشر الكتابة */
         .admin-typing-indicator {
             background: var(--whatsapp-dark-3);
-            padding: 10px 15px;
+            padding: 6px 10px;
             border-radius: 15px;
-            margin: 5px 0;
+            margin: 2px 0;
             align-self: flex-start;
             max-width: 200px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         .typing-dots {
@@ -599,8 +703,8 @@
         }
         
         .typing-dots span {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             background: var(--whatsapp-blue);
             border-radius: 50%;
             animation: typingBounce 1.4s infinite;
@@ -614,76 +718,69 @@
             30% { transform: translateY(-4px); }
         }
         
-        /* Escalation notification */
+        /* تحسين إشعار التصعيد */
         .escalation-notification {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid var(--danger);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin: 10px 0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 5px 0;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--danger);
         }
         
-        /* File attachment styles */
-        .file-msg {
+        /* شاشة التحميل */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--whatsapp-dark);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            text-decoration: none;
-            color: inherit;
-            border: 1px dashed var(--border-color);
-            transition: 0.2s;
-            margin-top: 5px;
+            justify-content: center;
+            z-index: 10000;
         }
         
-        .file-msg:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: var(--whatsapp-blue);
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--whatsapp-dark-4);
+            border-top: 5px solid var(--whatsapp-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
         
-        .file-icon {
-            font-size: 1.5rem;
-            color: var(--whatsapp-blue);
-        }
-        
-        .file-info {
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        .file-name {
-            font-weight: 600;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .file-size {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
+<!-- شاشة التحميل -->
+<div id="loadingScreen" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div style="color: var(--text-primary); font-size: 1rem;">جاري التحقق من بيانات الدخول...</div>
+</div>
+
 <div id="notification" class="notification"></div>
 
 <audio id="msgSound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
 
-<div class="chat-container">
+<div class="chat-container" id="chatContainer" style="display: none;">
     <div class="chat-header">
         <div class="header-main">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <a href="ChargGames.html" style="color:var(--text-primary); text-decoration:none;">
-                    <i class="fas fa-arrow-right"></i>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <a href="ChargGames.html" style="color:var(--text-primary); text-decoration:none; padding:5px;" aria-label="رجوع">
+                    <i class="fas fa-arrow-right" style="font-size:1.2rem;"></i>
                 </a>
-                <b style="font-size:1.1rem;">دعم VipClub المباشر</b>
+                <b style="font-size:1rem;">دعم VipClub</b>
             </div>
             <div class="header-actions">
                 <div class="esc-container">
@@ -706,7 +803,7 @@
             <span class="typing-dots">
                 <span></span><span></span><span></span>
             </span>
-            <span>فريق الدعم يكتب الآن...</span>
+            <span>الدعم يكتب...</span>
         </div>
     </div>
 
@@ -715,57 +812,110 @@
     <div class="emoji-panel" id="emojiPanel"></div>
     
     <div class="quick-upload-panel" id="quickUploadPanel">
-        <h4 style="margin-bottom: 15px; text-align: center; color:var(--text-primary);">📁 رفع ملفات خارجية</h4>
+        <h4 style="margin:0 0 10px 0; font-size:0.9rem; text-align:center;">📁 رفع ملفات خارجية</h4>
         <a href="https://ufile.io/" target="_blank" class="upload-site-btn">
             <i class="fas fa-cloud-upload-alt" style="color: #4CAF50;"></i>
-            <span>رفع على UFile.io</span>
-            <i class="fas fa-external-link-alt"></i>
+            <span style="font-size:0.85rem;">رفع على UFile.io</span>
+            <i class="fas fa-external-link-alt" style="font-size:0.8rem;"></i>
         </a>
         <a href="https://gofile.io/" target="_blank" class="upload-site-btn">
             <i class="fas fa-file-upload" style="color: #2196F3;"></i>
-            <span>رفع على GoFile.io</span>
-            <i class="fas fa-external-link-alt"></i>
+            <span style="font-size:0.85rem;">رفع على GoFile.io</span>
+            <i class="fas fa-external-link-alt" style="font-size:0.8rem;"></i>
         </a>
         <div class="external-link-input">
-            <input type="text" id="externalLinkInput" placeholder="ضع رابط الملف الخارجي هنا...">
-            <button onclick="sendExternalLink()">
+            <input type="text" id="externalLinkInput" placeholder="ضع رابط الملف هنا...">
+            <button onclick="sendExternalLink()" aria-label="إرسال الرابط">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 
     <div class="chat-input-area" id="inputBar">
-        <i class="far fa-smile input-btn" title="إيموجي" onclick="toggleEmoji()"></i>
-        <i class="fas fa-cloud-upload-alt input-btn" title="رفع ملف خارجي" onclick="toggleUploadPanel()"></i>
-        <label for="fileUpload" style="cursor:pointer;">
-            <i class="fas fa-paperclip input-btn" title="إرفاق ملف أو فيديو"></i>
+        <i class="far fa-smile input-btn" title="إيموجي" onclick="toggleEmoji()" role="button" aria-label="إيموجي"></i>
+        <i class="fas fa-cloud-upload-alt input-btn" title="رفع ملف خارجي" onclick="toggleUploadPanel()" role="button" aria-label="رفع ملف"></i>
+        <label for="fileUpload" style="cursor:pointer; display:flex;">
+            <i class="fas fa-paperclip input-btn" title="إرفاق ملف" role="button" aria-label="إرفاق ملف"></i>
         </label>
         <input type="file" id="fileUpload" hidden accept="image/*,video/*,.pdf,.doc,.docx" onchange="handleFileUpload()">
-        <input type="text" id="messageInput" placeholder="اكتب رسالة..." onkeypress="handleInputKeyPress(event)">
-        <button class="send-btn" onclick="sendMessage()" title="إرسال">
+        <input type="text" id="messageInput" placeholder="اكتب رسالة..." onkeypress="handleInputKeyPress(event)" autocomplete="off">
+        <button class="send-btn" onclick="sendMessage()" title="إرسال" aria-label="إرسال">
             <i class="fas fa-paper-plane"></i>
         </button>
     </div>
 </div>
 
 <script>
-    // Firebase Configuration
+    // Firebase Configuration - مشروع stvipclub الجديد
     const firebaseConfig = {
-        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-        authDomain: "vipclub-1d04a.firebaseapp.com",
-        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-        projectId: "vipclub-1d04a",
-        storageBucket: "vipclub-1d04a.firebasestorage.app",
-        messagingSenderId: "120667552740",
-        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+        authDomain: "stvipclub.firebaseapp.com",
+        databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "stvipclub",
+        storageBucket: "stvipclub.firebasestorage.app",
+        messagingSenderId: "526607326044",
+        appId: "1:526607326044:web:6af53db123ae02c7193f99",
+        measurementId: "G-QZQMQCH9N9"
     };
 
-    // Initialize Firebase
+    // تهيئة Firebase
     let database;
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+    let firebaseApp;
+
+    // ===== التحقق من تسجيل الدخول أولاً (الأهم) =====
+    function checkLogin() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        
+        if (!currentUser || !currentUser.numericId) {
+            console.log('❌ لا يوجد مستخدم مسجل - إعادة توجيه إلى صفحة تسجيل الدخول');
+            window.location.href = 'Login.html';
+            return false;
+        }
+        
+        console.log('✅ مستخدم موجود:', currentUser.username);
+        return currentUser;
     }
-    database = firebase.database();
+
+    // تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
+    async function initializeFirebase() {
+        try {
+            // حذف أي نسخة قديمة من Firebase
+            if (firebase.apps.length > 0) {
+                console.log('🔄 جاري حذف Firebase القديم...');
+                await firebase.app().delete();
+            }
+            
+            // تهيئة Firebase من جديد بالمشروع الصحيح
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            
+            console.log('✅ Firebase initialized for support with project:', firebaseConfig.projectId);
+            
+            // اختبار الاتصال بكتابة بسيطة
+            await database.ref('connection_test').set({
+                timestamp: new Date().toISOString(),
+                message: 'اتصال ناجح من صفحة الدعم'
+            });
+            
+            // إخفاء شاشة التحميل
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'flex';
+            
+            showNotification('تم تحميل الصفحة بنجاح ✅', 'success');
+            
+        } catch (error) {
+            console.error('❌ Firebase initialization error:', error);
+            showNotification('❌ خطأ في الاتصال: ' + error.message, 'error');
+            document.getElementById('loadingScreen').innerHTML = `
+                <div class="loading-spinner"></div>
+                <div style="color: var(--danger); font-size: 1rem; margin-bottom: 20px;">خطأ في الاتصال بقاعدة البيانات</div>
+                <button onclick="window.location.href='ChargGames.html'" 
+                        style="padding: 10px 20px; background: var(--whatsapp-blue); border: none; border-radius: 8px; color: white; cursor: pointer;">
+                    العودة للصفحة الرئيسية
+                </button>
+            `;
+        }
+    }
 
     // Variables
     const msgArea = document.getElementById('messagesArea');
@@ -773,21 +923,16 @@
     const msgSound = document.getElementById('msgSound');
     const adminTypingIndicator = document.getElementById('adminTypingIndicator');
     
-    // Generate or retrieve user data
-    let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    // الحصول على بيانات المستخدم الحالية (مضمون وجودها)
+    let currentUser = checkLogin();
+    
+    // إذا لم يكن هناك مستخدم، الكود يتوقف هنا (تم التوجيه إلى Login.html)
     if (!currentUser) {
-        const randomNum = Math.floor(100000 + Math.random() * 900000);
-        currentUser = { 
-            numericId: randomNum, 
-            username: `User_${randomNum}`,
-            nickname: `زائر_${randomNum}`,
-            isOnline: true
-        };
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        throw new Error('No user logged in');
     }
     
     const userId = `user_${currentUser.numericId}`;
-    const userName = currentUser.nickname || currentUser.username || "زائر";
+    const userName = currentUser.nickname || currentUser.username || "مستخدم";
     let editingMessageId = null;
     let messagesMap = new Map();
     let messagesListener = null;
@@ -809,17 +954,25 @@
             currentUser.lastSeen = new Date().toISOString();
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
-            // Save user data in both /users and /chats
-            const userRef = database.ref('users').child(currentUser.numericId.toString());
-            await userRef.set({
-                numericId: currentUser.numericId,
-                username: currentUser.username,
-                nickname: currentUser.nickname,
-                isOnline: true,
-                lastSeen: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                ...(currentUser.createdAt ? {} : { createdAt: new Date().toISOString() })
-            });
+            // البحث عن المستخدم في Firebase أولاً
+            const userSnapshot = await database.ref('users').orderByChild('numericId').equalTo(parseInt(currentUser.numericId)).once('value');
+            
+            if (!userSnapshot.exists()) {
+                console.log('⚠️ المستخدم غير موجود في Firebase، يتم إنشاؤه...');
+                // إنشاء المستخدم في Firebase
+                const userRef = database.ref('users').child(currentUser.numericId.toString());
+                await userRef.set({
+                    numericId: currentUser.numericId,
+                    username: currentUser.username,
+                    nickname: currentUser.nickname,
+                    email: currentUser.email || '',
+                    phone: currentUser.phone || '',
+                    isOnline: true,
+                    lastSeen: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    createdAt: currentUser.createdAt || new Date().toISOString()
+                });
+            }
             
             // Initialize chat if not exists
             const chatRef = database.ref('chats').child(userId);
@@ -862,7 +1015,7 @@
 
     // Track user activity (online/offline)
     function startActivityTracking() {
-        // Update online status every 10 seconds for faster response
+        // Update online status every 10 seconds
         const onlineInterval = setInterval(async () => {
             try {
                 if (document.visibilityState === 'visible') {
@@ -981,7 +1134,7 @@
             time: new Date().toISOString(),
             isEdited: false,
             isDeleted: false,
-            isRead: false, // رسائل المستخدم تكون غير مقروءة عند الإرسال
+            isRead: false,
             hiddenForAdmin: false
         };
 
@@ -1006,7 +1159,7 @@
             playNotificationSound();
             msgInput.value = '';
             setTypingStatus(false);
-            emojiPanel.style.display = 'none';
+            document.getElementById('emojiPanel').style.display = 'none';
             document.getElementById('quickUploadPanel').style.display = 'none';
             
         } catch (error) {
@@ -1059,7 +1212,7 @@
                     // Sort by time
                     messages.sort((a, b) => new Date(a.time) - new Date(b.time));
                     
-                    // Render messages with special handling for editing
+                    // Render messages
                     renderMessages(messages);
                 } catch (error) {
                     console.error('Error processing messages:', error);
@@ -1086,10 +1239,10 @@
         
         if (!messages || messages.length === 0) {
             msgArea.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <div style="text-align: center; padding: 30px; color: var(--text-secondary);">
                     <i class="fas fa-comments fa-3x" style="opacity: 0.2;"></i>
-                    <p style="margin-top: 15px; font-size: 1rem;">مرحباً بك في دعم VipClub!</p>
-                    <p style="font-size: 0.9rem; opacity: 0.8;">كيف يمكننا مساعدتك اليوم؟</p>
+                    <p style="margin-top: 10px; font-size: 0.95rem;">مرحباً بك في دعم VipClub!</p>
+                    <p style="font-size: 0.85rem; opacity: 0.8;">كيف يمكننا مساعدتك اليوم؟</p>
                 </div>
             `;
             messagesMap.clear();
@@ -1098,21 +1251,17 @@
         
         // If we're editing a message, preserve its edit state
         if (editingMessageId !== null) {
-            // Save the editing message state
             const editingWrapper = document.getElementById(`msg-${editingMessageId}`);
             if (editingWrapper) {
                 const editingClone = editingWrapper.cloneNode(true);
                 
-                // Clear and rebuild the messages
                 msgArea.innerHTML = '';
                 messagesMap.clear();
                 
-                // Add all messages, preserving the editing one
                 messages.forEach((msg) => {
                     if (!msg || msg.hiddenForAdmin) return;
                     
                     if (msg.firebaseKey === editingMessageId) {
-                        // Use the preserved editing wrapper
                         msgArea.appendChild(editingClone);
                         messagesMap.set(msg.firebaseKey, { wrapper: editingClone, msg });
                     } else {
@@ -1127,7 +1276,7 @@
             }
         }
         
-        // Normal rendering (no message being edited)
+        // Normal rendering
         msgArea.innerHTML = '';
         messagesMap.clear();
         
@@ -1155,10 +1304,10 @@
             </i>`;
         } else {
             if(msg.type === 'image') {
-                contentHTML = `<img src="${msg.text}" style="max-width:100%; max-height:300px; border-radius:8px; cursor: pointer;" 
-                       onclick="window.open('${msg.text}', '_blank')">`;
+                contentHTML = `<img src="${msg.text}" style="max-width:100%; max-height:250px; border-radius:8px; cursor: pointer;" 
+                       onclick="window.open('${msg.text}', '_blank')" loading="lazy">`;
             } else if(msg.type === 'video') {
-                contentHTML = `<video src="${msg.text}" controls style="max-width:100%; max-height:300px; border-radius:8px;"></video>`;
+                contentHTML = `<video src="${msg.text}" controls style="max-width:100%; max-height:250px; border-radius:8px;" preload="metadata"></video>`;
             } else if(msg.type === 'file') {
                 contentHTML = `
                     <a href="${msg.text}" download="${msg.fileName || 'file'}" class="file-msg">
@@ -1184,21 +1333,19 @@
         // علامات القراءة للمستخدم
         let readIcon = '';
         if (msg.sender === 'user') {
-            // رسائل المستخدم: تظهر علامة زرقاء إذا قرأها الأدمن
             if (msg.isRead) {
                 readIcon = '<i class="fas fa-check-double read-icon"></i>';
             } else {
                 readIcon = '<i class="fas fa-check unread-icon"></i>';
             }
-        } 
-        // لا نضع علامات قراءة لرسائل الأدمن
+        }
         
         // Add options button for user messages only
         let optionsButton = '';
         
         if (msg.sender === 'user' && !msg.isDeleted && msg.type === 'text') {
             optionsButton = `
-                <div class="dots-btn" onclick="showMessageMenu(event, '${msg.firebaseKey}', '${msg.text ? msg.text.replace(/'/g, "\\'") : ''}')">
+                <div class="dots-btn" onclick="showMessageMenu(event, '${msg.firebaseKey}', '${msg.text ? msg.text.replace(/'/g, "\\'").replace(/"/g, '&quot;') : ''}')">
                     <i class="fas fa-ellipsis-v"></i>
                 </div>
             `;
@@ -1234,14 +1381,26 @@
             existingMenu.remove();
         }
         
+        // Get position for mobile
+        let x = event.clientX;
+        let y = event.clientY;
+        
+        // Adjust for mobile
+        if (x > window.innerWidth - 150) {
+            x = window.innerWidth - 160;
+        }
+        if (y > window.innerHeight - 100) {
+            y = window.innerHeight - 120;
+        }
+        
         // Create new menu
         const menu = document.createElement('div');
         menu.className = 'msg-options-menu';
-        menu.style.left = event.clientX + 'px';
-        menu.style.top = event.clientY + 'px';
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
         
         menu.innerHTML = `
-            <div class="msg-option edit" onclick="editUserMessage('${messageId}', '${messageText.replace(/'/g, "\\'")}')">
+            <div class="msg-option edit" onclick="editUserMessage('${messageId}', '${messageText.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
                 <i class="fas fa-edit"></i>
                 <span>تعديل الرسالة</span>
             </div>
@@ -1328,7 +1487,9 @@
         
         if (messageContent && messageTextDiv) {
             messageContent.classList.remove('edit-mode');
-            messageTextDiv.innerHTML = originalHTML;
+            if (originalHTML) {
+                messageTextDiv.innerHTML = originalHTML;
+            }
         }
         
         editingMessageId = null;
@@ -1347,7 +1508,7 @@
         }
         
         try {
-            // تحديث في Firebase - مع الحفاظ على التوقيت القديم للحفاظ على الموقع
+            // تحديث في Firebase - مع الحفاظ على التوقيت القديم
             const msgData = messagesMap.get(messageId);
             const originalTime = msgData?.msg?.time || new Date().toISOString();
             
@@ -1357,7 +1518,7 @@
                 time: originalTime
             });
             
-            // تحديث الواجهة مباشرة دون إعادة تحميل
+            // تحديث الواجهة مباشرة
             const messageContent = document.getElementById(`message-content-${messageId}`);
             const messageTextDiv = document.getElementById(`message-text-${messageId}`);
             
@@ -1398,7 +1559,7 @@
         }
     }
 
-    // Delete user message (soft delete - mark as deleted)
+    // Delete user message
     async function deleteUserMessage(messageId) {
         if (!confirm('هل تريد حذف هذه الرسالة؟')) return;
         
@@ -1452,14 +1613,15 @@
 
     // Toggle panels
     function toggleEmoji() { 
+        const emojiPanel = document.getElementById('emojiPanel');
         emojiPanel.style.display = emojiPanel.style.display === 'grid' ? 'none' : 'grid';
         document.getElementById('quickUploadPanel').style.display = 'none';
     }
 
     function toggleUploadPanel() { 
-        document.getElementById('quickUploadPanel').style.display = 
-            document.getElementById('quickUploadPanel').style.display === 'block' ? 'none' : 'block';
-        emojiPanel.style.display = 'none';
+        const uploadPanel = document.getElementById('quickUploadPanel');
+        uploadPanel.style.display = uploadPanel.style.display === 'block' ? 'none' : 'block';
+        document.getElementById('emojiPanel').style.display = 'none';
     }
 
     // Emoji panel
@@ -1468,20 +1630,6 @@
     emojis.forEach(e => {
         let div = document.createElement('div');
         div.innerText = e;
-        div.style.cursor = 'pointer';
-        div.style.fontSize = '1.5rem';
-        div.style.textAlign = 'center';
-        div.style.padding = '5px';
-        div.style.borderRadius = '8px';
-        div.style.transition = '0.2s';
-        div.onmouseover = () => { 
-            div.style.background = 'var(--whatsapp-dark-3)';
-            div.style.transform = 'scale(1.1)';
-        };
-        div.onmouseout = () => { 
-            div.style.background = 'transparent';
-            div.style.transform = 'scale(1)';
-        };
         div.onclick = () => { 
             msgInput.value += e; 
             msgInput.focus();
@@ -1490,19 +1638,16 @@
         emojiPanel.appendChild(div);
     });
 
-    // Escalation timer with persistence
+    // Escalation timer
     function initializeEscalationTimer() {
-        // Check if already escalated
         database.ref('chats').child(userId).once('value').then(snapshot => {
             const chatData = snapshot.val();
             if (chatData && chatData.isEscalated) {
-                // Already escalated
                 isEscalated = true;
                 document.getElementById('escBtn').disabled = true;
                 document.getElementById('escTimer').textContent = 'مصعد';
                 document.getElementById('escTimer').style.background = 'var(--danger)';
                 
-                // Show escalation notification
                 showEscalationNotification();
                 return;
             }
@@ -1519,12 +1664,10 @@
                     escalationStartTime = timerData.startTime;
                     startEscalationTimer();
                 } else {
-                    // Timer expired
                     document.getElementById('escBtn').disabled = false;
                     localStorage.removeItem(`escalation_${userId}`);
                 }
             } else {
-                // Start new timer
                 startEscalationTimer();
             }
         });
@@ -1570,29 +1713,15 @@
         localStorage.setItem(`escalation_${userId}`, JSON.stringify(timerData));
     }
 
-    function resetEscalationTimer() {
-        timeLeft = 300;
-        escalationStartTime = null;
-        localStorage.removeItem(`escalation_${userId}`);
-        if (escalationTimer) {
-            clearInterval(escalationTimer);
-        }
-        document.getElementById('escTimer').textContent = '05:00';
-        document.getElementById('escTimer').style.background = 'var(--whatsapp-dark-4)';
-        document.getElementById('escBtn').disabled = true;
-        startEscalationTimer();
-    }
-
     function showEscalationNotification() {
         const notification = document.createElement('div');
         notification.className = 'escalation-notification';
         notification.innerHTML = `
             <i class="fas fa-exclamation-triangle"></i>
             <strong> تم تصعيد محادثتك للإدارة العليا</strong>
-            <p style="margin:5px 0 0 0; font-size:0.8rem; opacity:0.9;">سيتم الرد عليك بأولوية قصوى</p>
+            <p style="margin:5px 0 0 0; font-size:0.75rem;">سيتم الرد عليك بأولوية قصوى</p>
         `;
         
-        // Insert at the beginning of messages area
         const msgArea = document.getElementById('messagesArea');
         if (msgArea.firstChild) {
             msgArea.insertBefore(notification, msgArea.firstChild);
@@ -1604,28 +1733,23 @@
     // Escalate chat
     async function escalateChat() {
         try {
-            // Mark as escalated in Firebase
             await database.ref('chats').child(userId).update({
                 isEscalated: true,
                 escalatedAt: new Date().toISOString()
             });
             
-            // Send escalation notification
             await sendMessage("⚠️ تم تصعيد محادثتك للإدارة العليا. سيتم الرد عليك بأولوية قصوى.", 'text', 'admin');
             
-            // Update UI
             isEscalated = true;
             document.getElementById('escBtn').disabled = true;
             document.getElementById('escTimer').textContent = 'مصعد';
             document.getElementById('escTimer').style.background = 'var(--danger)';
             
-            // Clear timer
             if (escalationTimer) {
                 clearInterval(escalationTimer);
             }
             localStorage.removeItem(`escalation_${userId}`);
             
-            // Show notification
             showEscalationNotification();
             showNotification('✅ تم إرسال طلب تصعيد للإدارة', 'success');
             
@@ -1639,17 +1763,15 @@
         if(confirm("هل تريد إنهاء الجلسة والعودة للرئيسية؟ سيتم حفظ سجل المحادثة.")) {
             setTypingStatus(false);
             
-            // Update online status
             await database.ref('chats').child(userId).update({
                 isOnline: false,
                 lastSeen: new Date().toISOString()
             });
             
-            // Send end chat notification
             await sendMessage("🔴 تم إنهاء المحادثة من قبل العميل", 'text', 'admin');
             
             setTimeout(() => {
-                location.href = 'charggames.html';
+                location.href = 'ChargGames.html';
             }, 1000);
         }
     }
@@ -1676,12 +1798,11 @@
         }, 3000);
     }
 
-    // ====== الإضافة الجديدة: مراقبة تحديثات حالة القراءة ======
+    // Listen for read status updates
     function listenForReadStatusUpdates() {
         readStatusListener = database.ref('chats').child(userId).child('messages').on('child_changed', (snapshot) => {
             const msg = snapshot.val();
             if (msg && msg.sender === 'user' && msg.isRead) {
-                // تحديث واجهة المستخدم عندما تقرأ الرسائل
                 const messageWrapper = document.getElementById(`msg-${snapshot.key}`);
                 if (messageWrapper) {
                     const readIcon = messageWrapper.querySelector('.unread-icon');
@@ -1695,27 +1816,33 @@
 
     // Initialize
     window.onload = async function() {
-        await ensureUserInFirebase();
-        await loadMessages();
-        initializeEscalationTimer();
-        listenForAdminTyping();
-        listenForReadStatusUpdates(); // إضافة مراقبة تحديثات حالة القراءة
-        showNotification('✅ تم الاتصال بنظام الدعم', 'success');
-        
-        // Close panels when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!emojiPanel.contains(e.target) && !e.target.closest('.fa-smile')) {
-                emojiPanel.style.display = 'none';
-            }
-            if (!quickUploadPanel.contains(e.target) && !e.target.closest('.fa-cloud-upload-alt')) {
-                quickUploadPanel.style.display = 'none';
-            }
-        });
+        try {
+            await initializeFirebase();
+            await ensureUserInFirebase();
+            await loadMessages();
+            initializeEscalationTimer();
+            listenForAdminTyping();
+            listenForReadStatusUpdates();
+            showNotification('✅ تم الاتصال بنظام الدعم', 'success');
+            
+            // Close panels when clicking outside
+            document.addEventListener('click', function(e) {
+                const emojiPanel = document.getElementById('emojiPanel');
+                const quickUploadPanel = document.getElementById('quickUploadPanel');
+                if (!emojiPanel.contains(e.target) && !e.target.closest('.fa-smile')) {
+                    emojiPanel.style.display = 'none';
+                }
+                if (!quickUploadPanel.contains(e.target) && !e.target.closest('.fa-cloud-upload-alt')) {
+                    quickUploadPanel.style.display = 'none';
+                }
+            });
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
     };
 
     // Cleanup on unload
     window.onbeforeunload = async function() {
-        // Update offline status
         try {
             await database.ref('chats').child(userId).update({
                 isOnline: false,
@@ -1726,7 +1853,6 @@
             console.error('Error updating offline status:', error);
         }
         
-        // Clean up listeners
         if (messagesListener) {
             database.ref('chats').child(userId).child('messages').off('value', messagesListener);
         }
@@ -1737,7 +1863,6 @@
             database.ref('chats').child(userId).child('messages').off('child_changed', readStatusListener);
         }
         
-        // Save timer state
         if (timeLeft > 0 && !isEscalated) {
             saveTimerState();
         }
