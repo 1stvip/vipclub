@@ -49,6 +49,7 @@
         .btn-leave { padding: 4px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.7rem; transition: 0.3s; }
         .btn-leave:hover { background: #dc2626; }
 
+        /* ===== MAIN ===== */
         main {
             flex: 1;
             padding: 10px 3% 5px;
@@ -57,7 +58,10 @@
             gap: 10px;
         }
 
-        .seats-area { width: 100%; }
+        /* ===== SEATS AREA ===== */
+        .seats-area {
+            width: 100%;
+        }
         .seats-area h2 {
             font-size: 0.95rem;
             margin-bottom: 8px;
@@ -66,6 +70,7 @@
             align-items: center;
             gap: 6px;
         }
+        .seats-area h2 i { font-size: 0.85rem; }
 
         .seats-container {
             display: flex;
@@ -138,6 +143,7 @@
         }
         .seat .seat-number { font-size: 0.55rem; color: #555; margin-top: 3px; }
         .seat .seat-username { font-size: 0.75rem; font-weight: 600; margin-top: 3px; color: #ccc; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .seat .seat-username.owner-name { color: #ffd700; }
 
         .seat .seat-indicators { display: flex; gap: 6px; margin-top: 4px; justify-content: center; }
         .seat .seat-indicators .indicator { font-size: 0.6rem; }
@@ -146,6 +152,7 @@
         .seat .seat-indicators .indicator.speaker-on { color: #3b82f6; }
         .seat .seat-indicators .indicator.speaker-off { color: #6b7280; }
 
+        /* ===== موجات صوتية ===== */
         .seat .sound-waves {
             position: absolute;
             top: 50%;
@@ -206,7 +213,14 @@
         .seat .seat-actions .btn-mute:hover { background: #d97706; }
         .seat .seat-actions .btn-ban { background: #7c3aed; color: white; }
         .seat .seat-actions .btn-ban:hover { background: #6d28d9; }
+        .seat .seat-actions .btn-close-seat { background: #ef4444; color: white; }
+        .seat .seat-actions .btn-close-seat:hover { background: #dc2626; }
+        .seat .seat-actions .btn-invite { background: #3b82f6; color: white; }
+        .seat .seat-actions .btn-invite:hover { background: #2563eb; }
+        .seat .seat-actions .btn-open-seat { background: #10b981; color: white; }
+        .seat .seat-actions .btn-open-seat:hover { background: #059669; }
 
+        /* ===== CHAT AREA ===== */
         .chat-area {
             width: 50%;
             margin: 5px auto 0;
@@ -228,6 +242,7 @@
             flex-shrink: 0;
         }
         .chat-header h3 { font-size: 0.75rem; color: #ffd700; display: flex; align-items: center; gap: 5px; }
+        .chat-header h3 i { font-size: 0.7rem; }
         .chat-header .online-count { font-size: 0.6rem; color: #888; }
 
         .chat-messages {
@@ -254,17 +269,78 @@
             max-width: 70%;
             opacity: 0.8;
         }
-        .chat-messages .message.system.join { background: rgba(16, 185, 129, 0.06); color: #10b981; border-color: rgba(16, 185, 129, 0.06); }
-        .chat-messages .message.system.leave { background: rgba(239, 68, 68, 0.04); color: #ef4444; border-color: rgba(239, 68, 68, 0.05); }
+        .chat-messages .message.system.join { 
+            background: rgba(16, 185, 129, 0.06); 
+            color: #10b981; 
+            border-color: rgba(16, 185, 129, 0.06);
+        }
+        .chat-messages .message.system.leave { 
+            background: rgba(239, 68, 68, 0.04); 
+            color: #ef4444; 
+            border-color: rgba(239, 68, 68, 0.05);
+        }
         
-        .chat-messages .message.own { background: rgba(102, 126, 234, 0.15); align-self: flex-end; border: 1px solid rgba(102, 126, 234, 0.08); border-radius: 12px 12px 4px 12px; direction: rtl; text-align: right; max-width: 80%; padding: 4px 10px; }
-        .chat-messages .message.other { background: rgba(255,255,255,0.04); align-self: flex-start; border: 1px solid rgba(255,255,255,0.04); border-radius: 12px 12px 12px 4px; direction: ltr; text-align: left; max-width: 80%; padding: 4px 10px; }
+        .chat-messages .message.own { 
+            background: rgba(102, 126, 234, 0.15); 
+            align-self: flex-end; 
+            border: 1px solid rgba(102, 126, 234, 0.08);
+            border-radius: 12px 12px 4px 12px;
+            direction: rtl;
+            text-align: right;
+            max-width: 80%;
+            padding: 4px 10px;
+        }
+        .chat-messages .message.other { 
+            background: rgba(255,255,255,0.04); 
+            align-self: flex-start; 
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px 12px 12px 4px;
+            direction: ltr;
+            text-align: left;
+            max-width: 80%;
+            padding: 4px 10px;
+        }
         
         .chat-messages .message .msg-sender { font-size: 0.45rem; color: #888; margin-bottom: 1px; }
         .chat-messages .message .msg-sender.owner { color: #ffd700; }
         .chat-messages .message .msg-text { font-size: 0.75rem; word-wrap: break-word; }
         .chat-messages .message .msg-time { font-size: 0.4rem; color: #666; margin-top: 1px; }
         .chat-messages .message .msg-badge { font-size: 0.4rem; background: #ffd700; color: #1a1a2e; padding: 1px 6px; border-radius: 8px; margin-left: 4px; }
+
+        @keyframes fadeInMsg { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .scroll-down-btn {
+            position: absolute;
+            bottom: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.3);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+        .scroll-down-btn:hover {
+            background: rgba(102, 126, 234, 0.5);
+            transform: translateX(-50%) scale(1.1);
+        }
+        .scroll-down-btn.visible {
+            display: flex;
+            animation: fadeInBtn 0.3s ease;
+        }
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateX(-50%) scale(0.8); }
+            to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
 
         .chat-input-area {
             padding: 5px 10px;
@@ -273,6 +349,7 @@
             gap: 5px;
             align-items: center;
             flex-shrink: 0;
+            position: relative;
         }
         .chat-input-area .input-wrapper {
             flex: 1;
@@ -282,6 +359,8 @@
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.05);
             padding: 0 8px;
+            min-width: 80px;
+            position: relative;
         }
         .chat-input-area .input-wrapper input {
             flex: 1;
@@ -291,8 +370,27 @@
             color: white;
             outline: none;
             font-size: 0.75rem;
+            min-width: 40px;
         }
         .chat-input-area .input-wrapper input::placeholder { color: #666; font-size: 0.65rem; }
+        .chat-input-area .input-wrapper input:focus { border-color: transparent; }
+        
+        .chat-input-area .emoji-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 3px 5px;
+            transition: 0.3s;
+            border-radius: 6px;
+            position: relative;
+        }
+        .chat-input-area .emoji-btn:hover {
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+        }
+        
         .chat-input-area .send-btn {
             padding: 5px 12px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -305,7 +403,55 @@
             font-size: 0.7rem;
             white-space: nowrap;
         }
-        .chat-input-area .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
+        .chat-input-area .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .chat-input-area .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .emoji-picker {
+            display: none;
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 8px;
+            max-width: 220px;
+            max-height: 120px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            flex-wrap: wrap;
+            gap: 3px;
+            justify-content: center;
+        }
+        .emoji-picker.active {
+            display: flex;
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .emoji-picker .emoji-item {
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 6px;
+            transition: 0.2s;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .emoji-picker .emoji-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: scale(1.15);
+        }
 
         .audio-controls {
             position: fixed;
@@ -363,58 +509,108 @@
         .mic-overlay .mic-box .btn-skip { margin-top: 8px; background: transparent; color: #666; border: none; cursor: pointer; font-size: 0.8rem; transition: 0.3s; width: 100%; }
         .mic-overlay .mic-box .btn-skip:hover { color: #999; }
 
-        .connection-status {
-            position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            z-index: 1000;
-            display: none;
-            backdrop-filter: blur(10px);
-            text-align: center;
-            max-width: 90%;
-        }
-        .connection-status.connected {
-            display: block;
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #10b981;
-        }
-        .connection-status.disconnected {
-            display: block;
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-        }
-        .connection-status.connecting {
-            display: block;
-            background: rgba(251, 191, 36, 0.2);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            color: #fbbf24;
+        @media (max-width: 1024px) {
+            .seats-row.row-4 { max-width: 560px; }
+            .seats-row.row-3 { max-width: 420px; }
+            .seat { max-width: 110px; min-height: 100px; }
+            .seat.owner-seat { max-width: 125px; min-height: 115px; }
+            .seat .seat-avatar { width: 48px; height: 48px; font-size: 1.3rem; }
+            .chat-area { width: 60%; }
         }
 
         @media (max-width: 768px) {
-            .seats-row { gap: 8px; }
+            .seats-row.row-4 { max-width: 100%; }
+            .seats-row.row-3 { max-width: 100%; }
+            .seats-row.row-2 { max-width: 100%; }
+            .seats-row.row-1 { max-width: 100%; }
             .seat { max-width: 95px; min-height: 85px; padding: 10px 6px; }
+            .seat.owner-seat { max-width: 110px; min-height: 100px; }
             .seat .seat-avatar { width: 42px; height: 42px; font-size: 1.1rem; }
+            .seat .seat-username { font-size: 0.65rem; max-width: 70px; }
             .chat-area { width: 75%; height: 180px; }
             .audio-controls { bottom: 75px; right: 12px; gap: 6px; }
             .audio-btn { width: 38px; height: 38px; font-size: 1rem; }
+            .btn-leave-seat { width: 38px; height: 38px; font-size: 1rem; }
+            .emoji-picker { max-width: 180px; max-height: 100px; padding: 6px; }
+            .emoji-picker .emoji-item { width: 24px; height: 24px; font-size: 0.85rem; }
+            .room-info .room-name { max-width: 70px; font-size: 0.7rem; }
+            .room-info .room-id { font-size: 0.55rem; padding: 2px 6px; }
+            .btn-leave { padding: 3px 10px; font-size: 0.6rem; }
+            .logo { font-size: 1rem; }
+            .scroll-down-btn { width: 26px; height: 26px; font-size: 0.6rem; bottom: 55px; }
         }
 
         @media (max-width: 480px) {
             header { padding: 0.4rem 3%; min-height: 44px; }
             .logo { font-size: 0.85rem; }
+            .logo i { font-size: 0.95rem; }
+            
             .seats-container { padding: 10px; gap: 8px; }
+            .seats-row { gap: 8px; }
             .seat { max-width: 75px; min-height: 70px; padding: 8px 4px; border-radius: 12px; }
-            .seat .seat-avatar { width: 34px; height: 34px; font-size: 0.9rem; }
+            .seat.owner-seat { max-width: 88px; min-height: 82px; }
+            .seat .seat-avatar { width: 34px; height: 34px; font-size: 0.9rem; border-width: 1.5px; }
+            .seat .seat-username { font-size: 0.55rem; max-width: 60px; }
+            .seat .seat-number { font-size: 0.45rem; }
+            .seat .seat-indicators .indicator { font-size: 0.45rem; }
+            .seat .seat-crown { font-size: 1.2rem; top: -12px; }
+            .seat .seat-badge-owner { font-size: 0.4rem; padding: 1px 6px; }
+            .seat .seat-actions button { font-size: 0.4rem; padding: 2px 5px; }
+            
             .chat-area { width: 90%; height: 150px; }
+            .chat-header { padding: 4px 8px; }
+            .chat-header h3 { font-size: 0.65rem; }
+            .chat-messages { padding: 5px 8px; gap: 3px; }
+            .chat-messages .message.system { font-size: 0.5rem; padding: 2px 8px; max-width: 85%; }
+            .chat-messages .message.own { padding: 3px 8px; font-size: 0.65rem; }
+            .chat-messages .message.other { padding: 3px 8px; font-size: 0.65rem; }
+            .chat-messages .message .msg-text { font-size: 0.65rem; }
+            
+            .chat-input-area { padding: 4px 6px; gap: 4px; }
+            .chat-input-area .input-wrapper { padding: 0 6px; min-width: 60px; }
+            .chat-input-area .input-wrapper input { padding: 3px 6px; font-size: 0.65rem; min-width: 30px; }
+            .chat-input-area .emoji-btn { font-size: 0.8rem; padding: 2px 4px; }
+            .chat-input-area .send-btn { padding: 4px 10px; font-size: 0.6rem; }
+            
             .audio-controls { bottom: 65px; right: 10px; gap: 5px; }
             .audio-btn { width: 34px; height: 34px; font-size: 0.85rem; }
             .btn-leave-seat { width: 34px; height: 34px; font-size: 0.85rem; }
+            .audio-btn .tooltip { right: 42px; font-size: 0.5rem; padding: 3px 8px; }
+            .btn-leave-seat .tooltip { right: 42px; font-size: 0.5rem; padding: 3px 8px; }
+            
+            .emoji-picker { max-width: 160px; max-height: 90px; padding: 5px; bottom: 35px; }
+            .emoji-picker .emoji-item { width: 22px; height: 22px; font-size: 0.8rem; }
+            
+            .mic-overlay .mic-box { padding: 20px; }
+            .mic-overlay .mic-box .mic-icon { font-size: 2.5rem; }
+            .mic-overlay .mic-box h2 { font-size: 1rem; }
+            .mic-overlay .mic-box p { font-size: 0.75rem; }
+            .mic-overlay .mic-box .btn-allow { font-size: 0.85rem; padding: 10px 20px; }
+            
+            .room-info .room-name { max-width: 50px; font-size: 0.6rem; }
+            .room-info .room-id { font-size: 0.45rem; padding: 2px 4px; }
+            .btn-leave { padding: 2px 8px; font-size: 0.5rem; border-radius: 4px; }
+            
+            .scroll-down-btn { width: 24px; height: 24px; font-size: 0.55rem; bottom: 48px; }
+        }
+
+        @media (max-width: 380px) {
+            .seat { max-width: 60px; min-height: 58px; }
+            .seat.owner-seat { max-width: 72px; min-height: 70px; }
+            .seat .seat-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
+            .seat .seat-username { font-size: 0.45rem; max-width: 50px; }
+            .seat .seat-number { display: none; }
+            .seat .seat-indicators .indicator { font-size: 0.35rem; }
+            .seat .seat-crown { font-size: 1rem; top: -10px; }
+            
+            .chat-area { height: 130px; }
+            .chat-messages .message.system { font-size: 0.45rem; }
+            .chat-messages .message .msg-text { font-size: 0.55rem; }
+            
+            .audio-btn { width: 30px; height: 30px; font-size: 0.75rem; }
+            .btn-leave-seat { width: 30px; height: 30px; font-size: 0.75rem; }
+            .emoji-picker { max-width: 130px; max-height: 70px; }
+            .emoji-picker .emoji-item { width: 18px; height: 18px; font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -432,8 +628,6 @@
             <button class="btn-leave" onclick="leaveRoom()"><i class="fas fa-sign-out-alt"></i> مغادرة</button>
         </div>
     </header>
-
-    <div class="connection-status" id="connectionStatus">🔄 جاري الاتصال...</div>
 
     <div class="mic-overlay" id="micOverlay">
         <div class="mic-box">
@@ -458,10 +652,46 @@
                 <span class="online-count" id="chatOnlineCount">0 متصل</span>
             </div>
             <div class="chat-messages" id="chatMessages"></div>
+            
+            <button class="scroll-down-btn" id="scrollDownBtn" onclick="scrollToBottom()" title="الذهاب لأحدث الرسائل">
+                <i class="fas fa-arrow-down"></i>
+            </button>
 
             <div class="chat-input-area">
                 <div class="input-wrapper">
+                    <button class="emoji-btn" onclick="toggleEmojiPicker()" title="إضافة إيموجي">
+                        <i class="fas fa-smile-wink"></i>
+                    </button>
                     <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <div class="emoji-picker" id="emojiPicker">
+                        <span class="emoji-item" onclick="insertEmoji('😊')">😊</span>
+                        <span class="emoji-item" onclick="insertEmoji('😂')">😂</span>
+                        <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
+                        <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                        <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
+                        <span class="emoji-item" onclick="insertEmoji('👋')">👋</span>
+                        <span class="emoji-item" onclick="insertEmoji('🎉')">🎉</span>
+                        <span class="emoji-item" onclick="insertEmoji('💪')">💪</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤔')">🤔</span>
+                        <span class="emoji-item" onclick="insertEmoji('😍')">😍</span>
+                        <span class="emoji-item" onclick="insertEmoji('🥰')">🥰</span>
+                        <span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤣')">🤣</span>
+                        <span class="emoji-item" onclick="insertEmoji('😅')">😅</span>
+                        <span class="emoji-item" onclick="insertEmoji('🙏')">🙏</span>
+                        <span class="emoji-item" onclick="insertEmoji('✨')">✨</span>
+                        <span class="emoji-item" onclick="insertEmoji('💯')">💯</span>
+                        <span class="emoji-item" onclick="insertEmoji('🎶')">🎶</span>
+                        <span class="emoji-item" onclick="insertEmoji('💀')">💀</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤝')">🤝</span>
+                        <span class="emoji-item" onclick="insertEmoji('👀')">👀</span>
+                        <span class="emoji-item" onclick="insertEmoji('😴')">😴</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤩')">🤩</span>
+                        <span class="emoji-item" onclick="insertEmoji('🥳')">🥳</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤗')">🤗</span>
+                        <span class="emoji-item" onclick="insertEmoji('😇')">😇</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤪')">🤪</span>
+                    </div>
                 </div>
                 <button class="send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
@@ -509,19 +739,9 @@
         let roomListener = null;
         let seatsListener = null;
         let roomInitialized = false;
-        let isSpeakerActive = true;
         let audioContext = null;
-
-        // ============================================================
-        // 🔗 WebRTC Variables
-        // ============================================================
-        let peerConnections = {};
-        let peerStreams = {};
-        let signalingListener = null;
-        let speakingCheckInterval = null;
-        let audioAnalyser = null;
-        let audioDataArray = null;
-        let reconnectTimeouts = {};
+        let audioBuffers = [];
+        let isSpeakerActive = true;
 
         // ============================================================
         // 🎯 GET ROOM ID FROM URL
@@ -573,14 +793,11 @@
                     video: false 
                 });
                 mediaStream = stream;
-                
-                // إعداد تحليل الصوت
-                setupAudioAnalysis(stream);
-                
                 statusDiv.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> ✅ تم الحصول على إذن الميكروفون بنجاح!';
                 statusDiv.style.color = '#10b981';
                 btn.innerHTML = '<i class="fas fa-check"></i> تم السماح ✅';
                 btn.style.background = '#10b981';
+                initSounds();
                 setTimeout(() => {
                     document.getElementById('micOverlay').style.display = 'none';
                     initRoom();
@@ -601,39 +818,136 @@
 
         function skipMic() {
             document.getElementById('micOverlay').style.display = 'none';
+            initSounds();
             showToast('ℹ️ دخلت بدون ميكروفون (وضع الاستماع فقط)', 'info');
             initRoom();
         }
 
         // ============================================================
-        // 🎵 AUDIO ANALYSIS
+        // 🔊 SOUND SYSTEM
         // ============================================================
-        function setupAudioAnalysis(stream) {
-            try {
+        function generateSoundBuffer(frequency, duration, type = 'sine') {
+            if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const source = audioContext.createMediaStreamSource(stream);
-                audioAnalyser = audioContext.createAnalyser();
-                audioAnalyser.fftSize = 256;
-                audioAnalyser.smoothingTimeConstant = 0.8;
-                source.connect(audioAnalyser);
-                audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+            }
+            const sampleRate = audioContext.sampleRate;
+            const bufferLength = sampleRate * duration;
+            const buffer = audioContext.createBuffer(1, bufferLength, sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferLength; i++) {
+                const t = i / sampleRate;
+                if (type === 'sine') {
+                    data[i] = Math.sin(2 * Math.PI * frequency * t) * 0.5;
+                } else if (type === 'square') {
+                    data[i] = Math.sin(2 * Math.PI * frequency * t) > 0 ? 0.5 : -0.5;
+                } else if (type === 'sawtooth') {
+                    data[i] = (t * frequency) % 1 * 2 - 1;
+                } else if (type === 'noise') {
+                    data[i] = (Math.random() * 2 - 1) * 0.3;
+                }
+            }
+            return buffer;
+        }
+
+        function playSound(buffer, volume = 0.3) {
+            if (!isSpeakerActive) return null;
+            if (!audioContext) return null;
+            try {
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = volume;
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                source.start();
+                return source;
             } catch (e) {
-                console.warn('Could not setup audio analysis:', e);
+                console.log('Sound play error:', e);
             }
         }
 
-        function checkSpeaking() {
-            if (!audioAnalyser || !audioDataArray) return 0;
+        function initSounds() {
             try {
-                audioAnalyser.getByteFrequencyData(audioDataArray);
-                let sum = 0;
-                for (let i = 0; i < audioDataArray.length; i++) {
-                    sum += audioDataArray[i];
-                }
-                const average = sum / audioDataArray.length;
-                return average / 255;
+                audioBuffers.push(generateSoundBuffer(440, 0.3, 'sine'));
+                audioBuffers.push(generateSoundBuffer(554, 0.3, 'sine'));
+                audioBuffers.push(generateSoundBuffer(659, 0.3, 'sine'));
+                audioBuffers.push(generateSoundBuffer(880, 0.2, 'sine'));
+                audioBuffers.push(generateSoundBuffer(523, 0.4, 'square'));
+                audioBuffers.push(generateSoundBuffer(392, 0.4, 'sawtooth'));
+                audioBuffers.push(generateSoundBuffer(200, 0.5, 'sine'));
+                audioBuffers.push(generateSoundBuffer(1000, 0.1, 'sine'));
+                audioBuffers.push(generateSoundBuffer(300, 0.6, 'noise'));
+                audioBuffers.push(generateSoundBuffer(600, 0.3, 'square'));
+                console.log('✅ تم توليد الأصوات للاختبار');
             } catch (e) {
-                return 0;
+                console.log('Sound init error:', e);
+            }
+        }
+
+        // ============================================================
+        // 👤 DUMMY USERS - تم إزالة المستخدمين الوهميين
+        // ============================================================
+        // تم حذف مصفوفة dummyUsers بالكامل
+
+        // ============================================================
+        // 🚀 INITIALIZE FIREBASE
+        // ============================================================
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            console.log('✅ Firebase connected');
+        } catch (error) {
+            console.error('❌ Firebase error:', error);
+        }
+
+        // ============================================================
+        // 🔊 AUDIO CONTROLS
+        // ============================================================
+        function toggleMic() {
+            if (!mediaStream) return;
+            isMicMuted = !isMicMuted;
+            const btn = document.getElementById('micBtn');
+            if (isMicMuted) {
+                mediaStream.getAudioTracks().forEach(track => track.enabled = false);
+                btn.className = 'audio-btn mic-inactive';
+                btn.innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
+                showToast('🔇 تم كتم الميكروفون (لا أحد يسمعك)', 'warning');
+            } else {
+                mediaStream.getAudioTracks().forEach(track => track.enabled = true);
+                btn.className = 'audio-btn mic-active';
+                btn.innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">الميكروفون نشط</span>';
+                showToast('🔊 تم تفعيل الميكروفون (الجميع يسمعك)', 'success');
+            }
+            if (roomId && mySeatIndex !== -1) {
+                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/muted').set(isMicMuted);
+            }
+        }
+
+        function toggleSpeaker() {
+            isSpeakerActive = !isSpeakerActive;
+            const btn = document.getElementById('speakerBtn');
+            
+            if (!isSpeakerActive) {
+                btn.className = 'audio-btn speaker-inactive';
+                btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">السماعة مكتومة</span>';
+                showToast('🔇 تم كتم السماعة (لا تسمع أحداً)', 'warning');
+                if (audioContext) {
+                    audioContext.close();
+                    audioContext = null;
+                }
+            } else {
+                btn.className = 'audio-btn speaker-active';
+                btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">السماعة نشطة</span>';
+                showToast('🔊 تم تفعيل السماعة (تسمع الجميع)', 'success');
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            if (roomId && mySeatIndex !== -1) {
+                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speakerMuted').set(!isSpeakerActive);
             }
         }
 
@@ -668,6 +982,7 @@
             currentUser = getCurrentUser();
             document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
             
+            // عرض المقاعد فوراً
             renderSeatsPyramid({});
             
             loadRoomDataAndCheckBan();
@@ -688,8 +1003,10 @@
                 roomData = snapshot.val();
                 document.getElementById('roomNameDisplay').textContent = roomData.name || 'غرفة صوتية';
                 
+                // 🔥 تحديد المالك
                 isOwner = roomData.creatorId == currentUser.numericId;
                 
+                // عرض اسم المالك
                 const creatorName = roomData.creatorName || 'غير معروف';
                 document.getElementById('roomOwnerDisplay').textContent = '👑 المالك: ' + creatorName;
                 
@@ -718,15 +1035,13 @@
                 addChatMessage('system', `👑 مالك الغرفة: ${creatorName}`, null, null, '');
                 addChatMessage('system', `🔑 معرف الغرفة: ${roomId}`, null, null, '');
                 
+                // تحميل المقاعد
                 loadSeats();
                 
                 listenRoomUpdates();
                 listenChat();
                 listenSeats();
-                
-                // بدء نظام الصوت
-                listenSignaling();
-                startSpeakingDetection();
+                setupChatScrollMonitoring();
                 
             } catch (error) {
                 console.error('Error loading room:', error);
@@ -742,7 +1057,6 @@
                 const snapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const seats = snapshot.val() || {};
                 renderSeatsPyramid(seats);
-                initializePeerConnections(seats);
             } catch (error) {
                 console.error('Error loading seats:', error);
                 renderSeatsPyramid({});
@@ -763,14 +1077,13 @@
         }
 
         // ============================================================
-        // 💺 SEATS MANAGEMENT
+        // 💺 SEATS MANAGEMENT - بدون مستخدمين وهميين
         // ============================================================
         function listenSeats() {
             if (!database) return;
             seatsListener = database.ref('rooms/' + roomId + '/seats').on('value', (snapshot) => {
                 const seats = snapshot.val() || {};
                 renderSeatsPyramid(seats);
-                updatePeerConnections(seats);
             });
         }
 
@@ -817,6 +1130,7 @@
                     const isMuted = seat && seat.muted === true;
                     const isSpeakerOff = seat && seat.speakerMuted === true;
 
+                    // حدث النقر على المقعد
                     let clickHandler = '';
                     if (isOccupied) {
                         clickHandler = `onclick="openProfilePopup('${globalIndex}')"`;
@@ -892,424 +1206,20 @@
         }
 
         // ============================================================
-        // 👤 PROFILE POPUP
+        // 👤 PROFILE POPUP - نافذة الملف الشخصي
         // ============================================================
         function openProfilePopup(seatIndex) {
+            // جلب بيانات المستخدم من Firebase
             database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value').then((snapshot) => {
                 const seat = snapshot.val();
                 if (!seat) return;
+
+                // نافذة منبثقة بسيطة
                 alert(`👤 الملف الشخصي\n\nاسم المستخدم: ${seat.username}\nالمعرف: ${seat.userId}\n${seat.isOwner ? '👑 مالك الغرفة' : '👤 عضو'}\n${seat.muted ? '🔇 ميكروفون مكتوم' : '🎤 ميكروفون نشط'}`);
+                
             }).catch(err => {
                 console.error('Error loading profile:', err);
             });
-        }
-
-        // ============================================================
-        // 🔗 WEBRTC PEER CONNECTIONS مع TURN Server
-        // ============================================================
-        function getPeerConnectionConfig() {
-            return {
-                iceServers: [
-                    // STUN servers
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' },
-                    { urls: 'stun:stun4.l.google.com:19302' },
-                    // TURN servers - مهم لتجاوز جدران الحماية
-                    {
-                        urls: [
-                            'turn:openrelay.metered.ca:80',
-                            'turn:openrelay.metered.ca:443',
-                            'turn:openrelay.metered.ca:443?transport=tcp'
-                        ],
-                        username: 'openrelayproject',
-                        credential: 'openrelayproject'
-                    },
-                    {
-                        urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
-                        username: 'webrtc',
-                        credential: 'webrtc'
-                    }
-                ],
-                iceCandidatePoolSize: 10,
-                iceTransportPolicy: 'all',
-                rtcpMuxPolicy: 'require',
-                bundlePolicy: 'max-bundle'
-            };
-        }
-
-        function initializePeerConnections(seats) {
-            closeAllPeerConnections();
-            
-            if (!seats) return;
-            
-            for (const index in seats) {
-                const seat = seats[index];
-                if (seat.userId !== currentUser.numericId && seat.userId) {
-                    createPeerConnection(parseInt(index), seat.userId);
-                }
-            }
-        }
-
-        function updatePeerConnections(seats) {
-            const currentPeers = Object.keys(peerConnections).map(Number);
-            const activeSeats = [];
-            
-            if (seats) {
-                for (const index in seats) {
-                    const seat = seats[index];
-                    if (seat.userId !== currentUser.numericId && seat.userId) {
-                        activeSeats.push(parseInt(index));
-                    }
-                }
-            }
-            
-            for (const index of currentPeers) {
-                if (!activeSeats.includes(index)) {
-                    closePeerConnection(index);
-                }
-            }
-            
-            for (const index of activeSeats) {
-                if (!peerConnections[index]) {
-                    createPeerConnection(index, seats[index].userId);
-                }
-            }
-        }
-
-        function createPeerConnection(seatIndex, userId) {
-            if (!mediaStream) {
-                console.warn('No media stream available');
-                return;
-            }
-            
-            if (userId === currentUser.numericId) return;
-            
-            try {
-                const config = getPeerConnectionConfig();
-                const pc = new RTCPeerConnection(config);
-                peerConnections[seatIndex] = pc;
-                
-                // إضافة التدفق المحلي
-                mediaStream.getTracks().forEach(track => {
-                    try {
-                        pc.addTrack(track, mediaStream);
-                    } catch (e) {
-                        console.warn('Error adding track:', e);
-                    }
-                });
-                
-                // معالجة التدفقات الواردة
-                pc.ontrack = (event) => {
-                    const [stream] = event.streams;
-                    if (stream) {
-                        peerStreams[seatIndex] = stream;
-                        if (isSpeakerActive) {
-                            playPeerStream(seatIndex, stream);
-                        }
-                        showToast(`✅ تم استقبال الصوت من مقعد ${seatIndex + 1}`, 'success');
-                        updateConnectionStatus('connected');
-                    }
-                };
-                
-                // معالجة مرشحات ICE
-                pc.onicecandidate = (event) => {
-                    if (event.candidate) {
-                        sendSignalingMessage(userId, {
-                            type: 'candidate',
-                            candidate: {
-                                candidate: event.candidate.candidate,
-                                sdpMid: event.candidate.sdpMid || '',
-                                sdpMLineIndex: event.candidate.sdpMLineIndex || 0
-                            },
-                            from: currentUser.numericId,
-                            seatIndex: mySeatIndex
-                        });
-                    }
-                };
-                
-                // مراقبة حالة الاتصال
-                pc.onconnectionstatechange = () => {
-                    const state = pc.connectionState;
-                    console.log(`Connection state for seat ${seatIndex}: ${state}`);
-                    
-                    if (state === 'connected') {
-                        updateConnectionStatus('connected');
-                        showToast(`✅ تم الاتصال مع مقعد ${seatIndex + 1}`, 'success');
-                    } else if (state === 'disconnected' || state === 'failed') {
-                        updateConnectionStatus('disconnected');
-                        if (reconnectTimeouts[seatIndex]) {
-                            clearTimeout(reconnectTimeouts[seatIndex]);
-                        }
-                        reconnectTimeouts[seatIndex] = setTimeout(() => {
-                            if (peerConnections[seatIndex]) {
-                                closePeerConnection(seatIndex);
-                                setTimeout(() => {
-                                    const seatsSnapshot = database.ref('rooms/' + roomId + '/seats').once('value');
-                                    seatsSnapshot.then(snap => {
-                                        const seats = snap.val() || {};
-                                        if (seats[seatIndex] && seats[seatIndex].userId) {
-                                            createPeerConnection(seatIndex, seats[seatIndex].userId);
-                                        }
-                                    });
-                                }, 2000);
-                            }
-                        }, 5000);
-                    }
-                };
-                
-                pc.oniceconnectionstatechange = () => {
-                    const state = pc.iceConnectionState;
-                    console.log(`ICE state for seat ${seatIndex}: ${state}`);
-                };
-                
-                // بدء التفاوض
-                if (mySeatIndex !== -1 && mySeatIndex < seatIndex) {
-                    setTimeout(() => {
-                        createOffer(seatIndex, userId);
-                    }, 500);
-                }
-                
-            } catch (error) {
-                console.error('Error creating peer connection:', error);
-            }
-        }
-
-        function createOffer(seatIndex, userId) {
-            const pc = peerConnections[seatIndex];
-            if (!pc) return;
-            
-            pc.createOffer({
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: false
-            })
-            .then(offer => {
-                return pc.setLocalDescription(offer);
-            })
-            .then(() => {
-                sendSignalingMessage(userId, {
-                    type: 'offer',
-                    sdp: {
-                        type: pc.localDescription.type,
-                        sdp: pc.localDescription.sdp
-                    },
-                    from: currentUser.numericId,
-                    seatIndex: mySeatIndex
-                });
-            })
-            .catch(error => {
-                console.error('Error creating offer:', error);
-            });
-        }
-
-        function playPeerStream(seatIndex, stream) {
-            const audioId = `peer-audio-${seatIndex}`;
-            let audio = document.getElementById(audioId);
-            if (!audio) {
-                audio = document.createElement('audio');
-                audio.id = audioId;
-                audio.autoplay = true;
-                audio.style.display = 'none';
-                audio.volume = 1.0;
-                document.body.appendChild(audio);
-            }
-            
-            audio.srcObject = stream;
-            
-            if (isSpeakerActive) {
-                audio.play().catch(e => {
-                    console.warn('Error playing audio:', e);
-                    // محاولة التشغيل عند تفاعل المستخدم
-                    const clickHandler = () => {
-                        audio.play().catch(() => {});
-                        document.removeEventListener('click', clickHandler);
-                    };
-                    document.addEventListener('click', clickHandler, { once: true });
-                });
-            } else {
-                audio.pause();
-            }
-        }
-
-        function closePeerConnection(seatIndex) {
-            if (reconnectTimeouts[seatIndex]) {
-                clearTimeout(reconnectTimeouts[seatIndex]);
-                delete reconnectTimeouts[seatIndex];
-            }
-            
-            if (peerConnections[seatIndex]) {
-                try {
-                    peerConnections[seatIndex].close();
-                } catch (e) {}
-                delete peerConnections[seatIndex];
-            }
-            if (peerStreams[seatIndex]) {
-                delete peerStreams[seatIndex];
-            }
-            const audio = document.getElementById(`peer-audio-${seatIndex}`);
-            if (audio) {
-                audio.srcObject = null;
-                audio.remove();
-            }
-        }
-
-        function closeAllPeerConnections() {
-            for (const index in reconnectTimeouts) {
-                clearTimeout(reconnectTimeouts[index]);
-            }
-            reconnectTimeouts = {};
-            
-            for (const index in peerConnections) {
-                try {
-                    peerConnections[index].close();
-                } catch (e) {}
-            }
-            peerConnections = {};
-            peerStreams = {};
-            
-            document.querySelectorAll('[id^="peer-audio-"]').forEach(el => el.remove());
-        }
-
-        // ============================================================
-        // 📡 SIGNALING SYSTEM
-        // ============================================================
-        function listenSignaling() {
-            if (!database) return;
-            
-            if (signalingListener) {
-                database.ref('rooms/' + roomId + '/signaling').off();
-            }
-            
-            const signalingRef = database.ref('rooms/' + roomId + '/signaling');
-            signalingListener = signalingRef.on('child_added', (snapshot) => {
-                const signal = snapshot.val();
-                if (signal.to === currentUser.numericId) {
-                    handleSignal(signal);
-                    snapshot.ref.remove().catch(() => {});
-                }
-            });
-        }
-
-        function sendSignalingMessage(toUserId, data) {
-            if (!database || !roomId) return;
-            if (!toUserId || toUserId === currentUser.numericId) return;
-            
-            const signalRef = database.ref('rooms/' + roomId + '/signaling').push();
-            signalRef.set({
-                from: data.from || currentUser.numericId,
-                to: toUserId,
-                type: data.type,
-                data: data,
-                timestamp: Date.now()
-            }).catch(err => console.warn('Error sending signal:', err));
-        }
-
-        function handleSignal(signal) {
-            const { from, seatIndex, type, sdp, candidate } = signal.data;
-            
-            if (!from || from === currentUser.numericId) return;
-            
-            try {
-                if (type === 'offer') {
-                    database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value').then(snap => {
-                        const seat = snap.val();
-                        if (!seat || !seat.userId) {
-                            console.warn('Seat not found:', seatIndex);
-                            return;
-                        }
-                        
-                        let pc = peerConnections[seatIndex];
-                        if (!pc) {
-                            createPeerConnection(seatIndex, seat.userId);
-                            setTimeout(() => {
-                                const newPc = peerConnections[seatIndex];
-                                if (newPc) {
-                                    handleOffer(newPc, seatIndex, from, sdp);
-                                }
-                            }, 1000);
-                            return;
-                        }
-                        
-                        handleOffer(pc, seatIndex, from, sdp);
-                    });
-                    
-                } else if (type === 'answer') {
-                    const pc = peerConnections[seatIndex];
-                    if (pc && sdp) {
-                        pc.setRemoteDescription(new RTCSessionDescription(sdp))
-                            .catch(error => {
-                                console.error('Error setting remote description:', error);
-                            });
-                    }
-                    
-                } else if (type === 'candidate') {
-                    const pc = peerConnections[seatIndex];
-                    if (pc && candidate && candidate.candidate) {
-                        try {
-                            const iceCandidate = new RTCIceCandidate({
-                                candidate: candidate.candidate,
-                                sdpMid: candidate.sdpMid || '',
-                                sdpMLineIndex: candidate.sdpMLineIndex || 0
-                            });
-                            pc.addIceCandidate(iceCandidate)
-                                .catch(error => {
-                                    console.error('Error adding ICE candidate:', error);
-                                });
-                        } catch (error) {
-                            console.error('Error building ICE candidate:', error);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Error handling signal:', error);
-            }
-        }
-
-        function handleOffer(pc, seatIndex, from, sdp) {
-            if (!sdp || !sdp.sdp) return;
-            
-            pc.setRemoteDescription(new RTCSessionDescription(sdp))
-                .then(() => {
-                    return pc.createAnswer();
-                })
-                .then(answer => {
-                    return pc.setLocalDescription(answer);
-                })
-                .then(() => {
-                    sendSignalingMessage(from, {
-                        type: 'answer',
-                        sdp: {
-                            type: pc.localDescription.type,
-                            sdp: pc.localDescription.sdp
-                        },
-                        from: currentUser.numericId,
-                        seatIndex: mySeatIndex
-                    });
-                })
-                .catch(error => {
-                    console.error('Error handling offer:', error);
-                });
-        }
-
-        // ============================================================
-        // 🗣️ SPEAKING DETECTION
-        // ============================================================
-        function startSpeakingDetection() {
-            if (speakingCheckInterval) {
-                clearInterval(speakingCheckInterval);
-            }
-            
-            speakingCheckInterval = setInterval(() => {
-                if (mySeatIndex === -1) return;
-                if (isMicMuted) return;
-                if (!mediaStream) return;
-                
-                const volume = checkSpeaking();
-                const isSpeaking = volume > 0.08;
-                
-                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speaking').set(isSpeaking);
-            }, 300);
         }
 
         // ============================================================
@@ -1319,6 +1229,7 @@
             if (!database || !roomId) return;
 
             try {
+                // التحقق من أن المستخدم موجود
                 if (!currentUser || !currentUser.numericId) {
                     showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                     return;
@@ -1336,6 +1247,7 @@
                 const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const seats = seatsSnapshot.val() || {};
                 
+                // التحقق من أن المستخدم ليس في مقعد آخر
                 for (const key in seats) {
                     if (seats[key].userId == currentUser.numericId) {
                         showToast('⚠️ أنت بالفعل في مقعد آخر. اخرج منه أولاً', 'warning');
@@ -1349,6 +1261,7 @@
                     return;
                 }
 
+                // التحقق من مقعد المالك
                 if (seatIndex === 0 && !isOwner) {
                     showToast('⚠️ هذا المقعد خاص بمالك الغرفة فقط', 'warning');
                     return;
@@ -1371,12 +1284,11 @@
 
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).set(seatData);
 
+                const seatsCount = Object.keys(seats).length + 1;
+                await database.ref('rooms/' + roomId + '/members').set(seatsCount);
+
                 mySeatIndex = seatIndex;
                 document.getElementById('leaveSeatBtn').style.display = 'flex';
-
-                // إعادة تهيئة الاتصالات
-                const updatedSeats = await database.ref('rooms/' + roomId + '/seats').once('value');
-                initializePeerConnections(updatedSeats.val());
 
                 if (seatIndex === 0 && isOwner) {
                     showToast(`👑 جلست على مقعد المالك`, 'success');
@@ -1393,7 +1305,7 @@
         }
 
         // ============================================================
-        // 🚪 LEAVE SEAT
+        // 🚪 LEAVE SEAT - بدون تأكيد
         // ============================================================
         async function leaveSeat() {
             if (mySeatIndex === -1) {
@@ -1408,7 +1320,10 @@
                 
                 await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
                 
-                closeAllPeerConnections();
+                const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+                const seats = seatsSnapshot.val() || {};
+                const membersCount = Object.keys(seats).length;
+                await database.ref('rooms/' + roomId + '/members').set(membersCount);
                 
                 mySeatIndex = -1;
                 document.getElementById('leaveSeatBtn').style.display = 'none';
@@ -1433,8 +1348,15 @@
                 const seat = seatSnapshot.val();
                 if (!seat) return;
 
+                await sendNotification(seat.userId, '🚫 تم طردك من الغرفة', `تم طردك من غرفة "${roomData.name}" بواسطة المالك.`);
+
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
                 addChatMessage('system', `🚫 **${seat.username}** تم طرده من الغرفة`, null, null, 'leave');
+
+                const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+                const seats = seatsSnapshot.val() || {};
+                const membersCount = Object.keys(seats).length;
+                await database.ref('rooms/' + roomId + '/members').set(membersCount);
 
                 showToast('✅ تم طرد المستخدم', 'success');
 
@@ -1459,8 +1381,15 @@
                     bannedBy: currentUser.numericId
                 });
 
+                await sendNotification(seat.userId, '🚫 تم حظرك من الغرفة', `تم حظرك من غرفة "${roomData.name}" نهائياً بواسطة المالك.`);
+
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
                 addChatMessage('system', `🚫 **${seat.username}** تم حظره من الغرفة نهائياً`, null, null, 'leave');
+
+                const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+                const seats = seatsSnapshot.val() || {};
+                const membersCount = Object.keys(seats).length;
+                await database.ref('rooms/' + roomId + '/members').set(membersCount);
 
                 showToast('✅ تم حظر المستخدم نهائياً', 'success');
 
@@ -1490,8 +1419,57 @@
             }
         }
 
+        async function openSeat(seatIndex) {
+            if (!isOwner) return;
+
+            try {
+                const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
+                if (seatSnapshot.exists()) {
+                    await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
+                }
+                showToast('✅ تم فتح المقعد', 'success');
+
+            } catch (error) {
+                console.error('Error opening seat:', error);
+                showToast('❌ حدث خطأ في فتح المقعد', 'error');
+            }
+        }
+
+        async function inviteUser(seatIndex) {
+            if (!isOwner) return;
+
+            const userId = prompt('أدخل معرف المستخدم الذي تريد دعوته:');
+            if (!userId) return;
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ لم يتم العثور على المستخدم', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+                const user = userData[userKey];
+
+                await sendNotification(
+                    userId,
+                    `📩 دعوة للانضمام إلى غرفة "${roomData.name}"`,
+                    `تم دعوتك من قبل ${currentUser.nickname || currentUser.username} للانضمام إلى الغرفة الصوتية.\nمعرف الغرفة: ${roomId}`
+                );
+
+                showToast(`✅ تم إرسال الدعوة إلى ${user.username || userId}`, 'success');
+
+            } catch (error) {
+                console.error('Error inviting user:', error);
+                showToast('❌ حدث خطأ في إرسال الدعوة', 'error');
+            }
+        }
+
         // ============================================================
-        // 💬 CHAT SYSTEM - مع خاصية التمرير التلقائي
+        // 💬 CHAT SYSTEM
         // ============================================================
         function listenChat() {
             if (!database) return;
@@ -1499,8 +1477,7 @@
                 const msg = snapshot.val();
                 if (msg) {
                     displayMessage(msg);
-                    // التمرير إلى أحدث رسالة تلقائياً
-                    scrollToBottom();
+                    checkScrollPosition();
                 }
             });
         }
@@ -1521,6 +1498,10 @@
                 div.setAttribute('data-msg-id', msg.id || Date.now());
                 div.innerHTML = `<div class="msg-text">${msg.text}</div>`;
                 container.appendChild(div);
+                
+                if (isUserAtBottom()) {
+                    scrollToBottom();
+                }
                 return;
             }
             
@@ -1544,6 +1525,10 @@
             `;
 
             container.appendChild(div);
+            
+            if (isUserAtBottom()) {
+                scrollToBottom();
+            }
         }
 
         function addChatMessage(type, text, username = null, userId = null, subType = '') {
@@ -1565,14 +1550,6 @@
             }
 
             displayMessage(msg);
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            const container = document.getElementById('chatMessages');
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
         }
 
         async function sendChatMessage() {
@@ -1584,80 +1561,87 @@
             addChatMessage('user', text, user.nickname || user.username || 'مستخدم', user.numericId);
             input.value = '';
             input.focus();
-            // التمرير إلى الأسفل
-            scrollToBottom();
+            document.getElementById('emojiPicker').classList.remove('active');
         }
 
         // ============================================================
-        // 📡 CONNECTION STATUS
+        // 📜 CHAT SCROLL MANAGEMENT
         // ============================================================
-        function updateConnectionStatus(status) {
-            const el = document.getElementById('connectionStatus');
-            el.className = 'connection-status ' + status;
-            
-            if (status === 'connected') {
-                el.innerHTML = '✅ متصل بالصوت';
-                setTimeout(() => {
-                    el.className = 'connection-status';
-                }, 3000);
-            } else if (status === 'disconnected') {
-                el.innerHTML = '❌ انقطاع الاتصال... جاري إعادة المحاولة';
-            } else if (status === 'connecting') {
-                el.innerHTML = '🔄 جاري الاتصال بالصوت...';
-            }
+        function isUserAtBottom() {
+            const container = document.getElementById('chatMessages');
+            const threshold = 30;
+            return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
         }
 
-        // ============================================================
-        // 🔊 AUDIO CONTROLS
-        // ============================================================
-        function toggleMic() {
-            if (!mediaStream) return;
-            isMicMuted = !isMicMuted;
-            const btn = document.getElementById('micBtn');
-            if (isMicMuted) {
-                mediaStream.getAudioTracks().forEach(track => track.enabled = false);
-                btn.className = 'audio-btn mic-inactive';
-                btn.innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
-                showToast('🔇 تم كتم الميكروفون', 'warning');
+        function scrollToBottom() {
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
+            document.getElementById('scrollDownBtn').classList.remove('visible');
+        }
+
+        function checkScrollPosition() {
+            const btn = document.getElementById('scrollDownBtn');
+            if (!isUserAtBottom()) {
+                btn.classList.add('visible');
             } else {
-                mediaStream.getAudioTracks().forEach(track => track.enabled = true);
-                btn.className = 'audio-btn mic-active';
-                btn.innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">الميكروفون نشط</span>';
-                showToast('🔊 تم تفعيل الميكروفون', 'success');
-            }
-            if (roomId && mySeatIndex !== -1) {
-                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/muted').set(isMicMuted);
+                btn.classList.remove('visible');
             }
         }
 
-        function toggleSpeaker() {
-            isSpeakerActive = !isSpeakerActive;
-            const btn = document.getElementById('speakerBtn');
+        function setupChatScrollMonitoring() {
+            const container = document.getElementById('chatMessages');
             
-            if (!isSpeakerActive) {
-                btn.className = 'audio-btn speaker-inactive';
-                btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">السماعة مكتومة</span>';
-                showToast('🔇 تم كتم السماعة', 'warning');
-                for (const index in peerStreams) {
-                    const audio = document.getElementById(`peer-audio-${index}`);
-                    if (audio) {
-                        audio.muted = true;
-                    }
+            container.addEventListener('scroll', function() {
+                if (isUserAtBottom()) {
+                    document.getElementById('scrollDownBtn').classList.remove('visible');
+                } else {
+                    document.getElementById('scrollDownBtn').classList.add('visible');
                 }
-            } else {
-                btn.className = 'audio-btn speaker-active';
-                btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">السماعة نشطة</span>';
-                showToast('🔊 تم تفعيل السماعة', 'success');
-                for (const index in peerStreams) {
-                    const audio = document.getElementById(`peer-audio-${index}`);
-                    if (audio) {
-                        audio.muted = false;
-                        audio.play().catch(e => {});
-                    }
-                }
+            });
+        }
+
+        // ============================================================
+        // 😊 EMOJI PICKER
+        // ============================================================
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emojiPicker');
+            picker.classList.toggle('active');
+        }
+
+        function insertEmoji(emoji) {
+            const input = document.getElementById('chatInput');
+            input.value += emoji;
+            input.focus();
+            document.getElementById('emojiPicker').classList.remove('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const picker = document.getElementById('emojiPicker');
+            const btn = document.querySelector('.emoji-btn');
+            if (!picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                picker.classList.remove('active');
             }
-            if (roomId && mySeatIndex !== -1) {
-                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speakerMuted').set(!isSpeakerActive);
+        });
+
+        // ============================================================
+        // 🔔 SEND NOTIFICATION
+        // ============================================================
+        async function sendNotification(userId, title, message) {
+            if (!database) return;
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
+                if (!snapshot.exists()) return;
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+                await database.ref('users/' + userKey + '/notifications').push({
+                    text: `${title}\n${message}`,
+                    date: new Date().toLocaleString('ar-EG'),
+                    read: false,
+                    type: 'room_invite'
+                });
+            } catch (error) {
+                console.error('Error sending notification:', error);
             }
         }
 
@@ -1668,18 +1652,16 @@
             try {
                 if (mySeatIndex !== -1) {
                     await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
+                    const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+                    const seats = seatsSnapshot.val() || {};
+                    const membersCount = Object.keys(seats).length;
+                    await database.ref('rooms/' + roomId + '/members').set(membersCount);
                 }
                 if (roomListener) database.ref('rooms/' + roomId).off();
                 if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
                 if (seatsListener) database.ref('rooms/' + roomId + '/seats').off();
-                if (signalingListener) database.ref('rooms/' + roomId + '/signaling').off();
-                
-                closeAllPeerConnections();
-                
                 if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
                 if (audioContext) audioContext.close();
-                if (speakingCheckInterval) clearInterval(speakingCheckInterval);
-                
                 window.location.href = 'chat.html';
             } catch (error) {
                 console.error('Error leaving room:', error);
@@ -1697,15 +1679,10 @@
                 warning: '#f59e0b',
                 info: '#3b82f6'
             };
-            
-            const oldToast = document.querySelector('.toast-message');
-            if (oldToast) oldToast.remove();
-            
             const toast = document.createElement('div');
-            toast.className = 'toast-message';
             toast.style.cssText = `
                 position: fixed; top: 60px; right: 15px; padding: 6px 14px; border-radius: 8px;
-                color: white; font-weight: 600; z-index: 10000; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+                color: white; font-weight: 600; z-index: 9999; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
                 animation: slideDown 0.3s ease-out; max-width: 280px;
                 background: ${colors[type] || colors.info}; direction: rtl; font-size: 0.75rem;
             `;
@@ -1723,16 +1700,6 @@
         // 🚀 INIT ON PAGE LOAD
         // ============================================================
         window.onload = function() {
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                database = firebase.database();
-                console.log('✅ Firebase connected');
-            } catch (error) {
-                console.error('❌ Firebase error:', error);
-            }
-            
             const roomIdFromURL = getRoomIdFromURL();
             if (!roomIdFromURL) {
                 showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
@@ -1741,6 +1708,7 @@
             }
             document.getElementById('micOverlay').style.display = 'flex';
             console.log('🎙️ جاهز لطلب إذن الميكروفون');
+            console.log('⚠️ تم إزالة المستخدمين الوهميين - فقط المستخدمين الحقيقيين');
         };
 
         // ============================================================
@@ -1750,14 +1718,11 @@
             if (roomId && mySeatIndex !== -1) {
                 database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
             }
-            closeAllPeerConnections();
             if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
             if (audioContext) audioContext.close();
-            if (speakingCheckInterval) clearInterval(speakingCheckInterval);
             if (roomListener) database.ref('rooms/' + roomId).off();
             if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
             if (seatsListener) database.ref('rooms/' + roomId + '/seats').off();
-            if (signalingListener) database.ref('rooms/' + roomId + '/signaling').off();
         });
     </script>
 </body>
