@@ -413,6 +413,24 @@
         .toast.info { background: #3b82f6; }
         .toast.warning { background: #f59e0b; }
 
+        .btn-fix-permissions {
+            background: #ffd700;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+
+        .btn-fix-permissions:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255,215,0,0.3);
+        }
+
         @media (max-width: 768px) {
             .requests-grid {
                 grid-template-columns: 1fr;
@@ -477,7 +495,7 @@
     <main>
         <div class="admin-header">
             <h1><i class="fas fa-user-shield"></i> لوحة إدارة الغرف</h1>
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <button onclick="loadRequests(currentTab)" style="padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; cursor: pointer;">
                     <i class="fas fa-sync-alt"></i> تحديث
                 </button>
@@ -550,21 +568,24 @@
         }
 
         // ============================================================
-        // 📋 LOAD REQUESTS
+        // 📋 LOAD REQUESTS - مع معالجة أخطاء الصلاحيات
         // ============================================================
         async function loadRequests(status) {
+            const container = document.getElementById('requestsContainer');
+
             if (!database) {
-                document.getElementById('requestsContainer').innerHTML = `
+                container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
                         <h3 style="color: #ef4444;">❌ لا يوجد اتصال بقاعدة البيانات</h3>
                         <p style="color: #666;">تأكد من اتصالك بالإنترنت</p>
+                        <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
+                            <i class="fas fa-sync-alt"></i> إعادة المحاولة
+                        </button>
                     </div>
                 `;
                 return;
             }
-
-            const container = document.getElementById('requestsContainer');
 
             try {
                 const snapshot = await database.ref('room_requests').once('value');
@@ -673,13 +694,47 @@
 
             } catch (error) {
                 console.error('Error loading requests:', error);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                        <h3 style="color: #ef4444;">خطأ في تحميل الطلبات</h3>
-                        <p style="color: #666;">${error.message}</p>
-                    </div>
-                `;
+                
+                // معالجة خطأ الصلاحيات
+                if (error.message && error.message.includes('permission_denied')) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-lock" style="color: #ef4444; font-size: 4rem;"></i>
+                            <h3 style="color: #ef4444;">🔒 خطأ في الصلاحيات</h3>
+                            <p style="color: #aaa; max-width: 500px; margin: 10px auto;">
+                                لا تملك صلاحية الوصول إلى قاعدة البيانات. 
+                                يرجى تعديل <strong style="color: #ffd700;">قواعد أمان Firebase</strong>.
+                            </p>
+                            <div style="background: #1a1a2e; padding: 15px; border-radius: 10px; margin: 15px auto; max-width: 500px; text-align: right; direction: ltr; font-family: monospace; font-size: 0.8rem; color: #888; border: 1px solid #333;">
+                                {
+                                  "rules": {
+                                    ".read": true,
+                                    ".write": true
+                                  }
+                                }
+                            </div>
+                            <button onclick="window.open('https://console.firebase.google.com/project/vipclub-1d04a/database/vipclub-1d04a-default-rtdb/rules', '_blank')" 
+                                    class="btn-fix-permissions">
+                                <i class="fas fa-external-link-alt"></i> فتح قواعد Firebase
+                            </button>
+                            <br>
+                            <button onclick="location.reload()" style="margin-top:10px; padding:8px 20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:white; cursor:pointer;">
+                                <i class="fas fa-sync-alt"></i> إعادة المحاولة
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                            <h3 style="color: #ef4444;">خطأ في تحميل الطلبات</h3>
+                            <p style="color: #666;">${error.message}</p>
+                            <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
+                                <i class="fas fa-sync-alt"></i> إعادة المحاولة
+                            </button>
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -800,12 +855,16 @@
 
                 let userData = {};
                 if (request.creatorId && request.creatorId !== 'GUEST') {
-                    const usersRef = database.ref('users');
-                    const snapshot = await usersRef.orderByChild('numericId').equalTo(request.creatorId).once('value');
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        const userKey = Object.keys(data)[0];
-                        userData = data[userKey];
+                    try {
+                        const usersRef = database.ref('users');
+                        const snapshot = await usersRef.orderByChild('numericId').equalTo(request.creatorId).once('value');
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            const userKey = Object.keys(data)[0];
+                            userData = data[userKey];
+                        }
+                    } catch (e) {
+                        console.warn('Could not fetch user data:', e);
                     }
                 }
 
@@ -933,18 +992,21 @@
         // 🚀 INIT ON PAGE LOAD
         // ============================================================
         window.onload = function() {
-            // تحميل الطلبات مباشرة بدون أي تحقق
+            // تحميل الطلبات
             loadRequests('pending');
 
             // الاستماع للتحديثات
             if (database) {
-                database.ref('room_requests').on('value', () => {
-                    loadRequests(currentTab);
-                });
+                try {
+                    database.ref('room_requests').on('value', () => {
+                        loadRequests(currentTab);
+                    });
+                } catch (e) {
+                    console.warn('Could not listen to room_requests:', e);
+                }
             }
 
-            console.log('👑 لوحة إدارة الغرف جاهزة (وضع الاختبار)');
-            showToast('👑 مرحباً بك في لوحة الإدارة (وضع الاختبار)', 'info');
+            console.log('👑 لوحة إدارة الغرف جاهزة');
         };
     </script>
 </body>
