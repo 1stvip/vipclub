@@ -57,7 +57,7 @@
             gap: 10px;
         }
 
-        /* ===== SEATS AREA - أكبر عرض ===== */
+        /* ===== SEATS AREA ===== */
         .seats-area {
             width: 100%;
         }
@@ -219,7 +219,7 @@
         .seat .seat-actions .btn-open-seat { background: #10b981; color: white; }
         .seat .seat-actions .btn-open-seat:hover { background: #059669; }
 
-        /* ===== CHAT AREA - تحت المقاعد ===== */
+        /* ===== CHAT AREA ===== */
         .chat-area {
             width: 50%;
             margin: 5px auto 0;
@@ -255,7 +255,7 @@
             scroll-behavior: smooth;
         }
         
-        /* ===== رسائل النظام (ترحيب) - في المنتصف وصغيرة ===== */
+        /* ===== رسائل النظام (ترحيب) ===== */
         .chat-messages .message.system { 
             background: rgba(255,215,0,0.06); 
             color: #ffd700; 
@@ -413,7 +413,7 @@
         }
         .chat-input-area .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        /* ===== لوحة الإيموجي - فوق زر الإيموجي ===== */
+        /* ===== لوحة الإيموجي ===== */
         .emoji-picker {
             display: none;
             position: absolute;
@@ -625,7 +625,7 @@
 <body>
 
     <header>
-        <div class="logo" onclick="window.location.href='home.html'">
+        <div class="logo" onclick="window.location.href='chat.html'">
             <i class="fas fa-crown"></i> VipChat
         </div>
         <div class="room-info">
@@ -753,6 +753,7 @@
         let audioContext = null;
         let audioBuffers = [];
         let isSpeakerActive = true;
+        let bannedUsers = [];
 
         // ============================================================
         // 🎯 GET ROOM ID FROM URL
@@ -974,28 +975,65 @@
         }
 
         // ============================================================
+        // 🔍 CHECK IF USER IS BANNED
+        // ============================================================
+        async function isUserBanned(userId) {
+            if (!database || !roomId) return false;
+            try {
+                const snapshot = await database.ref('rooms/' + roomId + '/banned_users/' + userId).once('value');
+                return snapshot.exists();
+            } catch (error) {
+                console.error('Error checking ban status:', error);
+                return false;
+            }
+        }
+
+        // ============================================================
         // 🚀 INIT ROOM
         // ============================================================
         function initRoom() {
             if (roomInitialized) return;
             roomInitialized = true;
+
             roomId = getRoomIdFromURL();
             if (!roomId) {
                 showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
-                setTimeout(() => window.location.href = 'home.html', 2000);
+                setTimeout(() => window.location.href = 'chat.html', 2000);
                 return;
             }
             currentUser = getCurrentUser();
             document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
+            
+            // التحقق من حظر المستخدم
+            checkIfBanned();
+            
             loadRoomData();
             listenRoomUpdates();
             listenChat();
             listenSeats();
             startDummyUsers();
             startSoundSimulation();
-            
-            // مراقبة تمرير الشات
             setupChatScrollMonitoring();
+        }
+
+        // ============================================================
+        // 🔍 CHECK IF USER IS BANNED
+        // ============================================================
+        async function checkIfBanned() {
+            try {
+                const user = getCurrentUser();
+                if (!user || !user.numericId) return;
+                
+                const banned = await isUserBanned(user.numericId);
+                if (banned) {
+                    showToast('🚫 لقد تم حظرك من هذه الغرفة', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'chat.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Error checking ban:', error);
+            }
         }
 
         // ============================================================
@@ -1007,7 +1045,7 @@
                 const snapshot = await database.ref('rooms/' + roomId).once('value');
                 if (!snapshot.exists()) {
                     showToast('❌ الغرفة غير موجودة', 'error');
-                    setTimeout(() => window.location.href = 'home.html', 2000);
+                    setTimeout(() => window.location.href = 'chat.html', 2000);
                     return;
                 }
                 roomData = snapshot.val();
@@ -1262,6 +1300,14 @@
             if (!database || !roomId) return;
 
             try {
+                // التحقق من الحظر
+                const user = getCurrentUser();
+                if (await isUserBanned(user.numericId)) {
+                    showToast('🚫 لقد تم حظرك من هذه الغرفة', 'error');
+                    setTimeout(() => window.location.href = 'chat.html', 1500);
+                    return;
+                }
+
                 const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const seats = seatsSnapshot.val() || {};
                 
@@ -1313,13 +1359,14 @@
             }
         }
 
+        // ============================================================
+        // 🚪 LEAVE SEAT - بدون تأكيد
+        // ============================================================
         async function leaveSeat() {
             if (mySeatIndex === -1) {
                 showToast('⚠️ أنت لست جالساً على أي مقعد', 'warning');
                 return;
             }
-
-            if (!confirm('هل تريد مغادرة مقعدك الحالي؟')) return;
 
             try {
                 const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).once('value');
@@ -1345,7 +1392,10 @@
         }
 
         // ============================================================
-        // 👑 ADMIN ACTIONS (مختصرة)
+        // 👑 ADMIN ACTIONS
+        // ============================================================
+        // ============================================================
+        // 🚪 KICK USER - يخرج المستخدم لصفحة chat.html
         // ============================================================
         async function kickUser(seatIndex) {
             if (!isOwner) return;
@@ -1356,8 +1406,10 @@
                 const seat = seatSnapshot.val();
                 if (!seat || seat.isDummy) return;
 
+                // إرسال إشعار للمستخدم المطرود
                 await sendNotification(seat.userId, '🚫 تم طردك من الغرفة', `تم طردك من غرفة "${roomData.name}" بواسطة المالك.`);
 
+                // حذف المستخدم من المقعد
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
                 addChatMessage('system', `🚫 **${seat.username}** تم طرده من الغرفة`, null, null, 'leave');
 
@@ -1368,12 +1420,57 @@
 
                 showToast('✅ تم طرد المستخدم', 'success');
 
+                // إعادة توجيه المستخدم المطرود إلى chat.html
+                // لا يمكننا توجيه المستخدم من جانب الخادم، لكن يمكننا إرسال إشعار له
+
             } catch (error) {
                 console.error('Error kicking user:', error);
                 showToast('❌ حدث خطأ في طرد المستخدم', 'error');
             }
         }
 
+        // ============================================================
+        // 🚫 BAN USER - حظر نهائي مع منع الدخول مجدداً
+        // ============================================================
+        async function banUser(seatIndex) {
+            if (!isOwner) return;
+            if (!confirm(`هل تريد حظر المستخدم من مقعد ${seatIndex + 1} نهائياً؟`)) return;
+
+            try {
+                const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
+                const seat = seatSnapshot.val();
+                if (!seat || seat.isDummy) return;
+
+                // إضافة المستخدم إلى قائمة المحظورين
+                await database.ref('rooms/' + roomId + '/banned_users/' + seat.userId).set({
+                    username: seat.username,
+                    bannedAt: new Date().toISOString(),
+                    bannedBy: currentUser.numericId
+                });
+
+                // إرسال إشعار للمستخدم المحظور
+                await sendNotification(seat.userId, '🚫 تم حظرك من الغرفة', `تم حظرك من غرفة "${roomData.name}" نهائياً بواسطة المالك.`);
+
+                // حذف المستخدم من المقعد
+                await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
+                addChatMessage('system', `🚫 **${seat.username}** تم حظره من الغرفة نهائياً`, null, null, 'leave');
+
+                const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+                const seats = seatsSnapshot.val() || {};
+                const membersCount = Object.keys(seats).length;
+                await database.ref('rooms/' + roomId + '/members').set(membersCount);
+
+                showToast('✅ تم حظر المستخدم نهائياً', 'success');
+
+            } catch (error) {
+                console.error('Error banning user:', error);
+                showToast('❌ حدث خطأ في حظر المستخدم', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🔇 MUTE USER
+        // ============================================================
         async function muteUser(seatIndex) {
             if (!isOwner) return;
 
@@ -1394,39 +1491,9 @@
             }
         }
 
-        async function banUser(seatIndex) {
-            if (!isOwner) return;
-            if (!confirm(`هل تريد حظر المستخدم من مقعد ${seatIndex + 1} نهائياً؟`)) return;
-
-            try {
-                const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
-                const seat = seatSnapshot.val();
-                if (!seat || seat.isDummy) return;
-
-                await database.ref('rooms/' + roomId + '/banned_users/' + seat.userId).set({
-                    username: seat.username,
-                    bannedAt: new Date().toISOString(),
-                    bannedBy: currentUser.numericId
-                });
-
-                await sendNotification(seat.userId, '🚫 تم حظرك من الغرفة', `تم حظرك من غرفة "${roomData.name}" بواسطة المالك.`);
-
-                await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
-                addChatMessage('system', `🚫 **${seat.username}** تم حظره من الغرفة نهائياً`, null, null, 'leave');
-
-                const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
-                const seats = seatsSnapshot.val() || {};
-                const membersCount = Object.keys(seats).length;
-                await database.ref('rooms/' + roomId + '/members').set(membersCount);
-
-                showToast('✅ تم حظر المستخدم', 'success');
-
-            } catch (error) {
-                console.error('Error banning user:', error);
-                showToast('❌ حدث خطأ في حظر المستخدم', 'error');
-            }
-        }
-
+        // ============================================================
+        // 🔓 OPEN SEAT
+        // ============================================================
         async function openSeat(seatIndex) {
             if (!isOwner) return;
 
@@ -1443,6 +1510,9 @@
             }
         }
 
+        // ============================================================
+        // 📩 INVITE USER
+        // ============================================================
         async function inviteUser(seatIndex) {
             if (!isOwner) return;
 
@@ -1485,7 +1555,6 @@
                 const msg = snapshot.val();
                 if (msg) {
                     displayMessage(msg);
-                    // بعد إضافة رسالة جديدة، نتحقق من التمرير
                     checkScrollPosition();
                 }
             });
@@ -1508,7 +1577,6 @@
                 div.innerHTML = `<div class="msg-text">${msg.text}</div>`;
                 container.appendChild(div);
                 
-                // إذا كان المستخدم في الأسفل، نستمر في التمرير للأسفل
                 if (isUserAtBottom()) {
                     scrollToBottom();
                 }
@@ -1656,10 +1724,9 @@
         }
 
         // ============================================================
-        // 🚪 LEAVE ROOM
+        // 🚪 LEAVE ROOM - يخرج المستخدم لصفحة chat.html
         // ============================================================
         async function leaveRoom() {
-            if (!confirm('هل تريد مغادرة الغرفة؟')) return;
             try {
                 if (mySeatIndex !== -1) {
                     await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
@@ -1673,10 +1740,10 @@
                 if (seatsListener) database.ref('rooms/' + roomId + '/seats').off();
                 if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
                 if (audioContext) audioContext.close();
-                window.location.href = 'home.html';
+                window.location.href = 'chat.html';
             } catch (error) {
                 console.error('Error leaving room:', error);
-                window.location.href = 'home.html';
+                window.location.href = 'chat.html';
             }
         }
 
@@ -1714,7 +1781,7 @@
             const roomIdFromURL = getRoomIdFromURL();
             if (!roomIdFromURL) {
                 showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
-                setTimeout(() => window.location.href = 'home.html', 2000);
+                setTimeout(() => window.location.href = 'chat.html', 2000);
                 return;
             }
             document.getElementById('micOverlay').style.display = 'flex';
