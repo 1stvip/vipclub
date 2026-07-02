@@ -27,7 +27,6 @@
             overflow-x: hidden;
         }
 
-        /* ... (باقي الأنماط كما هي) ... */
         header {
             background: rgba(255,255,255,0.05);
             padding: 0.6rem 4%;
@@ -510,6 +509,24 @@
         .mic-overlay .mic-box .btn-skip { margin-top: 8px; background: transparent; color: #666; border: none; cursor: pointer; font-size: 0.8rem; transition: 0.3s; width: 100%; }
         .mic-overlay .mic-box .btn-skip:hover { color: #999; }
 
+        .connection-status {
+            position: fixed;
+            bottom: 140px;
+            right: 15px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #888;
+            z-index: 999;
+            display: none;
+        }
+        .connection-status.connected { border-color: #10b981; color: #10b981; display: block; }
+        .connection-status.disconnected { border-color: #ef4444; color: #ef4444; display: block; }
+        .connection-status.connecting { border-color: #f59e0b; color: #f59e0b; display: block; }
+
         @media (max-width: 1024px) {
             .seats-row.row-4 { max-width: 560px; }
             .seats-row.row-3 { max-width: 420px; }
@@ -539,6 +556,7 @@
             .btn-leave { padding: 3px 10px; font-size: 0.6rem; }
             .logo { font-size: 1rem; }
             .scroll-down-btn { width: 26px; height: 26px; font-size: 0.6rem; bottom: 55px; }
+            .connection-status { bottom: 135px; right: 12px; font-size: 0.5rem; padding: 4px 10px; }
         }
 
         @media (max-width: 480px) {
@@ -593,6 +611,7 @@
             .btn-leave { padding: 2px 8px; font-size: 0.5rem; border-radius: 4px; }
             
             .scroll-down-btn { width: 24px; height: 24px; font-size: 0.55rem; bottom: 48px; }
+            .connection-status { bottom: 130px; right: 10px; font-size: 0.45rem; padding: 3px 8px; }
         }
 
         @media (max-width: 380px) {
@@ -714,6 +733,8 @@
         </button>
     </div>
 
+    <div class="connection-status" id="connectionStatus">🔗 جاري الاتصال...</div>
+
     <script>
         // ============================================================
         // 🔥 FIREBASE CONFIG
@@ -743,7 +764,6 @@
         let audioContext = null;
         let audioBuffers = [];
         let isSpeakerActive = true;
-        let isChatScrolledUp = false; // لتتبع حالة التمرير
 
         // ============================================================
         // 🎵 PEERJS - للصوت بين الأجهزة
@@ -752,6 +772,9 @@
         let myPeerId = null;
         let peerConnections = {};
         let peerStreams = {};
+        let isReconnecting = false;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
 
         // ============================================================
         // 🎯 GET ROOM ID FROM URL
@@ -799,7 +822,13 @@
             statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري طلب الإذن...';
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
+                    audio: { 
+                        echoCancellation: true, 
+                        noiseSuppression: true, 
+                        autoGainControl: true,
+                        sampleRate: 48000,
+                        channelCount: 1
+                    }, 
                     video: false 
                 });
                 mediaStream = stream;
@@ -943,6 +972,10 @@
                     audioContext.close();
                     audioContext = null;
                 }
+                // إيقاف جميع تدفقات الصوت
+                Object.keys(peerStreams).forEach(peerId => {
+                    removeRemoteAudio(peerId);
+                });
             } else {
                 btn.className = 'audio-btn speaker-active';
                 btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">السماعة نشطة</span>';
@@ -950,6 +983,10 @@
                 if (!audioContext) {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 }
+                // إعادة تشغيل تدفقات الصوت
+                Object.keys(peerStreams).forEach(peerId => {
+                    playRemoteAudio(peerStreams[peerId], peerId);
+                });
             }
             if (roomId && mySeatIndex !== -1) {
                 database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speakerMuted').set(!isSpeakerActive);
@@ -987,7 +1024,6 @@
             currentUser = getCurrentUser();
             document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
             
-            // عرض المقاعد فوراً
             renderSeatsPyramid({});
             
             loadRoomDataAndCheckBan();
@@ -1008,10 +1044,8 @@
                 roomData = snapshot.val();
                 document.getElementById('roomNameDisplay').textContent = roomData.name || 'غرفة صوتية';
                 
-                // 🔥 تحديد المالك
                 isOwner = roomData.creatorId == currentUser.numericId;
                 
-                // عرض اسم المالك
                 const creatorName = roomData.creatorName || 'غير معروف';
                 document.getElementById('roomOwnerDisplay').textContent = '👑 المالك: ' + creatorName;
                 
@@ -1040,7 +1074,6 @@
                 addChatMessage('system', `👑 مالك الغرفة: ${creatorName}`, null, null, '');
                 addChatMessage('system', `🔑 معرف الغرفة: ${roomId}`, null, null, '');
                 
-                // تحميل المقاعد
                 loadSeats();
                 
                 listenRoomUpdates();
@@ -1048,7 +1081,6 @@
                 listenSeats();
                 setupChatScrollMonitoring();
 
-                // 🎵 بدء PeerJS للصوت بين الأجهزة
                 initPeerJS();
                 
             } catch (error) {
@@ -1057,7 +1089,7 @@
         }
 
         // ============================================================
-        // 🎵 PEERJS - نقل الصوت بين الأجهزة
+        // 🎵 PEERJS - نقل الصوت بين الأجهزة (محسّن)
         // ============================================================
         function initPeerJS() {
             if (!mediaStream) {
@@ -1067,7 +1099,9 @@
             }
 
             const peerId = currentUser.numericId;
-            peer = new Peer(peerId, {
+            
+            // إعدادات محسنة لخوادم ICE
+            const peerConfig = {
                 debug: 2,
                 config: {
                     iceServers: [
@@ -1075,37 +1109,118 @@
                         { urls: 'stun:stun1.l.google.com:19302' },
                         { urls: 'stun:stun2.l.google.com:19302' },
                         { urls: 'stun:stun3.l.google.com:19302' },
-                        { urls: 'stun:stun4.l.google.com:19302' }
-                    ]
+                        { urls: 'stun:stun4.l.google.com:19302' },
+                        { urls: 'stun:stun.ekiga.net' },
+                        { urls: 'stun:stun.ideasip.com' },
+                        { urls: 'stun:stun.iptel.org' },
+                        { urls: 'stun:stun.rixtelecom.se' },
+                        { urls: 'stun:stun.schlund.de' },
+                        { urls: 'stun:stun.stunprotocol.org:3478' },
+                        { urls: 'stun:stun.voiparound.com' },
+                        { urls: 'stun:stun.voipbuster.com' },
+                        { urls: 'stun:stun.voipstunt.com' },
+                        { urls: 'stun:stun.voxgratia.org' },
+                        // خوادم TURN (للمساعدة في اختراق الجدران النارية)
+                        {
+                            urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
+                            credential: 'webrtc',
+                            username: 'webrtc'
+                        },
+                        {
+                            urls: 'turn:turn.anyfirewall.com:443?transport=udp',
+                            credential: 'webrtc',
+                            username: 'webrtc'
+                        }
+                    ],
+                    iceTransportPolicy: 'all',
+                    iceCandidatePoolSize: 10
                 }
-            });
+            };
 
-            myPeerId = peerId;
+            try {
+                peer = new Peer(peerId, peerConfig);
+            } catch (e) {
+                console.error('❌ خطأ في إنشاء PeerJS:', e);
+                // محاولة بمعرف مختلف
+                const newId = peerId + '_' + Date.now();
+                peer = new Peer(newId, peerConfig);
+            }
+
+            myPeerId = peer.id;
 
             peer.on('open', (id) => {
                 console.log('✅ PeerJS متصل مع المعرف:', id);
+                myPeerId = id;
+                updateConnectionStatus('connected');
                 // تحديث معرف المستخدم في قاعدة البيانات
-                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(id);
+                if (mySeatIndex !== -1) {
+                    database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(id);
+                }
+                // الاتصال بالمستخدمين الموجودين
+                connectToExistingPeers();
             });
 
             peer.on('call', (call) => {
                 console.log('📞 مكالمة واردة من:', call.peer);
-                call.answer(mediaStream);
-                call.on('stream', (remoteStream) => {
-                    console.log('🎵 استقبال تدفق صوت من:', call.peer);
-                    peerStreams[call.peer] = remoteStream;
-                    playRemoteAudio(remoteStream, call.peer);
-                });
-                call.on('close', () => {
-                    console.log('🔇 انقطاع المكالمة مع:', call.peer);
-                    delete peerStreams[call.peer];
-                    removeRemoteAudio(call.peer);
-                });
-                peerConnections[call.peer] = call;
+                try {
+                    call.answer(mediaStream);
+                    call.on('stream', (remoteStream) => {
+                        console.log('🎵 استقبال تدفق صوت من:', call.peer);
+                        peerStreams[call.peer] = remoteStream;
+                        if (isSpeakerActive) {
+                            playRemoteAudio(remoteStream, call.peer);
+                        }
+                    });
+                    call.on('close', () => {
+                        console.log('🔇 انقطاع المكالمة مع:', call.peer);
+                        delete peerStreams[call.peer];
+                        removeRemoteAudio(call.peer);
+                    });
+                    call.on('error', (err) => {
+                        console.error('❌ خطأ في المكالمة مع', call.peer, err);
+                        delete peerStreams[call.peer];
+                        removeRemoteAudio(call.peer);
+                    });
+                    peerConnections[call.peer] = call;
+                } catch (e) {
+                    console.error('❌ خطأ في استقبال المكالمة:', e);
+                }
             });
 
             peer.on('error', (err) => {
                 console.error('❌ خطأ في PeerJS:', err);
+                updateConnectionStatus('disconnected');
+                
+                if (err.type === 'unavailable-id' || err.type === 'peer-unavailable') {
+                    // محاولة إعادة الاتصال بمعرف جديد
+                    if (!isReconnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                        isReconnecting = true;
+                        reconnectAttempts++;
+                        setTimeout(() => {
+                            isReconnecting = false;
+                            initPeerJS();
+                        }, 2000 * reconnectAttempts);
+                    }
+                }
+            });
+
+            peer.on('disconnected', () => {
+                console.log('🔌 PeerJS غير متصل');
+                updateConnectionStatus('disconnected');
+                // محاولة إعادة الاتصال
+                if (!isReconnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    isReconnecting = true;
+                    reconnectAttempts++;
+                    setTimeout(() => {
+                        isReconnecting = false;
+                        peer.reconnect();
+                    }, 3000);
+                }
+            });
+
+            peer.on('close', () => {
+                console.log('🔌 PeerJS مغلق');
+                updateConnectionStatus('disconnected');
             });
 
             // الاستماع لتغيرات المقاعد للاتصال بالمستخدمين الجدد
@@ -1115,69 +1230,193 @@
         function listenForPeerConnections() {
             if (!database || !roomId) return;
 
+            // الاستماع لإضافة مقاعد جديدة
             database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
                 const seatIndex = snapshot.key;
                 const seatData = snapshot.val();
                 if (seatData && seatData.userId && seatData.userId !== currentUser.numericId && seatData.peerId) {
-                    connectToPeer(seatData.peerId, seatData.userId);
+                    setTimeout(() => {
+                        connectToPeer(seatData.peerId, seatData.userId);
+                    }, 1000);
                 }
             });
 
+            // الاستماع لتغيير المقاعد
             database.ref('rooms/' + roomId + '/seats').on('child_changed', (snapshot) => {
                 const seatData = snapshot.val();
                 if (seatData && seatData.userId && seatData.userId !== currentUser.numericId && seatData.peerId) {
-                    connectToPeer(seatData.peerId, seatData.userId);
+                    setTimeout(() => {
+                        connectToPeer(seatData.peerId, seatData.userId);
+                    }, 500);
                 }
+            });
+
+            // الاستماع لإزالة المقاعد
+            database.ref('rooms/' + roomId + '/seats').on('child_removed', (snapshot) => {
+                const seatData = snapshot.val();
+                if (seatData && seatData.peerId) {
+                    disconnectFromPeer(seatData.peerId);
+                }
+            });
+        }
+
+        function connectToExistingPeers() {
+            if (!database || !roomId) return;
+            database.ref('rooms/' + roomId + '/seats').once('value', (snapshot) => {
+                const seats = snapshot.val() || {};
+                Object.keys(seats).forEach(key => {
+                    const seat = seats[key];
+                    if (seat && seat.userId && seat.userId !== currentUser.numericId && seat.peerId) {
+                        setTimeout(() => {
+                            connectToPeer(seat.peerId, seat.userId);
+                        }, 500);
+                    }
+                });
             });
         }
 
         function connectToPeer(peerId, userId) {
-            if (peerConnections[peerId] || !mediaStream) return;
+            if (!peer || !mediaStream) return;
             if (peerId === myPeerId) return;
+            if (peerConnections[peerId]) {
+                // التحقق من أن الاتصال لا يزال نشطاً
+                try {
+                    if (peerConnections[peerId].open) {
+                        return;
+                    }
+                } catch (e) {
+                    delete peerConnections[peerId];
+                }
+            }
 
-            console.log('🔗 الاتصال بـ:', peerId);
+            console.log('🔗 الاتصال بـ:', peerId, ' (المستخدم:', userId, ')');
+            updateConnectionStatus('connecting');
+            
             try {
-                const call = peer.call(peerId, mediaStream);
+                const call = peer.call(peerId, mediaStream, {
+                    metadata: {
+                        userId: currentUser.numericId,
+                        username: currentUser.nickname || currentUser.username
+                    }
+                });
+                
+                if (!call) {
+                    console.log('⚠️ فشل إنشاء المكالمة مع', peerId);
+                    return;
+                }
+
                 call.on('stream', (remoteStream) => {
                     console.log('🎵 استقبال تدفق صوت من:', peerId);
                     peerStreams[peerId] = remoteStream;
-                    playRemoteAudio(remoteStream, peerId);
+                    if (isSpeakerActive) {
+                        playRemoteAudio(remoteStream, peerId);
+                    }
+                    updateConnectionStatus('connected');
                 });
+
                 call.on('close', () => {
                     console.log('🔇 انقطاع المكالمة مع:', peerId);
                     delete peerStreams[peerId];
                     removeRemoteAudio(peerId);
+                    delete peerConnections[peerId];
                 });
+
+                call.on('error', (err) => {
+                    console.error('❌ خطأ في المكالمة مع', peerId, err);
+                    delete peerStreams[peerId];
+                    removeRemoteAudio(peerId);
+                    delete peerConnections[peerId];
+                    // محاولة إعادة الاتصال
+                    setTimeout(() => {
+                        connectToPeer(peerId, userId);
+                    }, 3000);
+                });
+
                 peerConnections[peerId] = call;
             } catch (error) {
                 console.error('❌ خطأ في الاتصال بـ', peerId, error);
+                // محاولة إعادة الاتصال
+                setTimeout(() => {
+                    connectToPeer(peerId, userId);
+                }, 2000);
+            }
+        }
+
+        function disconnectFromPeer(peerId) {
+            try {
+                if (peerConnections[peerId]) {
+                    peerConnections[peerId].close();
+                    delete peerConnections[peerId];
+                }
+                delete peerStreams[peerId];
+                removeRemoteAudio(peerId);
+                console.log('🔌 تم قطع الاتصال مع:', peerId);
+            } catch (e) {
+                console.log('Error disconnecting from peer:', e);
             }
         }
 
         function playRemoteAudio(stream, peerId) {
-            if (!isSpeakerActive) return;
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (!isSpeakerActive) {
+                console.log('🔇 السماعة مكتومة، تأجيل تشغيل الصوت من:', peerId);
+                return;
             }
+            
             try {
+                // إزالة أي عنصر صوت سابق لهذا المستخدم
+                removeRemoteAudio(peerId);
+                
                 const audioElement = document.createElement('audio');
                 audioElement.id = 'audio-' + peerId;
                 audioElement.srcObject = stream;
                 audioElement.autoplay = true;
                 audioElement.style.display = 'none';
+                // إعدادات محسنة للصوت
+                audioElement.volume = 1.0;
+                audioElement.muted = false;
                 document.body.appendChild(audioElement);
-                audioElement.play().catch(e => console.log('Audio play error:', e));
+                
+                const playPromise = audioElement.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        console.log('⚠️ خطأ في تشغيل الصوت من', peerId, e);
+                        // محاولة إعادة التشغيل
+                        setTimeout(() => {
+                            if (audioElement) {
+                                audioElement.play().catch(() => {});
+                            }
+                        }, 1000);
+                    });
+                }
                 console.log('✅ تشغيل صوت من:', peerId);
             } catch (e) {
-                console.log('Error playing remote audio:', e);
+                console.log('❌ خطأ في تشغيل الصوت من', peerId, e);
             }
         }
 
         function removeRemoteAudio(peerId) {
             const audioEl = document.getElementById('audio-' + peerId);
             if (audioEl) {
-                audioEl.remove();
+                try {
+                    audioEl.pause();
+                    audioEl.srcObject = null;
+                    audioEl.remove();
+                } catch (e) {
+                    console.log('Error removing audio element:', e);
+                }
                 console.log('🗑️ إزالة صوت من:', peerId);
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            const el = document.getElementById('connectionStatus');
+            el.className = 'connection-status ' + status;
+            if (status === 'connected') {
+                el.innerHTML = '🔗 متصل بالخادم الصوتي';
+            } else if (status === 'connecting') {
+                el.innerHTML = '🔄 جاري الاتصال...';
+            } else {
+                el.innerHTML = '🔌 غير متصل - محاولة إعادة الاتصال...';
             }
         }
 
@@ -1239,6 +1478,10 @@
                     if (isMySeat) {
                         mySeatIndex = globalIndex;
                         document.getElementById('leaveSeatBtn').style.display = 'flex';
+                        // تحديث peerId في قاعدة البيانات
+                        if (peer && myPeerId) {
+                            database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
+                        }
                     }
 
                     const isSeatOwner = seat && seat.isOwner === true;
@@ -1416,6 +1659,14 @@
                 mySeatIndex = seatIndex;
                 document.getElementById('leaveSeatBtn').style.display = 'flex';
 
+                // تأخير قصير للسماح باتصال PeerJS
+                setTimeout(() => {
+                    if (peer && myPeerId) {
+                        database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
+                    }
+                    connectToExistingPeers();
+                }, 1000);
+
                 if (seatIndex === 0 && isOwner) {
                     showToast(`👑 جلست على مقعد المالك`, 'success');
                     addChatMessage('system', `👑 **${currentUser.nickname || currentUser.username}** جلس على مقعد المالك`, null, null, 'join');
@@ -1554,7 +1805,6 @@
                 const msg = snapshot.val();
                 if (msg) {
                     displayMessage(msg);
-                    // التمرير لأسفل تلقائياً عند وصول رسالة جديدة
                     setTimeout(() => {
                         scrollToBottom();
                     }, 50);
@@ -1635,7 +1885,6 @@
             input.focus();
             document.getElementById('emojiPicker').classList.remove('active');
             
-            // التمرير لأسفل تلقائياً بعد الإرسال
             setTimeout(() => {
                 scrollToBottom();
             }, 50);
@@ -1654,17 +1903,14 @@
             const container = document.getElementById('chatMessages');
             container.scrollTop = container.scrollHeight;
             document.getElementById('scrollDownBtn').classList.remove('visible');
-            isChatScrolledUp = false;
         }
 
         function checkScrollPosition() {
             const btn = document.getElementById('scrollDownBtn');
             if (!isUserAtBottom()) {
                 btn.classList.add('visible');
-                isChatScrolledUp = true;
             } else {
                 btn.classList.remove('visible');
-                isChatScrolledUp = false;
             }
         }
 
@@ -1674,10 +1920,8 @@
             container.addEventListener('scroll', function() {
                 if (isUserAtBottom()) {
                     document.getElementById('scrollDownBtn').classList.remove('visible');
-                    isChatScrolledUp = false;
                 } else {
                     document.getElementById('scrollDownBtn').classList.add('visible');
-                    isChatScrolledUp = true;
                 }
             });
         }
