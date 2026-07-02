@@ -11,9 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
-    <!-- PeerJS لنقل الصوت -->
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -512,163 +509,6 @@
         .mic-overlay .mic-box .btn-skip { margin-top: 8px; background: transparent; color: #666; border: none; cursor: pointer; font-size: 0.8rem; transition: 0.3s; width: 100%; }
         .mic-overlay .mic-box .btn-skip:hover { color: #999; }
 
-        /* ===== نافذة الملف الشخصي العائمة ===== */
-        .profile-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: #1a1a2e;
-            border-radius: 24px;
-            padding: 30px;
-            width: 340px;
-            max-width: 90%;
-            z-index: 9999;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            display: none;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: center;
-        }
-        .profile-popup.active {
-            display: block;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn {
-            from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        .profile-popup .popup-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: white;
-            margin: 0 auto 15px;
-            border: 3px solid #ffd700;
-        }
-
-        .profile-popup .popup-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ffd700;
-            margin-bottom: 5px;
-        }
-
-        .profile-popup .popup-id {
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #888;
-            margin-bottom: 15px;
-            background: rgba(255,255,255,0.05);
-            padding: 5px 15px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        .profile-popup .popup-status {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-
-        .profile-popup .popup-status .status-item {
-            font-size: 0.8rem;
-            color: #ccc;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .profile-popup .popup-status .status-item .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .dot.online { background: #10b981; }
-        .dot.muted { background: #ef4444; }
-        .dot.speaker-off { background: #6b7280; }
-
-        .profile-popup .popup-close {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(255,255,255,0.05);
-            border: none;
-            color: #888;
-            font-size: 1.2rem;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .profile-popup .popup-close:hover {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-
-        .profile-popup .popup-role {
-            font-size: 0.7rem;
-            padding: 3px 12px;
-            border-radius: 12px;
-            background: #ffd700;
-            color: #1a1a2e;
-            display: inline-block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .profile-popup .popup-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .profile-popup .popup-actions button {
-            padding: 6px 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .profile-popup .popup-actions .btn-msg { background: #667eea; color: white; }
-        .profile-popup .popup-actions .btn-msg:hover { background: #5a67d8; }
-        .profile-popup .popup-actions .btn-kick { background: #ef4444; color: white; }
-        .profile-popup .popup-actions .btn-kick:hover { background: #dc2626; }
-        .profile-popup .popup-actions .btn-mute { background: #f59e0b; color: white; }
-        .profile-popup .popup-actions .btn-mute:hover { background: #d97706; }
-        .profile-popup .popup-actions .btn-ban { background: #7c3aed; color: white; }
-        .profile-popup .popup-actions .btn-ban:hover { background: #6d28d9; }
-
-        #popupOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 9998;
-            display: none;
-            backdrop-filter: blur(3px);
-        }
-        #popupOverlay.active { display: block; }
-
         @media (max-width: 1024px) {
             .seats-row.row-4 { max-width: 560px; }
             .seats-row.row-3 { max-width: 420px; }
@@ -698,8 +538,6 @@
             .btn-leave { padding: 3px 10px; font-size: 0.6rem; }
             .logo { font-size: 1rem; }
             .scroll-down-btn { width: 26px; height: 26px; font-size: 0.6rem; bottom: 55px; }
-            .profile-popup { width: 300px; padding: 25px; }
-            .profile-popup .popup-avatar { width: 65px; height: 65px; font-size: 2rem; }
         }
 
         @media (max-width: 480px) {
@@ -754,9 +592,6 @@
             .btn-leave { padding: 2px 8px; font-size: 0.5rem; border-radius: 4px; }
             
             .scroll-down-btn { width: 24px; height: 24px; font-size: 0.55rem; bottom: 48px; }
-            .profile-popup { width: 280px; padding: 20px; }
-            .profile-popup .popup-avatar { width: 55px; height: 55px; font-size: 1.6rem; }
-            .profile-popup .popup-name { font-size: 1rem; }
         }
 
         @media (max-width: 380px) {
@@ -776,8 +611,6 @@
             .btn-leave-seat { width: 30px; height: 30px; font-size: 0.75rem; }
             .emoji-picker { max-width: 130px; max-height: 70px; }
             .emoji-picker .emoji-item { width: 18px; height: 18px; font-size: 0.65rem; }
-            .profile-popup { width: 250px; padding: 15px; }
-            .profile-popup .popup-avatar { width: 45px; height: 45px; font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -805,22 +638,6 @@
             <button class="btn-allow" id="micAllowBtn" onclick="requestMicPermission()"><i class="fas fa-check"></i> السماح بالميكروفون</button>
             <br><button class="btn-skip" onclick="skipMic()">تخطي (دخول بدون صوت)</button>
         </div>
-    </div>
-
-    <!-- ===== نافذة الملف الشخصي العائمة ===== -->
-    <div id="popupOverlay" onclick="closeProfilePopup()"></div>
-    <div id="profilePopup" class="profile-popup">
-        <button class="popup-close" onclick="closeProfilePopup()"><i class="fas fa-times"></i></button>
-        <div class="popup-avatar" id="popupAvatar">U</div>
-        <div class="popup-role" id="popupRole">👤 عضو</div>
-        <div class="popup-name" id="popupName">مستخدم</div>
-        <div class="popup-id" id="popupId">🔑 ---</div>
-        <div class="popup-status">
-            <span class="status-item"><span class="dot online"></span> نشط</span>
-            <span class="status-item" id="popupMicStatus"><i class="fas fa-microphone" style="color:#10b981;"></i> ميكروفون نشط</span>
-            <span class="status-item" id="popupSpeakerStatus"><i class="fas fa-volume-up" style="color:#3b82f6;"></i> سماعة نشطة</span>
-        </div>
-        <div class="popup-actions" id="popupActions"></div>
     </div>
 
     <main>
@@ -923,13 +740,8 @@
         let seatsListener = null;
         let roomInitialized = false;
         let audioContext = null;
+        let audioBuffers = [];
         let isSpeakerActive = true;
-        
-        // ===== متغيرات WebRTC =====
-        let peer = null;
-        let myPeerId = null;
-        let connections = {};
-        let peerInitialized = false;
 
         // ============================================================
         // 🎯 GET ROOM ID FROM URL
@@ -968,108 +780,6 @@
         }
 
         // ============================================================
-        // 🔗 6. تهيئة PeerJS (المسؤول عن نقل الصوت)
-        // ============================================================
-        function initPeer() {
-            return new Promise((resolve, reject) => {
-                // معرف فريد لكل مستخدم
-                myPeerId = 'vip_' + currentUser.numericId + '_' + Date.now();
-                
-                peer = new Peer(myPeerId, {
-                    debug: 2,
-                    config: {
-                        'iceServers': [
-                            { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:stun1.l.google.com:19302' }
-                        ]
-                    }
-                });
-
-                peer.on('open', (id) => {
-                    console.log('✅ PeerJS متصل بالمعرف:', id);
-                    peerInitialized = true;
-                    resolve(id);
-                });
-
-                peer.on('error', (err) => {
-                    console.error('❌ خطأ في PeerJS:', err);
-                    reject(err);
-                });
-
-                peer.on('call', (call) => {
-                    // عندما يتصل بك مستخدم آخر
-                    console.log('📞 اتصال وارد من:', call.peer);
-                    if (mediaStream) {
-                        call.answer(mediaStream);
-                        connections[call.peer] = call;
-                        
-                        call.on('stream', (remoteStream) => {
-                            console.log('🎵 استقبال صوت من:', call.peer);
-                            playRemoteAudio(remoteStream, call.peer);
-                        });
-                        
-                        call.on('close', () => {
-                            console.log('📞 انتهى الاتصال مع:', call.peer);
-                            delete connections[call.peer];
-                            updateSeatsWithAudioStatus();
-                        });
-                    }
-                });
-
-                // إعادة المحاولة عند فقدان الاتصال
-                peer.on('disconnected', () => {
-                    console.log('🔄 PeerJS غير متصل، يعيد المحاولة...');
-                    peer.reconnect();
-                });
-            });
-        }
-
-        // ============================================================
-        // 🔊 8. تشغيل الصوت المستلم
-        // ============================================================
-        function playRemoteAudio(stream, peerId) {
-            // إزالة أي عنصر صوت قديم
-            const oldAudio = document.getElementById('audio_' + peerId);
-            if (oldAudio) oldAudio.remove();
-            
-            const audio = document.createElement('audio');
-            audio.id = 'audio_' + peerId;
-            audio.srcObject = stream;
-            audio.autoplay = true;
-            audio.volume = isSpeakerActive ? 1 : 0;
-            document.body.appendChild(audio);
-            console.log('🎧 تم تشغيل صوت من:', peerId);
-        }
-
-        // ============================================================
-        // 📞 9. الاتصال بمستخدم آخر
-        // ============================================================
-        function callUser(peerId) {
-            if (!peer || !mediaStream || connections[peerId]) return;
-            if (peerId === myPeerId) return;
-            
-            try {
-                console.log('📞 جاري الاتصال بـ:', peerId);
-                const call = peer.call(peerId, mediaStream);
-                connections[peerId] = call;
-                
-                call.on('stream', (remoteStream) => {
-                    console.log('🎵 استقبال صوت من:', peerId);
-                    playRemoteAudio(remoteStream, peerId);
-                });
-                
-                call.on('close', () => {
-                    console.log('📞 انتهى الاتصال مع:', peerId);
-                    delete connections[peerId];
-                    updateSeatsWithAudioStatus();
-                });
-                
-            } catch (error) {
-                console.error('❌ فشل الاتصال بـ:', peerId, error);
-            }
-        }
-
-        // ============================================================
         // 🎤 MIC PERMISSION
         // ============================================================
         async function requestMicPermission() {
@@ -1087,15 +797,7 @@
                 statusDiv.style.color = '#10b981';
                 btn.innerHTML = '<i class="fas fa-check"></i> تم السماح ✅';
                 btn.style.background = '#10b981';
-                
-                // تهيئة PeerJS بعد الحصول على الميكروفون
-                try {
-                    await initPeer();
-                    console.log('✅ PeerJS جاهز');
-                } catch (peerError) {
-                    console.error('❌ خطأ في PeerJS:', peerError);
-                }
-                
+                initSounds();
                 setTimeout(() => {
                     document.getElementById('micOverlay').style.display = 'none';
                     initRoom();
@@ -1116,13 +818,89 @@
 
         function skipMic() {
             document.getElementById('micOverlay').style.display = 'none';
+            initSounds();
             showToast('ℹ️ دخلت بدون ميكروفون (وضع الاستماع فقط)', 'info');
-            // تهيئة PeerJS بدون ميكروفون
-            initPeer().then(() => {
-                initRoom();
-            }).catch(() => {
-                initRoom();
-            });
+            initRoom();
+        }
+
+        // ============================================================
+        // 🔊 SOUND SYSTEM
+        // ============================================================
+        function generateSoundBuffer(frequency, duration, type = 'sine') {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            const sampleRate = audioContext.sampleRate;
+            const bufferLength = sampleRate * duration;
+            const buffer = audioContext.createBuffer(1, bufferLength, sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferLength; i++) {
+                const t = i / sampleRate;
+                if (type === 'sine') {
+                    data[i] = Math.sin(2 * Math.PI * frequency * t) * 0.5;
+                } else if (type === 'square') {
+                    data[i] = Math.sin(2 * Math.PI * frequency * t) > 0 ? 0.5 : -0.5;
+                } else if (type === 'sawtooth') {
+                    data[i] = (t * frequency) % 1 * 2 - 1;
+                } else if (type === 'noise') {
+                    data[i] = (Math.random() * 2 - 1) * 0.3;
+                }
+            }
+            return buffer;
+        }
+
+        function playSound(buffer, volume = 0.3) {
+            if (!isSpeakerActive) return null;
+            if (!audioContext) return null;
+            try {
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = volume;
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                source.start();
+                return source;
+            } catch (e) {
+                console.log('Sound play error:', e);
+            }
+        }
+
+        function initSounds() {
+            try {
+                audioBuffers.push(generateSoundBuffer(440, 0.3, 'sine'));
+                audioBuffers.push(generateSoundBuffer(554, 0.3, 'sine'));
+                audioBuffers.push(generateSoundBuffer(659, 0.3, 'sine'));
+                audioBuffers.push(generateSoundBuffer(880, 0.2, 'sine'));
+                audioBuffers.push(generateSoundBuffer(523, 0.4, 'square'));
+                audioBuffers.push(generateSoundBuffer(392, 0.4, 'sawtooth'));
+                audioBuffers.push(generateSoundBuffer(200, 0.5, 'sine'));
+                audioBuffers.push(generateSoundBuffer(1000, 0.1, 'sine'));
+                audioBuffers.push(generateSoundBuffer(300, 0.6, 'noise'));
+                audioBuffers.push(generateSoundBuffer(600, 0.3, 'square'));
+                console.log('✅ تم توليد الأصوات للاختبار');
+            } catch (e) {
+                console.log('Sound init error:', e);
+            }
+        }
+
+        // ============================================================
+        // 👤 DUMMY USERS - تم إزالة المستخدمين الوهميين
+        // ============================================================
+        // تم حذف مصفوفة dummyUsers بالكامل
+
+        // ============================================================
+        // 🚀 INITIALIZE FIREBASE
+        // ============================================================
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            console.log('✅ Firebase connected');
+        } catch (error) {
+            console.error('❌ Firebase error:', error);
         }
 
         // ============================================================
@@ -1146,24 +924,12 @@
             if (roomId && mySeatIndex !== -1) {
                 database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/muted').set(isMicMuted);
             }
-            
-            // تحديث حالة الميكروفون في PeerJS
-            if (mediaStream) {
-                mediaStream.getAudioTracks().forEach(track => {
-                    track.enabled = !isMicMuted;
-                });
-            }
         }
 
         function toggleSpeaker() {
             isSpeakerActive = !isSpeakerActive;
             const btn = document.getElementById('speakerBtn');
             
-            // تحديث جميع عناصر الصوت
-            document.querySelectorAll('audio').forEach(el => {
-                el.volume = isSpeakerActive ? 1 : 0;
-            });
-
             if (!isSpeakerActive) {
                 btn.className = 'audio-btn speaker-inactive';
                 btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">السماعة مكتومة</span>';
@@ -1248,8 +1014,7 @@
                     'المستخدم الحالي': currentUser,
                     'معرف المالك في الغرفة': roomData.creatorId,
                     'معرف المستخدم': currentUser.numericId,
-                    'isOwner': isOwner,
-                    'myPeerId': myPeerId
+                    'isOwner': isOwner
                 });
                 
                 if (isOwner) {
@@ -1270,21 +1035,8 @@
                 addChatMessage('system', `👑 مالك الغرفة: ${creatorName}`, null, null, '');
                 addChatMessage('system', `🔑 معرف الغرفة: ${roomId}`, null, null, '');
                 
-                // حفظ المستخدم في Firebase مع Peer ID
-                if (myPeerId) {
-                    await database.ref('rooms/' + roomId + '/users/' + currentUser.numericId).set({
-                        username: currentUser.nickname || currentUser.username || 'مستخدم',
-                        peerId: myPeerId,
-                        joinedAt: new Date().toISOString(),
-                        isMuted: false
-                    });
-                }
-                
                 // تحميل المقاعد
                 loadSeats();
-                
-                // الاستماع للمستخدمين للاتصال بهم
-                listenForUsers();
                 
                 listenRoomUpdates();
                 listenChat();
@@ -1294,29 +1046,6 @@
             } catch (error) {
                 console.error('Error loading room:', error);
             }
-        }
-
-        // ============================================================
-        // 👂 LISTEN FOR USERS (للاتصال الصوتي)
-        // ============================================================
-        function listenForUsers() {
-            if (!database) return;
-
-            database.ref('rooms/' + roomId + '/users').on('value', (snapshot) => {
-                const users = snapshot.val() || {};
-                updateSeatsWithAudioStatus();
-
-                // الاتصال بالمستخدمين الجدد
-                for (const userId in users) {
-                    const user = users[userId];
-                    if (user.peerId && user.peerId !== myPeerId && !connections[user.peerId] && peerInitialized) {
-                        console.log('🔄 اكتشاف مستخدم جديد:', user.username);
-                        setTimeout(() => {
-                            callUser(user.peerId);
-                        }, 1000);
-                    }
-                }
-            });
         }
 
         // ============================================================
@@ -1348,7 +1077,7 @@
         }
 
         // ============================================================
-        // 💺 SEATS MANAGEMENT
+        // 💺 SEATS MANAGEMENT - بدون مستخدمين وهميين
         // ============================================================
         function listenSeats() {
             if (!database) return;
@@ -1356,11 +1085,6 @@
                 const seats = snapshot.val() || {};
                 renderSeatsPyramid(seats);
             });
-        }
-
-        function updateSeatsWithAudioStatus() {
-            // تحديث حالة الصوت في المقاعد
-            // سيتم تحديثها عند إعادة رسم المقاعد
         }
 
         function renderSeatsPyramid(seats) {
@@ -1482,76 +1206,20 @@
         }
 
         // ============================================================
-        // 👤 PROFILE POPUP
+        // 👤 PROFILE POPUP - نافذة الملف الشخصي
         // ============================================================
         function openProfilePopup(seatIndex) {
+            // جلب بيانات المستخدم من Firebase
             database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value').then((snapshot) => {
                 const seat = snapshot.val();
                 if (!seat) return;
 
-                // تحديث بيانات النافذة
-                document.getElementById('popupAvatar').textContent = seat.username.charAt(0).toUpperCase();
-                document.getElementById('popupName').textContent = seat.username;
-                document.getElementById('popupId').textContent = `🔑 ${seat.userId || '---'}`;
+                // نافذة منبثقة بسيطة
+                alert(`👤 الملف الشخصي\n\nاسم المستخدم: ${seat.username}\nالمعرف: ${seat.userId}\n${seat.isOwner ? '👑 مالك الغرفة' : '👤 عضو'}\n${seat.muted ? '🔇 ميكروفون مكتوم' : '🎤 ميكروفون نشط'}`);
                 
-                const roleEl = document.getElementById('popupRole');
-                if (seat.isOwner) {
-                    roleEl.textContent = '👑 مالك الغرفة';
-                } else {
-                    roleEl.textContent = '👤 عضو';
-                }
-
-                const micStatus = document.getElementById('popupMicStatus');
-                if (seat.muted) {
-                    micStatus.innerHTML = '<i class="fas fa-microphone-slash" style="color:#ef4444;"></i> ميكروفون مكتوم';
-                } else {
-                    micStatus.innerHTML = '<i class="fas fa-microphone" style="color:#10b981;"></i> ميكروفون نشط';
-                }
-
-                const speakerStatus = document.getElementById('popupSpeakerStatus');
-                if (seat.speakerMuted) {
-                    speakerStatus.innerHTML = '<i class="fas fa-volume-mute" style="color:#6b7280;"></i> سماعة مكتومة';
-                } else {
-                    speakerStatus.innerHTML = '<i class="fas fa-volume-up" style="color:#3b82f6;"></i> سماعة نشطة';
-                }
-
-                const actionsDiv = document.getElementById('popupActions');
-                actionsDiv.innerHTML = '';
-                
-                if (isOwner && !seat.isOwner && seat.userId !== currentUser.numericId) {
-                    actionsDiv.innerHTML = `
-                        <button class="btn-kick" onclick="kickUser(${seatIndex}); closeProfilePopup();">✖ طرد</button>
-                        <button class="btn-mute" onclick="muteUser(${seatIndex}); closeProfilePopup();">🔇 كتم</button>
-                        <button class="btn-ban" onclick="banUser(${seatIndex}); closeProfilePopup();">🚫 حظر</button>
-                    `;
-                } else if (seat.userId === currentUser.numericId) {
-                    actionsDiv.innerHTML = `
-                        <button class="btn-msg" onclick="closeProfilePopup();" style="background:#10b981;">👤 أنت</button>
-                    `;
-                } else {
-                    actionsDiv.innerHTML = `
-                        <button class="btn-msg" onclick="closeProfilePopup(); sendPrivateMessage('${seat.username}')">💬 رسالة</button>
-                    `;
-                }
-
-                document.getElementById('profilePopup').classList.add('active');
-                document.getElementById('popupOverlay').classList.add('active');
-                document.body.style.overflow = 'hidden';
-
             }).catch(err => {
                 console.error('Error loading profile:', err);
             });
-        }
-
-        function closeProfilePopup() {
-            document.getElementById('profilePopup').classList.remove('active');
-            document.getElementById('popupOverlay').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        function sendPrivateMessage(username) {
-            showToast(`💬 سيتم فتح محادثة خاصة مع ${username}`, 'info');
-            closeProfilePopup();
         }
 
         // ============================================================
@@ -1561,6 +1229,7 @@
             if (!database || !roomId) return;
 
             try {
+                // التحقق من أن المستخدم موجود
                 if (!currentUser || !currentUser.numericId) {
                     showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                     return;
@@ -1578,6 +1247,7 @@
                 const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const seats = seatsSnapshot.val() || {};
                 
+                // التحقق من أن المستخدم ليس في مقعد آخر
                 for (const key in seats) {
                     if (seats[key].userId == currentUser.numericId) {
                         showToast('⚠️ أنت بالفعل في مقعد آخر. اخرج منه أولاً', 'warning');
@@ -1591,6 +1261,7 @@
                     return;
                 }
 
+                // التحقق من مقعد المالك
                 if (seatIndex === 0 && !isOwner) {
                     showToast('⚠️ هذا المقعد خاص بمالك الغرفة فقط', 'warning');
                     return;
@@ -1619,14 +1290,6 @@
                 mySeatIndex = seatIndex;
                 document.getElementById('leaveSeatBtn').style.display = 'flex';
 
-                // حفظ Peer ID في Firebase بعد الجلوس
-                if (myPeerId) {
-                    await database.ref('rooms/' + roomId + '/users/' + currentUser.numericId).update({
-                        peerId: myPeerId,
-                        seatNumber: seatIndex
-                    });
-                }
-
                 if (seatIndex === 0 && isOwner) {
                     showToast(`👑 جلست على مقعد المالك`, 'success');
                     addChatMessage('system', `👑 **${currentUser.nickname || currentUser.username}** جلس على مقعد المالك`, null, null, 'join');
@@ -1635,36 +1298,9 @@
                     addChatMessage('system', `👋 **${currentUser.nickname || currentUser.username}** انضم للغرفة`, null, null, 'join');
                 }
 
-                // الاتصال بالمستخدمين الآخرين بعد الجلوس
-                setTimeout(() => {
-                    connectToOtherUsers();
-                }, 1000);
-
             } catch (error) {
                 console.error('Error joining seat:', error);
                 showToast('❌ حدث خطأ في الجلوس على المقعد', 'error');
-            }
-        }
-
-        // ============================================================
-        // 🔗 الاتصال بالمستخدمين الآخرين
-        // ============================================================
-        async function connectToOtherUsers() {
-            if (!database || !roomId || !peerInitialized) return;
-            
-            try {
-                const snapshot = await database.ref('rooms/' + roomId + '/users').once('value');
-                const users = snapshot.val() || {};
-                
-                for (const userId in users) {
-                    const user = users[userId];
-                    if (user.peerId && user.peerId !== myPeerId && !connections[user.peerId]) {
-                        console.log('📞 الاتصال بـ:', user.username);
-                        callUser(user.peerId);
-                    }
-                }
-            } catch (error) {
-                console.error('Error connecting to users:', error);
             }
         }
 
@@ -1683,9 +1319,6 @@
                 const username = seat ? seat.username : 'مستخدم';
                 
                 await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
-                
-                // إزالة المستخدم من قائمة المستخدمين
-                await database.ref('rooms/' + roomId + '/users/' + currentUser.numericId).remove();
                 
                 const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const seats = seatsSnapshot.val() || {};
@@ -1717,9 +1350,6 @@
 
                 await sendNotification(seat.userId, '🚫 تم طردك من الغرفة', `تم طردك من غرفة "${roomData.name}" بواسطة المالك.`);
 
-                // إزالة المستخدم من قائمة المستخدمين
-                await database.ref('rooms/' + roomId + '/users/' + seat.userId).remove();
-                
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
                 addChatMessage('system', `🚫 **${seat.username}** تم طرده من الغرفة`, null, null, 'leave');
 
@@ -1753,9 +1383,6 @@
 
                 await sendNotification(seat.userId, '🚫 تم حظرك من الغرفة', `تم حظرك من غرفة "${roomData.name}" نهائياً بواسطة المالك.`);
 
-                // إزالة المستخدم من قائمة المستخدمين
-                await database.ref('rooms/' + roomId + '/users/' + seat.userId).remove();
-                
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
                 addChatMessage('system', `🚫 **${seat.username}** تم حظره من الغرفة نهائياً`, null, null, 'leave');
 
@@ -2030,22 +1657,10 @@
                     const membersCount = Object.keys(seats).length;
                     await database.ref('rooms/' + roomId + '/members').set(membersCount);
                 }
-                
-                // إزالة المستخدم من قائمة المستخدمين
-                if (currentUser && currentUser.numericId) {
-                    await database.ref('rooms/' + roomId + '/users/' + currentUser.numericId).remove();
-                }
-                
-                // إغلاق الاتصالات الصوتية
-                for (const id in connections) {
-                    try { connections[id].close(); } catch(e) {}
-                }
-                if (peer) { try { peer.destroy(); } catch(e) {} }
-                if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); }
-                
                 if (roomListener) database.ref('rooms/' + roomId).off();
                 if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
                 if (seatsListener) database.ref('rooms/' + roomId + '/seats').off();
+                if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
                 if (audioContext) audioContext.close();
                 window.location.href = 'chat.html';
             } catch (error) {
@@ -2093,7 +1708,7 @@
             }
             document.getElementById('micOverlay').style.display = 'flex';
             console.log('🎙️ جاهز لطلب إذن الميكروفون');
-            console.log('🔊 سيتم نقل الصوت عبر WebRTC (PeerJS)');
+            console.log('⚠️ تم إزالة المستخدمين الوهميين - فقط المستخدمين الحقيقيين');
         };
 
         // ============================================================
@@ -2103,25 +1718,11 @@
             if (roomId && mySeatIndex !== -1) {
                 database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
             }
-            if (currentUser && currentUser.numericId) {
-                database.ref('rooms/' + roomId + '/users/' + currentUser.numericId).remove();
-            }
-            for (const id in connections) {
-                try { connections[id].close(); } catch(e) {}
-            }
-            if (peer) { try { peer.destroy(); } catch(e) {} }
-            if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); }
+            if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
             if (audioContext) audioContext.close();
             if (roomListener) database.ref('rooms/' + roomId).off();
             if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
             if (seatsListener) database.ref('rooms/' + roomId + '/seats').off();
-        });
-
-        // إغلاق نافذة الملف الشخصي عند الضغط على ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeProfilePopup();
-            }
         });
     </script>
 </body>
