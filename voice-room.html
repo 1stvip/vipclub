@@ -134,6 +134,12 @@
         .seat.occupied .seat-avatar {
             width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 1.6rem; font-weight: bold; margin-bottom: 6px; border: 2px solid #10b981;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .seat.occupied .seat-avatar:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
         }
         .seat .seat-avatar {
             width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.05);
@@ -141,7 +147,8 @@
             margin-bottom: 6px; border: 2px dashed rgba(255,255,255,0.08); transition: all 0.3s ease;
         }
         .seat .seat-number { font-size: 0.55rem; color: #555; margin-top: 3px; }
-        .seat .seat-username { font-size: 0.75rem; font-weight: 600; margin-top: 3px; color: #ccc; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .seat .seat-username { font-size: 0.75rem; font-weight: 600; margin-top: 3px; color: #ccc; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; transition: 0.3s; }
+        .seat .seat-username:hover { color: #ffd700; }
         .seat .seat-username.owner-name { color: #ffd700; }
 
         .seat .seat-indicators { display: flex; gap: 6px; margin-top: 4px; justify-content: center; }
@@ -508,6 +515,163 @@
         .mic-overlay .mic-box .btn-skip { margin-top: 8px; background: transparent; color: #666; border: none; cursor: pointer; font-size: 0.8rem; transition: 0.3s; width: 100%; }
         .mic-overlay .mic-box .btn-skip:hover { color: #999; }
 
+        /* ===== نافذة الملف الشخصي العائمة ===== */
+        .profile-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: #1a1a2e;
+            border-radius: 24px;
+            padding: 30px;
+            width: 340px;
+            max-width: 90%;
+            z-index: 9999;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            display: none;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+        .profile-popup.active {
+            display: block;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .profile-popup .popup-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 15px;
+            border: 3px solid #ffd700;
+        }
+
+        .profile-popup .popup-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .profile-popup .popup-id {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 15px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .profile-popup .popup-status {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .profile-popup .popup-status .status-item {
+            font-size: 0.8rem;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .profile-popup .popup-status .status-item .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot.online { background: #10b981; }
+        .dot.muted { background: #ef4444; }
+        .dot.speaker-off { background: #6b7280; }
+
+        .profile-popup .popup-close {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: #888;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-popup .popup-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .profile-popup .popup-role {
+            font-size: 0.7rem;
+            padding: 3px 12px;
+            border-radius: 12px;
+            background: #ffd700;
+            color: #1a1a2e;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .profile-popup .popup-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .profile-popup .popup-actions button {
+            padding: 6px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .profile-popup .popup-actions .btn-msg { background: #667eea; color: white; }
+        .profile-popup .popup-actions .btn-msg:hover { background: #5a67d8; }
+        .profile-popup .popup-actions .btn-kick { background: #ef4444; color: white; }
+        .profile-popup .popup-actions .btn-kick:hover { background: #dc2626; }
+        .profile-popup .popup-actions .btn-mute { background: #f59e0b; color: white; }
+        .profile-popup .popup-actions .btn-mute:hover { background: #d97706; }
+        .profile-popup .popup-actions .btn-ban { background: #7c3aed; color: white; }
+        .profile-popup .popup-actions .btn-ban:hover { background: #6d28d9; }
+
+        #popupOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9998;
+            display: none;
+            backdrop-filter: blur(3px);
+        }
+        #popupOverlay.active { display: block; }
+
         @media (max-width: 1024px) {
             .seats-row.row-4 { max-width: 560px; }
             .seats-row.row-3 { max-width: 420px; }
@@ -537,6 +701,8 @@
             .btn-leave { padding: 3px 10px; font-size: 0.6rem; }
             .logo { font-size: 1rem; }
             .scroll-down-btn { width: 26px; height: 26px; font-size: 0.6rem; bottom: 55px; }
+            .profile-popup { width: 300px; padding: 25px; }
+            .profile-popup .popup-avatar { width: 65px; height: 65px; font-size: 2rem; }
         }
 
         @media (max-width: 480px) {
@@ -591,6 +757,9 @@
             .btn-leave { padding: 2px 8px; font-size: 0.5rem; border-radius: 4px; }
             
             .scroll-down-btn { width: 24px; height: 24px; font-size: 0.55rem; bottom: 48px; }
+            .profile-popup { width: 280px; padding: 20px; }
+            .profile-popup .popup-avatar { width: 55px; height: 55px; font-size: 1.6rem; }
+            .profile-popup .popup-name { font-size: 1rem; }
         }
 
         @media (max-width: 380px) {
@@ -610,6 +779,8 @@
             .btn-leave-seat { width: 30px; height: 30px; font-size: 0.75rem; }
             .emoji-picker { max-width: 130px; max-height: 70px; }
             .emoji-picker .emoji-item { width: 18px; height: 18px; font-size: 0.65rem; }
+            .profile-popup { width: 250px; padding: 15px; }
+            .profile-popup .popup-avatar { width: 45px; height: 45px; font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -636,6 +807,22 @@
             <button class="btn-allow" id="micAllowBtn" onclick="requestMicPermission()"><i class="fas fa-check"></i> السماح بالميكروفون</button>
             <br><button class="btn-skip" onclick="skipMic()">تخطي (دخول بدون صوت)</button>
         </div>
+    </div>
+
+    <!-- ===== نافذة الملف الشخصي العائمة ===== -->
+    <div id="popupOverlay" onclick="closeProfilePopup()"></div>
+    <div id="profilePopup" class="profile-popup">
+        <button class="popup-close" onclick="closeProfilePopup()"><i class="fas fa-times"></i></button>
+        <div class="popup-avatar" id="popupAvatar">U</div>
+        <div class="popup-role" id="popupRole">👤 عضو</div>
+        <div class="popup-name" id="popupName">مستخدم</div>
+        <div class="popup-id" id="popupId">🔑 ---</div>
+        <div class="popup-status">
+            <span class="status-item"><span class="dot online"></span> نشط</span>
+            <span class="status-item" id="popupMicStatus"><i class="fas fa-microphone" style="color:#10b981;"></i> ميكروفون نشط</span>
+            <span class="status-item" id="popupSpeakerStatus"><i class="fas fa-volume-up" style="color:#3b82f6;"></i> سماعة نشطة</span>
+        </div>
+        <div class="popup-actions" id="popupActions"></div>
     </div>
 
     <main>
@@ -738,8 +925,9 @@
         let seatsListener = null;
         let roomInitialized = false;
         let audioContext = null;
-        let audioBuffers = [];
         let isSpeakerActive = true;
+        let selectedUser = null;
+        let seatsCache = {};
 
         // ============================================================
         // 🎯 GET ROOM ID FROM URL
@@ -795,7 +983,6 @@
                 statusDiv.style.color = '#10b981';
                 btn.innerHTML = '<i class="fas fa-check"></i> تم السماح ✅';
                 btn.style.background = '#10b981';
-                initSounds();
                 setTimeout(() => {
                     document.getElementById('micOverlay').style.display = 'none';
                     initRoom();
@@ -816,160 +1003,17 @@
 
         function skipMic() {
             document.getElementById('micOverlay').style.display = 'none';
-            initSounds();
             showToast('ℹ️ دخلت بدون ميكروفون (وضع الاستماع فقط)', 'info');
             initRoom();
         }
 
         // ============================================================
-        // 🔊 SOUND SYSTEM
-        // ============================================================
-        function generateSoundBuffer(frequency, duration, type = 'sine') {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            const sampleRate = audioContext.sampleRate;
-            const bufferLength = sampleRate * duration;
-            const buffer = audioContext.createBuffer(1, bufferLength, sampleRate);
-            const data = buffer.getChannelData(0);
-            
-            for (let i = 0; i < bufferLength; i++) {
-                const t = i / sampleRate;
-                if (type === 'sine') {
-                    data[i] = Math.sin(2 * Math.PI * frequency * t) * 0.5;
-                } else if (type === 'square') {
-                    data[i] = Math.sin(2 * Math.PI * frequency * t) > 0 ? 0.5 : -0.5;
-                } else if (type === 'sawtooth') {
-                    data[i] = (t * frequency) % 1 * 2 - 1;
-                } else if (type === 'noise') {
-                    data[i] = (Math.random() * 2 - 1) * 0.3;
-                }
-            }
-            return buffer;
-        }
-
-        function playSound(buffer, volume = 0.3) {
-            if (!isSpeakerActive) return null;
-            if (!audioContext) return null;
-            try {
-                const source = audioContext.createBufferSource();
-                source.buffer = buffer;
-                const gainNode = audioContext.createGain();
-                gainNode.gain.value = volume;
-                source.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                source.start();
-                return source;
-            } catch (e) {
-                console.log('Sound play error:', e);
-            }
-        }
-
-        function initSounds() {
-            try {
-                audioBuffers.push(generateSoundBuffer(440, 0.3, 'sine'));
-                audioBuffers.push(generateSoundBuffer(554, 0.3, 'sine'));
-                audioBuffers.push(generateSoundBuffer(659, 0.3, 'sine'));
-                audioBuffers.push(generateSoundBuffer(880, 0.2, 'sine'));
-                audioBuffers.push(generateSoundBuffer(523, 0.4, 'square'));
-                audioBuffers.push(generateSoundBuffer(392, 0.4, 'sawtooth'));
-                audioBuffers.push(generateSoundBuffer(200, 0.5, 'sine'));
-                audioBuffers.push(generateSoundBuffer(1000, 0.1, 'sine'));
-                audioBuffers.push(generateSoundBuffer(300, 0.6, 'noise'));
-                audioBuffers.push(generateSoundBuffer(600, 0.3, 'square'));
-                console.log('✅ تم توليد الأصوات للاختبار');
-            } catch (e) {
-                console.log('Sound init error:', e);
-            }
-        }
-
-        // ============================================================
-        // 👤 DUMMY USERS
-        // ============================================================
-        const dummyUsers = [
-            { name: 'أحمد', color: '#667eea', emoji: '👨' },
-            { name: 'سارة', color: '#f093fb', emoji: '👩' },
-            { name: 'محمد', color: '#4facfe', emoji: '👨' },
-            { name: 'نور', color: '#43e97b', emoji: '👩' },
-            { name: 'خالد', color: '#fa709a', emoji: '👨' },
-            { name: 'ليلى', color: '#f6d365', emoji: '👩' },
-            { name: 'عمر', color: '#a18cd1', emoji: '👨' },
-            { name: 'منى', color: '#fbc2eb', emoji: '👩' },
-            { name: 'يوسف', color: '#a6c1ee', emoji: '👨' },
-            { name: 'نادين', color: '#fddb92', emoji: '👩' }
-        ];
-
-        // ============================================================
-        // 🚀 INITIALIZE FIREBASE
-        // ============================================================
-        try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            database = firebase.database();
-            console.log('✅ Firebase connected');
-        } catch (error) {
-            console.error('❌ Firebase error:', error);
-        }
-
-        // ============================================================
-        // 🔊 AUDIO CONTROLS
-        // ============================================================
-        function toggleMic() {
-            if (!mediaStream) return;
-            isMicMuted = !isMicMuted;
-            const btn = document.getElementById('micBtn');
-            if (isMicMuted) {
-                mediaStream.getAudioTracks().forEach(track => track.enabled = false);
-                btn.className = 'audio-btn mic-inactive';
-                btn.innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
-                showToast('🔇 تم كتم الميكروفون (لا أحد يسمعك)', 'warning');
-            } else {
-                mediaStream.getAudioTracks().forEach(track => track.enabled = true);
-                btn.className = 'audio-btn mic-active';
-                btn.innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">الميكروفون نشط</span>';
-                showToast('🔊 تم تفعيل الميكروفون (الجميع يسمعك)', 'success');
-            }
-            if (roomId && mySeatIndex !== -1) {
-                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/muted').set(isMicMuted);
-            }
-        }
-
-        function toggleSpeaker() {
-            isSpeakerActive = !isSpeakerActive;
-            const btn = document.getElementById('speakerBtn');
-            
-            if (!isSpeakerActive) {
-                btn.className = 'audio-btn speaker-inactive';
-                btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">السماعة مكتومة</span>';
-                showToast('🔇 تم كتم السماعة (لا تسمع أحداً)', 'warning');
-                if (audioContext) {
-                    audioContext.close();
-                    audioContext = null;
-                }
-            } else {
-                btn.className = 'audio-btn speaker-active';
-                btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">السماعة نشطة</span>';
-                showToast('🔊 تم تفعيل السماعة (تسمع الجميع)', 'success');
-                if (!audioContext) {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            }
-            if (roomId && mySeatIndex !== -1) {
-                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speakerMuted').set(!isSpeakerActive);
-            }
-        }
-
-        // ============================================================
-        // 🔍 CHECK IF USER IS BANNED (باستثناء المالك)
+        // 🔍 CHECK IF USER IS BANNED
         // ============================================================
         async function isUserBanned(userId) {
             if (!database || !roomId) return false;
             try {
-                // التحقق أولاً من أن المستخدم ليس مالك الغرفة
-                if (isOwner) {
-                    return false;
-                }
+                if (isOwner) return false;
                 const snapshot = await database.ref('rooms/' + roomId + '/banned_users/' + userId).once('value');
                 return snapshot.exists();
             } catch (error) {
@@ -979,7 +1023,7 @@
         }
 
         // ============================================================
-        // 🚀 INIT ROOM
+        // 🚀 INIT ROOM (محسّن للسرعة - بدون مستخدمين وهميين)
         // ============================================================
         function initRoom() {
             if (roomInitialized) return;
@@ -994,7 +1038,6 @@
             currentUser = getCurrentUser();
             document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
             
-            // تحميل بيانات الغرفة أولاً لتحديد المالك
             loadRoomDataAndCheckBan();
         }
 
@@ -1013,14 +1056,11 @@
                 roomData = snapshot.val();
                 document.getElementById('roomNameDisplay').textContent = roomData.name || 'غرفة صوتية';
                 
-                // تحديد المالك أولاً
                 isOwner = roomData.creatorId == currentUser.numericId;
                 
-                // إذا كان المستخدم مالكاً، لا نتحقق من الحظر
                 if (isOwner) {
                     showToast('👑 مرحباً بك كمالك الغرفة!', 'success');
                 } else {
-                    // التحقق من الحظر فقط للمستخدمين العاديين
                     const banned = await isUserBanned(currentUser.numericId);
                     if (banned) {
                         showToast('🚫 لقد تم حظرك من هذه الغرفة', 'error');
@@ -1035,15 +1075,31 @@
                 addChatMessage('system', `👑 مالك الغرفة: ${roomData.creatorName || 'غير معروف'}`, null, null, '');
                 addChatMessage('system', `🔑 معرف الغرفة: ${roomId}`, null, null, '');
                 
+                // تحميل المقاعد فوراً
+                loadSeats();
+                
                 listenRoomUpdates();
                 listenChat();
                 listenSeats();
-                startDummyUsers();
-                startSoundSimulation();
                 setupChatScrollMonitoring();
                 
             } catch (error) {
                 console.error('Error loading room:', error);
+            }
+        }
+
+        // ============================================================
+        // 💺 LOAD SEATS (تحميل سريع)
+        // ============================================================
+        async function loadSeats() {
+            if (!database || !roomId) return;
+            try {
+                const snapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+                const seats = snapshot.val() || {};
+                seatsCache = seats;
+                renderSeatsPyramid(seats);
+            } catch (error) {
+                console.error('Error loading seats:', error);
             }
         }
 
@@ -1061,103 +1117,13 @@
         }
 
         // ============================================================
-        // 🎭 START DUMMY USERS
-        // ============================================================
-        async function startDummyUsers() {
-            setTimeout(async () => {
-                try {
-                    const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
-                    const seats = seatsSnapshot.val() || {};
-                    
-                    for (const key in seats) {
-                        if (seats[key].isDummy) {
-                            await database.ref('rooms/' + roomId + '/seats/' + key).remove();
-                        }
-                    }
-
-                    const dummyCount = Math.min(7, 9);
-                    let seatIndex = 1;
-                    
-                    for (let i = 0; i < dummyCount && seatIndex < 10; i++) {
-                        const dummy = dummyUsers[i % dummyUsers.length];
-                        const dummyId = 'DUMMY_' + Math.random().toString(36).substr(2, 6);
-                        
-                        await database.ref('rooms/' + roomId + '/seats/' + seatIndex).set({
-                            userId: dummyId,
-                            username: dummy.name,
-                            isOwner: false,
-                            muted: Math.random() > 0.5,
-                            speakerMuted: Math.random() > 0.7,
-                            isDummy: true,
-                            color: dummy.color,
-                            seatNumber: seatIndex,
-                            speaking: false,
-                            joinedAt: new Date().toISOString()
-                        });
-                        
-                        addChatMessage('system', `👋 **${dummy.name}** انضم للغرفة`, null, null, 'join');
-                        seatIndex++;
-                    }
-                    
-                    const updatedSeats = await database.ref('rooms/' + roomId + '/seats').once('value');
-                    const newSeats = updatedSeats.val() || {};
-                    const membersCount = Object.keys(newSeats).length;
-                    await database.ref('rooms/' + roomId + '/members').set(membersCount);
-                    
-                } catch (error) {
-                    console.error('Error adding dummy users:', error);
-                }
-            }, 2000);
-        }
-
-        // ============================================================
-        // 🔊 SOUND SIMULATION
-        // ============================================================
-        function startSoundSimulation() {
-            setInterval(() => {
-                if (!roomId) return;
-                if (!isSpeakerActive) return;
-                
-                database.ref('rooms/' + roomId + '/seats').once('value').then((snapshot) => {
-                    const seats = snapshot.val() || {};
-                    const dummySeats = [];
-                    
-                    for (const key in seats) {
-                        if (seats[key].isDummy && seats[key].isDummy === true) {
-                            dummySeats.push({ index: key, data: seats[key] });
-                        }
-                    }
-                    
-                    if (dummySeats.length === 0 || audioBuffers.length === 0) return;
-                    
-                    const speakingCount = Math.floor(Math.random() * 2) + 1;
-                    const shuffled = dummySeats.sort(() => 0.5 - Math.random());
-                    const selected = shuffled.slice(0, Math.min(speakingCount, shuffled.length));
-                    
-                    selected.forEach(({ index, data }) => {
-                        const soundIndex = Math.floor(Math.random() * audioBuffers.length);
-                        const volume = Math.random() * 0.3 + 0.1;
-                        playSound(audioBuffers[soundIndex], volume);
-                        
-                        database.ref('rooms/' + roomId + '/seats/' + index + '/speaking').set(true);
-                        
-                        const duration = Math.random() * 3000 + 2000;
-                        setTimeout(() => {
-                            database.ref('rooms/' + roomId + '/seats/' + index + '/speaking').set(false);
-                        }, duration);
-                    });
-                    
-                }).catch(err => console.error('Error simulating sound:', err));
-            }, 4000);
-        }
-
-        // ============================================================
-        // 💺 SEATS MANAGEMENT
+        // 💺 SEATS MANAGEMENT (بدون مستخدمين وهميين)
         // ============================================================
         function listenSeats() {
             if (!database) return;
             seatsListener = database.ref('rooms/' + roomId + '/seats').on('value', (snapshot) => {
                 const seats = snapshot.val() || {};
+                seatsCache = seats;
                 renderSeatsPyramid(seats);
             });
         }
@@ -1185,16 +1151,19 @@
 
                     const isSeatOwner = seat && seat.isOwner === true;
                     const isOwnerSeat = globalIndex === 0;
-                    const isDummy = seat && seat.isDummy === true;
                     const isSpeaking = seat && seat.speaking === true;
 
                     let displayName = seat ? seat.username : 'مقعد فارغ';
                     let avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
                     let seatClass = 'seat';
                     
-                    if (isOwnerSeat) seatClass += ' owner-seat';
-                    else if (isOccupied) seatClass += ' occupied';
-                    else seatClass += ' empty';
+                    if (isOwnerSeat) {
+                        seatClass += ' owner-seat';
+                    } else if (isOccupied) {
+                        seatClass += ' occupied';
+                    } else {
+                        seatClass += ' empty';
+                    }
 
                     if (isSpeaking && isOccupied) seatClass += ' speaking';
 
@@ -1202,8 +1171,11 @@
                     const isMuted = seat && seat.muted === true;
                     const isSpeakerOff = seat && seat.speakerMuted === true;
 
+                    // حدث النقر على المقعد المشغول لعرض الملف الشخصي
+                    const clickHandler = isOccupied ? `onclick="openProfilePopup('${globalIndex}')"` : '';
+
                     html += `
-                        <div class="${seatClass}" onclick="${!isOccupied && !isOwnerSeat ? `joinSeat(${globalIndex})` : isOwnerSeat && !isOccupied && isOwner ? `joinSeat(${globalIndex})` : ''}">
+                        <div class="${seatClass}" ${clickHandler}>
                             ${isOccupied ? `
                                 ${isSeatOwner ? `<div class="seat-crown">👑</div>` : ''}
                                 ${isSpeaking ? `
@@ -1217,7 +1189,7 @@
                                 <div class="seat-avatar" style="background: ${userColor} !important; border-color: ${isSeatOwner ? '#ffd700' : isMuted ? '#ef4444' : isSpeaking ? '#3b82f6' : '#10b981'} !important; ${isSpeaking ? 'box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);' : ''}">
                                     ${avatarLetter}
                                 </div>
-                                <div class="seat-username ${isSeatOwner ? 'owner-name' : ''}">${displayName} ${isDummy ? '🤖' : ''}</div>
+                                <div class="seat-username ${isSeatOwner ? 'owner-name' : ''}">${displayName}</div>
                                 ${isSeatOwner ? `<div class="seat-badge-owner">👑 المالك</div>` : ''}
                                 <div class="seat-indicators">
                                     <span class="indicator ${isMuted ? 'mic-off' : 'mic-on'}" title="${isMuted ? 'الميكروفون مكتوم' : 'الميكروفون نشط'}">
@@ -1229,26 +1201,26 @@
                                     ${isSpeaking ? `<span class="indicator" style="color:#3b82f6; animation: pulse-icon 0.8s infinite;" title="يتحدث الآن"><i class="fas fa-wave-square"></i></span>` : ''}
                                 </div>
                                 <div class="seat-number">مقعد ${globalIndex + 1}</div>
-                                ${isOwner && !isSeatOwner && isOccupied && !isDummy ? `
-                                    <div class="seat-actions">
+                                ${isOwner && !isSeatOwner && isOccupied ? `
+                                    <div class="seat-actions" onclick="event.stopPropagation();">
                                         <button class="btn-kick" onclick="event.stopPropagation();kickUser(${globalIndex})">✖ طرد</button>
                                         <button class="btn-mute" onclick="event.stopPropagation();muteUser(${globalIndex})">🔇 كتم</button>
                                         <button class="btn-ban" onclick="event.stopPropagation();banUser(${globalIndex})">🚫 حظر</button>
                                     </div>
                                 ` : ''}
                                 ${isOwner && isOwnerSeat && isOccupied && isMySeat ? `
-                                    <div class="seat-actions">
+                                    <div class="seat-actions" onclick="event.stopPropagation();">
                                         <button class="btn-close-seat" onclick="event.stopPropagation();leaveSeat()">🚪 مغادرة</button>
                                     </div>
                                 ` : ''}
                                 ${isOwner && !isOccupied && !isOwnerSeat ? `
-                                    <div class="seat-actions">
+                                    <div class="seat-actions" onclick="event.stopPropagation();">
                                         <button class="btn-open-seat" onclick="event.stopPropagation();openSeat(${globalIndex})">🔓 فتح</button>
                                         <button class="btn-invite" onclick="event.stopPropagation();inviteUser(${globalIndex})">📩 دعوة</button>
                                     </div>
                                 ` : ''}
                                 ${isOwner && isOwnerSeat && !isOccupied ? `
-                                    <div class="seat-actions">
+                                    <div class="seat-actions" onclick="event.stopPropagation();">
                                         <button class="btn-open-seat" onclick="event.stopPropagation();openSeat(${globalIndex})">🔓 فتح</button>
                                     </div>
                                 ` : ''}
@@ -1279,13 +1251,92 @@
         }
 
         // ============================================================
+        // 👤 PROFILE POPUP
+        // ============================================================
+        function openProfilePopup(seatIndex) {
+            const seat = seatsCache[seatIndex];
+            if (!seat) return;
+
+            selectedUser = {
+                seatIndex: seatIndex,
+                userId: seat.userId,
+                username: seat.username,
+                isOwner: seat.isOwner === true,
+                isMuted: seat.muted === true,
+                isSpeakerOff: seat.speakerMuted === true,
+                isSpeaking: seat.speaking === true,
+                color: seat.color || '#667eea'
+            };
+
+            document.getElementById('popupAvatar').textContent = selectedUser.username.charAt(0).toUpperCase();
+            document.getElementById('popupAvatar').style.background = `linear-gradient(135deg, ${selectedUser.color}, #4a3f7a)`;
+            document.getElementById('popupName').textContent = selectedUser.username;
+            document.getElementById('popupId').textContent = `🔑 ${selectedUser.userId || '---'}`;
+            
+            const roleEl = document.getElementById('popupRole');
+            if (selectedUser.isOwner) {
+                roleEl.textContent = '👑 مالك الغرفة';
+            } else {
+                roleEl.textContent = '👤 عضو';
+            }
+
+            const micStatus = document.getElementById('popupMicStatus');
+            if (selectedUser.isMuted) {
+                micStatus.innerHTML = '<i class="fas fa-microphone-slash" style="color:#ef4444;"></i> ميكروفون مكتوم';
+            } else {
+                micStatus.innerHTML = '<i class="fas fa-microphone" style="color:#10b981;"></i> ميكروفون نشط';
+            }
+
+            const speakerStatus = document.getElementById('popupSpeakerStatus');
+            if (selectedUser.isSpeakerOff) {
+                speakerStatus.innerHTML = '<i class="fas fa-volume-mute" style="color:#6b7280;"></i> سماعة مكتومة';
+            } else {
+                speakerStatus.innerHTML = '<i class="fas fa-volume-up" style="color:#3b82f6;"></i> سماعة نشطة';
+            }
+
+            const actionsDiv = document.getElementById('popupActions');
+            actionsDiv.innerHTML = '';
+            
+            if (isOwner && !selectedUser.isOwner && selectedUser.userId !== currentUser.numericId) {
+                actionsDiv.innerHTML = `
+                    <button class="btn-kick" onclick="kickUser(${seatIndex}); closeProfilePopup();">✖ طرد</button>
+                    <button class="btn-mute" onclick="muteUser(${seatIndex}); closeProfilePopup();">🔇 كتم</button>
+                    <button class="btn-ban" onclick="banUser(${seatIndex}); closeProfilePopup();">🚫 حظر</button>
+                `;
+            } else if (selectedUser.userId === currentUser.numericId) {
+                actionsDiv.innerHTML = `
+                    <button class="btn-msg" onclick="closeProfilePopup();" style="background:#10b981;">👤 أنت</button>
+                `;
+            } else {
+                actionsDiv.innerHTML = `
+                    <button class="btn-msg" onclick="closeProfilePopup(); sendPrivateMessage('${selectedUser.username}')">💬 رسالة</button>
+                `;
+            }
+
+            document.getElementById('profilePopup').classList.add('active');
+            document.getElementById('popupOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProfilePopup() {
+            document.getElementById('profilePopup').classList.remove('active');
+            document.getElementById('popupOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            selectedUser = null;
+        }
+
+        function sendPrivateMessage(username) {
+            showToast(`💬 سيتم فتح محادثة خاصة مع ${username}`, 'info');
+            closeProfilePopup();
+        }
+
+        // ============================================================
         // 🪑 SEAT ACTIONS
         // ============================================================
         async function joinSeat(seatIndex) {
             if (!database || !roomId) return;
 
             try {
-                // التحقق من الحظر (للمستخدمين العاديين فقط)
                 if (!isOwner) {
                     const banned = await isUserBanned(currentUser.numericId);
                     if (banned) {
@@ -1316,7 +1367,8 @@
                     return;
                 }
 
-                const randomColor = dummyUsers[Math.floor(Math.random() * dummyUsers.length)].color;
+                const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#f6d365', '#a18cd1', '#fbc2eb', '#a6c1ee', '#fddb92'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).set({
                     userId: currentUser.numericId,
@@ -1324,7 +1376,6 @@
                     isOwner: isOwner && seatIndex === 0,
                     muted: false,
                     speakerMuted: false,
-                    isDummy: false,
                     color: randomColor,
                     speaking: false,
                     seatNumber: seatIndex,
@@ -1388,7 +1439,7 @@
             try {
                 const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
                 const seat = seatSnapshot.val();
-                if (!seat || seat.isDummy) return;
+                if (!seat) return;
 
                 await sendNotification(seat.userId, '🚫 تم طردك من الغرفة', `تم طردك من غرفة "${roomData.name}" بواسطة المالك.`);
 
@@ -1401,6 +1452,7 @@
                 await database.ref('rooms/' + roomId + '/members').set(membersCount);
 
                 showToast('✅ تم طرد المستخدم', 'success');
+                closeProfilePopup();
 
             } catch (error) {
                 console.error('Error kicking user:', error);
@@ -1408,9 +1460,6 @@
             }
         }
 
-        // ============================================================
-        // 🚫 BAN USER - حظر نهائي (لا يشمل المالك)
-        // ============================================================
         async function banUser(seatIndex) {
             if (!isOwner) return;
             if (!confirm(`هل تريد حظر المستخدم من مقعد ${seatIndex + 1} نهائياً؟`)) return;
@@ -1418,13 +1467,7 @@
             try {
                 const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
                 const seat = seatSnapshot.val();
-                if (!seat || seat.isDummy) return;
-
-                // لا يمكن حظر المالك
-                if (seat.isOwner) {
-                    showToast('⚠️ لا يمكن حظر مالك الغرفة', 'warning');
-                    return;
-                }
+                if (!seat || seat.isOwner) return;
 
                 await database.ref('rooms/' + roomId + '/banned_users/' + seat.userId).set({
                     username: seat.username,
@@ -1443,6 +1486,7 @@
                 await database.ref('rooms/' + roomId + '/members').set(membersCount);
 
                 showToast('✅ تم حظر المستخدم نهائياً', 'success');
+                closeProfilePopup();
 
             } catch (error) {
                 console.error('Error banning user:', error);
@@ -1450,22 +1494,20 @@
             }
         }
 
-        // ============================================================
-        // 🔇 MUTE USER
-        // ============================================================
         async function muteUser(seatIndex) {
             if (!isOwner) return;
 
             try {
                 const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
                 const seat = seatSnapshot.val();
-                if (!seat || seat.isDummy) return;
+                if (!seat) return;
 
                 const newMuteState = !seat.muted;
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex + '/muted').set(newMuteState);
                 
                 showToast(newMuteState ? '🔇 تم كتم الميكروفون' : '🔊 تم فك الكتم', 'success');
                 addChatMessage('system', `${newMuteState ? '🔇 تم كتم' : '🔊 تم فك كتم'} **${seat.username}**`, null, null, '');
+                closeProfilePopup();
 
             } catch (error) {
                 console.error('Error muting user:', error);
@@ -1473,9 +1515,6 @@
             }
         }
 
-        // ============================================================
-        // 🔓 OPEN SEAT
-        // ============================================================
         async function openSeat(seatIndex) {
             if (!isOwner) return;
 
@@ -1492,9 +1531,6 @@
             }
         }
 
-        // ============================================================
-        // 📩 INVITE USER
-        // ============================================================
         async function inviteUser(seatIndex) {
             if (!isOwner) return;
 
@@ -1706,7 +1742,55 @@
         }
 
         // ============================================================
-        // 🚪 LEAVE ROOM - يخرج المستخدم لصفحة chat.html
+        // 🔊 AUDIO CONTROLS
+        // ============================================================
+        function toggleMic() {
+            if (!mediaStream) return;
+            isMicMuted = !isMicMuted;
+            const btn = document.getElementById('micBtn');
+            if (isMicMuted) {
+                mediaStream.getAudioTracks().forEach(track => track.enabled = false);
+                btn.className = 'audio-btn mic-inactive';
+                btn.innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
+                showToast('🔇 تم كتم الميكروفون (لا أحد يسمعك)', 'warning');
+            } else {
+                mediaStream.getAudioTracks().forEach(track => track.enabled = true);
+                btn.className = 'audio-btn mic-active';
+                btn.innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">الميكروفون نشط</span>';
+                showToast('🔊 تم تفعيل الميكروفون (الجميع يسمعك)', 'success');
+            }
+            if (roomId && mySeatIndex !== -1) {
+                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/muted').set(isMicMuted);
+            }
+        }
+
+        function toggleSpeaker() {
+            isSpeakerActive = !isSpeakerActive;
+            const btn = document.getElementById('speakerBtn');
+            
+            if (!isSpeakerActive) {
+                btn.className = 'audio-btn speaker-inactive';
+                btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">السماعة مكتومة</span>';
+                showToast('🔇 تم كتم السماعة (لا تسمع أحداً)', 'warning');
+                if (audioContext) {
+                    audioContext.close();
+                    audioContext = null;
+                }
+            } else {
+                btn.className = 'audio-btn speaker-active';
+                btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">السماعة نشطة</span>';
+                showToast('🔊 تم تفعيل السماعة (تسمع الجميع)', 'success');
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            if (roomId && mySeatIndex !== -1) {
+                database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speakerMuted').set(!isSpeakerActive);
+            }
+        }
+
+        // ============================================================
+        // 🚪 LEAVE ROOM
         // ============================================================
         async function leaveRoom() {
             try {
@@ -1768,6 +1852,7 @@
             }
             document.getElementById('micOverlay').style.display = 'flex';
             console.log('🎙️ جاهز لطلب إذن الميكروفون');
+            console.log('⚠️ لا يوجد مستخدمين وهميين - فقط المستخدمين الحقيقيين');
         };
 
         // ============================================================
@@ -1782,6 +1867,13 @@
             if (roomListener) database.ref('rooms/' + roomId).off();
             if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
             if (seatsListener) database.ref('rooms/' + roomId + '/seats').off();
+        });
+
+        // إغلاق نافذة الملف الشخصي عند الضغط على ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeProfilePopup();
+            }
         });
     </script>
 </body>
