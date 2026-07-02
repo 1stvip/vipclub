@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 لوحة إدارة الغرف - VipChat</title>
+    <link rel="shortcut icon" href="images/videoslogo/vip.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+
+        header {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: #ffd700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .admin-badge {
+            background: #ffd700;
+            color: #1a1a2e;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 5%;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .admin-header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-header h1 i {
+            color: #ffd700;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tabs button {
+            padding: 10px 25px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #aaa;
+        }
+
+        .admin-tabs button:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+            background: rgba(255,215,0,0.05);
+        }
+
+        .admin-tabs button.active {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            border-color: #7c3aed;
+        }
+
+        .admin-tabs button .count {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 10px;
+            border-radius: 10px;
+            margin-right: 5px;
+        }
+
+        .requests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+        }
+
+        .request-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .request-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .request-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .request-card .room-id {
+            font-family: monospace;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .request-card .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .status-badge.pending { background: #f59e0b; color: #1a1a2e; }
+        .status-badge.approved { background: #10b981; color: white; }
+        .status-badge.rejected { background: #ef4444; color: white; }
+
+        .request-card .room-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px 0 5px;
+        }
+
+        .request-card .room-desc {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .request-card .creator-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px;
+        }
+
+        .request-card .creator-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .request-card .creator-info .details {
+            flex: 1;
+        }
+
+        .request-card .creator-info .details .name {
+            font-weight: bold;
+        }
+
+        .request-card .creator-info .details .id {
+            font-size: 0.75rem;
+            color: #888;
+            font-family: monospace;
+        }
+
+        .request-card .creator-info .details .contact {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .request-card .card-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .request-card .card-actions button {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .request-card .card-actions button:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-approve { background: #10b981; color: white; }
+        .btn-approve:hover { background: #059669; }
+        .btn-reject { background: #ef4444; color: white; }
+        .btn-reject:hover { background: #dc2626; }
+        .btn-view { background: #3b82f6; color: white; }
+        .btn-view:hover { background: #2563eb; }
+        .btn-delete { background: #dc2626; color: white; }
+        .btn-delete:hover { background: #b91c1c; }
+
+        .request-card .card-date {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h3 {
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 35px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-content h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid rgba(255,215,0,0.2);
+            padding-bottom: 15px;
+        }
+
+        .modal-content .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .modal-content .info-row .label {
+            color: #888;
+        }
+
+        .modal-content .info-row .value {
+            color: #eee;
+            font-weight: 500;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-actions .btn-close {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .modal-actions .btn-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease-out;
+            max-width: 400px;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        .toast.warning { background: #f59e0b; }
+
+        @media (max-width: 768px) {
+            .requests-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .admin-tabs {
+                justify-content: center;
+            }
+
+            .admin-tabs button {
+                font-size: 0.8rem;
+                padding: 8px 15px;
+            }
+
+            .request-card .card-actions button {
+                min-width: 60px;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .admin-tabs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .request-card .card-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-crown"></i>
+            VipChat Admin
+        </div>
+        <div class="header-actions">
+            <span class="admin-badge">👑 أدمن</span>
+            <a href="home.html" class="btn-back">
+                <i class="fas fa-arrow-right"></i>
+                العودة للرئيسية
+            </a>
+        </div>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+        <div class="admin-header">
+            <h1><i class="fas fa-user-shield"></i> لوحة إدارة الغرف</h1>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="loadRequests(currentTab)" style="padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; cursor: pointer;">
+                    <i class="fas fa-sync-alt"></i> تحديث
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-tabs">
+            <button class="active" onclick="switchTab('pending', this)">
+                <i class="fas fa-clock"></i> قيد الانتظار
+                <span class="count" id="pendingCount">0</span>
+            </button>
+            <button onclick="switchTab('approved', this)">
+                <i class="fas fa-check-circle"></i> تمت الموافقة
+            </button>
+            <button onclick="switchTab('rejected', this)">
+                <i class="fas fa-times-circle"></i> مرفوضة
+            </button>
+        </div>
+
+        <div id="requestsContainer">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h3>جاري تحميل الطلبات...</h3>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== MODAL: بيانات المنشيء ===== -->
+    <div id="creatorModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-user-circle"></i> بيانات منشيء الغرفة</h2>
+            <div id="creatorInfo">
+                <!-- سيتم ملؤها ديناميكياً -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-close" onclick="closeModal('creatorModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+            authDomain: "vipclub-1d04a.firebaseapp.com",
+            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+            projectId: "vipclub-1d04a",
+            storageBucket: "vipclub-1d04a.firebasestorage.app",
+            messagingSenderId: "120667552740",
+            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        };
+
+        let database;
+        let currentTab = 'pending';
+
+        // ============================================================
+        // 🚀 INITIALIZE FIREBASE
+        // ============================================================
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            console.log('✅ Firebase connected');
+        } catch (error) {
+            console.error('❌ Firebase error:', error);
+            showToast('❌ فشل الاتصال بقاعدة البيانات', 'error');
+        }
+
+        // ============================================================
+        // 📋 LOAD REQUESTS
+        // ============================================================
+        async function loadRequests(status) {
+            if (!database) {
+                document.getElementById('requestsContainer').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                        <h3 style="color: #ef4444;">❌ لا يوجد اتصال بقاعدة البيانات</h3>
+                        <p style="color: #666;">تأكد من اتصالك بالإنترنت</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const container = document.getElementById('requestsContainer');
+
+            try {
+                const snapshot = await database.ref('room_requests').once('value');
+
+                if (!snapshot.exists()) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>لا توجد طلبات</h3>
+                            <p style="color: #666;">سوف تظهر هنا طلبات إنشاء الغرف</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const requests = snapshot.val();
+                let allRequests = [];
+                let pendingCount = 0;
+
+                for (const roomId in requests) {
+                    const req = requests[roomId];
+                    req._roomId = roomId;
+                    allRequests.push(req);
+                    if (req.status === 'pending') pendingCount++;
+                }
+
+                document.getElementById('pendingCount').textContent = pendingCount;
+
+                const filtered = allRequests.filter(req => req.status === status);
+                filtered.sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+
+                if (filtered.length === 0) {
+                    const statusText = {
+                        'pending': 'قيد الانتظار',
+                        'approved': 'تمت الموافقة',
+                        'rejected': 'مرفوضة'
+                    };
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>لا توجد طلبات ${statusText[status] || ''}</h3>
+                            <p style="color: #666;">جميع الطلبات ${statusText[status] ? statusText[status].toLowerCase() : ''}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<div class="requests-grid">';
+                filtered.forEach(req => {
+                    const date = req.createdAt ? new Date(req.createdAt).toLocaleString('ar-EG') : '---';
+                    const statusBadge = {
+                        'pending': 'pending',
+                        'approved': 'approved',
+                        'rejected': 'rejected'
+                    };
+
+                    html += `
+                        <div class="request-card">
+                            <div class="card-header">
+                                <div class="room-id">🔑 ${req._roomId}</div>
+                                <div class="status-badge ${statusBadge[req.status] || 'pending'}">
+                                    ${req.status === 'pending' ? '🟡 قيد الانتظار' : 
+                                      req.status === 'approved' ? '🟢 تمت الموافقة' : 
+                                      '🔴 مرفوضة'}
+                                </div>
+                            </div>
+                            <div class="room-name">${req.name || 'غرفة بدون اسم'}</div>
+                            <div class="room-desc">${req.description || 'لا يوجد وصف'}</div>
+                            <div class="creator-info">
+                                <div class="avatar">${(req.creatorName || 'U').charAt(0).toUpperCase()}</div>
+                                <div class="details">
+                                    <div class="name">${req.creatorName || 'مستخدم'}</div>
+                                    <div class="id">🆔 ${req.creatorId || '---'}</div>
+                                    ${req.creatorEmail ? `<div class="contact">📧 ${req.creatorEmail}</div>` : ''}
+                                    ${req.creatorPhone ? `<div class="contact">📱 ${req.creatorPhone}</div>` : ''}
+                                    ${req.isGuest ? '<div class="contact" style="color: #f59e0b;">👤 مستخدم زائر</div>' : ''}
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                ${req.status === 'pending' ? `
+                                    <button class="btn-approve" onclick="approveRoom('${req._roomId}')">
+                                        <i class="fas fa-check"></i> موافقة
+                                    </button>
+                                    <button class="btn-reject" onclick="rejectRoom('${req._roomId}')">
+                                        <i class="fas fa-times"></i> رفض
+                                    </button>
+                                ` : ''}
+                                <button class="btn-view" onclick="viewCreator('${req._roomId}')">
+                                    <i class="fas fa-user"></i> بيانات المنشيء
+                                </button>
+                                ${req.status === 'approved' ? `
+                                    <button class="btn-delete" onclick="deleteRoom('${req._roomId}')">
+                                        <i class="fas fa-trash"></i> حذف
+                                    </button>
+                                ` : ''}
+                            </div>
+                            <div class="card-date"><i class="far fa-clock"></i> ${date}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                        <h3 style="color: #ef4444;">خطأ في تحميل الطلبات</h3>
+                        <p style="color: #666;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================
+        // 🔄 SWITCH TAB
+        // ============================================================
+        function switchTab(tab, button) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.admin-tabs button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+
+            loadRequests(tab);
+        }
+
+        // ============================================================
+        // 👑 ADMIN ACTIONS
+        // ============================================================
+        async function approveRoom(roomId) {
+            if (!confirm(`✅ هل تريد الموافقة على إنشاء الغرفة ${roomId}؟`)) return;
+
+            try {
+                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
+                const request = requestSnapshot.val();
+
+                if (!request) {
+                    showToast('❌ لم يتم العثور على الطلب', 'error');
+                    return;
+                }
+
+                await database.ref('rooms/' + roomId).set({
+                    roomId: roomId,
+                    name: request.name,
+                    description: request.description,
+                    creatorId: request.creatorId,
+                    creatorName: request.creatorName,
+                    createdAt: request.createdAt,
+                    status: 'approved',
+                    members: 0,
+                    isActive: true
+                });
+
+                await database.ref('room_requests/' + roomId + '/status').set('approved');
+
+                if (request.creatorId && request.creatorId !== 'GUEST') {
+                    await sendNotification(
+                        request.creatorId,
+                        `✅ تمت الموافقة على غرفتك "${request.name}"!`,
+                        `معرف الغرفة: ${roomId}\nيمكنك الآن الدخول إلى الغرفة والبدء في الدردشة الصوتية.`
+                    );
+                }
+
+                showToast(`✅ تمت الموافقة على الغرفة ${request.name}`, 'success');
+                loadRequests(currentTab);
+
+            } catch (error) {
+                console.error('Error approving room:', error);
+                showToast('❌ حدث خطأ في الموافقة على الغرفة', 'error');
+            }
+        }
+
+        async function rejectRoom(roomId) {
+            if (!confirm(`❌ هل تريد رفض إنشاء الغرفة ${roomId}؟`)) return;
+
+            try {
+                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
+                const request = requestSnapshot.val();
+
+                if (request && request.creatorId && request.creatorId !== 'GUEST') {
+                    await sendNotification(
+                        request.creatorId,
+                        `❌ تم رفض طلب إنشاء غرفتك "${request.name}"`,
+                        `معرف الغرفة: ${roomId}\nيرجى التواصل مع الإدارة لمعرفة السبب.`
+                    );
+                }
+
+                await database.ref('room_requests/' + roomId + '/status').set('rejected');
+
+                showToast(`❌ تم رفض الغرفة`, 'error');
+                loadRequests(currentTab);
+
+            } catch (error) {
+                console.error('Error rejecting room:', error);
+                showToast('❌ حدث خطأ في رفض الغرفة', 'error');
+            }
+        }
+
+        async function deleteRoom(roomId) {
+            if (!confirm(`⚠️ هل أنت متأكد من حذف الغرفة ${roomId} نهائياً؟\nهذا الإجراء لا يمكن التراجع عنه!`)) return;
+
+            try {
+                await database.ref('rooms/' + roomId).remove();
+                await database.ref('room_requests/' + roomId + '/status').set('deleted');
+
+                showToast(`🗑️ تم حذف الغرفة ${roomId}`, 'info');
+                loadRequests(currentTab);
+
+            } catch (error) {
+                console.error('Error deleting room:', error);
+                showToast('❌ حدث خطأ في حذف الغرفة', 'error');
+            }
+        }
+
+        // ============================================================
+        // 👤 VIEW CREATOR
+        // ============================================================
+        async function viewCreator(roomId) {
+            try {
+                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
+                const request = requestSnapshot.val();
+
+                if (!request) {
+                    showToast('❌ لم يتم العثور على بيانات الطلب', 'error');
+                    return;
+                }
+
+                let userData = {};
+                if (request.creatorId && request.creatorId !== 'GUEST') {
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.orderByChild('numericId').equalTo(request.creatorId).once('value');
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        const userKey = Object.keys(data)[0];
+                        userData = data[userKey];
+                    }
+                }
+
+                const infoDiv = document.getElementById('creatorInfo');
+                infoDiv.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6d28d9); display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 2.5rem; color: white;">
+                            ${(request.creatorName || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        <h3 style="color: #ffd700;">${request.creatorName || 'مستخدم'}</h3>
+                        <div style="color: #888; font-family: monospace;">🆔 ${request.creatorId || '---'}</div>
+                        ${request.isGuest ? '<div style="color: #f59e0b; font-size: 0.8rem;">👤 مستخدم زائر (غير مسجل)</div>' : ''}
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px;">
+                        <div class="info-row">
+                            <span class="label">📧 البريد الإلكتروني</span>
+                            <span class="value">${userData.email || request.creatorEmail || 'غير متوفر'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📱 رقم الهاتف</span>
+                            <span class="value">${userData.phone || request.creatorPhone || 'غير متوفر'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">👤 اسم المستخدم</span>
+                            <span class="value">${userData.username || 'غير متوفر'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">💰 الرصيد (EGP)</span>
+                            <span class="value">${userData.balanceEGP ? userData.balanceEGP.toFixed(2) : 'غير متوفر'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📛 اسم الغرفة</span>
+                            <span class="value">${request.name}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📝 وصف الغرفة</span>
+                            <span class="value">${request.description || 'لا يوجد'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📅 تاريخ الطلب</span>
+                            <span class="value">${request.createdAt ? new Date(request.createdAt).toLocaleString('ar-EG') : '---'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📊 حالة الطلب</span>
+                            <span class="value" style="color: ${request.status === 'approved' ? '#10b981' : request.status === 'pending' ? '#f59e0b' : '#ef4444'};">
+                                ${request.status === 'approved' ? '✅ تمت الموافقة' : 
+                                  request.status === 'pending' ? '🟡 قيد الانتظار' : 
+                                  '❌ مرفوض'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('creatorModal').classList.add('active');
+
+            } catch (error) {
+                console.error('Error loading creator info:', error);
+                showToast('❌ حدث خطأ في تحميل بيانات المنشيء', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🔔 SEND NOTIFICATION
+        // ============================================================
+        async function sendNotification(userId, title, message) {
+            if (!database) return;
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
+
+                if (!snapshot.exists()) {
+                    console.warn('User not found:', userId);
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+
+                await database.ref('users/' + userKey + '/notifications').push({
+                    text: `${title}\n${message}`,
+                    date: new Date().toLocaleString('ar-EG'),
+                    read: false,
+                    type: 'room_request'
+                });
+
+            } catch (error) {
+                console.error('Error sending notification:', error);
+            }
+        }
+
+        // ============================================================
+        // 🍞 TOAST SYSTEM
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // ============================================================
+        // 🖥️ MODAL FUNCTIONS
+        // ============================================================
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // ============================================================
+        // 🚀 INIT ON PAGE LOAD
+        // ============================================================
+        window.onload = function() {
+            // تحميل الطلبات مباشرة بدون أي تحقق
+            loadRequests('pending');
+
+            // الاستماع للتحديثات
+            if (database) {
+                database.ref('room_requests').on('value', () => {
+                    loadRequests(currentTab);
+                });
+            }
+
+            console.log('👑 لوحة إدارة الغرف جاهزة (وضع الاختبار)');
+            showToast('👑 مرحباً بك في لوحة الإدارة (وضع الاختبار)', 'info');
+        };
+    </script>
+</body>
+</html>
