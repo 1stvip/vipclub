@@ -366,35 +366,32 @@
             border: 1px solid rgba(251, 191, 36, 0.3);
             color: #fbbf24;
         }
-        .connection-status.testing {
-            display: block;
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            color: #3b82f6;
-        }
 
         .debug-panel {
             position: fixed;
             bottom: 140px;
             right: 15px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px;
             padding: 10px;
-            max-width: 250px;
-            font-size: 0.6rem;
+            max-width: 300px;
+            font-size: 0.55rem;
             color: #888;
             z-index: 999;
             display: none;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
+            direction: ltr;
+            font-family: monospace;
         }
         .debug-panel.active {
             display: block;
         }
         .debug-panel .debug-line {
             padding: 2px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            word-break: break-all;
         }
         .debug-panel .debug-line.success { color: #10b981; }
         .debug-panel .debug-line.error { color: #ef4444; }
@@ -429,7 +426,7 @@
             .chat-area { width: 75%; height: 180px; }
             .audio-controls { bottom: 75px; right: 12px; gap: 6px; }
             .audio-btn { width: 38px; height: 38px; font-size: 1rem; }
-            .debug-panel { bottom: 130px; right: 10px; max-width: 200px; }
+            .debug-panel { bottom: 130px; right: 10px; max-width: 220px; }
             .btn-debug { bottom: 130px; right: 55px; }
         }
 
@@ -443,7 +440,7 @@
             .audio-controls { bottom: 65px; right: 10px; gap: 5px; }
             .audio-btn { width: 34px; height: 34px; font-size: 0.85rem; }
             .btn-leave-seat { width: 34px; height: 34px; font-size: 0.85rem; }
-            .debug-panel { bottom: 120px; right: 10px; max-width: 160px; font-size: 0.5rem; }
+            .debug-panel { bottom: 120px; right: 10px; max-width: 180px; font-size: 0.5rem; }
             .btn-debug { bottom: 120px; right: 50px; width: 26px; height: 26px; font-size: 0.6rem; }
         }
     </style>
@@ -543,9 +540,7 @@
         let roomInitialized = false;
         let isSpeakerActive = true;
 
-        // ============================================================
-        // 🔗 WebRTC Variables
-        // ============================================================
+        // WebRTC Variables
         let peerConnections = {};
         let peerStreams = {};
         let audioContext = null;
@@ -557,6 +552,8 @@
         let debugLogs = [];
         let isDebugActive = false;
         let signalingListener = null;
+        let connectionTimers = {};
+        let isInitiator = {};
 
         const SEATS_LAYOUT = [
             { row: 0, seats: 1 },
@@ -941,19 +938,16 @@
         }
 
         // ============================================================
-        // 🔗 WEBRTC PEER CONNECTIONS مع TURN متعددة
+        // 🔗 WEBRTC PEER CONNECTIONS - نسخة مصححة
         // ============================================================
         function getPeerConnectionConfig() {
             return {
                 iceServers: [
-                    // Google STUN servers
                     { urls: 'stun:stun.l.google.com:19302' },
                     { urls: 'stun:stun1.l.google.com:19302' },
                     { urls: 'stun:stun2.l.google.com:19302' },
                     { urls: 'stun:stun3.l.google.com:19302' },
                     { urls: 'stun:stun4.l.google.com:19302' },
-                    
-                    // TURN servers متعددة
                     {
                         urls: [
                             'turn:openrelay.metered.ca:80',
@@ -962,12 +956,6 @@
                         ],
                         username: 'openrelayproject',
                         credential: 'openrelayproject'
-                    },
-                    // TURN server آخر كبديل
-                    {
-                        urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
-                        username: 'webrtc',
-                        credential: 'webrtc'
                     }
                 ],
                 iceCandidatePoolSize: 10,
@@ -983,10 +971,7 @@
             
             if (!seats) return;
             
-            const seatKeys = Object.keys(seats);
-            addDebugLog(`عدد المقاعد: ${seatKeys.length}`, 'info');
-            
-            for (const index of seatKeys) {
+            for (const index in seats) {
                 const seat = seats[index];
                 if (seat.userId !== currentUser.numericId && seat.userId) {
                     addDebugLog(`إنشاء اتصال مع مقعد ${index} (${seat.username})`, 'info');
@@ -1008,7 +993,6 @@
                 }
             }
             
-            // Remove connections for seats that are no longer occupied
             for (const index of currentPeers) {
                 if (!activeSeats.includes(index)) {
                     addDebugLog(`إغلاق اتصال مع مقعد ${index} (غير موجود)`, 'warning');
@@ -1016,13 +1000,11 @@
                 }
             }
             
-            // Create connections for new seats
             for (const index of activeSeats) {
                 if (!peerConnections[index]) {
                     addDebugLog(`إنشاء اتصال مع مقعد ${index} (جديد)`, 'info');
                     createPeerConnection(index, seats[index].userId);
                 } else {
-                    // Check connection state and reconnect if needed
                     const pc = peerConnections[index];
                     if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected' || pc.connectionState === 'closed') {
                         addDebugLog(`إعادة إنشاء اتصال مع مقعد ${index} (حالة: ${pc.connectionState})`, 'warning');
@@ -1043,14 +1025,13 @@
                 const config = getPeerConnectionConfig();
                 const pc = new RTCPeerConnection(config);
                 peerConnections[seatIndex] = pc;
+                isInitiator[seatIndex] = false;
                 addDebugLog(`✅ تم إنشاء PeerConnection مع مقعد ${seatIndex}`, 'success');
                 
-                // Add local stream tracks
                 mediaStream.getTracks().forEach(track => {
                     pc.addTrack(track, mediaStream);
                 });
                 
-                // Handle incoming tracks
                 pc.ontrack = (event) => {
                     const [stream] = event.streams;
                     if (stream) {
@@ -1062,20 +1043,22 @@
                     }
                 };
                 
-                // Handle ICE candidates
                 pc.onicecandidate = (event) => {
                     if (event.candidate) {
                         addDebugLog(`📡 إرسال مرشح ICE لمقعد ${seatIndex}`, 'info');
                         sendSignalingMessage(userId, {
                             type: 'candidate',
-                            candidate: event.candidate,
+                            candidate: {
+                                candidate: event.candidate.candidate,
+                                sdpMid: event.candidate.sdpMid,
+                                sdpMLineIndex: event.candidate.sdpMLineIndex
+                            },
                             from: currentUser.numericId,
                             seatIndex: mySeatIndex
                         });
                     }
                 };
                 
-                // Handle connection state changes
                 pc.onconnectionstatechange = () => {
                     const state = pc.connectionState;
                     addDebugLog(`📊 حالة الاتصال لمقعد ${seatIndex}: ${state}`, 'info');
@@ -1088,7 +1071,6 @@
                     } else if (state === 'disconnected') {
                         updateConnectionStatus('disconnected');
                         addDebugLog(`⚠️ انقطاع الاتصال مع مقعد ${seatIndex}`, 'warning');
-                        // Try to reconnect
                         if (!reconnectAttempts[seatIndex]) {
                             reconnectAttempts[seatIndex] = 0;
                         }
@@ -1097,9 +1079,6 @@
                             addDebugLog(`🔄 محاولة إعادة الاتصال ${reconnectAttempts[seatIndex]}/5 مع مقعد ${seatIndex}`, 'warning');
                             setTimeout(() => {
                                 closePeerConnection(seatIndex);
-                                if (seatsListener) {
-                                    // Will be recreated by seats listener
-                                }
                             }, 3000 * reconnectAttempts[seatIndex]);
                         }
                     } else if (state === 'failed') {
@@ -1111,38 +1090,34 @@
                     }
                 };
                 
-                // Handle ICE connection state
                 pc.oniceconnectionstatechange = () => {
                     const state = pc.iceConnectionState;
                     addDebugLog(`🧊 حالة ICE لمقعد ${seatIndex}: ${state}`, 'info');
-                    
                     if (state === 'connected' || state === 'completed') {
                         updateConnectionStatus('connected');
                     } else if (state === 'failed') {
                         updateConnectionStatus('disconnected');
                         addDebugLog(`❌ فشل ICE لمقعد ${seatIndex}`, 'error');
-                    } else if (state === 'disconnected') {
-                        updateConnectionStatus('disconnected');
                     }
                 };
                 
-                // Handle negotiation needed
                 pc.onnegotiationneeded = () => {
                     addDebugLog(`🔄 تفاوض مطلوب مع مقعد ${seatIndex}`, 'info');
-                    if (mySeatIndex !== -1) {
-                        createOffer(seatIndex, userId);
+                    if (mySeatIndex !== -1 && !isInitiator[seatIndex]) {
+                        isInitiator[seatIndex] = true;
+                        setTimeout(() => {
+                            createOffer(seatIndex, userId);
+                        }, 500);
                     }
                 };
                 
-                // If we're the one initiating
-                if (mySeatIndex !== -1) {
-                    // Both sides can initiate, let the lower seat index initiate
-                    if (mySeatIndex < seatIndex) {
-                        setTimeout(() => {
-                            addDebugLog(`📤 بدء عرض (Offer) لمقعد ${seatIndex}`, 'info');
-                            createOffer(seatIndex, userId);
-                        }, 1000);
-                    }
+                // Only one side should initiate - the one with lower seat index
+                if (mySeatIndex !== -1 && mySeatIndex < seatIndex) {
+                    setTimeout(() => {
+                        addDebugLog(`📤 بدء عرض (Offer) لمقعد ${seatIndex} (المبادئ: ${mySeatIndex} < ${seatIndex})`, 'info');
+                        isInitiator[seatIndex] = true;
+                        createOffer(seatIndex, userId);
+                    }, 1000);
                 }
                 
             } catch (error) {
@@ -1173,7 +1148,10 @@
                 addDebugLog(`📤 إرسال العرض لمقعد ${seatIndex}`, 'info');
                 sendSignalingMessage(userId, {
                     type: 'offer',
-                    sdp: pc.localDescription,
+                    sdp: {
+                        type: pc.localDescription.type,
+                        sdp: pc.localDescription.sdp
+                    },
                     from: currentUser.numericId,
                     seatIndex: mySeatIndex
                 });
@@ -1205,7 +1183,6 @@
                     playPromise.catch(e => {
                         console.warn('Error playing audio:', e);
                         addDebugLog(`⚠️ خطأ في تشغيل الصوت لمقعد ${seatIndex}: ${e.message}`, 'warning');
-                        // Try again after user interaction
                         const clickHandler = () => {
                             audio.play().catch(() => {});
                             document.removeEventListener('click', clickHandler);
@@ -1240,6 +1217,7 @@
             }
             delete reconnectAttempts[seatIndex];
             delete iceConnectionStates[seatIndex];
+            delete isInitiator[seatIndex];
         }
 
         function closeAllPeerConnections() {
@@ -1253,12 +1231,13 @@
             peerStreams = {};
             reconnectAttempts = {};
             iceConnectionStates = {};
+            isInitiator = {};
             
             document.querySelectorAll('[id^="peer-audio-"]').forEach(el => el.remove());
         }
 
         // ============================================================
-        // 📡 SIGNALING SYSTEM
+        // 📡 SIGNALING SYSTEM - نسخة مصححة
         // ============================================================
         function listenSignaling() {
             if (!database) return;
@@ -1271,7 +1250,6 @@
                 if (signal.to === currentUser.numericId) {
                     addDebugLog(`📩 استلام إشارة من ${signal.from} (نوع: ${signal.type})`, 'info');
                     handleSignal(signal);
-                    // Remove after processing
                     snapshot.ref.remove().catch(() => {});
                 }
             });
@@ -1301,47 +1279,30 @@
             try {
                 if (type === 'offer') {
                     addDebugLog(`📥 استلام عرض (Offer) من مقعد ${seatIndex}`, 'info');
+                    
+                    // Get or create peer connection
                     let pc = peerConnections[seatIndex];
                     if (!pc) {
-                        // Create connection if it doesn't exist
-                        addDebugLog(`🔄 إنشاء اتصال جديد لمقعد ${seatIndex}`, 'info');
+                        addDebugLog(`🔄 إنشاء اتصال جديد لمقعد ${seatIndex} للرد على العرض`, 'info');
                         const seatsSnapshot = database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
                         seatsSnapshot.then(snap => {
                             const seat = snap.val();
                             if (seat && seat.userId) {
                                 createPeerConnection(seatIndex, seat.userId);
                                 setTimeout(() => {
-                                    // Retry handling after connection created
-                                    addDebugLog(`🔄 إعادة معالجة العرض لمقعد ${seatIndex}`, 'info');
-                                    handleSignal(signal);
+                                    // Retry after connection created
+                                    const newPc = peerConnections[seatIndex];
+                                    if (newPc) {
+                                        handleOffer(newPc, seatIndex, from, sdp);
+                                    }
                                 }, 1500);
                             }
                         });
                         return;
                     }
                     
-                    pc.setRemoteDescription(new RTCSessionDescription(sdp))
-                        .then(() => {
-                            addDebugLog(`✅ تم تعيين الوصف البعيد لمقعد ${seatIndex}`, 'success');
-                            return pc.createAnswer();
-                        })
-                        .then(answer => {
-                            addDebugLog(`✅ تم إنشاء الإجابة لمقعد ${seatIndex}`, 'success');
-                            return pc.setLocalDescription(answer);
-                        })
-                        .then(() => {
-                            addDebugLog(`📤 إرسال الإجابة لمقعد ${seatIndex}`, 'info');
-                            sendSignalingMessage(from, {
-                                type: 'answer',
-                                sdp: pc.localDescription,
-                                from: currentUser.numericId,
-                                seatIndex: mySeatIndex
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error handling offer:', error);
-                            addDebugLog(`❌ خطأ في معالجة العرض: ${error.message}`, 'error');
-                        });
+                    handleOffer(pc, seatIndex, from, sdp);
+                    
                 } else if (type === 'answer') {
                     addDebugLog(`📥 استلام إجابة (Answer) من مقعد ${seatIndex}`, 'info');
                     const pc = peerConnections[seatIndex];
@@ -1357,26 +1318,69 @@
                     } else {
                         addDebugLog(`⚠️ لا يوجد PeerConnection لمقعد ${seatIndex} للإجابة`, 'warning');
                     }
+                    
                 } else if (type === 'candidate') {
                     addDebugLog(`📥 استلام مرشح ICE من مقعد ${seatIndex}`, 'info');
                     const pc = peerConnections[seatIndex];
-                    if (pc) {
-                        pc.addIceCandidate(new RTCIceCandidate(candidate))
-                            .then(() => {
-                                addDebugLog(`✅ تم إضافة مرشح ICE لمقعد ${seatIndex}`, 'success');
-                            })
-                            .catch(error => {
-                                console.error('Error adding ICE candidate:', error);
-                                addDebugLog(`❌ خطأ في إضافة مرشح ICE: ${error.message}`, 'error');
+                    if (pc && candidate && candidate.candidate) {
+                        try {
+                            const iceCandidate = new RTCIceCandidate({
+                                candidate: candidate.candidate,
+                                sdpMid: candidate.sdpMid || '',
+                                sdpMLineIndex: candidate.sdpMLineIndex || 0
                             });
+                            pc.addIceCandidate(iceCandidate)
+                                .then(() => {
+                                    addDebugLog(`✅ تم إضافة مرشح ICE لمقعد ${seatIndex}`, 'success');
+                                })
+                                .catch(error => {
+                                    console.error('Error adding ICE candidate:', error);
+                                    addDebugLog(`❌ خطأ في إضافة مرشح ICE: ${error.message}`, 'error');
+                                });
+                        } catch (error) {
+                            addDebugLog(`❌ خطأ في بناء مرشح ICE: ${error.message}`, 'error');
+                        }
                     } else {
-                        addDebugLog(`⚠️ لا يوجد PeerConnection لمقعد ${seatIndex} للمرشح`, 'warning');
+                        addDebugLog(`⚠️ مرشح ICE غير صالح لمقعد ${seatIndex}`, 'warning');
                     }
                 }
             } catch (error) {
                 console.error('Error handling signal:', error);
                 addDebugLog(`❌ خطأ في معالجة الإشارة: ${error.message}`, 'error');
             }
+        }
+
+        function handleOffer(pc, seatIndex, from, sdp) {
+            if (!sdp || !sdp.sdp) {
+                addDebugLog(`❌ عرض غير صالح لمقعد ${seatIndex}`, 'error');
+                return;
+            }
+            
+            pc.setRemoteDescription(new RTCSessionDescription(sdp))
+                .then(() => {
+                    addDebugLog(`✅ تم تعيين الوصف البعيد لمقعد ${seatIndex}`, 'success');
+                    return pc.createAnswer();
+                })
+                .then(answer => {
+                    addDebugLog(`✅ تم إنشاء الإجابة لمقعد ${seatIndex}`, 'success');
+                    return pc.setLocalDescription(answer);
+                })
+                .then(() => {
+                    addDebugLog(`📤 إرسال الإجابة لمقعد ${seatIndex}`, 'info');
+                    sendSignalingMessage(from, {
+                        type: 'answer',
+                        sdp: {
+                            type: pc.localDescription.type,
+                            sdp: pc.localDescription.sdp
+                        },
+                        from: currentUser.numericId,
+                        seatIndex: mySeatIndex
+                    });
+                })
+                .catch(error => {
+                    console.error('Error handling offer:', error);
+                    addDebugLog(`❌ خطأ في معالجة العرض: ${error.message}`, 'error');
+                });
         }
 
         // ============================================================
@@ -1546,7 +1550,6 @@
                 btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">السماعة مكتومة</span>';
                 showToast('🔇 تم كتم السماعة', 'warning');
                 addDebugLog('🔇 كتم السماعة', 'warning');
-                // Mute all peer streams
                 for (const index in peerStreams) {
                     const audio = document.getElementById(`peer-audio-${index}`);
                     if (audio) {
@@ -1558,7 +1561,6 @@
                 btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">السماعة نشطة</span>';
                 showToast('🔊 تم تفعيل السماعة', 'success');
                 addDebugLog('🔊 تفعيل السماعة', 'success');
-                // Unmute all peer streams
                 for (const index in peerStreams) {
                     const audio = document.getElementById(`peer-audio-${index}`);
                     if (audio) {
@@ -1768,8 +1770,6 @@
                 el.innerHTML = '❌ انقطاع الاتصال... جاري إعادة المحاولة';
             } else if (status === 'connecting') {
                 el.innerHTML = '🔄 جاري الاتصال بالصوت...';
-            } else if (status === 'testing') {
-                el.innerHTML = '🧪 جاري اختبار الاتصال...';
             }
         }
 
