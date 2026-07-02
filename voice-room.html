@@ -1023,7 +1023,7 @@
         }
 
         // ============================================================
-        // 🚀 INIT ROOM (محسّن للسرعة - بدون مستخدمين وهميين)
+        // 🚀 INIT ROOM - عرض المقاعد مباشرة
         // ============================================================
         function initRoom() {
             if (roomInitialized) return;
@@ -1037,6 +1037,9 @@
             }
             currentUser = getCurrentUser();
             document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
+            
+            // عرض المقاعد فوراً حتى قبل تحميل البيانات
+            renderSeatsPyramid({});
             
             loadRoomDataAndCheckBan();
         }
@@ -1075,7 +1078,7 @@
                 addChatMessage('system', `👑 مالك الغرفة: ${roomData.creatorName || 'غير معروف'}`, null, null, '');
                 addChatMessage('system', `🔑 معرف الغرفة: ${roomId}`, null, null, '');
                 
-                // تحميل المقاعد فوراً
+                // تحميل المقاعد
                 loadSeats();
                 
                 listenRoomUpdates();
@@ -1089,7 +1092,7 @@
         }
 
         // ============================================================
-        // 💺 LOAD SEATS (تحميل سريع)
+        // 💺 LOAD SEATS
         // ============================================================
         async function loadSeats() {
             if (!database || !roomId) return;
@@ -1100,6 +1103,8 @@
                 renderSeatsPyramid(seats);
             } catch (error) {
                 console.error('Error loading seats:', error);
+                // في حالة الخطأ، نعرض المقاعد الفارغة
+                renderSeatsPyramid({});
             }
         }
 
@@ -1117,7 +1122,7 @@
         }
 
         // ============================================================
-        // 💺 SEATS MANAGEMENT (بدون مستخدمين وهميين)
+        // 💺 SEATS MANAGEMENT - تعرض جميع المقاعد دائماً
         // ============================================================
         function listenSeats() {
             if (!database) return;
@@ -1171,8 +1176,15 @@
                     const isMuted = seat && seat.muted === true;
                     const isSpeakerOff = seat && seat.speakerMuted === true;
 
-                    // حدث النقر على المقعد المشغول لعرض الملف الشخصي
-                    const clickHandler = isOccupied ? `onclick="openProfilePopup('${globalIndex}')"` : '';
+                    // حدث النقر على المقعد
+                    let clickHandler = '';
+                    if (isOccupied) {
+                        clickHandler = `onclick="openProfilePopup('${globalIndex}')"`;
+                    } else if (!isOwnerSeat) {
+                        clickHandler = `onclick="joinSeat(${globalIndex})"`;
+                    } else if (isOwnerSeat && isOwner) {
+                        clickHandler = `onclick="joinSeat(${globalIndex})"`;
+                    }
 
                     html += `
                         <div class="${seatClass}" ${clickHandler}>
@@ -1211,17 +1223,6 @@
                                 ${isOwner && isOwnerSeat && isOccupied && isMySeat ? `
                                     <div class="seat-actions" onclick="event.stopPropagation();">
                                         <button class="btn-close-seat" onclick="event.stopPropagation();leaveSeat()">🚪 مغادرة</button>
-                                    </div>
-                                ` : ''}
-                                ${isOwner && !isOccupied && !isOwnerSeat ? `
-                                    <div class="seat-actions" onclick="event.stopPropagation();">
-                                        <button class="btn-open-seat" onclick="event.stopPropagation();openSeat(${globalIndex})">🔓 فتح</button>
-                                        <button class="btn-invite" onclick="event.stopPropagation();inviteUser(${globalIndex})">📩 دعوة</button>
-                                    </div>
-                                ` : ''}
-                                ${isOwner && isOwnerSeat && !isOccupied ? `
-                                    <div class="seat-actions" onclick="event.stopPropagation();">
-                                        <button class="btn-open-seat" onclick="event.stopPropagation();openSeat(${globalIndex})">🔓 فتح</button>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -1852,7 +1853,6 @@
             }
             document.getElementById('micOverlay').style.display = 'flex';
             console.log('🎙️ جاهز لطلب إذن الميكروفون');
-            console.log('⚠️ لا يوجد مستخدمين وهميين - فقط المستخدمين الحقيقيين');
         };
 
         // ============================================================
