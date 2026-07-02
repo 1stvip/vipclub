@@ -633,10 +633,6 @@
             margin-bottom: 10px;
             font-weight: bold;
         }
-        .profile-popup .popup-role.moderator {
-            background: #60a5fa;
-            color: white;
-        }
 
         .profile-popup .popup-actions {
             display: flex;
@@ -826,9 +822,7 @@
             <span class="status-item" id="popupMicStatus"><i class="fas fa-microphone" style="color:#10b981;"></i> ميكروفون نشط</span>
             <span class="status-item" id="popupSpeakerStatus"><i class="fas fa-volume-up" style="color:#3b82f6;"></i> سماعة نشطة</span>
         </div>
-        <div class="popup-actions" id="popupActions">
-            <!-- سيتم إضافة الأزرار ديناميكياً حسب صلاحيات المستخدم -->
-        </div>
+        <div class="popup-actions" id="popupActions"></div>
     </div>
 
     <main>
@@ -933,6 +927,7 @@
         let audioContext = null;
         let isSpeakerActive = true;
         let selectedUser = null;
+        let seatsCache = {};
 
         // ============================================================
         // 🎯 GET ROOM ID FROM URL
@@ -1028,7 +1023,7 @@
         }
 
         // ============================================================
-        // 🚀 INIT ROOM
+        // 🚀 INIT ROOM (محسّن للسرعة)
         // ============================================================
         function initRoom() {
             if (roomInitialized) return;
@@ -1047,7 +1042,7 @@
         }
 
         // ============================================================
-        // 📋 LOAD ROOM DATA AND CHECK BAN
+        // 📋 LOAD ROOM DATA AND CHECK BAN (محسّن)
         // ============================================================
         async function loadRoomDataAndCheckBan() {
             if (!database) return;
@@ -1080,6 +1075,9 @@
                 addChatMessage('system', `👑 مالك الغرفة: ${roomData.creatorName || 'غير معروف'}`, null, null, '');
                 addChatMessage('system', `🔑 معرف الغرفة: ${roomId}`, null, null, '');
                 
+                // تحميل المقاعد فوراً
+                loadSeats();
+                
                 listenRoomUpdates();
                 listenChat();
                 listenSeats();
@@ -1087,6 +1085,21 @@
                 
             } catch (error) {
                 console.error('Error loading room:', error);
+            }
+        }
+
+        // ============================================================
+        // 💺 LOAD SEATS (تحميل سريع)
+        // ============================================================
+        async function loadSeats() {
+            if (!database || !roomId) return;
+            try {
+                const snapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+                const seats = snapshot.val() || {};
+                seatsCache = seats;
+                renderSeatsPyramid(seats);
+            } catch (error) {
+                console.error('Error loading seats:', error);
             }
         }
 
@@ -1104,12 +1117,13 @@
         }
 
         // ============================================================
-        // 💺 SEATS MANAGEMENT - عرض جميع المقاعد
+        // 💺 SEATS MANAGEMENT (محسّن)
         // ============================================================
         function listenSeats() {
             if (!database) return;
             seatsListener = database.ref('rooms/' + roomId + '/seats').on('value', (snapshot) => {
                 const seats = snapshot.val() || {};
+                seatsCache = seats;
                 renderSeatsPyramid(seats);
             });
         }
@@ -1143,7 +1157,6 @@
                     let avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
                     let seatClass = 'seat';
                     
-                    // المقعد الأول خاص بالمالك
                     if (isOwnerSeat) {
                         seatClass += ' owner-seat';
                     } else if (isOccupied) {
@@ -1235,86 +1248,74 @@
             container.innerHTML = html;
             document.getElementById('seatsCount').textContent = `(${occupied}/${globalIndex})`;
             document.getElementById('chatOnlineCount').textContent = occupied + ' متصل';
-            
-            // إذا لم يكن هناك مستخدمين، نضيف رسالة ترحيب
-            if (occupied === 0 && !isOwner) {
-                // لا تفعل شيء، المقاعد الفارغة ظاهرة
-            }
         }
 
         // ============================================================
         // 👤 PROFILE POPUP
         // ============================================================
         function openProfilePopup(seatIndex) {
-            database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value').then((snapshot) => {
-                const seat = snapshot.val();
-                if (!seat) return;
+            const seat = seatsCache[seatIndex];
+            if (!seat) return;
 
-                selectedUser = {
-                    seatIndex: seatIndex,
-                    userId: seat.userId,
-                    username: seat.username,
-                    isOwner: seat.isOwner === true,
-                    isMuted: seat.muted === true,
-                    isSpeakerOff: seat.speakerMuted === true,
-                    isSpeaking: seat.speaking === true,
-                    color: seat.color || '#667eea'
-                };
+            selectedUser = {
+                seatIndex: seatIndex,
+                userId: seat.userId,
+                username: seat.username,
+                isOwner: seat.isOwner === true,
+                isMuted: seat.muted === true,
+                isSpeakerOff: seat.speakerMuted === true,
+                isSpeaking: seat.speaking === true,
+                color: seat.color || '#667eea'
+            };
 
-                document.getElementById('popupAvatar').textContent = selectedUser.username.charAt(0).toUpperCase();
-                document.getElementById('popupAvatar').style.background = `linear-gradient(135deg, ${selectedUser.color}, #4a3f7a)`;
-                document.getElementById('popupName').textContent = selectedUser.username;
-                document.getElementById('popupId').textContent = `🔑 ${selectedUser.userId || '---'}`;
-                
-                const roleEl = document.getElementById('popupRole');
-                if (selectedUser.isOwner) {
-                    roleEl.textContent = '👑 مالك الغرفة';
-                    roleEl.className = 'popup-role';
-                } else {
-                    roleEl.textContent = '👤 عضو';
-                    roleEl.className = 'popup-role';
-                }
+            document.getElementById('popupAvatar').textContent = selectedUser.username.charAt(0).toUpperCase();
+            document.getElementById('popupAvatar').style.background = `linear-gradient(135deg, ${selectedUser.color}, #4a3f7a)`;
+            document.getElementById('popupName').textContent = selectedUser.username;
+            document.getElementById('popupId').textContent = `🔑 ${selectedUser.userId || '---'}`;
+            
+            const roleEl = document.getElementById('popupRole');
+            if (selectedUser.isOwner) {
+                roleEl.textContent = '👑 مالك الغرفة';
+            } else {
+                roleEl.textContent = '👤 عضو';
+            }
 
-                const micStatus = document.getElementById('popupMicStatus');
-                if (selectedUser.isMuted) {
-                    micStatus.innerHTML = '<i class="fas fa-microphone-slash" style="color:#ef4444;"></i> ميكروفون مكتوم';
-                } else {
-                    micStatus.innerHTML = '<i class="fas fa-microphone" style="color:#10b981;"></i> ميكروفون نشط';
-                }
+            const micStatus = document.getElementById('popupMicStatus');
+            if (selectedUser.isMuted) {
+                micStatus.innerHTML = '<i class="fas fa-microphone-slash" style="color:#ef4444;"></i> ميكروفون مكتوم';
+            } else {
+                micStatus.innerHTML = '<i class="fas fa-microphone" style="color:#10b981;"></i> ميكروفون نشط';
+            }
 
-                const speakerStatus = document.getElementById('popupSpeakerStatus');
-                if (selectedUser.isSpeakerOff) {
-                    speakerStatus.innerHTML = '<i class="fas fa-volume-mute" style="color:#6b7280;"></i> سماعة مكتومة';
-                } else {
-                    speakerStatus.innerHTML = '<i class="fas fa-volume-up" style="color:#3b82f6;"></i> سماعة نشطة';
-                }
+            const speakerStatus = document.getElementById('popupSpeakerStatus');
+            if (selectedUser.isSpeakerOff) {
+                speakerStatus.innerHTML = '<i class="fas fa-volume-mute" style="color:#6b7280;"></i> سماعة مكتومة';
+            } else {
+                speakerStatus.innerHTML = '<i class="fas fa-volume-up" style="color:#3b82f6;"></i> سماعة نشطة';
+            }
 
-                const actionsDiv = document.getElementById('popupActions');
-                actionsDiv.innerHTML = '';
-                
-                if (isOwner && !selectedUser.isOwner && selectedUser.userId !== currentUser.numericId) {
-                    actionsDiv.innerHTML = `
-                        <button class="btn-kick" onclick="kickUser(${seatIndex}); closeProfilePopup();">✖ طرد</button>
-                        <button class="btn-mute" onclick="muteUser(${seatIndex}); closeProfilePopup();">🔇 كتم</button>
-                        <button class="btn-ban" onclick="banUser(${seatIndex}); closeProfilePopup();">🚫 حظر</button>
-                    `;
-                } else if (selectedUser.userId === currentUser.numericId) {
-                    actionsDiv.innerHTML = `
-                        <button class="btn-msg" onclick="closeProfilePopup();" style="background:#10b981;">👤 أنت</button>
-                    `;
-                } else {
-                    actionsDiv.innerHTML = `
-                        <button class="btn-msg" onclick="closeProfilePopup(); sendPrivateMessage('${selectedUser.username}')">💬 رسالة</button>
-                    `;
-                }
+            const actionsDiv = document.getElementById('popupActions');
+            actionsDiv.innerHTML = '';
+            
+            if (isOwner && !selectedUser.isOwner && selectedUser.userId !== currentUser.numericId) {
+                actionsDiv.innerHTML = `
+                    <button class="btn-kick" onclick="kickUser(${seatIndex}); closeProfilePopup();">✖ طرد</button>
+                    <button class="btn-mute" onclick="muteUser(${seatIndex}); closeProfilePopup();">🔇 كتم</button>
+                    <button class="btn-ban" onclick="banUser(${seatIndex}); closeProfilePopup();">🚫 حظر</button>
+                `;
+            } else if (selectedUser.userId === currentUser.numericId) {
+                actionsDiv.innerHTML = `
+                    <button class="btn-msg" onclick="closeProfilePopup();" style="background:#10b981;">👤 أنت</button>
+                `;
+            } else {
+                actionsDiv.innerHTML = `
+                    <button class="btn-msg" onclick="closeProfilePopup(); sendPrivateMessage('${selectedUser.username}')">💬 رسالة</button>
+                `;
+            }
 
-                document.getElementById('profilePopup').classList.add('active');
-                document.getElementById('popupOverlay').classList.add('active');
-                document.body.style.overflow = 'hidden';
-
-            }).catch(err => {
-                console.error('Error opening profile:', err);
-            });
+            document.getElementById('profilePopup').classList.add('active');
+            document.getElementById('popupOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeProfilePopup() {
