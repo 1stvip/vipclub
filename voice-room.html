@@ -334,7 +334,6 @@
         .mic-overlay .mic-box .btn-skip { margin-top: 8px; background: transparent; color: #666; border: none; cursor: pointer; font-size: 0.8rem; transition: 0.3s; width: 100%; }
         .mic-overlay .mic-box .btn-skip:hover { color: #999; }
 
-        /* Connection Status */
         .connection-status {
             position: fixed;
             top: 60px;
@@ -490,6 +489,8 @@
         let audioAnalyser = null;
         let audioDataArray = null;
         let speakingCheckInterval = null;
+        let reconnectAttempts = {};
+        let iceConnectionStates = {};
 
         const SEATS_LAYOUT = [
             { row: 0, seats: 1 },
@@ -526,7 +527,13 @@
             statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري طلب الإذن...';
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
+                    audio: { 
+                        echoCancellation: true, 
+                        noiseSuppression: true, 
+                        autoGainControl: true,
+                        sampleRate: 48000,
+                        channelCount: 1
+                    }, 
                     video: false 
                 });
                 mediaStream = stream;
@@ -588,7 +595,7 @@
                     sum += audioDataArray[i];
                 }
                 const average = sum / audioDataArray.length;
-                return average / 255; // 0 to 1
+                return average / 255;
             } catch (e) {
                 return 0;
             }
@@ -676,10 +683,7 @@
                 listenChat();
                 listenSeats();
                 
-                // Start WebRTC signaling listener
                 listenSignaling();
-                
-                // Start speaking detection
                 startSpeakingDetection();
                 
             } catch (error) {
@@ -696,8 +700,6 @@
                 const snapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const seats = snapshot.val() || {};
                 renderSeatsPyramid(seats);
-                
-                // Initialize WebRTC connections for all seats
                 initializePeerConnections(seats);
             } catch (error) {
                 console.error('Error loading seats:', error);
@@ -835,18 +837,47 @@
         }
 
         // ============================================================
-        // 🔗 WEBRTC PEER CONNECTIONS
+        // 🔗 WEBRTC PEER CONNECTIONS مع TURN SERVER
         // ============================================================
+        function getPeerConnectionConfig() {
+            return {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' },
+                    // TURN servers لتجاوز جدران الحماية
+                    {
+                        urls: 'turn:openrelay.metered.ca:80',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    }
+                ],
+                iceCandidatePoolSize: 10,
+                iceTransportPolicy: 'all',
+                rtcpMuxPolicy: 'require'
+            };
+        }
+
         function initializePeerConnections(seats) {
-            // Close all existing connections
             closeAllPeerConnections();
             
             if (!seats) return;
             
-            // For each occupied seat that is not me, create a peer connection
             for (const index in seats) {
                 const seat = seats[index];
-                if (seat.userId !== currentUser.numericId) {
+                if (seat.userId !== currentUser.numericId && seat.userId) {
                     createPeerConnection(parseInt(index), seat.userId);
                 }
             }
@@ -859,41 +890,44 @@
             if (seats) {
                 for (const index in seats) {
                     const seat = seats[index];
-                    if (seat.userId !== currentUser.numericId) {
+                    if (seat.userId !== currentUser.numericId && seat.userId) {
                         activeSeats.push(parseInt(index));
                     }
                 }
             }
             
-            // Remove connections for seats that are no longer occupied
             for (const index of currentPeers) {
                 if (!activeSeats.includes(index)) {
                     closePeerConnection(index);
                 }
             }
             
-            // Create connections for new seats
             for (const index of activeSeats) {
                 if (!peerConnections[index]) {
                     createPeerConnection(index, seats[index].userId);
+                } else {
+                    // Check connection state and reconnect if needed
+                    const pc = peerConnections[index];
+                    if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+                        closePeerConnection(index);
+                        createPeerConnection(index, seats[index].userId);
+                    }
                 }
             }
         }
 
         function createPeerConnection(seatIndex, userId) {
-            if (!mediaStream) return;
+            if (!mediaStream) {
+                console.warn('No media stream available for peer connection');
+                return;
+            }
             
             try {
-                const config = {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' }
-                    ]
-                };
-                
+                const config = getPeerConnectionConfig();
                 const pc = new RTCPeerConnection(config);
+                peerConnections[seatIndex] = pc;
                 
-                // Add local stream
+                // Add local stream tracks
                 mediaStream.getTracks().forEach(track => {
                     pc.addTrack(track, mediaStream);
                 });
@@ -925,29 +959,66 @@
                 pc.onconnectionstatechange = () => {
                     const state = pc.connectionState;
                     console.log(`Connection state for seat ${seatIndex}: ${state}`);
+                    iceConnectionStates[seatIndex] = state;
                     
                     if (state === 'connected') {
                         updateConnectionStatus('connected');
-                    } else if (state === 'disconnected' || state === 'failed') {
+                        showToast('✅ تم الاتصال الصوتي', 'success');
+                    } else if (state === 'disconnected') {
                         updateConnectionStatus('disconnected');
-                        // Attempt to reconnect
+                        // Try to reconnect
+                        if (!reconnectAttempts[seatIndex]) {
+                            reconnectAttempts[seatIndex] = 0;
+                        }
+                        if (reconnectAttempts[seatIndex] < 3) {
+                            reconnectAttempts[seatIndex]++;
+                            setTimeout(() => {
+                                console.log(`Attempting to reconnect to seat ${seatIndex}`);
+                                closePeerConnection(seatIndex);
+                                if (seatsListener) {
+                                    // Will be recreated by seats listener
+                                }
+                            }, 3000);
+                        }
+                    } else if (state === 'failed') {
+                        updateConnectionStatus('disconnected');
+                        // Recreate connection
                         setTimeout(() => {
+                            closePeerConnection(seatIndex);
                             if (seatsListener) {
-                                seatsListener.off();
-                                listenSeats();
+                                // Will be recreated by seats listener
                             }
                         }, 5000);
                     }
                 };
                 
-                peerConnections[seatIndex] = pc;
+                // Handle ICE connection state
+                pc.oniceconnectionstatechange = () => {
+                    const state = pc.iceConnectionState;
+                    console.log(`ICE state for seat ${seatIndex}: ${state}`);
+                    
+                    if (state === 'connected' || state === 'completed') {
+                        updateConnectionStatus('connected');
+                    } else if (state === 'failed' || state === 'disconnected') {
+                        updateConnectionStatus('disconnected');
+                    }
+                };
                 
-                // Create offer if we're the one initiating
-                if (mySeatIndex !== -1) {
+                // Handle negotiation needed
+                pc.onnegotiationneeded = () => {
+                    if (mySeatIndex !== -1) {
+                        createOffer(seatIndex, userId);
+                    }
+                };
+                
+                // If we're the one initiating (owner or first seat)
+                if (mySeatIndex !== -1 && mySeatIndex < seatIndex) {
                     createOffer(seatIndex, userId);
                 }
+                
             } catch (error) {
                 console.error('Error creating peer connection:', error);
+                showToast('⚠️ خطأ في إنشاء الاتصال الصوتي', 'warning');
             }
         }
 
@@ -955,51 +1026,76 @@
             const pc = peerConnections[seatIndex];
             if (!pc) return;
             
-            pc.createOffer()
-                .then(offer => pc.setLocalDescription(offer))
-                .then(() => {
-                    sendSignalingMessage(userId, {
-                        type: 'offer',
-                        sdp: pc.localDescription,
-                        from: currentUser.numericId,
-                        seatIndex: mySeatIndex
-                    });
-                })
-                .catch(error => console.error('Error creating offer:', error));
+            pc.createOffer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: false
+            })
+            .then(offer => {
+                return pc.setLocalDescription(offer);
+            })
+            .then(() => {
+                sendSignalingMessage(userId, {
+                    type: 'offer',
+                    sdp: pc.localDescription,
+                    from: currentUser.numericId,
+                    seatIndex: mySeatIndex
+                });
+            })
+            .catch(error => {
+                console.error('Error creating offer:', error);
+                // Retry after delay
+                setTimeout(() => {
+                    if (peerConnections[seatIndex]) {
+                        createOffer(seatIndex, userId);
+                    }
+                }, 2000);
+            });
         }
 
         function playPeerStream(seatIndex, stream) {
-            // Create audio element for this stream
             const audioId = `peer-audio-${seatIndex}`;
             let audio = document.getElementById(audioId);
             if (!audio) {
                 audio = document.createElement('audio');
                 audio.id = audioId;
                 audio.autoplay = true;
+                audio.style.display = 'none';
                 document.body.appendChild(audio);
             }
             
+            audio.srcObject = stream;
+            
             if (isSpeakerActive) {
-                audio.srcObject = stream;
-                audio.play().catch(e => console.warn('Error playing audio:', e));
+                audio.play().catch(e => {
+                    console.warn('Error playing audio:', e);
+                    // Try again after user interaction
+                    document.addEventListener('click', function playOnClick() {
+                        audio.play().catch(() => {});
+                        document.removeEventListener('click', playOnClick);
+                    }, { once: true });
+                });
             } else {
-                audio.srcObject = null;
+                audio.pause();
             }
         }
 
         function closePeerConnection(seatIndex) {
             if (peerConnections[seatIndex]) {
-                peerConnections[seatIndex].close();
+                try {
+                    peerConnections[seatIndex].close();
+                } catch (e) {}
                 delete peerConnections[seatIndex];
             }
             if (peerStreams[seatIndex]) {
                 delete peerStreams[seatIndex];
             }
-            // Remove audio element
             const audio = document.getElementById(`peer-audio-${seatIndex}`);
             if (audio) {
+                audio.srcObject = null;
                 audio.remove();
             }
+            delete reconnectAttempts[seatIndex];
+            delete iceConnectionStates[seatIndex];
         }
 
         function closeAllPeerConnections() {
@@ -1010,13 +1106,14 @@
             }
             peerConnections = {};
             peerStreams = {};
+            reconnectAttempts = {};
+            iceConnectionStates = {};
             
-            // Remove all peer audio elements
             document.querySelectorAll('[id^="peer-audio-"]').forEach(el => el.remove());
         }
 
         // ============================================================
-        // 📡 SIGNALING SYSTEM
+        // 📡 SIGNALING SYSTEM مع إعادة المحاولة
         // ============================================================
         function listenSignaling() {
             if (!database) return;
@@ -1027,7 +1124,7 @@
                 if (signal.to === currentUser.numericId) {
                     handleSignal(signal);
                     // Remove after processing
-                    snapshot.ref.remove();
+                    snapshot.ref.remove().catch(() => {});
                 }
             });
         }
@@ -1046,13 +1143,27 @@
         }
 
         function handleSignal(signal) {
-            const { from, seatIndex, type } = signal.data;
+            const { from, seatIndex, type, sdp, candidate } = signal.data;
             
-            if (type === 'offer') {
-                // Handle offer from peer
-                const pc = peerConnections[seatIndex];
-                if (pc) {
-                    pc.setRemoteDescription(new RTCSessionDescription(signal.data.sdp))
+            try {
+                if (type === 'offer') {
+                    const pc = peerConnections[seatIndex];
+                    if (!pc) {
+                        // Create connection if it doesn't exist
+                        const seatsSnapshot = database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
+                        seatsSnapshot.then(snap => {
+                            const seat = snap.val();
+                            if (seat && seat.userId) {
+                                createPeerConnection(seatIndex, seat.userId);
+                                setTimeout(() => {
+                                    handleSignal(signal);
+                                }, 1000);
+                            }
+                        });
+                        return;
+                    }
+                    
+                    pc.setRemoteDescription(new RTCSessionDescription(sdp))
                         .then(() => pc.createAnswer())
                         .then(answer => pc.setLocalDescription(answer))
                         .then(() => {
@@ -1063,20 +1174,34 @@
                                 seatIndex: mySeatIndex
                             });
                         })
-                        .catch(error => console.error('Error handling offer:', error));
+                        .catch(error => {
+                            console.error('Error handling offer:', error);
+                            // Retry
+                            setTimeout(() => {
+                                if (peerConnections[seatIndex]) {
+                                    handleSignal(signal);
+                                }
+                            }, 2000);
+                        });
+                } else if (type === 'answer') {
+                    const pc = peerConnections[seatIndex];
+                    if (pc) {
+                        pc.setRemoteDescription(new RTCSessionDescription(sdp))
+                            .catch(error => {
+                                console.error('Error setting remote description:', error);
+                            });
+                    }
+                } else if (type === 'candidate') {
+                    const pc = peerConnections[seatIndex];
+                    if (pc) {
+                        pc.addIceCandidate(new RTCIceCandidate(candidate))
+                            .catch(error => {
+                                console.error('Error adding ICE candidate:', error);
+                            });
+                    }
                 }
-            } else if (type === 'answer') {
-                const pc = peerConnections[seatIndex];
-                if (pc) {
-                    pc.setRemoteDescription(new RTCSessionDescription(signal.data.sdp))
-                        .catch(error => console.error('Error setting remote description:', error));
-                }
-            } else if (type === 'candidate') {
-                const pc = peerConnections[seatIndex];
-                if (pc) {
-                    pc.addIceCandidate(new RTCIceCandidate(signal.data.candidate))
-                        .catch(error => console.error('Error adding ICE candidate:', error));
-                }
+            } catch (error) {
+                console.error('Error handling signal:', error);
             }
         }
 
@@ -1094,9 +1219,8 @@
                 if (!mediaStream) return;
                 
                 const volume = checkSpeaking();
-                const isSpeaking = volume > 0.15; // Threshold for speaking
+                const isSpeaking = volume > 0.12;
                 
-                // Update speaking status in Firebase
                 database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speaking').set(isSpeaking);
             }, 150);
         }
@@ -1163,7 +1287,6 @@
                 mySeatIndex = seatIndex;
                 document.getElementById('leaveSeatBtn').style.display = 'flex';
 
-                // Initialize WebRTC connections for all peers
                 const updatedSeats = await database.ref('rooms/' + roomId + '/seats').once('value');
                 initializePeerConnections(updatedSeats.val());
 
@@ -1197,7 +1320,6 @@
                 
                 await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
                 
-                // Close peer connections
                 closeAllPeerConnections();
                 
                 mySeatIndex = -1;
@@ -1259,10 +1381,6 @@
                     if (audio) {
                         audio.muted = false;
                         audio.play().catch(e => console.warn('Error playing audio:', e));
-                    }
-                    // Reconnect if needed
-                    if (peerConnections[index]) {
-                        // Re-add tracks if needed
                     }
                 }
             }
