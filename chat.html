@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👑 لوحة إدارة الغرف - VipChat</title>
+    <title>🎙️ VipChat - غرف الدردشة الصوتية</title>
     <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -20,204 +20,345 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: white;
         }
 
+        /* ===== HEADER ===== */
         header {
-            background: rgba(255,255,255,0.05);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
             padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             flex-wrap: wrap;
             gap: 10px;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .logo i {
+            font-size: 2rem;
             color: #ffd700;
         }
 
-        .header-actions {
+        .header-icons {
             display: flex;
-            gap: 10px;
             align-items: center;
+            gap: 12px;
+            position: relative;
+            flex-wrap: wrap;
         }
 
-        .btn-back {
-            padding: 10px 20px;
+        .icon-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
             background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
             color: white;
+            font-size: 1.3rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-decoration: none;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+            color: #ffd700;
+        }
+
+        .icon-btn .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 50%;
+            border: 2px solid #1a1a2e;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* ===== NOTIFICATION DROPDOWN ===== */
+        .notif-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 380px;
+            max-width: 90vw;
+            background: #1a1a2e;
+            border-radius: 15px;
+            border: 1px solid #333;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+            max-height: 500px;
+        }
+
+        .notif-dropdown.active {
+            display: flex;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .notif-header {
+            padding: 15px 20px;
+            background: #16213e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .notif-header h3 {
+            color: #ffd700;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-back:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
+        .notif-actions {
+            display: flex;
+            gap: 10px;
+            font-size: 0.75rem;
         }
 
-        .admin-badge {
-            background: #ffd700;
-            color: #1a1a2e;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.8rem;
+        .notif-actions span {
+            cursor: pointer;
+            color: #aaa;
+            transition: 0.3s;
+            padding: 3px 8px;
+            border-radius: 5px;
         }
 
+        .notif-actions span:hover {
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+        }
+
+        .notif-actions .delete-all:hover {
+            color: #ff4757;
+            background: rgba(255,71,87,0.1);
+        }
+
+        #notifList {
+            overflow-y: auto;
+            max-height: 350px;
+            min-height: 100px;
+        }
+
+        .notif-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #2a2a3e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            cursor: default;
+        }
+
+        .notif-item:hover {
+            background: #2a2a3e;
+        }
+
+        .notif-item.unread {
+            background: #1e2a4a;
+            border-right: 4px solid #ffd700;
+        }
+
+        .notif-item .notif-content {
+            flex: 1;
+        }
+
+        .notif-item .notif-text {
+            color: #eee;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .notif-item .notif-time {
+            color: #777;
+            font-size: 0.7rem;
+            margin-top: 3px;
+        }
+
+        .notif-item .notif-actions-btn {
+            display: flex;
+            gap: 8px;
+        }
+
+        .notif-item .notif-actions-btn i {
+            cursor: pointer;
+            color: #555;
+            transition: 0.3s;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .notif-item .notif-actions-btn i:hover {
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+        }
+
+        .notif-item .notif-actions-btn .delete-notif:hover {
+            color: #ff4757;
+            background: rgba(255,71,87,0.1);
+        }
+
+        .empty-notif {
+            padding: 40px 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .empty-notif i {
+            font-size: 2.5rem;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
         main {
             flex: 1;
             padding: 30px 5%;
         }
 
-        .admin-header {
+        .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
             gap: 15px;
         }
 
-        .admin-header h1 {
+        .page-header h1 {
+            color: #1a1a2e;
             font-size: 1.8rem;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .admin-header h1 i {
-            color: #ffd700;
+        .page-header h1 i {
+            color: #7c3aed;
         }
 
-        .admin-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .admin-tabs button {
-            padding: 10px 25px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.05);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: #aaa;
-        }
-
-        .admin-tabs button:hover {
-            border-color: #ffd700;
-            color: #ffd700;
-            background: rgba(255,215,0,0.05);
-        }
-
-        .admin-tabs button.active {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            color: white;
-            border-color: #7c3aed;
-        }
-
-        .admin-tabs button .count {
-            background: rgba(255,255,255,0.15);
-            padding: 2px 10px;
-            border-radius: 10px;
-            margin-right: 5px;
-        }
-
-        .requests-grid {
+        /* ===== ROOMS GRID ===== */
+        .rooms-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
         }
 
-        .request-card {
-            background: rgba(255,255,255,0.05);
+        .room-card {
+            background: white;
             border-radius: 16px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
+            border: 1px solid #eee;
+            position: relative;
         }
 
-        .request-card:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
         }
 
-        .request-card .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 10px;
+        .room-card .room-header {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            padding: 20px;
+            color: white;
+            position: relative;
         }
 
-        .request-card .room-id {
-            font-family: monospace;
-            background: rgba(255,255,255,0.1);
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            color: #aaa;
-        }
-
-        .request-card .status-badge {
-            padding: 4px 12px;
+        .room-card .room-header .room-id {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: bold;
+            letter-spacing: 1px;
+            backdrop-filter: blur(5px);
         }
 
-        .status-badge.pending { background: #f59e0b; color: #1a1a2e; }
-        .status-badge.approved { background: #10b981; color: white; }
-        .status-badge.rejected { background: #ef4444; color: white; }
+        .room-card .room-header .room-icon {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
 
-        .request-card .room-name {
+        .room-card .room-header .room-name {
             font-size: 1.2rem;
             font-weight: bold;
-            margin: 10px 0 5px;
+            margin-top: 5px;
         }
 
-        .request-card .room-desc {
-            color: #aaa;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 12px;
+        .room-card .room-body {
+            padding: 20px;
         }
 
-        .request-card .creator-info {
+        .room-card .room-body .room-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .room-card .room-body .room-creator {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 12px;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
         }
 
-        .request-card .creator-info .avatar {
+        .room-card .room-body .room-creator .creator-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -225,84 +366,199 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
             font-weight: bold;
             font-size: 1.2rem;
-            flex-shrink: 0;
         }
 
-        .request-card .creator-info .details {
+        .room-card .room-body .room-creator .creator-info {
             flex: 1;
         }
 
-        .request-card .creator-info .details .name {
+        .room-card .room-body .room-creator .creator-info .creator-name {
             font-weight: bold;
+            color: #1a1a2e;
         }
 
-        .request-card .creator-info .details .id {
+        .room-card .room-body .room-creator .creator-info .creator-id {
             font-size: 0.75rem;
             color: #888;
             font-family: monospace;
         }
 
-        .request-card .creator-info .details .contact {
-            font-size: 0.75rem;
-            color: #888;
-            margin-top: 2px;
-        }
-
-        .request-card .card-actions {
+        .room-card .room-footer {
+            padding: 15px 20px;
+            background: #f8fafc;
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
         }
 
-        .request-card .card-actions button {
-            flex: 1;
-            min-width: 80px;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .room-card .room-footer .room-stats {
+            display: flex;
+            gap: 15px;
             font-size: 0.85rem;
-        }
-
-        .request-card .card-actions button:hover {
-            transform: scale(1.02);
-        }
-
-        .btn-approve { background: #10b981; color: white; }
-        .btn-approve:hover { background: #059669; }
-        .btn-reject { background: #ef4444; color: white; }
-        .btn-reject:hover { background: #dc2626; }
-        .btn-view { background: #3b82f6; color: white; }
-        .btn-view:hover { background: #2563eb; }
-        .btn-delete { background: #dc2626; color: white; }
-        .btn-delete:hover { background: #b91c1c; }
-
-        .request-card .card-date {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
             color: #666;
         }
 
-        .empty-state i {
-            font-size: 3rem;
-            color: #444;
-            margin-bottom: 15px;
+        .room-card .room-footer .room-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .empty-state h3 {
-            color: #888;
-            margin-bottom: 5px;
+        .room-card .room-footer .btn-join {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .room-card .room-footer .btn-join:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .room-card .room-status {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .room-status.live {
+            background: #10b981;
+            color: white;
+        }
+
+        .room-status.pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .room-status.closed {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* ============================================= */
+        /* ===== FLOATING BUTTONS (الأزرار العائمة) ===== */
+        /* ============================================= */
+        
+        /* ===== زر إنشاء غرفة (الجانب الأيسر) ===== */
+        .floating-create-room {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 5px 25px rgba(79, 70, 229, 0.4);
+            text-decoration: none;
+            position: fixed;
+        }
+
+        .floating-create-room:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 35px rgba(79, 70, 229, 0.6);
+            background: linear-gradient(135deg, #6366f1, #7c3aed);
+        }
+
+        /* علامة + بيضاء على زر إنشاء الغرفة */
+        .floating-create-room .plus-icon {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #ff4757;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.8), 0 0 30px rgba(255, 71, 87, 0.4);
+            animation: glow-pulse 1.5s ease-in-out infinite;
+            line-height: 1;
+            text-shadow: 0 0 3px rgba(0,0,0,0.3);
+        }
+
+        @keyframes glow-pulse {
+            0% {
+                box-shadow: 0 0 8px rgba(255, 71, 87, 0.6), 0 0 15px rgba(255, 71, 87, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 71, 87, 1), 0 0 40px rgba(255, 71, 87, 0.6), 0 0 60px rgba(255, 71, 87, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 8px rgba(255, 71, 87, 0.6), 0 0 15px rgba(255, 71, 87, 0.3);
+            }
+        }
+
+        /* ===== زر الدعم الفني (الجانب الأيمن) ===== */
+        .floating-support {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 25px rgba(59, 130, 246, 0.4);
+            cursor: pointer;
+            z-index: 9999;
+            transition: 0.3s;
+            text-decoration: none;
+            border: none;
+        }
+
+        .floating-support:hover {
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 8px 35px rgba(59, 130, 246, 0.6);
+        }
+
+        .floating-support .pulse-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: #ff4757;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); }
+            80%, 100% { opacity: 0; }
         }
 
         /* ===== MODAL ===== */
@@ -313,7 +569,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.6);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -327,45 +583,69 @@
         }
 
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .modal-content {
-            background: #1a1a2e;
+            background: white;
             border-radius: 20px;
             padding: 35px;
             width: 100%;
             max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
         }
 
         .modal-content h2 {
-            color: #ffd700;
+            color: #1a1a2e;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            border-bottom: 2px solid rgba(255,215,0,0.2);
+            border-bottom: 2px solid #7c3aed;
             padding-bottom: 15px;
         }
 
-        .modal-content .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+        .modal-content .form-group {
+            margin-bottom: 18px;
         }
 
-        .modal-content .info-row .label {
-            color: #888;
+        .modal-content .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
         }
 
-        .modal-content .info-row .value {
-            color: #eee;
-            font-weight: 500;
+        .modal-content .form-group input,
+        .modal-content .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            outline: none;
+        }
+
+        .modal-content .form-group input:focus,
+        .modal-content .form-group textarea:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .modal-content .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
         .modal-actions {
@@ -381,16 +661,26 @@
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
-        .modal-actions .btn-close {
-            background: rgba(255,255,255,0.1);
+        .modal-actions .btn-submit {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
             color: white;
         }
 
-        .modal-actions .btn-close:hover {
-            background: rgba(255,255,255,0.2);
+        .modal-actions .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+
+        .modal-actions .btn-cancel {
+            background: #f1f1f1;
+            color: #666;
+        }
+
+        .modal-actions .btn-cancel:hover {
+            background: #e2e2e2;
         }
 
         /* ===== TOAST ===== */
@@ -403,73 +693,131 @@
             color: white;
             font-weight: 600;
             z-index: 9999;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             animation: slideDown 0.3s ease-out;
             max-width: 400px;
         }
 
-        .toast.success { background: #10b981; }
-        .toast.error { background: #ef4444; }
-        .toast.info { background: #3b82f6; }
-        .toast.warning { background: #f59e0b; }
+        .toast.success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .toast.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .toast.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
 
-        .btn-fix-permissions {
-            background: #ffd700;
-            color: #1a1a2e;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 15px;
-            font-size: 1rem;
+        /* ===== FOOTER ===== */
+        footer {
+            background: #1a1a2e;
+            color: #888;
+            text-align: center;
+            padding: 20px;
+            border-top: 2px solid #ffd700;
+            margin-top: auto;
         }
 
-        .btn-fix-permissions:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(255,215,0,0.3);
-        }
-
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .requests-grid {
+            header {
+                padding: 0.8rem 4%;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            .logo i {
+                font-size: 1.5rem;
+            }
+
+            .icon-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+
+            .notif-dropdown {
+                right: -10px;
+                width: 340px;
+            }
+
+            .rooms-grid {
                 grid-template-columns: 1fr;
             }
 
-            .admin-header {
+            .page-header {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .admin-tabs {
-                justify-content: center;
+            .modal-content {
+                padding: 25px;
             }
 
-            .admin-tabs button {
-                font-size: 0.8rem;
-                padding: 8px 15px;
+            .floating-create-room,
+            .floating-support {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
             }
 
-            .request-card .card-actions button {
-                min-width: 60px;
-                font-size: 0.75rem;
+            .floating-create-room {
+                left: 20px;
+                bottom: 20px;
+            }
+
+            .floating-support {
+                right: 20px;
+                bottom: 20px;
+            }
+
+            .floating-create-room .plus-icon {
+                width: 18px;
+                height: 18px;
+                font-size: 0.7rem;
+                top: -3px;
+                right: -3px;
             }
         }
 
         @media (max-width: 480px) {
-            header {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
+            .header-icons {
+                gap: 6px;
             }
 
-            .admin-tabs {
-                flex-direction: column;
-                align-items: stretch;
+            .icon-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
             }
 
-            .request-card .card-actions {
-                flex-direction: column;
+            .notif-dropdown {
+                width: 280px;
+                right: -5px;
+            }
+
+            .floating-create-room,
+            .floating-support {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+
+            .floating-create-room {
+                left: 15px;
+                bottom: 15px;
+            }
+
+            .floating-support {
+                right: 15px;
+                bottom: 15px;
+            }
+
+            .floating-create-room .plus-icon {
+                width: 16px;
+                height: 16px;
+                font-size: 0.6rem;
+                top: -2px;
+                right: -2px;
             }
         }
     </style>
@@ -478,63 +826,117 @@
 
     <!-- ===== HEADER ===== -->
     <header>
-        <div class="logo">
+        <div class="logo" onclick="location.reload()">
             <i class="fas fa-crown"></i>
-            VipChat Admin
+            VipChat
         </div>
-        <div class="header-actions">
-            <span class="admin-badge">👑 أدمن</span>
-            <a href="home.html" class="btn-back">
-                <i class="fas fa-arrow-right"></i>
-                العودة للرئيسية
-            </a>
+
+        <div class="header-icons" style="position: relative;">
+            <!-- أيقونة الملف الشخصي -->
+            <button class="icon-btn" onclick="handleProfileClick()" title="الملف الشخصي">
+                <i class="fas fa-user-circle"></i>
+            </button>
+
+            <!-- أيقونة المحفظة -->
+            <button class="icon-btn" onclick="handleWalletClick()" title="المحفظة">
+                <i class="fas fa-wallet"></i>
+            </button>
+
+            <!-- أيقونة الإعدادات -->
+            <button class="icon-btn" onclick="handleSettingsClick()" title="الإعدادات">
+                <i class="fas fa-cog"></i>
+            </button>
+
+            <!-- أيقونة الإشعارات -->
+            <button class="icon-btn" onclick="toggleNotifs()" title="الإشعارات" id="notifBtn">
+                <i class="fas fa-bell"></i>
+                <span class="badge" id="notifBadge" style="display: none;">0</span>
+            </button>
+
+            <!-- ===== NOTIFICATION DROPDOWN ===== -->
+            <div id="notifDropdown" class="notif-dropdown">
+                <div class="notif-header">
+                    <h3><i class="fas fa-bell"></i> الإشعارات</h3>
+                    <div class="notif-actions">
+                        <span onclick="loadNotifications()" title="تحديث">
+                            <i class="fas fa-sync-alt"></i>
+                        </span>
+                        <span onclick="markAllRead()" title="تعيين الكل كمقروء">
+                            <i class="fas fa-check-double"></i>
+                        </span>
+                        <span onclick="deleteAllNotifs()" class="delete-all" title="حذف الكل">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                    </div>
+                </div>
+                <div id="notifList">
+                    <div class="empty-notif">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>جاري تحميل الإشعارات...</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- ===== MAIN ===== -->
+    <!-- ===== MAIN CONTENT ===== -->
     <main>
-        <div class="admin-header">
-            <h1><i class="fas fa-user-shield"></i> لوحة إدارة الغرف</h1>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <button onclick="loadRequests(currentTab)" style="padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; cursor: pointer;">
-                    <i class="fas fa-sync-alt"></i> تحديث
-                </button>
-            </div>
+        <div class="page-header">
+            <h1><i class="fas fa-microphone-alt"></i> غرف الدردشة الصوتية</h1>
         </div>
 
-        <div class="admin-tabs">
-            <button class="active" onclick="switchTab('pending', this)">
-                <i class="fas fa-clock"></i> قيد الانتظار
-                <span class="count" id="pendingCount">0</span>
-            </button>
-            <button onclick="switchTab('approved', this)">
-                <i class="fas fa-check-circle"></i> تمت الموافقة
-            </button>
-            <button onclick="switchTab('rejected', this)">
-                <i class="fas fa-times-circle"></i> مرفوضة
-            </button>
-        </div>
-
-        <div id="requestsContainer">
-            <div class="empty-state">
-                <i class="fas fa-spinner fa-spin"></i>
-                <h3>جاري تحميل الطلبات...</h3>
-            </div>
+        <div class="rooms-grid" id="roomsGrid">
+            <!-- سيتم إضافة الغرف ديناميكياً -->
         </div>
     </main>
 
-    <!-- ===== MODAL: بيانات المنشيء ===== -->
-    <div id="creatorModal" class="modal">
+    <!-- ========================================================== -->
+    <!-- ===== الأزرار العائمة (FLOATING BUTTONS) ===== -->
+    <!-- ========================================================== -->
+    
+    <!-- زر إنشاء غرفة (الجانب الأيسر) -->
+    <button class="floating-create-room" onclick="openCreateRoomModal()" title="إنشاء غرفة جديدة">
+        <i class="fas fa-home"></i>
+        <span class="plus-icon">+</span>
+    </button>
+
+    <!-- زر الدعم الفني (الجانب الأيمن) -->
+    <button class="floating-support" onclick="handleSupportClick()" title="الدعم الفني">
+        <i class="fas fa-headset"></i>
+        <span class="pulse-dot"></span>
+    </button>
+
+    <!-- ===== MODAL: إنشاء غرفة ===== -->
+    <div id="createRoomModal" class="modal">
         <div class="modal-content">
-            <h2><i class="fas fa-user-circle"></i> بيانات منشيء الغرفة</h2>
-            <div id="creatorInfo">
-                <!-- سيتم ملؤها ديناميكياً -->
+            <h2><i class="fas fa-home" style="color: #7c3aed;"></i> إنشاء غرفة جديدة</h2>
+            <div class="form-group">
+                <label>اسم الغرفة *</label>
+                <input type="text" id="roomNameInput" placeholder="أدخل اسم الغرفة" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>وصف الغرفة</label>
+                <textarea id="roomDescInput" placeholder="أدخل وصفاً للغرفة..." rows="3"></textarea>
+            </div>
+            <div class="form-group" style="background: #f0f7ff; padding: 15px; border-radius: 10px;">
+                <p style="font-size: 0.9rem; color: #555;">
+                    <i class="fas fa-info-circle" style="color: #7c3aed;"></i>
+                    سيتم إرسال طلبك إلى الإدارة للموافقة عليه. ستتلقى إشعاراً عند الموافقة أو الرفض.
+                </p>
             </div>
             <div class="modal-actions">
-                <button class="btn-close" onclick="closeModal('creatorModal')">إغلاق</button>
+                <button class="btn-submit" onclick="submitRoomRequest()">
+                    <i class="fas fa-paper-plane"></i> إرسال الطلب
+                </button>
+                <button class="btn-cancel" onclick="closeModal('createRoomModal')">إلغاء</button>
             </div>
         </div>
     </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        &copy; 2026 VipChat - جميع الحقوق محفوظة
+    </footer>
 
     <script>
         // ============================================================
@@ -551,7 +953,7 @@
         };
 
         let database;
-        let currentTab = 'pending';
+        let currentUser = null;
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
@@ -561,368 +963,182 @@
                 firebase.initializeApp(firebaseConfig);
             }
             database = firebase.database();
-            console.log('✅ Firebase connected');
+            console.log('✅ Firebase connected successfully');
         } catch (error) {
-            console.error('❌ Firebase error:', error);
-            showToast('❌ فشل الاتصال بقاعدة البيانات', 'error');
+            console.error('❌ Firebase connection error:', error);
         }
 
         // ============================================================
-        // 📋 LOAD REQUESTS - مع معالجة أخطاء الصلاحيات
+        // 👤 USER MANAGEMENT
         // ============================================================
-        async function loadRequests(status) {
-            const container = document.getElementById('requestsContainer');
-
-            if (!database) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                        <h3 style="color: #ef4444;">❌ لا يوجد اتصال بقاعدة البيانات</h3>
-                        <p style="color: #666;">تأكد من اتصالك بالإنترنت</p>
-                        <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
-                            <i class="fas fa-sync-alt"></i> إعادة المحاولة
-                        </button>
-                    </div>
-                `;
-                return;
+        function getCurrentUser() {
+            try {
+                return JSON.parse(localStorage.getItem('currentUser'));
+            } catch (e) {
+                return null;
             }
+        }
+
+        // ============================================================
+        // 📋 ROOMS MANAGEMENT
+        // ============================================================
+        function generateRoomId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        async function loadRooms() {
+            if (!database) return;
 
             try {
-                const snapshot = await database.ref('room_requests').once('value');
+                const snapshot = await database.ref('rooms').once('value');
+                const roomsGrid = document.getElementById('roomsGrid');
 
                 if (!snapshot.exists()) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h3>لا توجد طلبات</h3>
-                            <p style="color: #666;">سوف تظهر هنا طلبات إنشاء الغرف</p>
+                    roomsGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                            <i class="fas fa-microphone-slash" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                            <h3 style="color: #555;">لا توجد غرف حالياً</h3>
+                            <p style="color: #888;">اضغط على أيقونة <strong style="color: #7c3aed;">🏠+</strong> لإنشاء غرفة جديدة</p>
                         </div>
                     `;
                     return;
                 }
 
-                const requests = snapshot.val();
-                let allRequests = [];
-                let pendingCount = 0;
+                const roomsData = snapshot.val();
+                let html = '';
+                let hasActiveRooms = false;
 
-                for (const roomId in requests) {
-                    const req = requests[roomId];
-                    req._roomId = roomId;
-                    allRequests.push(req);
-                    if (req.status === 'pending') pendingCount++;
-                }
+                for (const roomId in roomsData) {
+                    const room = roomsData[roomId];
+                    
+                    if (room.status !== 'approved') continue;
+                    
+                    hasActiveRooms = true;
 
-                document.getElementById('pendingCount').textContent = pendingCount;
-
-                const filtered = allRequests.filter(req => req.status === status);
-                filtered.sort((a, b) => {
-                    return new Date(b.createdAt) - new Date(a.createdAt);
-                });
-
-                if (filtered.length === 0) {
-                    const statusText = {
-                        'pending': 'قيد الانتظار',
-                        'approved': 'تمت الموافقة',
-                        'rejected': 'مرفوضة'
-                    };
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-check-circle"></i>
-                            <h3>لا توجد طلبات ${statusText[status] || ''}</h3>
-                            <p style="color: #666;">جميع الطلبات ${statusText[status] ? statusText[status].toLowerCase() : ''}</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                let html = '<div class="requests-grid">';
-                filtered.forEach(req => {
-                    const date = req.createdAt ? new Date(req.createdAt).toLocaleString('ar-EG') : '---';
-                    const statusBadge = {
-                        'pending': 'pending',
-                        'approved': 'approved',
-                        'rejected': 'rejected'
-                    };
+                    let creatorName = room.creatorName || 'مستخدم';
+                    let creatorId = room.creatorId || '---';
 
                     html += `
-                        <div class="request-card">
-                            <div class="card-header">
-                                <div class="room-id">🔑 ${req._roomId}</div>
-                                <div class="status-badge ${statusBadge[req.status] || 'pending'}">
-                                    ${req.status === 'pending' ? '🟡 قيد الانتظار' : 
-                                      req.status === 'approved' ? '🟢 تمت الموافقة' : 
-                                      '🔴 مرفوضة'}
+                        <div class="room-card" data-room-id="${roomId}">
+                            <div class="room-header">
+                                <div class="room-id">🔑 ${roomId}</div>
+                                <div class="room-status live">● مباشر</div>
+                                <div class="room-icon">🎙️</div>
+                                <div class="room-name">${room.name || 'غرفة بدون اسم'}</div>
+                            </div>
+                            <div class="room-body">
+                                <div class="room-description">${room.description || 'لا يوجد وصف'}</div>
+                                <div class="room-creator">
+                                    <div class="creator-avatar">${creatorName.charAt(0).toUpperCase()}</div>
+                                    <div class="creator-info">
+                                        <div class="creator-name">${creatorName}</div>
+                                        <div class="creator-id">🆔 ${creatorId}</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="room-name">${req.name || 'غرفة بدون اسم'}</div>
-                            <div class="room-desc">${req.description || 'لا يوجد وصف'}</div>
-                            <div class="creator-info">
-                                <div class="avatar">${(req.creatorName || 'U').charAt(0).toUpperCase()}</div>
-                                <div class="details">
-                                    <div class="name">${req.creatorName || 'مستخدم'}</div>
-                                    <div class="id">🆔 ${req.creatorId || '---'}</div>
-                                    ${req.creatorEmail ? `<div class="contact">📧 ${req.creatorEmail}</div>` : ''}
-                                    ${req.creatorPhone ? `<div class="contact">📱 ${req.creatorPhone}</div>` : ''}
-                                    ${req.isGuest ? '<div class="contact" style="color: #f59e0b;">👤 مستخدم زائر</div>' : ''}
+                            <div class="room-footer">
+                                <div class="room-stats">
+                                    <span><i class="fas fa-users"></i> ${room.members || 0}</span>
+                                    <span><i class="fas fa-calendar"></i> ${room.createdAt ? new Date(room.createdAt).toLocaleDateString('ar-EG') : '---'}</span>
                                 </div>
-                            </div>
-                            <div class="card-actions">
-                                ${req.status === 'pending' ? `
-                                    <button class="btn-approve" onclick="approveRoom('${req._roomId}')">
-                                        <i class="fas fa-check"></i> موافقة
-                                    </button>
-                                    <button class="btn-reject" onclick="rejectRoom('${req._roomId}')">
-                                        <i class="fas fa-times"></i> رفض
-                                    </button>
-                                ` : ''}
-                                <button class="btn-view" onclick="viewCreator('${req._roomId}')">
-                                    <i class="fas fa-user"></i> بيانات المنشيء
+                                <button class="btn-join" onclick="joinRoom('${roomId}')">
+                                    <i class="fas fa-sign-in-alt"></i> دخول
                                 </button>
-                                ${req.status === 'approved' ? `
-                                    <button class="btn-delete" onclick="deleteRoom('${req._roomId}')">
-                                        <i class="fas fa-trash"></i> حذف
-                                    </button>
-                                ` : ''}
                             </div>
-                            <div class="card-date"><i class="far fa-clock"></i> ${date}</div>
                         </div>
                     `;
-                });
-                html += '</div>';
+                }
 
-                container.innerHTML = html;
-
-            } catch (error) {
-                console.error('Error loading requests:', error);
-                
-                // معالجة خطأ الصلاحيات
-                if (error.message && error.message.includes('permission_denied')) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-lock" style="color: #ef4444; font-size: 4rem;"></i>
-                            <h3 style="color: #ef4444;">🔒 خطأ في الصلاحيات</h3>
-                            <p style="color: #aaa; max-width: 500px; margin: 10px auto;">
-                                لا تملك صلاحية الوصول إلى قاعدة البيانات. 
-                                يرجى تعديل <strong style="color: #ffd700;">قواعد أمان Firebase</strong>.
-                            </p>
-                            <div style="background: #1a1a2e; padding: 15px; border-radius: 10px; margin: 15px auto; max-width: 500px; text-align: right; direction: ltr; font-family: monospace; font-size: 0.8rem; color: #888; border: 1px solid #333;">
-                                {
-                                  "rules": {
-                                    ".read": true,
-                                    ".write": true
-                                  }
-                                }
-                            </div>
-                            <button onclick="window.open('https://console.firebase.google.com/project/vipclub-1d04a/database/vipclub-1d04a-default-rtdb/rules', '_blank')" 
-                                    class="btn-fix-permissions">
-                                <i class="fas fa-external-link-alt"></i> فتح قواعد Firebase
-                            </button>
-                            <br>
-                            <button onclick="location.reload()" style="margin-top:10px; padding:8px 20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:white; cursor:pointer;">
-                                <i class="fas fa-sync-alt"></i> إعادة المحاولة
-                            </button>
+                if (!hasActiveRooms) {
+                    roomsGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                            <i class="fas fa-microphone-slash" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                            <h3 style="color: #555;">لا توجد غرف متاحة حالياً</h3>
+                            <p style="color: #888;">قم بإنشاء غرفة جديدة وسيتم مراجعتها من قبل الإدارة</p>
                         </div>
                     `;
                 } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                            <h3 style="color: #ef4444;">خطأ في تحميل الطلبات</h3>
-                            <p style="color: #666;">${error.message}</p>
-                            <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
-                                <i class="fas fa-sync-alt"></i> إعادة المحاولة
-                            </button>
-                        </div>
-                    `;
+                    roomsGrid.innerHTML = html;
                 }
+
+            } catch (error) {
+                console.error('Error loading rooms:', error);
             }
         }
 
         // ============================================================
-        // 🔄 SWITCH TAB
+        // 📝 SUBMIT ROOM REQUEST
         // ============================================================
-        function switchTab(tab, button) {
-            currentTab = tab;
+        async function submitRoomRequest() {
+            const name = document.getElementById('roomNameInput').value.trim();
+            const description = document.getElementById('roomDescInput').value.trim();
+
+            if (!name) {
+                showToast('⚠️ يرجى إدخال اسم الغرفة', 'warning');
+                return;
+            }
+
+            currentUser = getCurrentUser();
             
-            document.querySelectorAll('.admin-tabs button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            button.classList.add('active');
+            const userData = currentUser || {
+                numericId: 'GUEST_' + Math.floor(Math.random() * 1000000),
+                username: 'زائر',
+                nickname: 'زائر',
+                isGuest: true
+            };
 
-            loadRequests(tab);
-        }
-
-        // ============================================================
-        // 👑 ADMIN ACTIONS
-        // ============================================================
-        async function approveRoom(roomId) {
-            if (!confirm(`✅ هل تريد الموافقة على إنشاء الغرفة ${roomId}؟`)) return;
+            const roomId = generateRoomId();
+            const requestData = {
+                roomId: roomId,
+                name: name,
+                description: description || 'لا يوجد وصف',
+                creatorId: userData.numericId || 'GUEST',
+                creatorName: userData.nickname || userData.username || 'زائر',
+                creatorEmail: userData.email || '',
+                creatorPhone: userData.phone || '',
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                members: 0,
+                isActive: false,
+                isGuest: userData.isGuest || false
+            };
 
             try {
-                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
-                const request = requestSnapshot.val();
+                await database.ref('room_requests/' + roomId).set(requestData);
 
-                if (!request) {
-                    showToast('❌ لم يتم العثور على الطلب', 'error');
-                    return;
-                }
-
-                await database.ref('rooms/' + roomId).set({
+                await database.ref('admin_notifications').push({
+                    type: 'new_room_request',
                     roomId: roomId,
-                    name: request.name,
-                    description: request.description,
-                    creatorId: request.creatorId,
-                    creatorName: request.creatorName,
-                    createdAt: request.createdAt,
-                    status: 'approved',
-                    members: 0,
-                    isActive: true
+                    roomName: name,
+                    creatorName: requestData.creatorName,
+                    creatorId: requestData.creatorId,
+                    read: false,
+                    createdAt: new Date().toISOString()
                 });
 
-                await database.ref('room_requests/' + roomId + '/status').set('approved');
-
-                if (request.creatorId && request.creatorId !== 'GUEST') {
+                if (currentUser && currentUser.numericId) {
                     await sendNotification(
-                        request.creatorId,
-                        `✅ تمت الموافقة على غرفتك "${request.name}"!`,
-                        `معرف الغرفة: ${roomId}\nيمكنك الآن الدخول إلى الغرفة والبدء في الدردشة الصوتية.`
+                        currentUser.numericId,
+                        `✅ تم استلام طلب إنشاء غرفة "${name}" بنجاح!`,
+                        `معرف الطلب: ${roomId}\nسيتم مراجعة طلبك من قبل الإدارة وسنخطرك عند الموافقة.`
                     );
                 }
 
-                showToast(`✅ تمت الموافقة على الغرفة ${request.name}`, 'success');
-                loadRequests(currentTab);
+                showToast('✅ تم إرسال طلب إنشاء الغرفة بنجاح!', 'success');
+                closeModal('createRoomModal');
+                document.getElementById('roomNameInput').value = '';
+                document.getElementById('roomDescInput').value = '';
+
+                setTimeout(() => loadRooms(), 500);
 
             } catch (error) {
-                console.error('Error approving room:', error);
-                showToast('❌ حدث خطأ في الموافقة على الغرفة', 'error');
-            }
-        }
-
-        async function rejectRoom(roomId) {
-            if (!confirm(`❌ هل تريد رفض إنشاء الغرفة ${roomId}؟`)) return;
-
-            try {
-                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
-                const request = requestSnapshot.val();
-
-                if (request && request.creatorId && request.creatorId !== 'GUEST') {
-                    await sendNotification(
-                        request.creatorId,
-                        `❌ تم رفض طلب إنشاء غرفتك "${request.name}"`,
-                        `معرف الغرفة: ${roomId}\nيرجى التواصل مع الإدارة لمعرفة السبب.`
-                    );
-                }
-
-                await database.ref('room_requests/' + roomId + '/status').set('rejected');
-
-                showToast(`❌ تم رفض الغرفة`, 'error');
-                loadRequests(currentTab);
-
-            } catch (error) {
-                console.error('Error rejecting room:', error);
-                showToast('❌ حدث خطأ في رفض الغرفة', 'error');
-            }
-        }
-
-        async function deleteRoom(roomId) {
-            if (!confirm(`⚠️ هل أنت متأكد من حذف الغرفة ${roomId} نهائياً؟\nهذا الإجراء لا يمكن التراجع عنه!`)) return;
-
-            try {
-                await database.ref('rooms/' + roomId).remove();
-                await database.ref('room_requests/' + roomId + '/status').set('deleted');
-
-                showToast(`🗑️ تم حذف الغرفة ${roomId}`, 'info');
-                loadRequests(currentTab);
-
-            } catch (error) {
-                console.error('Error deleting room:', error);
-                showToast('❌ حدث خطأ في حذف الغرفة', 'error');
-            }
-        }
-
-        // ============================================================
-        // 👤 VIEW CREATOR
-        // ============================================================
-        async function viewCreator(roomId) {
-            try {
-                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
-                const request = requestSnapshot.val();
-
-                if (!request) {
-                    showToast('❌ لم يتم العثور على بيانات الطلب', 'error');
-                    return;
-                }
-
-                let userData = {};
-                if (request.creatorId && request.creatorId !== 'GUEST') {
-                    try {
-                        const usersRef = database.ref('users');
-                        const snapshot = await usersRef.orderByChild('numericId').equalTo(request.creatorId).once('value');
-                        if (snapshot.exists()) {
-                            const data = snapshot.val();
-                            const userKey = Object.keys(data)[0];
-                            userData = data[userKey];
-                        }
-                    } catch (e) {
-                        console.warn('Could not fetch user data:', e);
-                    }
-                }
-
-                const infoDiv = document.getElementById('creatorInfo');
-                infoDiv.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6d28d9); display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 2.5rem; color: white;">
-                            ${(request.creatorName || 'U').charAt(0).toUpperCase()}
-                        </div>
-                        <h3 style="color: #ffd700;">${request.creatorName || 'مستخدم'}</h3>
-                        <div style="color: #888; font-family: monospace;">🆔 ${request.creatorId || '---'}</div>
-                        ${request.isGuest ? '<div style="color: #f59e0b; font-size: 0.8rem;">👤 مستخدم زائر (غير مسجل)</div>' : ''}
-                    </div>
-                    <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px;">
-                        <div class="info-row">
-                            <span class="label">📧 البريد الإلكتروني</span>
-                            <span class="value">${userData.email || request.creatorEmail || 'غير متوفر'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">📱 رقم الهاتف</span>
-                            <span class="value">${userData.phone || request.creatorPhone || 'غير متوفر'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">👤 اسم المستخدم</span>
-                            <span class="value">${userData.username || 'غير متوفر'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">💰 الرصيد (EGP)</span>
-                            <span class="value">${userData.balanceEGP ? userData.balanceEGP.toFixed(2) : 'غير متوفر'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">📛 اسم الغرفة</span>
-                            <span class="value">${request.name}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">📝 وصف الغرفة</span>
-                            <span class="value">${request.description || 'لا يوجد'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">📅 تاريخ الطلب</span>
-                            <span class="value">${request.createdAt ? new Date(request.createdAt).toLocaleString('ar-EG') : '---'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">📊 حالة الطلب</span>
-                            <span class="value" style="color: ${request.status === 'approved' ? '#10b981' : request.status === 'pending' ? '#f59e0b' : '#ef4444'};">
-                                ${request.status === 'approved' ? '✅ تمت الموافقة' : 
-                                  request.status === 'pending' ? '🟡 قيد الانتظار' : 
-                                  '❌ مرفوض'}
-                            </span>
-                        </div>
-                    </div>
-                `;
-
-                document.getElementById('creatorModal').classList.add('active');
-
-            } catch (error) {
-                console.error('Error loading creator info:', error);
-                showToast('❌ حدث خطأ في تحميل بيانات المنشيء', 'error');
+                console.error('Error submitting room request:', error);
+                showToast('❌ حدث خطأ في إرسال الطلب. حاول مرة أخرى.', 'error');
             }
         }
 
@@ -937,7 +1153,7 @@
                 const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
 
                 if (!snapshot.exists()) {
-                    console.warn('User not found:', userId);
+                    console.warn('User not found for notification:', userId);
                     return;
                 }
 
@@ -957,7 +1173,268 @@
         }
 
         // ============================================================
-        // 🍞 TOAST SYSTEM
+        // 🔔 NOTIFICATIONS
+        // ============================================================
+        async function loadNotifications() {
+            const list = document.getElementById('notifList');
+
+            try {
+                currentUser = getCurrentUser();
+                if (!currentUser || !currentUser.numericId) {
+                    list.innerHTML = `
+                        <div class="empty-notif">
+                            <i class="fas fa-user-lock"></i>
+                            <p>يجب تسجيل الدخول لعرض الإشعارات</p>
+                            <button onclick="window.location.href='Login.html'" 
+                                    style="margin-top:15px; padding:8px 20px; background:#ffd700; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">
+                                تسجيل الدخول
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+
+                if (!snapshot.exists()) {
+                    list.innerHTML = `
+                        <div class="empty-notif">
+                            <i class="fas fa-user-slash"></i>
+                            <p>المستخدم غير موجود</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const notifRef = database.ref('users/' + userId + '/notifications');
+                const notifSnapshot = await notifRef.once('value');
+
+                if (!notifSnapshot.exists()) {
+                    list.innerHTML = `
+                        <div class="empty-notif">
+                            <i class="far fa-bell"></i>
+                            <p>لا توجد إشعارات</p>
+                        </div>
+                    `;
+                    document.getElementById('notifBadge').style.display = 'none';
+                    return;
+                }
+
+                const notifications = [];
+                let unreadCount = 0;
+
+                notifSnapshot.forEach(child => {
+                    const notif = child.val();
+                    const isRead = notif.read || false;
+                    notifications.push({
+                        key: child.key,
+                        text: notif.text || 'إشعار جديد',
+                        read: isRead,
+                        date: notif.date || new Date().toLocaleString('ar-EG')
+                    });
+                    if (!isRead) unreadCount++;
+                });
+
+                notifications.sort((a, b) => b.key.localeCompare(a.key));
+
+                const badge = document.getElementById('notifBadge');
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                list.innerHTML = '';
+                notifications.forEach(notif => {
+                    const item = document.createElement('div');
+                    item.className = `notif-item ${!notif.read ? 'unread' : ''}`;
+                    item.innerHTML = `
+                        <div class="notif-content">
+                            <div class="notif-text">${notif.text}</div>
+                            <div class="notif-time"><i class="far fa-clock"></i> ${notif.date}</div>
+                        </div>
+                        <div class="notif-actions-btn">
+                            ${!notif.read ? `
+                                <i class="fas fa-check" onclick="markAsRead('${userId}', '${notif.key}')" 
+                                   title="تعيين كمقروء" style="color:#10b981;"></i>
+                            ` : ''}
+                            <i class="fas fa-trash delete-notif" onclick="deleteNotif('${userId}', '${notif.key}')" 
+                               title="حذف"></i>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                list.innerHTML = `
+                    <div class="empty-notif">
+                        <i class="fas fa-exclamation-triangle" style="color:#ff4757;"></i>
+                        <p>خطأ في تحميل الإشعارات</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function markAsRead(userId, notifKey) {
+            try {
+                await database.ref('users/' + userId + '/notifications/' + notifKey).update({ read: true });
+                await loadNotifications();
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        }
+
+        async function markAllRead() {
+            try {
+                currentUser = getCurrentUser();
+                if (!currentUser || !currentUser.numericId) return;
+
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+
+                if (!snapshot.exists()) return;
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const notifRef = database.ref('users/' + userId + '/notifications');
+                const notifSnapshot = await notifRef.once('value');
+
+                if (!notifSnapshot.exists()) return;
+
+                const updates = {};
+                notifSnapshot.forEach(child => {
+                    updates[child.key + '/read'] = true;
+                });
+
+                await notifRef.update(updates);
+                await loadNotifications();
+
+            } catch (error) {
+                console.error('Error marking all as read:', error);
+            }
+        }
+
+        async function deleteNotif(userId, notifKey) {
+            if (!confirm('هل تريد حذف هذا الإشعار؟')) return;
+
+            try {
+                await database.ref('users/' + userId + '/notifications/' + notifKey).remove();
+                await loadNotifications();
+            } catch (error) {
+                console.error('Error deleting notification:', error);
+            }
+        }
+
+        async function deleteAllNotifs() {
+            if (!confirm('هل تريد حذف جميع الإشعارات نهائياً؟')) return;
+
+            try {
+                currentUser = getCurrentUser();
+                if (!currentUser || !currentUser.numericId) return;
+
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+
+                if (!snapshot.exists()) return;
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+
+                await database.ref('users/' + userId + '/notifications').remove();
+                await loadNotifications();
+
+            } catch (error) {
+                console.error('Error deleting all notifications:', error);
+            }
+        }
+
+        // ============================================================
+        // 🧭 NAVIGATION FUNCTIONS
+        // ============================================================
+        function handleProfileClick() {
+            const user = getCurrentUser();
+            if (user) {
+                window.location.href = 'profile.html';
+            } else {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                setTimeout(() => window.location.href = 'Login.html', 1500);
+            }
+        }
+
+        function handleWalletClick() {
+            const user = getCurrentUser();
+            if (user) {
+                window.location.href = 'wallet.html';
+            } else {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                setTimeout(() => window.location.href = 'Login.html', 1500);
+            }
+        }
+
+        function handleSettingsClick() {
+            const user = getCurrentUser();
+            if (user) {
+                window.location.href = 'settings.html';
+            } else {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                setTimeout(() => window.location.href = 'Login.html', 1500);
+            }
+        }
+
+        function handleSupportClick() {
+            window.location.href = 'support.html';
+        }
+
+        function toggleNotifs() {
+            const dropdown = document.getElementById('notifDropdown');
+            dropdown.classList.toggle('active');
+            if (dropdown.classList.contains('active')) {
+                loadNotifications();
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notifDropdown');
+            const notifBtn = document.getElementById('notifBtn');
+
+            if (!dropdown.contains(event.target) && event.target !== notifBtn && !notifBtn.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // ============================================================
+        // 🎯 JOIN ROOM
+        // ============================================================
+        function joinRoom(roomId) {
+            window.location.href = `voice-room.html?room=${roomId}`;
+        }
+
+        // ============================================================
+        // 🖥️ MODAL FUNCTIONS
+        // ============================================================
+        function openCreateRoomModal() {
+            document.getElementById('createRoomModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // ============================================================
+        // 🔔 TOAST SYSTEM
         // ============================================================
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -974,40 +1451,79 @@
         }
 
         // ============================================================
-        // 🖥️ MODAL FUNCTIONS
-        // ============================================================
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
-        });
-
-        // ============================================================
         // 🚀 INIT ON PAGE LOAD
         // ============================================================
         window.onload = function() {
-            // تحميل الطلبات
-            loadRequests('pending');
+            currentUser = getCurrentUser();
+            loadRooms();
 
-            // الاستماع للتحديثات
-            if (database) {
-                try {
-                    database.ref('room_requests').on('value', () => {
-                        loadRequests(currentTab);
-                    });
-                } catch (e) {
-                    console.warn('Could not listen to room_requests:', e);
-                }
+            if (currentUser) {
+                updateNotifBadge();
             }
 
-            console.log('👑 لوحة إدارة الغرف جاهزة');
+            if (database) {
+                database.ref('rooms').on('value', () => {
+                    loadRooms();
+                });
+            }
+
+            console.log('🎙️ VipChat - غرف الدردشة الصوتية جاهزة!');
+            console.log('📌 الأزرار العائمة:');
+            console.log('   🏠+ زر إنشاء غرفة (أسفل اليسار)');
+            console.log('   🎧 زر الدعم الفني (أسفل اليمين)');
         };
+
+        async function updateNotifBadge() {
+            try {
+                currentUser = getCurrentUser();
+                if (!currentUser || !currentUser.numericId) {
+                    document.getElementById('notifBadge').style.display = 'none';
+                    return;
+                }
+
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+
+                if (!snapshot.exists()) {
+                    document.getElementById('notifBadge').style.display = 'none';
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const notifRef = database.ref('users/' + userId + '/notifications');
+                const notifSnapshot = await notifRef.once('value');
+
+                if (!notifSnapshot.exists()) {
+                    document.getElementById('notifBadge').style.display = 'none';
+                    return;
+                }
+
+                let unreadCount = 0;
+                notifSnapshot.forEach(child => {
+                    if (!child.val().read) unreadCount++;
+                });
+
+                const badge = document.getElementById('notifBadge');
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('Error updating badge:', error);
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
     </script>
 </body>
 </html>
