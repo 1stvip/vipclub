@@ -70,7 +70,7 @@
 
         .icon-btn {
             font-size: 1.2rem;
-            color: var(--text-main);
+            color: #f8fafc;
             cursor: pointer;
             position: relative;
             width: 40px;
@@ -1053,9 +1053,6 @@
         </div>
         <button class="icon-btn" onclick="handleProfileClick()" title="الملف الشخصي">
             <i class="fas fa-user-circle"></i>
-        </button>
-        <button class="icon-btn" onclick="prepareForWallet()" title="المحفظة">
-            <i class="fas fa-wallet"></i>
         </button>
     </div>
     <div class="room-info">
@@ -2076,7 +2073,7 @@
     }
 
     // ============================================================
-    // 🚪 دوال تسجيل الخروج والمحفظة
+    // 🚪 دوال تسجيل الخروج
     // ============================================================
     async function logout() {
         try {
@@ -2086,40 +2083,6 @@
         }
         localStorage.removeItem('currentUser');
         window.location.reload();
-    }
-
-    async function prepareForWallet() {
-        try {
-            if (!requireLogin()) return false;
-            
-            const user = await getCurrentUserFullData();
-            if (!user) {
-                redirectToLogin();
-                return false;
-            }
-            
-            const walletData = {
-                id: user.numericId || user.id,
-                nickname: user.nickname || user.username,
-                balanceEGP: user.balanceEGP || "0",
-                balanceUSD: user.balanceUSD || "0",
-                numericId: user.numericId,
-                username: user.username,
-                email: user.email || '',
-                phone: user.phone || '',
-                firebaseKey: user.firebaseKey,
-                purchasedCards: user.purchasedCards || []
-            };
-            
-            localStorage.setItem('walletUserData', JSON.stringify(walletData));
-            window.location.href = 'Wallet.html';
-            return true;
-            
-        } catch (error) {
-            console.error('Error preparing wallet:', error);
-            showFirebaseAlert('❌ خطأ في تحضير بيانات المحفظة', 'error');
-            return false;
-        }
     }
 
     // ============================================================
@@ -2209,7 +2172,7 @@
     }
 
     // ============================================================
-    // 🎵 PEERJS - الصوت
+    // 🎵 PEERJS - الصوت (مختصر)
     // ============================================================
     function initPeerJS() {
         if (!mediaStream) {
