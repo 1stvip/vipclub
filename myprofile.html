@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images/videoslogo/vip.png">
+    <title>👤 الملف الشخصي - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.6rem 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 60px;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo i { font-size: 1.3rem; }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            font-size: 1.2rem;
+            color: #f8fafc;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            text-decoration: none;
+        }
+        .icon-btn:hover {
+            background: #8b5cf6;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* الهيدر */
+        .profile-header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.2), transparent 70%);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #ffd700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            margin: 0 auto 15px;
+            border: 4px solid rgba(255,215,0,0.3);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .profile-id {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .profile-vip {
+            display: inline-block;
+            padding: 4px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        .vip-1 { background: #8b5cf6; color: white; }
+        .vip-2 { background: #f59e0b; color: #1a1a2e; }
+        .vip-3 { background: #10b981; color: white; }
+        .vip-4 { background: #3b82f6; color: white; }
+        .vip-5 { background: #ef4444; color: white; }
+        .vip-none { background: #334155; color: #94a3b8; }
+
+        /* بطاقات الرصيد */
+        .balance-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .balance-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .balance-card .label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .balance-card .amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .balance-card .amount.egp { color: #10b981; }
+        .balance-card .amount.usd { color: #60a5fa; }
+
+        /* قسم الإنجازات */
+        .section-title {
+            font-size: 1.3rem;
+            color: #ffd700;
+            margin: 30px 0 15px;
+            padding-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .achievement-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            border-color: #8b5cf6;
+        }
+
+        .achievement-card .ach-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .achievement-card .ach-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .achievement-card .ach-desc {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .achievement-card .ach-date {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+
+        .achievement-card.unlocked {
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .achievement-card.locked {
+            opacity: 0.5;
+        }
+
+        .achievement-card.locked .ach-icon {
+            filter: grayscale(1);
+        }
+
+        /* الأطارات والدخلات */
+        .cosmetics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cosmetic-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        .cosmetic-item:hover {
+            transform: translateY(-3px);
+            border-color: #8b5cf6;
+        }
+
+        .cosmetic-item .cos-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .cosmetic-item .cos-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .cosmetic-item .cos-type {
+            font-size: 0.65rem;
+            color: #94a3b8;
+        }
+
+        .cosmetic-item.active {
+            border-color: #ffd700;
+            background: rgba(255,215,0,0.05);
+        }
+
+        /* التوست */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 14px;
+            z-index: 10000;
+            animation: slideUp 0.4s ease;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-success { background: rgba(16, 185, 129, 0.95); color: white; }
+        .toast-error { background: rgba(239, 68, 68, 0.95); color: white; }
+        .toast-warning { background: rgba(245, 158, 11, 0.95); color: white; }
+        .toast-info { background: rgba(59, 130, 246, 0.95); color: white; }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #94a3b8;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .profile-avatar { width: 80px; height: 80px; font-size: 2.5rem; }
+            .profile-name { font-size: 1.3rem; }
+            .balance-cards { grid-template-columns: 1fr 1fr; }
+            .achievements-grid { grid-template-columns: 1fr; }
+            .cosmetics-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التنقل -->
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='chat.html'">
+        <i class="fas fa-crown"></i> VipClub
+    </div>
+    <div class="nav-icons">
+        <a href="chat.html" class="icon-btn" title="الغرفة الصوتية">
+            <i class="fas fa-microphone-alt"></i>
+        </a>
+        <a href="Store.html" class="icon-btn" title="المتجر">
+            <i class="fas fa-store"></i>
+        </a>
+        <a href="vipsystem.html" class="icon-btn" title="نظام VIP">
+            <i class="fas fa-crown"></i>
+        </a>
+        <a href="Wallet.html" class="icon-btn" title="المحفظة">
+            <i class="fas fa-wallet"></i>
+        </a>
+        <button class="icon-btn" onclick="logout()" title="تسجيل الخروج">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- المحتوى -->
+<div id="profileContent">
+    <div class="loading">
+        <i class="fas fa-spinner"></i>
+        <p>جاري تحميل الملف الشخصي...</p>
+    </div>
+</div>
+
+<script>
+    // ===== Firebase Config =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+        authDomain: "vipclub-1d04a.firebaseapp.com",
+        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+        projectId: "vipclub-1d04a",
+        storageBucket: "vipclub-1d04a.firebasestorage.app",
+        messagingSenderId: "120667552740",
+        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    };
+
+    let database, auth;
+    let currentUser = null;
+
+    // ===== بيانات VIP =====
+    const VIP_DATA = {
+        1: { name: 'VIP 1', icon: '⭐', color: '#8b5cf6', class: 'vip-1' },
+        2: { name: 'VIP 2', icon: '🦁', color: '#f59e0b', class: 'vip-2' },
+        3: { name: 'VIP 3', icon: '🌊', color: '#10b981', class: 'vip-3' },
+        4: { name: 'VIP 4', icon: '🌲', color: '#3b82f6', class: 'vip-4' },
+        5: { name: 'VIP 5', icon: '🚀', color: '#ef4444', class: 'vip-5' }
+    };
+
+    // ===== الإنجازات =====
+    const ACHIEVEMENTS = {
+        'first_purchase': { icon: '🛒', name: 'أول عملية شراء', desc: 'قم بشراء أول حساب من المتجر' },
+        'vip_1': { icon: '⭐', name: 'نجم VIP', desc: 'الوصول إلى مستوى VIP 1' },
+        'vip_2': { icon: '🦁', name: 'ملك الغابة', desc: 'الوصول إلى مستوى VIP 2' },
+        'vip_3': { icon: '🌊', name: 'سيد المحيط', desc: 'الوصول إلى مستوى VIP 3' },
+        'vip_4': { icon: '🌲', name: 'حارس الغابة', desc: 'الوصول إلى مستوى VIP 4' },
+        'vip_5': { icon: '🚀', name: 'رائد الفضاء', desc: 'الوصول إلى مستوى VIP 5' },
+        'spend_1000': { icon: '💰', name: 'المستهلك الذهبي', desc: 'إنفاق 1,000 جنيه في المتجر' },
+        'spend_5000': { icon: '💎', name: 'المستهلك الماسي', desc: 'إنفاق 5,000 جنيه في المتجر' },
+        'spend_10000': { icon: '👑', name: 'المستهلك الأسطوري', desc: 'إنفاق 10,000 جنيه في المتجر' }
+    };
+
+    // ===== الأطارات والدخلات =====
+    const COSMETICS = {
+        frames: [
+            { id: 'frame_default', name: 'الإطار الافتراضي', icon: '⬜', type: 'إطار' },
+            { id: 'frame_vip1', name: 'إطار VIP 1', icon: '⭐', type: 'إطار', requiredVip: 1 },
+            { id: 'frame_vip2', name: 'إطار VIP 2', icon: '🦁', type: 'إطار', requiredVip: 2 },
+            { id: 'frame_vip3', name: 'إطار VIP 3', icon: '🌊', type: 'إطار', requiredVip: 3 },
+            { id: 'frame_vip4', name: 'إطار VIP 4', icon: '🌲', type: 'إطار', requiredVip: 4 },
+            { id: 'frame_vip5', name: 'إطار VIP 5', icon: '🚀', type: 'إطار', requiredVip: 5 },
+            { id: 'frame_gold', name: 'الإطار الذهبي', icon: '👑', type: 'إطار', requiredVip: 2 },
+            { id: 'frame_star', name: 'الإطار النجمي', icon: '✨', type: 'إطار', requiredVip: 4 }
+        ],
+        entrances: [
+            { id: 'entrance_default', name: 'دخول عادي', icon: '🚪', type: 'دخلة' },
+            { id: 'entrance_car', name: 'دخلة سيارة', icon: '🚗', type: 'دخلة', requiredVip: 1 },
+            { id: 'entrance_lion', name: 'دخلة أسد', icon: '🦁', type: 'دخلة', requiredVip: 2 },
+            { id: 'entrance_ocean', name: 'دخلة محيط', icon: '🌊', type: 'دخلة', requiredVip: 3 },
+            { id: 'entrance_forest', name: 'دخلة غابة', icon: '🌲', type: 'دخلة', requiredVip: 4 },
+            { id: 'entrance_space', name: 'دخلة فضاء', icon: '🚀', type: 'دخلة', requiredVip: 5 },
+            { id: 'entrance_dragon', name: 'دخلة تنين', icon: '🐉', type: 'دخلة', requiredVip: 5 }
+        ],
+        titles: [
+            { id: 'title_default', name: 'عضو', icon: '👤', type: 'لقب' },
+            { id: 'title_vip1', name: 'نجم VIP', icon: '⭐', type: 'لقب', requiredVip: 1 },
+            { id: 'title_vip2', name: 'ملك الغابة', icon: '🦁', type: 'لقب', requiredVip: 2 },
+            { id: 'title_vip3', name: 'سيد المحيط', icon: '🌊', type: 'لقب', requiredVip: 3 },
+            { id: 'title_vip4', name: 'حارس الغابة', icon: '🌲', type: 'لقب', requiredVip: 4 },
+            { id: 'title_vip5', name: 'رائد الفضاء', icon: '🚀', type: 'لقب', requiredVip: 5 },
+            { id: 'title_legend', name: 'أسطورة', icon: '👑', type: 'لقب', requiredVip: 5 }
+        ]
+    };
+
+    // ===== تهيئة Firebase =====
+    function initializeFirebase() {
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            auth = firebase.auth();
+            console.log('✅ Firebase initialized');
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    loadProfile();
+                } else {
+                    window.location.href = 'Login2.html';
+                }
+            });
+        } catch (error) {
+            console.error('❌ Firebase error:', error);
+        }
+    }
+
+    // ===== جلب بيانات المستخدم =====
+    function getCurrentUserFromStorage() {
+        try {
+            return JSON.parse(localStorage.getItem('currentUser'));
+        } catch {
+            return null;
+        }
+    }
+
+    async function loadProfile() {
+        try {
+            const localUser = getCurrentUserFromStorage();
+            if (!localUser) {
+                window.location.href = 'Login2.html';
+                return;
+            }
+
+            currentUser = localUser;
+
+            if (database) {
+                const userRef = database.ref('users').orderByChild('numericId').equalTo(localUser.numericId);
+                const snapshot = await userRef.once('value');
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    const userId = Object.keys(users)[0];
+                    const userData = users[userId];
+                    currentUser = { ...localUser, ...userData, firebaseKey: userId };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+            }
+
+            renderProfile();
+
+        } catch (error) {
+            console.error('Error loading profile:', error);
+            showToast('❌ حدث خطأ في تحميل الملف الشخصي', 'error');
+        }
+    }
+
+    // ===== عرض الملف الشخصي =====
+    function renderProfile() {
+        if (!currentUser) return;
+
+        const vipLevel = currentUser.vipLevel || 0;
+        const vipInfo = VIP_DATA[vipLevel] || null;
+        const vipClass = vipInfo ? vipInfo.class : 'vip-none';
+        const vipName = vipInfo ? vipInfo.name : 'لا يوجد VIP';
+        const vipIcon = vipInfo ? vipInfo.icon : '👤';
+
+        // حساب الإنجازات
+        const achievements = calculateAchievements(currentUser);
+        const unlockedAchievements = achievements.filter(a => a.unlocked);
+        const lockedAchievements = achievements.filter(a => !a.unlocked);
+
+        // حساب المقتنيات المتاحة
+        const availableCosmetics = getAvailableCosmetics(currentUser);
+
+        const html = `
+            <!-- الهيدر -->
+            <div class="profile-header">
+                <div class="profile-avatar" style="background: linear-gradient(135deg, ${vipInfo ? vipInfo.color : '#334155'}, #ffd700);">
+                    ${vipIcon}
+                </div>
+                <div class="profile-name">${currentUser.nickname || currentUser.username || 'مستخدم'}</div>
+                <div class="profile-id">🆔 ${formatNumericId(currentUser.numericId)}</div>
+                <div class="profile-vip ${vipClass}">${vipIcon} ${vipName}</div>
+            </div>
+
+            <!-- الرصيد -->
+            <div class="balance-cards">
+                <div class="balance-card">
+                    <div class="label">🇪🇬 رصيد الجنيه المصري</div>
+                    <div class="amount egp">${currentUser.balanceEGP || 0} ج.م</div>
+                </div>
+                <div class="balance-card">
+                    <div class="label">🇺🇸 رصيد الدولار</div>
+                    <div class="amount usd">${currentUser.balanceUSD || 0} $</div>
+                </div>
+                <div class="balance-card">
+                    <div class="label">💰 إجمالي الإنفاق</div>
+                    <div class="amount" style="color: #ffd700;">${currentUser.totalSpent || 0} ج.م</div>
+                </div>
+            </div>
+
+            <!-- الإنجازات -->
+            <div class="section-title">
+                <i class="fas fa-trophy"></i> الإنجازات
+                <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">
+                    (${unlockedAchievements.length}/${achievements.length})
+                </span>
+            </div>
+            <div class="achievements-grid">
+                ${achievements.map(a => `
+                    <div class="achievement-card ${a.unlocked ? 'unlocked' : 'locked'}">
+                        <div class="ach-icon">${a.icon}</div>
+                        <div class="ach-name">${a.name}</div>
+                        <div class="ach-desc">${a.desc}</div>
+                        ${a.unlocked ? `<div class="ach-date">✅ تم الفتح في ${a.date}</div>` : '<div class="ach-date">🔒 غير مفتوح</div>'}
+                    </div>
+                `).join('')}
+            </div>
+
+            <!-- الأطارات -->
+            <div class="section-title">
+                <i class="fas fa-image"></i> الأطارات المتاحة
+            </div>
+            <div class="cosmetics-grid">
+                ${availableCosmetics.frames.map(f => `
+                    <div class="cosmetic-item ${f.active ? 'active' : ''}">
+                        <div class="cos-icon">${f.icon}</div>
+                        <div class="cos-name">${f.name}</div>
+                        <div class="cos-type">${f.type}</div>
+                        ${f.active ? '<div style="color: #ffd700; font-size: 0.7rem;">✅ مفعل</div>' : ''}
+                    </div>
+                `).join('')}
+            </div>
+
+            <!-- الدخلات -->
+            <div class="section-title">
+                <i class="fas fa-door-open"></i> الدخلات المتاحة
+            </div>
+            <div class="cosmetics-grid">
+                ${availableCosmetics.entrances.map(e => `
+                    <div class="cosmetic-item ${e.active ? 'active' : ''}">
+                        <div class="cos-icon">${e.icon}</div>
+                        <div class="cos-name">${e.name}</div>
+                        <div class="cos-type">${e.type}</div>
+                        ${e.active ? '<div style="color: #ffd700; font-size: 0.7rem;">✅ مفعل</div>' : ''}
+                    </div>
+                `).join('')}
+            </div>
+
+            <!-- الألقاب -->
+            <div class="section-title">
+                <i class="fas fa-tag"></i> الألقاب المتاحة
+            </div>
+            <div class="cosmetics-grid">
+                ${availableCosmetics.titles.map(t => `
+                    <div class="cosmetic-item ${t.active ? 'active' : ''}">
+                        <div class="cos-icon">${t.icon}</div>
+                        <div class="cos-name">${t.name}</div>
+                        <div class="cos-type">${t.type}</div>
+                        ${t.active ? '<div style="color: #ffd700; font-size: 0.7rem;">✅ مفعل</div>' : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        document.getElementById('profileContent').innerHTML = html;
+    }
+
+    // ===== حساب الإنجازات =====
+    function calculateAchievements(user) {
+        const vipLevel = user.vipLevel || 0;
+        const totalSpent = user.totalSpent || 0;
+        const achievements = [];
+
+        for (const key in ACHIEVEMENTS) {
+            const ach = ACHIEVEMENTS[key];
+            let unlocked = false;
+            let date = '';
+
+            // التحقق من الإنجازات
+            if (key === 'first_purchase') {
+                unlocked = user.purchasedCards && user.purchasedCards.length > 0;
+            } else if (key.startsWith('vip_')) {
+                const requiredVip = parseInt(key.split('_')[1]);
+                unlocked = vipLevel >= requiredVip;
+            } else if (key === 'spend_1000') {
+                unlocked = totalSpent >= 1000;
+            } else if (key === 'spend_5000') {
+                unlocked = totalSpent >= 5000;
+            } else if (key === 'spend_10000') {
+                unlocked = totalSpent >= 10000;
+            }
+
+            if (unlocked && user.achievements && user.achievements[key]) {
+                date = user.achievements[key];
+            }
+
+            achievements.push({
+                ...ach,
+                unlocked: unlocked,
+                date: date || 'اليوم'
+            });
+        }
+
+        return achievements;
+    }
+
+    // ===== الحصول على المقتنيات المتاحة =====
+    function getAvailableCosmetics(user) {
+        const vipLevel = user.vipLevel || 0;
+        const allCosmetics = {
+            frames: [],
+            entrances: [],
+            titles: []
+        };
+
+        // الأطارات
+        COSMETICS.frames.forEach(f => {
+            const available = !f.requiredVip || vipLevel >= f.requiredVip;
+            allCosmetics.frames.push({
+                ...f,
+                available: available,
+                active: f.id === (user.activeFrame || 'frame_default') && available
+            });
+        });
+
+        // الدخلات
+        COSMETICS.entrances.forEach(e => {
+            const available = !e.requiredVip || vipLevel >= e.requiredVip;
+            allCosmetics.entrances.push({
+                ...e,
+                available: available,
+                active: e.id === (user.activeEntrance || 'entrance_default') && available
+            });
+        });
+
+        // الألقاب
+        COSMETICS.titles.forEach(t => {
+            const available = !t.requiredVip || vipLevel >= t.requiredVip;
+            allCosmetics.titles.push({
+                ...t,
+                available: available,
+                active: t.id === (user.activeTitle || 'title_default') && available
+            });
+        });
+
+        return allCosmetics;
+    }
+
+    // ===== تنسيق المعرف =====
+    function formatNumericId(id) {
+        if (!id) return "000000";
+        const numId = parseInt(id);
+        if (isNaN(numId)) return "000000";
+        return numId.toString().padStart(6, '0');
+    }
+
+    // ===== توست =====
+    function showToast(message, type = 'info') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+        toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> ${message}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    // ===== تسجيل الخروج =====
+    function logout() {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'Login2.html';
+    }
+
+    // ===== التهيئة =====
+    window.onload = function() {
+        initializeFirebase();
+    };
+</script>
+</body>
+</html>

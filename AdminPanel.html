@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images/videoslogo/vip.png">
+    <title>👑 لوحة تحكم الأدمن - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.6rem 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 60px;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo i { font-size: 1.3rem; }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            font-size: 1.2rem;
+            color: #f8fafc;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            text-decoration: none;
+        }
+        .icon-btn:hover {
+            background: #8b5cf6;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .admin-header {
+            text-align: center;
+            padding: 30px 20px;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15), transparent 70%);
+        }
+
+        .admin-header h1 {
+            font-size: 2rem;
+            color: #ffd700;
+        }
+
+        .admin-header p {
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #ffd700;
+            margin: 30px 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .users-table-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            overflow-x: auto;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .users-table th {
+            background: rgba(139, 92, 246, 0.2);
+            padding: 12px 15px;
+            text-align: right;
+            font-weight: 600;
+            color: #ffd700;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .users-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #cbd5e1;
+        }
+
+        .users-table tr:hover td {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .users-table .vip-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .vip-1 { background: #8b5cf6; color: white; }
+        .vip-2 { background: #f59e0b; color: #1a1a2e; }
+        .vip-3 { background: #10b981; color: white; }
+        .vip-4 { background: #3b82f6; color: white; }
+        .vip-5 { background: #ef4444; color: white; }
+        .vip-none { background: #334155; color: #94a3b8; }
+
+        .admin-actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .admin-actions button {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .admin-actions .btn-give { background: #10b981; color: white; }
+        .admin-actions .btn-give:hover { background: #059669; transform: scale(1.05); }
+        .admin-actions .btn-remove { background: #ef4444; color: white; }
+        .admin-actions .btn-remove:hover { background: #dc2626; transform: scale(1.05); }
+        .admin-actions .btn-ban { background: #7c3aed; color: white; }
+        .admin-actions .btn-ban:hover { background: #6d28d9; transform: scale(1.05); }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 14px;
+            z-index: 10000;
+            animation: slideUp 0.4s ease;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-success { background: rgba(16, 185, 129, 0.95); color: white; }
+        .toast-error { background: rgba(239, 68, 68, 0.95); color: white; }
+        .toast-warning { background: rgba(245, 158, 11, 0.95); color: white; }
+        .toast-info { background: rgba(59, 130, 246, 0.95); color: white; }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #94a3b8;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .users-table th, .users-table td { padding: 8px 10px; font-size: 0.8rem; }
+            .admin-actions button { font-size: 0.6rem; padding: 3px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التنقل -->
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='chat.html'">
+        <i class="fas fa-crown"></i> VipClub
+    </div>
+    <div class="nav-icons">
+        <a href="chat.html" class="icon-btn" title="الغرفة الصوتية">
+            <i class="fas fa-microphone-alt"></i>
+        </a>
+        <a href="Store.html" class="icon-btn" title="المتجر">
+            <i class="fas fa-store"></i>
+        </a>
+        <a href="vipsystem.html" class="icon-btn" title="نظام VIP">
+            <i class="fas fa-crown"></i>
+        </a>
+        <a href="Profile.html" class="icon-btn" title="الملف الشخصي">
+            <i class="fas fa-user-circle"></i>
+        </a>
+        <button class="icon-btn" onclick="logout()" title="تسجيل الخروج">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- المحتوى -->
+<div id="adminContent">
+    <div class="loading">
+        <i class="fas fa-spinner"></i>
+        <p>جاري تحميل لوحة التحكم...</p>
+    </div>
+</div>
+
+<script>
+    // ===== Firebase Config =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+        authDomain: "vipclub-1d04a.firebaseapp.com",
+        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+        projectId: "vipclub-1d04a",
+        storageBucket: "vipclub-1d04a.firebasestorage.app",
+        messagingSenderId: "120667552740",
+        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+    };
+
+    let database, auth;
+    let currentUser = null;
+    let allUsers = [];
+
+    // ===== بيانات VIP =====
+    const VIP_DATA = {
+        0: { name: 'لا يوجد', class: 'vip-none' },
+        1: { name: 'VIP 1', class: 'vip-1' },
+        2: { name: 'VIP 2', class: 'vip-2' },
+        3: { name: 'VIP 3', class: 'vip-3' },
+        4: { name: 'VIP 4', class: 'vip-4' },
+        5: { name: 'VIP 5', class: 'vip-5' }
+    };
+
+    // ===== قائمة الأدمن =====
+    const ADMIN_IDS = ['120667552740', 'admin_1', 'admin_2']; // أضف معرفات الأدمن هنا
+
+    // ===== تهيئة Firebase =====
+    function initializeFirebase() {
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            auth = firebase.auth();
+            console.log('✅ Firebase initialized');
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    checkAdminStatus(user);
+                } else {
+                    window.location.href = 'Login2.html';
+                }
+            });
+        } catch (error) {
+            console.error('❌ Firebase error:', error);
+        }
+    }
+
+    // ===== التحقق من صلاحية الأدمن =====
+    async function checkAdminStatus(user) {
+        try {
+            const localUser = getCurrentUserFromStorage();
+            if (!localUser) {
+                window.location.href = 'Login2.html';
+                return;
+            }
+
+            currentUser = localUser;
+
+            // التحقق من أن المستخدم أدمن
+            const isAdmin = ADMIN_IDS.includes(localUser.numericId) || 
+                           ADMIN_IDS.includes(localUser.uid) ||
+                           localUser.isAdmin === true;
+
+            if (!isAdmin) {
+                showToast('🚫 غير مصرح لك بالدخول إلى هذه الصفحة', 'error');
+                setTimeout(() => window.location.href = 'chat.html', 2000);
+                return;
+            }
+
+            loadUsers();
+
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+        }
+    }
+
+    // ===== جلب المستخدمين =====
+    async function loadUsers() {
+        try {
+            if (!database) return;
+
+            const snapshot = await database.ref('users').once('value');
+            allUsers = [];
+
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                for (const key in users) {
+                    const user = users[key];
+                    allUsers.push({
+                        ...user,
+                        firebaseKey: key,
+                        id: key
+                    });
+                }
+            }
+
+            renderAdminPanel();
+
+        } catch (error) {
+            console.error('Error loading users:', error);
+            showToast('❌ حدث خطأ في تحميل المستخدمين', 'error');
+        }
+    }
+
+    // ===== عرض لوحة التحكم =====
+    function renderAdminPanel() {
+        const totalUsers = allUsers.length;
+        const totalVip = allUsers.filter(u => (u.vipLevel || 0) > 0).length;
+        const totalSpent = allUsers.reduce((sum, u) => sum + (u.totalSpent || 0), 0);
+        const vipDistribution = {};
+        
+        allUsers.forEach(u => {
+            const level = u.vipLevel || 0;
+            vipDistribution[level] = (vipDistribution[level] || 0) + 1;
+        });
+
+        const html = `
+            <div class="admin-header">
+                <h1>👑 لوحة تحكم الأدمن</h1>
+                <p>إدارة المستخدمين والإنجازات والمقتنيات</p>
+            </div>
+
+            <!-- الإحصائيات -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">${totalUsers}</div>
+                    <div class="stat-label">👥 إجمالي المستخدمين</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${totalVip}</div>
+                    <div class="stat-label">⭐ مستخدمي VIP</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${totalSpent.toLocaleString()} ج.م</div>
+                    <div class="stat-label">💰 إجمالي الإنفاق</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${Object.keys(vipDistribution).length - 1}</div>
+                    <div class="stat-label">🏆 مستويات VIP مفعلة</div>
+                </div>
+            </div>
+
+            <!-- توزيع VIP -->
+            <div class="stats-grid" style="max-width: 800px;">
+                ${Object.keys(vipDistribution).sort((a,b) => a-b).map(level => `
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 1.2rem; color: ${level > 0 ? '#ffd700' : '#94a3b8'};">
+                            ${VIP_DATA[level]?.name || `VIP ${level}`}
+                        </div>
+                        <div class="stat-label">${vipDistribution[level]} مستخدم</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <!-- قائمة المستخدمين -->
+            <div class="section-title">
+                <i class="fas fa-users"></i> قائمة المستخدمين
+                <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">(${totalUsers} مستخدم)</span>
+            </div>
+
+            <div class="users-table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>المستخدم</th>
+                            <th>المعرف</th>
+                            <th>VIP</th>
+                            <th>الرصيد (ج.م)</th>
+                            <th>الرصيد ($)</th>
+                            <th>الإجمالي</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allUsers.map(u => `
+                            <tr>
+                                <td>${u.nickname || u.username || 'مستخدم'}</td>
+                                <td style="font-family: monospace;">${formatNumericId(u.numericId)}</td>
+                                <td>
+                                    <span class="vip-badge ${VIP_DATA[u.vipLevel || 0]?.class || 'vip-none'}">
+                                        ${VIP_DATA[u.vipLevel || 0]?.name || 'لا يوجد'}
+                                    </span>
+                                </td>
+                                <td>${u.balanceEGP || 0}</td>
+                                <td>${u.balanceUSD || 0}</td>
+                                <td>${u.totalSpent || 0}</td>
+                                <td>
+                                    <div class="admin-actions">
+                                        <button class="btn-give" onclick="giveVip('${u.firebaseKey}', ${(u.vipLevel || 0) + 1})">
+                                            ⬆ رفع VIP
+                                        </button>
+                                        <button class="btn-remove" onclick="removeVip('${u.firebaseKey}')">
+                                            ⬇ خفض VIP
+                                        </button>
+                                        <button class="btn-ban" onclick="banUser('${u.firebaseKey}')">
+                                            🚫 حظر
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        document.getElementById('adminContent').innerHTML = html;
+    }
+
+    // ===== رفع مستوى VIP =====
+    async function giveVip(userKey, newLevel) {
+        if (newLevel > 5) {
+            showToast('⚠️ أعلى مستوى هو VIP 5', 'warning');
+            return;
+        }
+
+        if (!confirm(`هل تريد رفع مستوى VIP إلى ${VIP_DATA[newLevel]?.name || `VIP ${newLevel}`}؟`)) return;
+
+        try {
+            const user = allUsers.find(u => u.firebaseKey === userKey);
+            if (!user) return;
+
+            await database.ref('users/' + userKey).update({
+                vipLevel: newLevel,
+                updatedAt: new Date().toISOString(),
+                [`achievements/vip_${newLevel}`]: new Date().toISOString()
+            });
+
+            showToast(`✅ تم رفع ${user.nickname || user.username} إلى ${VIP_DATA[newLevel]?.name}`, 'success');
+            loadUsers();
+
+        } catch (error) {
+            console.error('Error giving VIP:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    // ===== خفض مستوى VIP =====
+    async function removeVip(userKey) {
+        if (!confirm('هل تريد خفض مستوى VIP لهذا المستخدم؟')) return;
+
+        try {
+            const user = allUsers.find(u => u.firebaseKey === userKey);
+            if (!user) return;
+
+            const currentLevel = user.vipLevel || 0;
+            const newLevel = Math.max(0, currentLevel - 1);
+
+            await database.ref('users/' + userKey).update({
+                vipLevel: newLevel,
+                updatedAt: new Date().toISOString()
+            });
+
+            showToast(`✅ تم خفض ${user.nickname || user.username} إلى ${VIP_DATA[newLevel]?.name || 'لا يوجد VIP'}`, 'success');
+            loadUsers();
+
+        } catch (error) {
+            console.error('Error removing VIP:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    // ===== حظر المستخدم =====
+    async function banUser(userKey) {
+        if (!confirm('هل تريد حظر هذا المستخدم نهائياً؟')) return;
+
+        try {
+            const user = allUsers.find(u => u.firebaseKey === userKey);
+            if (!user) return;
+
+            await database.ref('users/' + userKey).update({
+                isBanned: true,
+                banReason: 'تم الحظر بواسطة الأدمن',
+                banExpiry: 'permanent',
+                updatedAt: new Date().toISOString()
+            });
+
+            showToast(`🚫 تم حظر ${user.nickname || user.username}`, 'success');
+            loadUsers();
+
+        } catch (error) {
+            console.error('Error banning user:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    // ===== دوال مساعدة =====
+    function getCurrentUserFromStorage() {
+        try {
+            return JSON.parse(localStorage.getItem('currentUser'));
+        } catch {
+            return null;
+        }
+    }
+
+    function formatNumericId(id) {
+        if (!id) return "000000";
+        const numId = parseInt(id);
+        if (isNaN(numId)) return "000000";
+        return numId.toString().padStart(6, '0');
+    }
+
+    function showToast(message, type = 'info') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+        toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> ${message}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'Login2.html';
+    }
+
+    // ===== التهيئة =====
+    window.onload = function() {
+        initializeFirebase();
+    };
+</script>
+</body>
+</html>
