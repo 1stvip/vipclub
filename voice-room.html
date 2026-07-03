@@ -15,7 +15,7 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
-        /* ... (نفس الأنماط السابقة) ... */
+        /* نفس الأنماط السابقة بالكامل */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -61,9 +61,7 @@
             gap: 10px;
         }
 
-        .seats-area {
-            width: 100%;
-        }
+        .seats-area { width: 100%; }
         .seats-area h2 {
             font-size: 0.95rem;
             margin-bottom: 8px;
@@ -72,7 +70,6 @@
             align-items: center;
             gap: 6px;
         }
-        .seats-area h2 i { font-size: 0.85rem; }
 
         .seats-container {
             display: flex;
@@ -269,37 +266,11 @@
             max-width: 70%;
             opacity: 0.8;
         }
-        .chat-messages .message.system.join { 
-            background: rgba(16, 185, 129, 0.06); 
-            color: #10b981; 
-            border-color: rgba(16, 185, 129, 0.06);
-        }
-        .chat-messages .message.system.leave { 
-            background: rgba(239, 68, 68, 0.04); 
-            color: #ef4444; 
-            border-color: rgba(239, 68, 68, 0.05);
-        }
+        .chat-messages .message.system.join { background: rgba(16, 185, 129, 0.06); color: #10b981; border-color: rgba(16, 185, 129, 0.06); }
+        .chat-messages .message.system.leave { background: rgba(239, 68, 68, 0.04); color: #ef4444; border-color: rgba(239, 68, 68, 0.05); }
         
-        .chat-messages .message.own { 
-            background: rgba(102, 126, 234, 0.15); 
-            align-self: flex-end; 
-            border: 1px solid rgba(102, 126, 234, 0.08);
-            border-radius: 12px 12px 4px 12px;
-            direction: rtl;
-            text-align: right;
-            max-width: 80%;
-            padding: 4px 10px;
-        }
-        .chat-messages .message.other { 
-            background: rgba(255,255,255,0.04); 
-            align-self: flex-start; 
-            border: 1px solid rgba(255,255,255,0.04);
-            border-radius: 12px 12px 12px 4px;
-            direction: ltr;
-            text-align: left;
-            max-width: 80%;
-            padding: 4px 10px;
-        }
+        .chat-messages .message.own { background: rgba(102, 126, 234, 0.15); align-self: flex-end; border: 1px solid rgba(102, 126, 234, 0.08); border-radius: 12px 12px 4px 12px; direction: rtl; text-align: right; max-width: 80%; padding: 4px 10px; }
+        .chat-messages .message.other { background: rgba(255,255,255,0.04); align-self: flex-start; border: 1px solid rgba(255,255,255,0.04); border-radius: 12px 12px 12px 4px; direction: ltr; text-align: left; max-width: 80%; padding: 4px 10px; }
         
         .chat-messages .message .msg-sender { font-size: 0.45rem; color: #888; margin-bottom: 1px; }
         .chat-messages .message .msg-sender.owner { color: #ffd700; }
@@ -511,126 +482,56 @@
 
         .connection-status {
             position: fixed;
-            bottom: 140px;
-            right: 15px;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.6rem;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.05);
-            color: #888;
-            z-index: 999;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            z-index: 1000;
             display: none;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            max-width: 90%;
         }
-        .connection-status.connected { border-color: #10b981; color: #10b981; display: block; }
-        .connection-status.disconnected { border-color: #ef4444; color: #ef4444; display: block; }
-        .connection-status.connecting { border-color: #f59e0b; color: #f59e0b; display: block; }
-
-        @media (max-width: 1024px) {
-            .seats-row.row-4 { max-width: 560px; }
-            .seats-row.row-3 { max-width: 420px; }
-            .seat { max-width: 110px; min-height: 100px; }
-            .seat.owner-seat { max-width: 125px; min-height: 115px; }
-            .seat .seat-avatar { width: 48px; height: 48px; font-size: 1.3rem; }
-            .chat-area { width: 60%; }
+        .connection-status.connected {
+            display: block;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        .connection-status.disconnected {
+            display: block;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        .connection-status.connecting {
+            display: block;
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
         }
 
         @media (max-width: 768px) {
-            .seats-row.row-4 { max-width: 100%; }
-            .seats-row.row-3 { max-width: 100%; }
-            .seats-row.row-2 { max-width: 100%; }
-            .seats-row.row-1 { max-width: 100%; }
+            .seats-row { gap: 8px; }
             .seat { max-width: 95px; min-height: 85px; padding: 10px 6px; }
-            .seat.owner-seat { max-width: 110px; min-height: 100px; }
             .seat .seat-avatar { width: 42px; height: 42px; font-size: 1.1rem; }
-            .seat .seat-username { font-size: 0.65rem; max-width: 70px; }
             .chat-area { width: 75%; height: 180px; }
             .audio-controls { bottom: 75px; right: 12px; gap: 6px; }
             .audio-btn { width: 38px; height: 38px; font-size: 1rem; }
-            .btn-leave-seat { width: 38px; height: 38px; font-size: 1rem; }
-            .emoji-picker { max-width: 180px; max-height: 100px; padding: 6px; }
-            .emoji-picker .emoji-item { width: 24px; height: 24px; font-size: 0.85rem; }
-            .room-info .room-name { max-width: 70px; font-size: 0.7rem; }
-            .room-info .room-id { font-size: 0.55rem; padding: 2px 6px; }
-            .btn-leave { padding: 3px 10px; font-size: 0.6rem; }
-            .logo { font-size: 1rem; }
-            .scroll-down-btn { width: 26px; height: 26px; font-size: 0.6rem; bottom: 55px; }
-            .connection-status { bottom: 135px; right: 12px; font-size: 0.5rem; padding: 4px 10px; }
         }
 
         @media (max-width: 480px) {
             header { padding: 0.4rem 3%; min-height: 44px; }
             .logo { font-size: 0.85rem; }
-            .logo i { font-size: 0.95rem; }
-            
             .seats-container { padding: 10px; gap: 8px; }
-            .seats-row { gap: 8px; }
             .seat { max-width: 75px; min-height: 70px; padding: 8px 4px; border-radius: 12px; }
-            .seat.owner-seat { max-width: 88px; min-height: 82px; }
-            .seat .seat-avatar { width: 34px; height: 34px; font-size: 0.9rem; border-width: 1.5px; }
-            .seat .seat-username { font-size: 0.55rem; max-width: 60px; }
-            .seat .seat-number { font-size: 0.45rem; }
-            .seat .seat-indicators .indicator { font-size: 0.45rem; }
-            .seat .seat-crown { font-size: 1.2rem; top: -12px; }
-            .seat .seat-badge-owner { font-size: 0.4rem; padding: 1px 6px; }
-            .seat .seat-actions button { font-size: 0.4rem; padding: 2px 5px; }
-            
+            .seat .seat-avatar { width: 34px; height: 34px; font-size: 0.9rem; }
             .chat-area { width: 90%; height: 150px; }
-            .chat-header { padding: 4px 8px; }
-            .chat-header h3 { font-size: 0.65rem; }
-            .chat-messages { padding: 5px 8px; gap: 3px; }
-            .chat-messages .message.system { font-size: 0.5rem; padding: 2px 8px; max-width: 85%; }
-            .chat-messages .message.own { padding: 3px 8px; font-size: 0.65rem; }
-            .chat-messages .message.other { padding: 3px 8px; font-size: 0.65rem; }
-            .chat-messages .message .msg-text { font-size: 0.65rem; }
-            
-            .chat-input-area { padding: 4px 6px; gap: 4px; }
-            .chat-input-area .input-wrapper { padding: 0 6px; min-width: 60px; }
-            .chat-input-area .input-wrapper input { padding: 3px 6px; font-size: 0.65rem; min-width: 30px; }
-            .chat-input-area .emoji-btn { font-size: 0.8rem; padding: 2px 4px; }
-            .chat-input-area .send-btn { padding: 4px 10px; font-size: 0.6rem; }
-            
             .audio-controls { bottom: 65px; right: 10px; gap: 5px; }
             .audio-btn { width: 34px; height: 34px; font-size: 0.85rem; }
             .btn-leave-seat { width: 34px; height: 34px; font-size: 0.85rem; }
-            .audio-btn .tooltip { right: 42px; font-size: 0.5rem; padding: 3px 8px; }
-            .btn-leave-seat .tooltip { right: 42px; font-size: 0.5rem; padding: 3px 8px; }
-            
-            .emoji-picker { max-width: 160px; max-height: 90px; padding: 5px; bottom: 35px; }
-            .emoji-picker .emoji-item { width: 22px; height: 22px; font-size: 0.8rem; }
-            
-            .mic-overlay .mic-box { padding: 20px; }
-            .mic-overlay .mic-box .mic-icon { font-size: 2.5rem; }
-            .mic-overlay .mic-box h2 { font-size: 1rem; }
-            .mic-overlay .mic-box p { font-size: 0.75rem; }
-            .mic-overlay .mic-box .btn-allow { font-size: 0.85rem; padding: 10px 20px; }
-            
-            .room-info .room-name { max-width: 50px; font-size: 0.6rem; }
-            .room-info .room-id { font-size: 0.45rem; padding: 2px 4px; }
-            .btn-leave { padding: 2px 8px; font-size: 0.5rem; border-radius: 4px; }
-            
-            .scroll-down-btn { width: 24px; height: 24px; font-size: 0.55rem; bottom: 48px; }
-            .connection-status { bottom: 130px; right: 10px; font-size: 0.45rem; padding: 3px 8px; }
-        }
-
-        @media (max-width: 380px) {
-            .seat { max-width: 60px; min-height: 58px; }
-            .seat.owner-seat { max-width: 72px; min-height: 70px; }
-            .seat .seat-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
-            .seat .seat-username { font-size: 0.45rem; max-width: 50px; }
-            .seat .seat-number { display: none; }
-            .seat .seat-indicators .indicator { font-size: 0.35rem; }
-            .seat .seat-crown { font-size: 1rem; top: -10px; }
-            
-            .chat-area { height: 130px; }
-            .chat-messages .message.system { font-size: 0.45rem; }
-            .chat-messages .message .msg-text { font-size: 0.55rem; }
-            
-            .audio-btn { width: 30px; height: 30px; font-size: 0.75rem; }
-            .btn-leave-seat { width: 30px; height: 30px; font-size: 0.75rem; }
-            .emoji-picker { max-width: 130px; max-height: 70px; }
-            .emoji-picker .emoji-item { width: 18px; height: 18px; font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -648,6 +549,8 @@
             <button class="btn-leave" onclick="leaveRoom()"><i class="fas fa-sign-out-alt"></i> مغادرة</button>
         </div>
     </header>
+
+    <div class="connection-status" id="connectionStatus">🔄 جاري الاتصال...</div>
 
     <div class="mic-overlay" id="micOverlay">
         <div class="mic-box">
@@ -733,8 +636,6 @@
         </button>
     </div>
 
-    <div class="connection-status" id="connectionStatus">🔗 جاري الاتصال...</div>
-
     <script>
         // ============================================================
         // 🔥 FIREBASE CONFIG
@@ -762,7 +663,6 @@
         let seatsListener = null;
         let roomInitialized = false;
         let audioContext = null;
-        let audioBuffers = [];
         let isSpeakerActive = true;
 
         // ============================================================
@@ -836,7 +736,6 @@
                 statusDiv.style.color = '#10b981';
                 btn.innerHTML = '<i class="fas fa-check"></i> تم السماح ✅';
                 btn.style.background = '#10b981';
-                initSounds();
                 setTimeout(() => {
                     document.getElementById('micOverlay').style.display = 'none';
                     initRoom();
@@ -857,71 +756,8 @@
 
         function skipMic() {
             document.getElementById('micOverlay').style.display = 'none';
-            initSounds();
             showToast('ℹ️ دخلت بدون ميكروفون (وضع الاستماع فقط)', 'info');
             initRoom();
-        }
-
-        // ============================================================
-        // 🔊 SOUND SYSTEM
-        // ============================================================
-        function generateSoundBuffer(frequency, duration, type = 'sine') {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            const sampleRate = audioContext.sampleRate;
-            const bufferLength = sampleRate * duration;
-            const buffer = audioContext.createBuffer(1, bufferLength, sampleRate);
-            const data = buffer.getChannelData(0);
-            
-            for (let i = 0; i < bufferLength; i++) {
-                const t = i / sampleRate;
-                if (type === 'sine') {
-                    data[i] = Math.sin(2 * Math.PI * frequency * t) * 0.5;
-                } else if (type === 'square') {
-                    data[i] = Math.sin(2 * Math.PI * frequency * t) > 0 ? 0.5 : -0.5;
-                } else if (type === 'sawtooth') {
-                    data[i] = (t * frequency) % 1 * 2 - 1;
-                } else if (type === 'noise') {
-                    data[i] = (Math.random() * 2 - 1) * 0.3;
-                }
-            }
-            return buffer;
-        }
-
-        function playSound(buffer, volume = 0.3) {
-            if (!isSpeakerActive) return null;
-            if (!audioContext) return null;
-            try {
-                const source = audioContext.createBufferSource();
-                source.buffer = buffer;
-                const gainNode = audioContext.createGain();
-                gainNode.gain.value = volume;
-                source.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                source.start();
-                return source;
-            } catch (e) {
-                console.log('Sound play error:', e);
-            }
-        }
-
-        function initSounds() {
-            try {
-                audioBuffers.push(generateSoundBuffer(440, 0.3, 'sine'));
-                audioBuffers.push(generateSoundBuffer(554, 0.3, 'sine'));
-                audioBuffers.push(generateSoundBuffer(659, 0.3, 'sine'));
-                audioBuffers.push(generateSoundBuffer(880, 0.2, 'sine'));
-                audioBuffers.push(generateSoundBuffer(523, 0.4, 'square'));
-                audioBuffers.push(generateSoundBuffer(392, 0.4, 'sawtooth'));
-                audioBuffers.push(generateSoundBuffer(200, 0.5, 'sine'));
-                audioBuffers.push(generateSoundBuffer(1000, 0.1, 'sine'));
-                audioBuffers.push(generateSoundBuffer(300, 0.6, 'noise'));
-                audioBuffers.push(generateSoundBuffer(600, 0.3, 'square'));
-                console.log('✅ تم توليد الأصوات للاختبار');
-            } catch (e) {
-                console.log('Sound init error:', e);
-            }
         }
 
         // ============================================================
@@ -1081,6 +917,7 @@
                 listenSeats();
                 setupChatScrollMonitoring();
 
+                // 🎵 بدء PeerJS للصوت بين الأجهزة مع إعدادات محسنة
                 initPeerJS();
                 
             } catch (error) {
@@ -1089,7 +926,7 @@
         }
 
         // ============================================================
-        // 🎵 PEERJS - نقل الصوت بين الأجهزة (محسّن)
+        // 🎵 PEERJS - نقل الصوت بين الأجهزة (محسّن مع TURN)
         // ============================================================
         function initPeerJS() {
             if (!mediaStream) {
@@ -1100,36 +937,31 @@
 
             const peerId = currentUser.numericId;
             
-            // إعدادات محسنة لخوادم ICE
+            // إعدادات محسنة مع خوادم TURN
             const peerConfig = {
                 debug: 2,
                 config: {
                     iceServers: [
+                        // STUN servers
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
                         { urls: 'stun:stun2.l.google.com:19302' },
                         { urls: 'stun:stun3.l.google.com:19302' },
                         { urls: 'stun:stun4.l.google.com:19302' },
-                        { urls: 'stun:stun.ekiga.net' },
-                        { urls: 'stun:stun.ideasip.com' },
-                        { urls: 'stun:stun.iptel.org' },
-                        { urls: 'stun:stun.rixtelecom.se' },
-                        { urls: 'stun:stun.schlund.de' },
-                        { urls: 'stun:stun.stunprotocol.org:3478' },
-                        { urls: 'stun:stun.voiparound.com' },
-                        { urls: 'stun:stun.voipbuster.com' },
-                        { urls: 'stun:stun.voipstunt.com' },
-                        { urls: 'stun:stun.voxgratia.org' },
-                        // خوادم TURN (للمساعدة في اختراق الجدران النارية)
+                        // TURN servers - مهم لتجاوز جدران الحماية
                         {
-                            urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
-                            credential: 'webrtc',
-                            username: 'webrtc'
+                            urls: [
+                                'turn:openrelay.metered.ca:80',
+                                'turn:openrelay.metered.ca:443',
+                                'turn:openrelay.metered.ca:443?transport=tcp'
+                            ],
+                            username: 'openrelayproject',
+                            credential: 'openrelayproject'
                         },
                         {
-                            urls: 'turn:turn.anyfirewall.com:443?transport=udp',
-                            credential: 'webrtc',
-                            username: 'webrtc'
+                            urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
+                            username: 'webrtc',
+                            credential: 'webrtc'
                         }
                     ],
                     iceTransportPolicy: 'all',
@@ -1141,7 +973,6 @@
                 peer = new Peer(peerId, peerConfig);
             } catch (e) {
                 console.error('❌ خطأ في إنشاء PeerJS:', e);
-                // محاولة بمعرف مختلف
                 const newId = peerId + '_' + Date.now();
                 peer = new Peer(newId, peerConfig);
             }
@@ -1192,7 +1023,6 @@
                 updateConnectionStatus('disconnected');
                 
                 if (err.type === 'unavailable-id' || err.type === 'peer-unavailable') {
-                    // محاولة إعادة الاتصال بمعرف جديد
                     if (!isReconnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                         isReconnecting = true;
                         reconnectAttempts++;
@@ -1207,7 +1037,6 @@
             peer.on('disconnected', () => {
                 console.log('🔌 PeerJS غير متصل');
                 updateConnectionStatus('disconnected');
-                // محاولة إعادة الاتصال
                 if (!isReconnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                     isReconnecting = true;
                     reconnectAttempts++;
@@ -1223,14 +1052,13 @@
                 updateConnectionStatus('disconnected');
             });
 
-            // الاستماع لتغيرات المقاعد للاتصال بالمستخدمين الجدد
+            // الاستماع لتغيرات المقاعد
             listenForPeerConnections();
         }
 
         function listenForPeerConnections() {
             if (!database || !roomId) return;
 
-            // الاستماع لإضافة مقاعد جديدة
             database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
                 const seatIndex = snapshot.key;
                 const seatData = snapshot.val();
@@ -1241,7 +1069,6 @@
                 }
             });
 
-            // الاستماع لتغيير المقاعد
             database.ref('rooms/' + roomId + '/seats').on('child_changed', (snapshot) => {
                 const seatData = snapshot.val();
                 if (seatData && seatData.userId && seatData.userId !== currentUser.numericId && seatData.peerId) {
@@ -1251,7 +1078,6 @@
                 }
             });
 
-            // الاستماع لإزالة المقاعد
             database.ref('rooms/' + roomId + '/seats').on('child_removed', (snapshot) => {
                 const seatData = snapshot.val();
                 if (seatData && seatData.peerId) {
@@ -1279,7 +1105,6 @@
             if (!peer || !mediaStream) return;
             if (peerId === myPeerId) return;
             if (peerConnections[peerId]) {
-                // التحقق من أن الاتصال لا يزال نشطاً
                 try {
                     if (peerConnections[peerId].open) {
                         return;
@@ -1326,7 +1151,6 @@
                     delete peerStreams[peerId];
                     removeRemoteAudio(peerId);
                     delete peerConnections[peerId];
-                    // محاولة إعادة الاتصال
                     setTimeout(() => {
                         connectToPeer(peerId, userId);
                     }, 3000);
@@ -1335,7 +1159,6 @@
                 peerConnections[peerId] = call;
             } catch (error) {
                 console.error('❌ خطأ في الاتصال بـ', peerId, error);
-                // محاولة إعادة الاتصال
                 setTimeout(() => {
                     connectToPeer(peerId, userId);
                 }, 2000);
@@ -1363,7 +1186,6 @@
             }
             
             try {
-                // إزالة أي عنصر صوت سابق لهذا المستخدم
                 removeRemoteAudio(peerId);
                 
                 const audioElement = document.createElement('audio');
@@ -1371,7 +1193,6 @@
                 audioElement.srcObject = stream;
                 audioElement.autoplay = true;
                 audioElement.style.display = 'none';
-                // إعدادات محسنة للصوت
                 audioElement.volume = 1.0;
                 audioElement.muted = false;
                 document.body.appendChild(audioElement);
@@ -1380,7 +1201,6 @@
                 if (playPromise !== undefined) {
                     playPromise.catch(e => {
                         console.log('⚠️ خطأ في تشغيل الصوت من', peerId, e);
-                        // محاولة إعادة التشغيل
                         setTimeout(() => {
                             if (audioElement) {
                                 audioElement.play().catch(() => {});
@@ -1412,11 +1232,14 @@
             const el = document.getElementById('connectionStatus');
             el.className = 'connection-status ' + status;
             if (status === 'connected') {
-                el.innerHTML = '🔗 متصل بالخادم الصوتي';
+                el.innerHTML = '✅ متصل بالصوت';
+                setTimeout(() => {
+                    el.className = 'connection-status';
+                }, 3000);
+            } else if (status === 'disconnected') {
+                el.innerHTML = '❌ انقطاع الاتصال... جاري إعادة المحاولة';
             } else if (status === 'connecting') {
-                el.innerHTML = '🔄 جاري الاتصال...';
-            } else {
-                el.innerHTML = '🔌 غير متصل - محاولة إعادة الاتصال...';
+                el.innerHTML = '🔄 جاري الاتصال بالصوت...';
             }
         }
 
@@ -1594,7 +1417,7 @@
         }
 
         // ============================================================
-        // 🪑 SEAT ACTIONS
+        // 🪑 SEAT ACTIONS (محسّن)
         // ============================================================
         async function joinSeat(seatIndex) {
             if (!database || !roomId) return;
@@ -2006,10 +1829,15 @@
                 warning: '#f59e0b',
                 info: '#3b82f6'
             };
+            
+            const oldToast = document.querySelector('.toast-message');
+            if (oldToast) oldToast.remove();
+            
             const toast = document.createElement('div');
+            toast.className = 'toast-message';
             toast.style.cssText = `
                 position: fixed; top: 60px; right: 15px; padding: 6px 14px; border-radius: 8px;
-                color: white; font-weight: 600; z-index: 9999; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+                color: white; font-weight: 600; z-index: 10000; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
                 animation: slideDown 0.3s ease-out; max-width: 280px;
                 background: ${colors[type] || colors.info}; direction: rtl; font-size: 0.75rem;
             `;
@@ -2027,6 +1855,16 @@
         // 🚀 INIT ON PAGE LOAD
         // ============================================================
         window.onload = function() {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                database = firebase.database();
+                console.log('✅ Firebase connected');
+            } catch (error) {
+                console.error('❌ Firebase error:', error);
+            }
+            
             const roomIdFromURL = getRoomIdFromURL();
             if (!roomIdFromURL) {
                 showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
