@@ -15,7 +15,6 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
-        /* جميع الأنماط كما هي */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -81,6 +80,7 @@
             border-radius: 14px;
             border: 1px solid rgba(255,255,255,0.05);
             width: 100%;
+            min-height: 200px;
         }
 
         .seats-row {
@@ -556,7 +556,7 @@
         let isSpeakerActive = true;
 
         // ============================================================
-        // 🎵 PEERJS - للصوت بين الأجهزة
+        // 🎵 PEERJS
         // ============================================================
         let peer = null;
         let myPeerId = null;
@@ -665,12 +665,12 @@
                 mediaStream.getAudioTracks().forEach(track => track.enabled = false);
                 btn.className = 'audio-btn mic-inactive';
                 btn.innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
-                showToast('🔇 تم كتم الميكروفون (لا أحد يسمعك)', 'warning');
+                showToast('🔇 تم كتم الميكروفون', 'warning');
             } else {
                 mediaStream.getAudioTracks().forEach(track => track.enabled = true);
                 btn.className = 'audio-btn mic-active';
                 btn.innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">الميكروفون نشط</span>';
-                showToast('🔊 تم تفعيل الميكروفون (الجميع يسمعك)', 'success');
+                showToast('🔊 تم تفعيل الميكروفون', 'success');
             }
             if (roomId && mySeatIndex !== -1) {
                 database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/muted').set(isMicMuted);
@@ -684,7 +684,7 @@
             if (!isSpeakerActive) {
                 btn.className = 'audio-btn speaker-inactive';
                 btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">السماعة مكتومة</span>';
-                showToast('🔇 تم كتم السماعة (لا تسمع أحداً)', 'warning');
+                showToast('🔇 تم كتم السماعة', 'warning');
                 if (audioContext) {
                     audioContext.close();
                     audioContext = null;
@@ -692,7 +692,7 @@
             } else {
                 btn.className = 'audio-btn speaker-active';
                 btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">السماعة نشطة</span>';
-                showToast('🔊 تم تفعيل السماعة (تسمع الجميع)', 'success');
+                showToast('🔊 تم تفعيل السماعة', 'success');
                 if (!audioContext) {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 }
@@ -802,7 +802,6 @@
         // ============================================================
         function initPeerJS() {
             if (!mediaStream) {
-                console.log('⏳ انتظار تدفق الصوت قبل بدء PeerJS');
                 setTimeout(initPeerJS, 1000);
                 return;
             }
@@ -849,11 +848,6 @@
                         delete peerStreams[call.peer];
                         removeRemoteAudio(call.peer);
                     });
-                    call.on('error', (err) => {
-                        console.error('❌ خطأ في المكالمة مع', call.peer, err);
-                        delete peerStreams[call.peer];
-                        removeRemoteAudio(call.peer);
-                    });
                     peerConnections[call.peer] = call;
                 } catch (e) {
                     console.error('❌ خطأ في استقبال المكالمة:', e);
@@ -872,28 +866,11 @@
             if (!database || !roomId) return;
 
             database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
-                const seatIndex = snapshot.key;
                 const seatData = snapshot.val();
                 if (seatData && seatData.userId && seatData.userId !== currentUser.numericId && seatData.peerId) {
                     setTimeout(() => {
-                        connectToPeer(seatData.peerId, seatData.userId);
+                        connectToPeer(seatData.peerId);
                     }, 1000);
-                }
-            });
-
-            database.ref('rooms/' + roomId + '/seats').on('child_changed', (snapshot) => {
-                const seatData = snapshot.val();
-                if (seatData && seatData.userId && seatData.userId !== currentUser.numericId && seatData.peerId) {
-                    setTimeout(() => {
-                        connectToPeer(seatData.peerId, seatData.userId);
-                    }, 500);
-                }
-            });
-
-            database.ref('rooms/' + roomId + '/seats').on('child_removed', (snapshot) => {
-                const seatData = snapshot.val();
-                if (seatData && seatData.peerId) {
-                    disconnectFromPeer(seatData.peerId);
                 }
             });
         }
@@ -906,29 +883,18 @@
                     const seat = seats[key];
                     if (seat && seat.userId && seat.userId !== currentUser.numericId && seat.peerId) {
                         setTimeout(() => {
-                            connectToPeer(seat.peerId, seat.userId);
+                            connectToPeer(seat.peerId);
                         }, 500);
                     }
                 });
             });
         }
 
-        function connectToPeer(peerId, userId) {
+        function connectToPeer(peerId) {
             if (!peer || !mediaStream) return;
             if (peerId === myPeerId) return;
-            if (peerConnections[peerId]) {
-                try {
-                    if (peerConnections[peerId].open) {
-                        return;
-                    }
-                } catch (e) {
-                    delete peerConnections[peerId];
-                }
-            }
+            if (peerConnections[peerId]) return;
 
-            console.log('🔗 الاتصال بـ:', peerId);
-            updateConnectionStatus('connecting');
-            
             try {
                 const call = peer.call(peerId, mediaStream);
                 if (!call) return;
@@ -949,29 +915,9 @@
                     delete peerConnections[peerId];
                 });
 
-                call.on('error', (err) => {
-                    console.error('❌ خطأ في المكالمة مع', peerId, err);
-                    delete peerStreams[peerId];
-                    removeRemoteAudio(peerId);
-                    delete peerConnections[peerId];
-                });
-
                 peerConnections[peerId] = call;
             } catch (error) {
                 console.error('❌ خطأ في الاتصال بـ', peerId, error);
-            }
-        }
-
-        function disconnectFromPeer(peerId) {
-            try {
-                if (peerConnections[peerId]) {
-                    peerConnections[peerId].close();
-                    delete peerConnections[peerId];
-                }
-                delete peerStreams[peerId];
-                removeRemoteAudio(peerId);
-            } catch (e) {
-                console.log('Error disconnecting from peer:', e);
             }
         }
 
@@ -986,29 +932,18 @@
                 audioElement.srcObject = stream;
                 audioElement.autoplay = true;
                 audioElement.style.display = 'none';
-                audioElement.volume = 1.0;
-                audioElement.muted = false;
                 document.body.appendChild(audioElement);
                 
-                audioElement.play().catch(e => {
-                    console.log('⚠️ خطأ في تشغيل الصوت من', peerId, e);
-                });
-                console.log('✅ تشغيل صوت من:', peerId);
+                audioElement.play().catch(e => console.log('Audio play error:', e));
             } catch (e) {
-                console.log('❌ خطأ في تشغيل الصوت من', peerId, e);
+                console.log('Error playing remote audio:', e);
             }
         }
 
         function removeRemoteAudio(peerId) {
             const audioEl = document.getElementById('audio-' + peerId);
             if (audioEl) {
-                try {
-                    audioEl.pause();
-                    audioEl.srcObject = null;
-                    audioEl.remove();
-                } catch (e) {
-                    console.log('Error removing audio element:', e);
-                }
+                audioEl.remove();
             }
         }
 
@@ -1021,9 +956,9 @@
                     el.className = 'connection-status';
                 }, 3000);
             } else if (status === 'disconnected') {
-                el.innerHTML = '❌ انقطاع الاتصال... جاري إعادة المحاولة';
+                el.innerHTML = '❌ انقطاع الاتصال';
             } else if (status === 'connecting') {
-                el.innerHTML = '🔄 جاري الاتصال بالصوت...';
+                el.innerHTML = '🔄 جاري الاتصال';
             }
         }
 
@@ -1056,11 +991,10 @@
         }
 
         // ============================================================
-        // 💺 SEATS MANAGEMENT (محسّن)
+        // 💺 SEATS MANAGEMENT - مبسط ومضمون
         // ============================================================
         function listenSeats() {
             if (!database) return;
-            // استخدام 'value' بدلاً من 'child_added' للتحديث الكامل
             seatsListener = database.ref('rooms/' + roomId + '/seats').on('value', (snapshot) => {
                 const seats = snapshot.val() || {};
                 console.log('🔄 تحديث المقاعد:', seats);
@@ -1074,6 +1008,21 @@
             let occupied = 0;
             let globalIndex = 0;
 
+            // تحديث mySeatIndex بناءً على البيانات الحالية
+            let foundMySeat = false;
+            for (const key in seats) {
+                if (seats[key].userId == currentUser.numericId) {
+                    mySeatIndex = parseInt(key);
+                    foundMySeat = true;
+                    document.getElementById('leaveSeatBtn').style.display = 'flex';
+                    break;
+                }
+            }
+            if (!foundMySeat) {
+                mySeatIndex = -1;
+                document.getElementById('leaveSeatBtn').style.display = 'none';
+            }
+
             SEATS_LAYOUT.forEach((rowData, rowIndex) => {
                 const rowClass = `row-${rowIndex + 1}`;
                 html += `<div class="seats-row ${rowClass}">`;
@@ -1082,20 +1031,9 @@
                     const seat = seats[globalIndex] || null;
                     const isOccupied = seat !== null;
                     
-                    if (isOccupied) {
-                        occupied++;
-                        console.log(`✅ مقعد ${globalIndex + 1} مشغول بواسطة:`, seat.username);
-                    }
+                    if (isOccupied) occupied++;
 
                     const isMySeat = seat && seat.userId == currentUser.numericId;
-                    if (isMySeat) {
-                        mySeatIndex = globalIndex;
-                        document.getElementById('leaveSeatBtn').style.display = 'flex';
-                        if (peer && myPeerId) {
-                            database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
-                        }
-                    }
-
                     const isSeatOwner = seat && seat.isOwner === true;
                     const isOwnerSeat = globalIndex === 0;
                     const isSpeaking = seat && seat.speaking === true;
@@ -1121,14 +1059,10 @@
                     let clickHandler = '';
                     if (isOccupied) {
                         clickHandler = `onclick="openProfilePopup('${globalIndex}')"`;
-                    } else if (!isOwnerSeat || isOwner) {
+                    } else if (globalIndex === 0 && !isOwner) {
+                        clickHandler = '';
+                    } else {
                         clickHandler = `onclick="joinSeat(${globalIndex})"`;
-                    }
-
-                    // عرض معلومات الحالة للمقعد
-                    let statusBadge = '';
-                    if (isOccupied && isSeatOwner) {
-                        statusBadge = `<div class="seat-badge-owner">👑 المالك</div>`;
                     }
 
                     html += `
@@ -1147,7 +1081,7 @@
                                     ${avatarLetter}
                                 </div>
                                 <div class="seat-username ${isSeatOwner ? 'owner-name' : ''}">${displayName}</div>
-                                ${statusBadge}
+                                ${isSeatOwner ? `<div class="seat-badge-owner">👑 المالك</div>` : ''}
                                 <div class="seat-indicators">
                                     <span class="indicator ${isMuted ? 'mic-off' : 'mic-on'}" title="${isMuted ? 'الميكروفون مكتوم' : 'الميكروفون نشط'}">
                                         <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
@@ -1165,13 +1099,8 @@
                                         <button class="btn-ban" onclick="event.stopPropagation();banUser(${globalIndex})">🚫 حظر</button>
                                     </div>
                                 ` : ''}
-                                ${isOwner && isOwnerSeat && isOccupied && isMySeat ? `
-                                    <div class="seat-actions" onclick="event.stopPropagation();">
-                                        <button class="btn-close-seat" onclick="event.stopPropagation();leaveSeat()">🚪 مغادرة</button>
-                                    </div>
-                                ` : ''}
                             ` : `
-                                ${isOwnerSeat ? `
+                                ${globalIndex === 0 ? `
                                     <div class="seat-crown">👑</div>
                                     <div class="seat-avatar" style="border-color: #ffd700 !important;">
                                         <i class="fas fa-crown" style="color: #ffd700;"></i>
@@ -1210,7 +1139,7 @@
         }
 
         // ============================================================
-        // 🪑 SEAT ACTIONS (محسّن)
+        // 🪑 JOIN SEAT - مبسط ومضمون
         // ============================================================
         async function joinSeat(seatIndex) {
             if (!database || !roomId) return;
@@ -1232,32 +1161,32 @@
                     }
                 }
 
-                // جلب المقاعد الحالية
+                // 1. جلب المقاعد الحالية
                 const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const seats = seatsSnapshot.val() || {};
                 
-                // التحقق من أن المستخدم ليس في مقعد آخر
+                // 2. إذا كان المستخدم في مقعد آخر، قم بإزالته
                 for (const key in seats) {
                     if (seats[key].userId == currentUser.numericId) {
-                        // إذا كان في مقعد آخر، قم بإزالته أولاً
-                        console.log('🔄 المستخدم في مقعد آخر، سيتم إزالته:', key);
+                        console.log('🔄 إزالة المستخدم من مقعد:', key);
                         await database.ref('rooms/' + roomId + '/seats/' + key).remove();
                     }
                 }
 
-                // التحقق من أن المقعد غير مشغول
-                const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
-                if (seatSnapshot.exists()) {
+                // 3. التحقق من أن المقعد غير مشغول
+                const seatCheck = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
+                if (seatCheck.exists()) {
                     showToast('⚠️ هذا المقعد مشغول', 'warning');
                     return;
                 }
 
-                // التحقق من مقعد المالك
+                // 4. التحقق من مقعد المالك
                 if (seatIndex === 0 && !isOwner) {
                     showToast('⚠️ هذا المقعد خاص بمالك الغرفة فقط', 'warning');
                     return;
                 }
 
+                // 5. إنشاء بيانات المقعد
                 const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#f6d365', '#a18cd1', '#fbc2eb', '#a6c1ee', '#fddb92'];
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
@@ -1274,23 +1203,25 @@
                     peerId: myPeerId || currentUser.numericId
                 };
 
-                console.log('📝 بيانات المقعد:', seatData);
+                console.log('📝 حفظ بيانات المقعد:', seatData);
 
-                // حفظ بيانات المقعد
+                // 6. حفظ المقعد
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).set(seatData);
 
-                // تحديث عدد الأعضاء
+                // 7. تحديث عدد الأعضاء
                 const updatedSeats = await database.ref('rooms/' + roomId + '/seats').once('value');
                 const updatedSeatsData = updatedSeats.val() || {};
                 const membersCount = Object.keys(updatedSeatsData).length;
                 await database.ref('rooms/' + roomId + '/members').set(membersCount);
 
+                // 8. تحديث المتغيرات المحلية
                 mySeatIndex = seatIndex;
                 document.getElementById('leaveSeatBtn').style.display = 'flex';
 
-                // إعادة تحميل المقاعد لتحديث الواجهة
+                // 9. إعادة تحميل المقاعد
                 renderSeatsPyramid(updatedSeatsData);
 
+                // 10. إرسال رسالة في الشات
                 if (seatIndex === 0 && isOwner) {
                     showToast(`👑 جلست على مقعد المالك`, 'success');
                     addChatMessage('system', `👑 **${currentUser.nickname || currentUser.username}** جلس على مقعد المالك`, null, null, 'join');
@@ -1300,13 +1231,13 @@
                 }
 
             } catch (error) {
-                console.error('❌ خطأ في الجلوس على المقعد:', error);
+                console.error('❌ خطأ في الجلوس:', error);
                 showToast('❌ حدث خطأ في الجلوس على المقعد', 'error');
             }
         }
 
         // ============================================================
-        // 🚪 LEAVE SEAT (محسّن)
+        // 🚪 LEAVE SEAT
         // ============================================================
         async function leaveSeat() {
             if (mySeatIndex === -1) {
@@ -1331,14 +1262,13 @@
                 mySeatIndex = -1;
                 document.getElementById('leaveSeatBtn').style.display = 'none';
                 
-                // إعادة تحميل المقاعد
                 renderSeatsPyramid(seats);
                 
                 showToast('✅ تم مغادرة المقعد', 'success');
                 addChatMessage('system', `🚪 **${username}** غادر المقعد`, null, null, 'leave');
 
             } catch (error) {
-                console.error('❌ خطأ في مغادرة المقعد:', error);
+                console.error('❌ خطأ في المغادرة:', error);
                 showToast('❌ حدث خطأ في مغادرة المقعد', 'error');
             }
         }
@@ -1354,8 +1284,6 @@
                 const seatSnapshot = await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value');
                 const seat = seatSnapshot.val();
                 if (!seat) return;
-
-                await sendNotification(seat.userId, '🚫 تم طردك من الغرفة', `تم طردك من غرفة "${roomData.name}" بواسطة المالك.`);
 
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
                 addChatMessage('system', `🚫 **${seat.username}** تم طرده من الغرفة`, null, null, 'leave');
@@ -1388,8 +1316,6 @@
                     bannedAt: new Date().toISOString(),
                     bannedBy: currentUser.numericId
                 });
-
-                await sendNotification(seat.userId, '🚫 تم حظرك من الغرفة', `تم حظرك من غرفة "${roomData.name}" نهائياً بواسطة المالك.`);
 
                 await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
                 addChatMessage('system', `🚫 **${seat.username}** تم حظره من الغرفة نهائياً`, null, null, 'leave');
@@ -1522,7 +1448,7 @@
         }
 
         // ============================================================
-        // 📜 CHAT SCROLL MANAGEMENT
+        // 📜 CHAT SCROLL
         // ============================================================
         function isUserAtBottom() {
             const container = document.getElementById('chatMessages');
@@ -1558,28 +1484,6 @@
         }
 
         // ============================================================
-        // 🔔 SEND NOTIFICATION
-        // ============================================================
-        async function sendNotification(userId, title, message) {
-            if (!database) return;
-            try {
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
-                if (!snapshot.exists()) return;
-                const userData = snapshot.val();
-                const userKey = Object.keys(userData)[0];
-                await database.ref('users/' + userKey + '/notifications').push({
-                    text: `${title}\n${message}`,
-                    date: new Date().toLocaleString('ar-EG'),
-                    read: false,
-                    type: 'room_invite'
-                });
-            } catch (error) {
-                console.error('Error sending notification:', error);
-            }
-        }
-
-        // ============================================================
         // 🚪 LEAVE ROOM
         // ============================================================
         async function leaveRoom() {
@@ -1601,7 +1505,7 @@
         }
 
         // ============================================================
-        // 🍞 TOAST SYSTEM
+        // 🍞 TOAST
         // ============================================================
         function showToast(message, type = 'info') {
             const colors = {
@@ -1633,7 +1537,7 @@
         }
 
         // ============================================================
-        // 🚀 INIT ON PAGE LOAD
+        // 🚀 INIT
         // ============================================================
         window.onload = function() {
             try {
@@ -1657,7 +1561,7 @@
         };
 
         // ============================================================
-        // 🧹 CLEANUP ON UNLOAD
+        // 🧹 CLEANUP
         // ============================================================
         window.addEventListener('beforeunload', function() {
             if (roomId && mySeatIndex !== -1) {
