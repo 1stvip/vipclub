@@ -476,7 +476,7 @@
             transform: translateY(-2px);
         }
 
-        /* ===== المقاعد ===== */
+        /* ===== المقاعد - النسخة الأصلية ===== */
         .seats-area { width: 100%; }
         .seats-area h2 {
             font-size: 0.95rem;
@@ -505,70 +505,39 @@
             gap: 14px;
             width: 100%;
         }
-        .seats-row.row-1 { max-width: 180px; }
-        .seats-row.row-2 { max-width: 360px; }
-        .seats-row.row-3 { max-width: 540px; }
-        .seats-row.row-4 { max-width: 720px; }
+        .seats-row.row-1 { max-width: 160px; }
+        .seats-row.row-2 { max-width: 340px; }
+        .seats-row.row-3 { max-width: 520px; }
+        .seats-row.row-4 { max-width: 700px; }
 
         .seat {
             background: rgba(255,255,255,0.05);
             border: 2px solid rgba(255,255,255,0.1);
             border-radius: 16px;
-            padding: 16px 12px;
+            padding: 14px 10px;
             text-align: center;
             transition: all 0.3s ease;
             position: relative;
-            min-height: 150px;
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             flex: 1;
-            max-width: 150px;
-            min-width: 100px;
+            max-width: 130px;
             cursor: pointer;
         }
         .seat:hover { transform: translateY(-3px); }
-
-        .seat .seat-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            color: #666;
-            margin-bottom: 6px;
-            border: 2px dashed rgba(255,255,255,0.08);
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
 
         .seat.owner-seat {
             background: linear-gradient(145deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
             border: 2px solid #ffd700;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
-            min-height: 170px;
-            max-width: 170px;
-            min-width: 120px;
+            min-height: 140px;
+            max-width: 150px;
         }
-        .seat.owner-seat .seat-avatar {
-            width: 65px;
-            height: 65px;
-            font-size: 2rem;
-            border-color: #ffd700 !important;
-            background: linear-gradient(135deg, #ffd700, #f59e0b) !important;
-            color: #1a1a2e !important;
-        }
-        .seat.owner-seat .seat-crown {
-            position: absolute;
-            top: -16px;
-            font-size: 1.8rem;
-            animation: crown-glow 2s ease-in-out infinite;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-        }
+        .seat.owner-seat .seat-avatar { border-color: #ffd700 !important; background: linear-gradient(135deg, #ffd700, #f59e0b) !important; color: #1a1a2e !important; }
+        .seat.owner-seat .seat-crown { position: absolute; top: -16px; font-size: 1.8rem; animation: crown-glow 2s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
         @keyframes crown-glow { 0%, 100% { transform: scale(1) rotate(-5deg); } 50% { transform: scale(1.1) rotate(5deg); } }
         .seat.owner-seat .seat-username { color: #ffd700 !important; font-size: 0.85rem; }
         .seat.owner-seat .seat-badge-owner { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; padding: 2px 12px; border-radius: 12px; font-size: 0.55rem; font-weight: bold; margin-top: 3px; }
@@ -578,7 +547,15 @@
         .seat.empty .seat-avatar { border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
 
         .seat.occupied { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); }
-
+        .seat.occupied .seat-avatar {
+            width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; font-weight: bold; margin-bottom: 6px; border: 2px solid #10b981;
+        }
+        .seat .seat-avatar {
+            width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #666;
+            margin-bottom: 6px; border: 2px dashed rgba(255,255,255,0.08); transition: all 0.3s ease;
+        }
         .seat .seat-number { font-size: 0.55rem; color: #555; margin-top: 3px; }
         .seat .seat-username { font-size: 0.75rem; font-weight: 600; margin-top: 3px; color: #ccc; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .seat .seat-username.owner-name { color: #ffd700; }
@@ -1214,10 +1191,8 @@
         /* ===== توافق الجوال ===== */
         @media (max-width: 768px) {
             .seats-row { gap: 8px; }
-            .seat { min-height: 120px; max-width: 110px; min-width: 80px; padding: 12px 8px; }
-            .seat .seat-avatar { width: 48px; height: 48px; font-size: 1.4rem; }
-            .seat.owner-seat { min-height: 140px; max-width: 130px; min-width: 100px; }
-            .seat.owner-seat .seat-avatar { width: 52px; height: 52px; font-size: 1.6rem; }
+            .seat { max-width: 95px; min-height: 85px; padding: 10px 6px; }
+            .seat .seat-avatar { width: 42px; height: 42px; font-size: 1.1rem; }
             .chat-area { width: 75%; height: 180px; }
             .audio-controls { bottom: 75px; right: 12px; gap: 6px; }
             .audio-btn { width: 38px; height: 38px; font-size: 1rem; }
@@ -1231,10 +1206,8 @@
 
         @media (max-width: 480px) {
             .seats-container { padding: 10px; gap: 8px; }
-            .seat { min-height: 100px; max-width: 85px; min-width: 65px; padding: 8px 4px; border-radius: 12px; }
-            .seat .seat-avatar { width: 38px; height: 38px; font-size: 1.1rem; }
-            .seat.owner-seat { min-height: 120px; max-width: 100px; min-width: 80px; }
-            .seat.owner-seat .seat-avatar { width: 42px; height: 42px; font-size: 1.3rem; }
+            .seat { max-width: 75px; min-height: 70px; padding: 8px 4px; border-radius: 12px; }
+            .seat .seat-avatar { width: 34px; height: 34px; font-size: 0.9rem; }
             .chat-area { width: 90%; height: 150px; }
             .audio-controls { bottom: 65px; right: 10px; gap: 5px; }
             .audio-btn { width: 34px; height: 34px; font-size: 0.85rem; }
@@ -2937,7 +2910,7 @@
     }
 
     // ============================================================
-    // 💺 دوال المقاعد
+    // 💺 دوال المقاعد - النسخة الأصلية
     // ============================================================
     const SEATS_LAYOUT = [
         { row: 0, seats: 1 },
@@ -3030,7 +3003,7 @@
                                 <div class="sound-waves">
                                     <div class="wave"></div>
                                     <div class="wave"></div>
-                                    <div class="wave"></div>
+                                    <div class="wave></div>
                                     <div class="wave"></div>
                                 </div>
                             ` : ''}
@@ -3439,39 +3412,72 @@
         if (!database || !roomId) return;
         
         try {
-            const snapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
-            const seats = snapshot.val() || {};
-            const list = document.getElementById('usersList');
+            // جلب جميع المستخدمين من الغرفة
+            const seatsSnapshot = await database.ref('rooms/' + roomId + '/seats').once('value');
+            const seats = seatsSnapshot.val() || {};
             
+            // جلب قائمة المستخدمين المسجلين في الغرفة من خلال جدول users
+            const usersRef = database.ref('users');
+            const allUsersSnapshot = await usersRef.once('value');
+            const allUsers = allUsersSnapshot.val() || {};
+            
+            const list = document.getElementById('usersList');
             const users = [];
+            
+            // إضافة المستخدمين الجالسين على المقاعد
             for (const key in seats) {
                 const seat = seats[key];
                 if (seat && seat.userId) {
                     users.push({
-                        seatIndex: key,
                         userId: seat.userId,
                         username: seat.username || 'مستخدم',
                         isOwner: seat.isOwner || false,
                         muted: seat.muted || false,
                         color: seat.color || '#667eea',
-                        avatar: seat.avatar || null
+                        avatar: seat.avatar || null,
+                        isInSeat: true
                     });
                 }
             }
 
-            // Add owner if not in seats
+            // إضافة المالك إذا لم يكن في المقاعد
             if (roomData && roomData.creatorId) {
                 const ownerInSeats = users.some(u => u.userId == roomData.creatorId);
                 if (!ownerInSeats) {
+                    // البحث عن المالك في users
+                    let ownerName = roomData.creatorName || 'المالك';
                     users.push({
-                        seatIndex: 'owner',
                         userId: roomData.creatorId,
-                        username: roomData.creatorName || 'المالك',
+                        username: ownerName,
                         isOwner: true,
                         muted: false,
                         color: '#ffd700',
-                        avatar: null
+                        avatar: null,
+                        isInSeat: false
                     });
+                }
+            }
+
+            // إضافة جميع المستخدمين الآخرين (غير الجالسين على مقاعد)
+            // الذين لديهم حساب في النظام
+            for (const key in allUsers) {
+                const userData = allUsers[key];
+                if (userData && userData.numericId) {
+                    // التحقق من أن المستخدم ليس موجوداً بالفعل في القائمة
+                    const exists = users.some(u => u.userId == userData.numericId);
+                    if (!exists) {
+                        // التحقق من أن المستخدم هو مالك الغرفة أو تمت دعوته
+                        // سنضيف جميع المستخدمين المسجلين في النظام
+                        users.push({
+                            userId: userData.numericId,
+                            username: userData.nickname || userData.username || 'مستخدم',
+                            isOwner: false,
+                            muted: false,
+                            color: '#6b7280',
+                            avatar: userData.avatar || null,
+                            isInSeat: false
+                        });
+                    }
                 }
             }
 
@@ -3486,7 +3492,7 @@
                         ${user.avatar ? `<img src="${user.avatar}" alt="">` : user.username.charAt(0).toUpperCase()}
                     </div>
                     <div class="user-info-small">
-                        <div class="user-name-small">${user.username} ${user.isOwner ? '👑' : ''}</div>
+                        <div class="user-name-small">${user.username} ${user.isOwner ? '👑' : ''} ${user.isInSeat ? '🪑' : ''}</div>
                         <div class="user-id-small">🆔 ${user.userId}</div>
                         <div class="user-status-small">${user.muted ? '🔇 مكتوم' : '🎤 نشط'}</div>
                     </div>
