@@ -141,7 +141,7 @@
             text-align: center;
         }
 
-        /* ===== ROOM CARD مع VIP ===== */
+        /* ===== ROOM CARD ===== */
         .room-card {
             background: white;
             border-radius: 16px;
@@ -159,77 +159,27 @@
         }
 
         .room-card .room-header {
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
-            padding: 25px 20px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            padding: 20px;
             color: white;
             position: relative;
             overflow: hidden;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
 
-        /* ===== VIP WAVE EFFECT ===== */
-        .room-card .room-header .vip-wave {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #0a0a1a;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .room-card .room-header .vip-wave::before {
+        .room-card .room-header::after {
             content: '';
             position: absolute;
             top: -50%;
-            left: -50%;
+            right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 50%, transparent 40%, rgba(0,0,0,0.8) 60%, #0a0a1a 100%);
-            animation: waveMove 6s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            animation: shimmer 4s infinite linear;
         }
 
-        .room-card .room-header .vip-wave::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 70% 50%, transparent 40%, rgba(0,0,0,0.6) 60%, #0a0a1a 100%);
-            animation: waveMove 8s ease-in-out infinite reverse;
-        }
-
-        @keyframes waveMove {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(5%, 5%) rotate(5deg); }
-            50% { transform: translate(10%, 0) rotate(0deg); }
-            75% { transform: translate(5%, -5%) rotate(-5deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-
-        .room-card .room-header .vip-text {
-            position: relative;
-            z-index: 2;
-            font-size: 2.5rem;
-            font-weight: 900;
-            letter-spacing: 8px;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
-            animation: vipGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes vipGlow {
-            0% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1); }
-            50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.5), 0 0 80px rgba(255, 215, 0, 0.2), 0 0 120px rgba(255, 215, 0, 0.1); }
-            100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1); }
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .room-card .room-header .room-id {
@@ -243,10 +193,26 @@
             font-weight: bold;
             letter-spacing: 0.5px;
             backdrop-filter: blur(5px);
-            z-index: 3;
+            z-index: 1;
         }
 
-        .room-card .room-header .room-status {
+        .room-card .room-header .room-icon {
+            font-size: 2.5rem;
+            margin-bottom: 3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .room-card .room-header .room-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 3px;
+            position: relative;
+            z-index: 1;
+            word-break: break-word;
+        }
+
+        .room-card .room-status {
             position: absolute;
             top: 12px;
             left: 12px;
@@ -255,7 +221,7 @@
             font-size: 0.65rem;
             font-weight: bold;
             text-transform: uppercase;
-            z-index: 3;
+            z-index: 1;
         }
 
         .room-status.live {
@@ -271,17 +237,6 @@
         .room-status.closed {
             background: #ef4444;
             color: white;
-        }
-
-        .room-card .room-header .room-name {
-            position: relative;
-            z-index: 2;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 8px;
-            word-break: break-word;
-            color: #fff;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .room-card .room-body {
@@ -1719,11 +1674,6 @@
                 padding: 18px;
                 max-width: 95%;
             }
-
-            .room-card .room-header .vip-text {
-                font-size: 1.8rem;
-                letter-spacing: 5px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -1854,16 +1804,6 @@
             .gifts-modal .gifts-container .gift-item .gift-details {
                 flex-direction: column;
                 align-items: flex-start;
-            }
-
-            .room-card .room-header .vip-text {
-                font-size: 1.4rem;
-                letter-spacing: 3px;
-            }
-
-            .room-card .room-header {
-                min-height: 90px;
-                padding: 18px 12px;
             }
         }
 
@@ -2097,6 +2037,14 @@
     <main>
         <div class="page-header">
             <h1><i class="fas fa-microphone-alt"></i> غرف الدردشة الصوتية</h1>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button onclick="window.location.href='profile_admin.html'" style="padding:10px 20px; background:linear-gradient(135deg,#ef4444,#dc2626); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">
+                    <i class="fas fa-shield-alt"></i> لوحة الأدمن
+                </button>
+                <button onclick="window.location.href='admin_users.html'" style="padding:10px 20px; background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">
+                    <i class="fas fa-users-cog"></i> إدارة المستخدمين
+                </button>
+            </div>
         </div>
 
         <div class="rooms-grid" id="roomsGrid">
@@ -2325,9 +2273,7 @@
                             <div class="room-header">
                                 <div class="room-id">🔑 ${roomId}</div>
                                 <div class="room-status live">● مباشر</div>
-                                <div class="vip-wave">
-                                    <div class="vip-text">V I P</div>
-                                </div>
+                                <div class="room-icon">🎙️</div>
                                 <div class="room-name">${room.name || 'غرفة بدون اسم'}</div>
                             </div>
                             <div class="room-body">
@@ -2893,10 +2839,6 @@
                     const likedBy = fullUser.likedBy || [];
                     const currentUserNumericId = user.numericId;
                     
-                    // Check if current user already liked this profile
-                    // For self profile, we check if the user is in their own likedBy list
-                    // Actually, we need to check if someone else liked this profile
-                    // But for simplicity, we'll check if the user already liked (self-like is not allowed)
                     hasLiked = likedBy.includes(currentUserNumericId);
                     
                     const likeBtn = document.getElementById('likeButton');
@@ -2998,29 +2940,8 @@
                 }
 
                 // منع الإعجاب بالنفس
-                // يتم فتح الملف الشخصي للمستخدم نفسه، لذلك لا يمكن الإعجاب بالنفس
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-                
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    const userId = Object.keys(userData)[0];
-                    const fullUser = userData[userId];
-                    
-                    const likedBy = fullUser.likedBy || [];
-                    const currentUserNumericId = user.numericId;
-                    
-                    // منع الإعجاب بالنفس
-                    if (likedBy.includes(currentUserNumericId)) {
-                        showToast('⚠️ لقد قمت بالفعل بالإعجاب بهذا الملف', 'warning');
-                        return;
-                    }
-
-                    // منع الإعجاب بالنفس - المستخدم لا يمكنه الإعجاب بملفه الشخصي
-                    // لأن الملف المفتوح هو ملف المستخدم نفسه
-                    showToast('⚠️ لا يمكنك الإعجاب بملفك الشخصي', 'warning');
-                    return;
-                }
+                showToast('⚠️ لا يمكنك الإعجاب بملفك الشخصي', 'warning');
+                return;
 
             } catch (error) {
                 console.error('Error sending like:', error);
@@ -3320,10 +3241,8 @@
             }
 
             console.log('🎙️ VipChat جاهز!');
-            console.log('✅ تم إلغاء خاصية تغيير ألوان الوصف');
-            console.log('✅ إضافة تأثير VIP الموجة السوداء مع كلمة VIP الذهبية');
-            console.log('✅ منع الإعجاب والإبلاغ عن النفس');
-            console.log('✅ سيتم إرسال إشعار عند إرسال البلاغ');
+            console.log('✅ تم إرجاع لون بطاقة الغرف كما كان');
+            console.log('✅ تم ربط لوحة الأدمن بصفحة إدارة المستخدمين');
         };
 
         async function updateNotifBadge() {
