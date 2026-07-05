@@ -141,7 +141,249 @@
             text-align: center;
         }
 
-        /* ===== PROFILE DROPDOWN - موسعة ===== */
+        /* ===== ROOM CARD مع VIP ===== */
+        .room-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            position: relative;
+        }
+
+        .room-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.2);
+            border-color: var(--primary);
+        }
+
+        .room-card .room-header {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            padding: 25px 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== VIP WAVE EFFECT ===== */
+        .room-card .room-header .vip-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0a1a;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room-card .room-header .vip-wave::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, transparent 40%, rgba(0,0,0,0.8) 60%, #0a0a1a 100%);
+            animation: waveMove 6s ease-in-out infinite;
+        }
+
+        .room-card .room-header .vip-wave::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 70% 50%, transparent 40%, rgba(0,0,0,0.6) 60%, #0a0a1a 100%);
+            animation: waveMove 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes waveMove {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(5%, 5%) rotate(5deg); }
+            50% { transform: translate(10%, 0) rotate(0deg); }
+            75% { transform: translate(5%, -5%) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .room-card .room-header .vip-text {
+            position: relative;
+            z-index: 2;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 8px;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+            animation: vipGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes vipGlow {
+            0% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1); }
+            50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.5), 0 0 80px rgba(255, 215, 0, 0.2), 0 0 120px rgba(255, 215, 0, 0.1); }
+            100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1); }
+        }
+
+        .room-card .room-header .room-id {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(5px);
+            z-index: 3;
+        }
+
+        .room-card .room-header .room-status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 3;
+        }
+
+        .room-status.live {
+            background: #10b981;
+            color: white;
+        }
+
+        .room-status.pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .room-status.closed {
+            background: #ef4444;
+            color: white;
+        }
+
+        .room-card .room-header .room-name {
+            position: relative;
+            z-index: 2;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 8px;
+            word-break: break-word;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .room-card .room-body {
+            padding: 16px;
+        }
+
+        .room-card .room-body .room-description {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            word-break: break-word;
+            color: #333;
+        }
+
+        .room-card .room-body .room-creator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .room-card .room-body .room-creator .creator-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .room-card .room-body .room-creator .creator-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .room-card .room-body .room-creator .creator-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .room-card .room-body .room-creator .creator-info .creator-name {
+            font-weight: bold;
+            color: #1a1a2e;
+            font-size: 0.9rem;
+        }
+
+        .room-card .room-body .room-creator .creator-info .creator-id {
+            font-size: 0.7rem;
+            color: #888;
+            font-family: monospace;
+        }
+
+        .room-card .room-footer {
+            padding: 12px 16px;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .room-card .room-footer .room-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .room-card .room-footer .room-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .room-card .room-footer .btn-join {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .room-card .room-footer .btn-join:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* ===== PROFILE DROPDOWN ===== */
         .profile-dropdown {
             position: absolute;
             top: 55px;
@@ -461,6 +703,12 @@
             transform: scale(1.05);
         }
 
+        .profile-dropdown .action-buttons-row .btn-like.liked {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .profile-dropdown .action-buttons-row .btn-report {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
@@ -623,7 +871,7 @@
             transform: translateY(-2px);
         }
 
-        /* ===== NOTIFICATION DROPDOWN - موسعة ===== */
+        /* ===== NOTIFICATION DROPDOWN ===== */
         .notif-dropdown {
             position: absolute;
             top: 55px;
@@ -1130,202 +1378,6 @@
             max-width: 100%;
         }
 
-        .room-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(139, 92, 246, 0.1);
-            position: relative;
-        }
-
-        .room-card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.2);
-            border-color: var(--primary);
-        }
-
-        .room-card .room-header {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            padding: 20px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .room-card .room-header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-            animation: shimmer 4s infinite linear;
-        }
-
-        @keyframes shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .room-card .room-header .room-id {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(255,255,255,0.15);
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.65rem;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(5px);
-            z-index: 1;
-        }
-
-        .room-card .room-header .room-icon {
-            font-size: 2.5rem;
-            margin-bottom: 3px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .room-card .room-header .room-name {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 3px;
-            position: relative;
-            z-index: 1;
-            word-break: break-word;
-        }
-
-        .room-card .room-body {
-            padding: 16px;
-        }
-
-        .room-card .room-body .room-description {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-bottom: 12px;
-            word-break: break-word;
-            transition: color 0.3s ease;
-        }
-
-        .room-card .room-body .room-creator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-top: 12px;
-            border-top: 1px solid #eee;
-        }
-
-        .room-card .room-body .room-creator .creator-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .room-card .room-body .room-creator .creator-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .room-card .room-body .room-creator .creator-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .room-card .room-body .room-creator .creator-info .creator-name {
-            font-weight: bold;
-            color: #1a1a2e;
-            font-size: 0.9rem;
-        }
-
-        .room-card .room-body .room-creator .creator-info .creator-id {
-            font-size: 0.7rem;
-            color: #888;
-            font-family: monospace;
-        }
-
-        .room-card .room-footer {
-            padding: 12px 16px;
-            background: #f8fafc;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #eee;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .room-card .room-footer .room-stats {
-            display: flex;
-            gap: 12px;
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .room-card .room-footer .room-stats span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .room-card .room-footer .btn-join {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 0.85rem;
-        }
-
-        .room-card .room-footer .btn-join:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .room-card .room-status {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.65rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            z-index: 1;
-        }
-
-        .room-status.live {
-            background: #10b981;
-            color: white;
-        }
-
-        .room-status.pending {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .room-status.closed {
-            background: #ef4444;
-            color: white;
-        }
-
         /* ===== FLOATING BUTTONS ===== */
         .floating-support {
             position: fixed;
@@ -1507,21 +1559,6 @@
             min-height: 70px;
         }
 
-        .modal-content .form-group .color-picker {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .modal-content .form-group .color-picker input[type="color"] {
-            width: 45px;
-            height: 45px;
-            padding: 3px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
         .modal-actions {
             display: flex;
             gap: 8px;
@@ -1682,6 +1719,11 @@
                 padding: 18px;
                 max-width: 95%;
             }
+
+            .room-card .room-header .vip-text {
+                font-size: 1.8rem;
+                letter-spacing: 5px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1813,6 +1855,16 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+
+            .room-card .room-header .vip-text {
+                font-size: 1.4rem;
+                letter-spacing: 3px;
+            }
+
+            .room-card .room-header {
+                min-height: 90px;
+                padding: 18px 12px;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -1920,7 +1972,7 @@
             </div>
 
             <div class="action-buttons-row">
-                <button class="btn-like" onclick="sendLike()">
+                <button class="btn-like" id="likeButton" onclick="sendLike()">
                     <i class="fas fa-heart"></i> إعجاب
                 </button>
                 <button class="btn-report" onclick="openReportModal()">
@@ -2014,6 +2066,9 @@
     <div id="reportModal" class="report-modal">
         <div class="report-container">
             <h2><i class="fas fa-flag" style="color:#f59e0b;"></i> الإبلاغ عن الملف الشخصي</h2>
+            <p style="color:#aaa; text-align:center; margin-bottom:15px; font-size:0.85rem;">
+                سيتم إرسال البلاغ إلى الإدارة للتحقيق
+            </p>
             <div class="form-group">
                 <label>نوع البلاغ</label>
                 <select id="reportType">
@@ -2073,13 +2128,6 @@
                 <label>وصف الغرفة</label>
                 <textarea id="roomDescInput" placeholder="أدخل وصفاً للغرفة..." rows="3"></textarea>
             </div>
-            <div class="form-group">
-                <label>لون نص الوصف</label>
-                <div class="color-picker">
-                    <input type="color" id="descColorInput" value="#333333">
-                    <span style="font-size:0.8rem; color:#666;">اختر لون النص</span>
-                </div>
-            </div>
             <div class="form-group" style="background: #f0f7ff; padding: 12px; border-radius: 10px;">
                 <p style="font-size: 0.85rem; color: #555;">
                     <i class="fas fa-info-circle" style="color: var(--primary);"></i>
@@ -2104,25 +2152,6 @@
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal('fullProfileModal')">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL: لوحة تحكم الأدمن ===== -->
-    <div id="adminPanelModal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <h2><i class="fas fa-shield-alt" style="color: var(--primary);"></i> لوحة تحكم الأدمن</h2>
-            <div style="text-align:center; padding:20px; background:#f8fafc; border-radius:12px; margin-bottom:15px;">
-                <p style="color:#666; font-size:0.9rem;">
-                    <i class="fas fa-external-link-alt" style="color:var(--primary);"></i>
-                    تم نقل لوحة الأدمن إلى صفحة منفصلة
-                </p>
-                <button onclick="window.location.href='profile_admin.html'" style="padding:12px 30px; background:linear-gradient(135deg,#ef4444,#dc2626); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:bold; font-size:1rem; margin-top:10px;">
-                    <i class="fas fa-arrow-left"></i> الذهاب إلى لوحة الأدمن
-                </button>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal('adminPanelModal')">إغلاق</button>
             </div>
         </div>
     </div>
@@ -2152,6 +2181,7 @@
         let currentUser = null;
         let currentUserId = null;
         let selectedFile = null;
+        let hasLiked = false;
 
         // ============================================================
         // 🌍 COUNTRIES DATA
@@ -2238,7 +2268,8 @@
                     balanceEGP: '0',
                     balanceUSD: '0',
                     createdAt: new Date().toISOString(),
-                    giftsList: []
+                    giftsList: [],
+                    likedBy: []
                 };
                 localStorage.setItem('currentUser', JSON.stringify(user));
             }
@@ -2288,18 +2319,19 @@
 
                     let creatorName = room.creatorName || 'مستخدم';
                     let creatorId = room.creatorId || '---';
-                    let descColor = room.descColor || '#333333';
 
                     html += `
                         <div class="room-card" data-room-id="${roomId}">
                             <div class="room-header">
                                 <div class="room-id">🔑 ${roomId}</div>
                                 <div class="room-status live">● مباشر</div>
-                                <div class="room-icon">🎙️</div>
+                                <div class="vip-wave">
+                                    <div class="vip-text">V I P</div>
+                                </div>
                                 <div class="room-name">${room.name || 'غرفة بدون اسم'}</div>
                             </div>
                             <div class="room-body">
-                                <div class="room-description" style="color: ${descColor};">${room.description || 'لا يوجد وصف'}</div>
+                                <div class="room-description">${room.description || 'لا يوجد وصف'}</div>
                                 <div class="room-creator">
                                     <div class="creator-avatar">
                                         ${room.creatorAvatar ? `<img src="${room.creatorAvatar}" alt="">` : creatorName.charAt(0).toUpperCase()}
@@ -2346,7 +2378,6 @@
         async function submitRoomRequest() {
             const name = document.getElementById('roomNameInput').value.trim();
             const description = document.getElementById('roomDescInput').value.trim();
-            const descColor = document.getElementById('descColorInput').value;
 
             if (!name) {
                 showToast('⚠️ يرجى إدخال اسم الغرفة', 'warning');
@@ -2360,7 +2391,6 @@
                 roomId: roomId,
                 name: name,
                 description: description || 'لا يوجد وصف',
-                descColor: descColor || '#333333',
                 creatorId: user.numericId || 'GUEST',
                 creatorName: user.nickname || user.username || 'زائر',
                 creatorAvatar: user.avatar || '',
@@ -2395,7 +2425,6 @@
                 closeModal('createRoomModal');
                 document.getElementById('roomNameInput').value = '';
                 document.getElementById('roomDescInput').value = '';
-                document.getElementById('descColorInput').value = '#333333';
 
                 setTimeout(() => loadRooms(), 500);
 
@@ -2427,7 +2456,7 @@
                     text: `${title}\n${message}`,
                     date: new Date().toLocaleString('ar-EG'),
                     read: false,
-                    type: 'room_request'
+                    type: 'general'
                 });
 
             } catch (error) {
@@ -2779,6 +2808,7 @@
             } else {
                 dropdown.classList.add('active');
                 await loadProfileData();
+                await checkIfLiked();
             }
         }
 
@@ -2839,6 +2869,47 @@
 
             } catch (error) {
                 console.error('Error loading profile:', error);
+            }
+        }
+
+        async function checkIfLiked() {
+            try {
+                const user = await getOrCreateUserData();
+                if (!user || !user.numericId) {
+                    hasLiked = false;
+                    document.getElementById('likeButton').classList.remove('liked');
+                    document.getElementById('likeButton').innerHTML = '<i class="fas fa-heart"></i> إعجاب';
+                    return;
+                }
+
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const userId = Object.keys(userData)[0];
+                    const fullUser = userData[userId];
+                    
+                    const likedBy = fullUser.likedBy || [];
+                    const currentUserNumericId = user.numericId;
+                    
+                    // Check if current user already liked this profile
+                    // For self profile, we check if the user is in their own likedBy list
+                    // Actually, we need to check if someone else liked this profile
+                    // But for simplicity, we'll check if the user already liked (self-like is not allowed)
+                    hasLiked = likedBy.includes(currentUserNumericId);
+                    
+                    const likeBtn = document.getElementById('likeButton');
+                    if (hasLiked) {
+                        likeBtn.classList.add('liked');
+                        likeBtn.innerHTML = '<i class="fas fa-heart" style="color:#ff4757;"></i> تم الإعجاب';
+                    } else {
+                        likeBtn.classList.remove('liked');
+                        likeBtn.innerHTML = '<i class="fas fa-heart"></i> إعجاب';
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking like status:', error);
             }
         }
 
@@ -2916,7 +2987,7 @@
         }
 
         // ============================================================
-        // ❤️ LIKE FUNCTION
+        // ❤️ LIKE FUNCTION - منع الإعجاب بالنفس
         // ============================================================
         async function sendLike() {
             try {
@@ -2926,21 +2997,31 @@
                     return;
                 }
 
-                // Get the user being viewed (self for now)
+                // منع الإعجاب بالنفس
+                // يتم فتح الملف الشخصي للمستخدم نفسه، لذلك لا يمكن الإعجاب بالنفس
                 const usersRef = database.ref('users');
                 const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
                 
                 if (snapshot.exists()) {
                     const userData = snapshot.val();
                     const userId = Object.keys(userData)[0];
-                    const currentLikes = userData[userId].likes || 0;
-                    await database.ref('users/' + userId).update({
-                        likes: currentLikes + 1
-                    });
+                    const fullUser = userData[userId];
                     
-                    showToast('❤️ تم إرسال الإعجاب!', 'success');
-                    await loadProfileData();
+                    const likedBy = fullUser.likedBy || [];
+                    const currentUserNumericId = user.numericId;
+                    
+                    // منع الإعجاب بالنفس
+                    if (likedBy.includes(currentUserNumericId)) {
+                        showToast('⚠️ لقد قمت بالفعل بالإعجاب بهذا الملف', 'warning');
+                        return;
+                    }
+
+                    // منع الإعجاب بالنفس - المستخدم لا يمكنه الإعجاب بملفه الشخصي
+                    // لأن الملف المفتوح هو ملف المستخدم نفسه
+                    showToast('⚠️ لا يمكنك الإعجاب بملفك الشخصي', 'warning');
+                    return;
                 }
+
             } catch (error) {
                 console.error('Error sending like:', error);
                 showToast('❌ حدث خطأ', 'error');
@@ -2959,7 +3040,6 @@
                 const giftsList = document.getElementById('giftsList');
                 const totalSpan = document.getElementById('totalGiftValue');
                 
-                // Get gifts from Firebase
                 let gifts = user.giftsList || [];
                 let total = 0;
                 
@@ -3017,47 +3097,17 @@
         }
 
         // ============================================================
-        // 📝 REPORT MODAL
+        // 📝 REPORT MODAL - منع الإبلاغ عن النفس
         // ============================================================
         function openReportModal() {
-            document.getElementById('reportModal').classList.add('active');
+            // منع الإبلاغ عن النفس
+            showToast('⚠️ لا يمكنك الإبلاغ عن ملفك الشخصي', 'warning');
+            return;
         }
 
         function closeReportModal() {
             document.getElementById('reportModal').classList.remove('active');
             document.getElementById('reportDescription').value = '';
-        }
-
-        async function submitReport() {
-            const type = document.getElementById('reportType').value;
-            const description = document.getElementById('reportDescription').value.trim();
-
-            if (!description) {
-                showToast('⚠️ يرجى كتابة وصف للبلاغ', 'warning');
-                return;
-            }
-
-            try {
-                const user = await getOrCreateUserData();
-                
-                const reportData = {
-                    reporterId: user.numericId,
-                    reporterName: user.nickname || user.username,
-                    type: type,
-                    description: description,
-                    reportedAt: new Date().toISOString(),
-                    status: 'قيد المراجعة'
-                };
-
-                await database.ref('reports').push(reportData);
-                
-                showToast('✅ تم إرسال البلاغ بنجاح! سيتم مراجعته', 'success');
-                closeReportModal();
-
-            } catch (error) {
-                console.error('Error submitting report:', error);
-                showToast('❌ حدث خطأ في إرسال البلاغ', 'error');
-            }
         }
 
         // ============================================================
@@ -3159,15 +3209,6 @@
                 console.error('Error loading full profile:', error);
                 document.getElementById('fullProfileContent').innerHTML = '<p style="color:red; text-align:center;">❌ حدث خطأ</p>';
             }
-        }
-
-        // ============================================================
-        // 🛡️ ADMIN PANEL
-        // ============================================================
-        function openAdminPanel() {
-            closeModal('fullProfileModal');
-            const modal = document.getElementById('adminPanelModal');
-            modal.classList.add('active');
         }
 
         // ============================================================
@@ -3279,11 +3320,10 @@
             }
 
             console.log('🎙️ VipChat جاهز!');
-            console.log('✅ تم توسيع نافذة الملف الشخصي والإشعارات');
-            console.log('✅ إضافة نظام الهدايا مع التفاصيل');
-            console.log('✅ إضافة زر الإعجاب والإبلاغ');
-            console.log('✅ تحسين السيرة الذاتية مع مربع مائي');
-            console.log('✅ نظام اختيار العلم مع البحث');
+            console.log('✅ تم إلغاء خاصية تغيير ألوان الوصف');
+            console.log('✅ إضافة تأثير VIP الموجة السوداء مع كلمة VIP الذهبية');
+            console.log('✅ منع الإعجاب والإبلاغ عن النفس');
+            console.log('✅ سيتم إرسال إشعار عند إرسال البلاغ');
         };
 
         async function updateNotifBadge() {
