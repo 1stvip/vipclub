@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ لوحة تحكم الأدمن - VipChat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0a0a1a;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .admin-header h1 {
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
+
+        .admin-header .back-btn {
+            padding: 10px 20px;
+            background: var(--primary, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-header .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .search-section {
+            background: #111827;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #1e293b;
+        }
+
+        .search-section .search-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-section input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 2px solid #1e293b;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .search-section input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        .search-section button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .search-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .results-container {
+            background: #111827;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #1e293b;
+            min-height: 200px;
+        }
+
+        .results-container .placeholder {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+
+        .results-container .placeholder i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .user-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border: 1px solid #1e293b;
+            transition: 0.3s;
+        }
+
+        .user-card:hover {
+            border-color: #8b5cf6;
+            box-shadow: 0 5px 25px rgba(139, 92, 246, 0.1);
+        }
+
+        .user-card .user-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .user-card .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-card .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-card .user-info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .user-card .user-info .name {
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: #fff;
+        }
+
+        .user-card .user-info .id {
+            font-size: 0.8rem;
+            color: #888;
+            font-family: monospace;
+        }
+
+        .user-card .user-info .bio {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .user-card .user-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+
+        .user-card .user-badges .badge-tag {
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        .user-card .user-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .user-card .user-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .user-card .user-actions .btn-edit {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .user-card .user-actions .btn-edit:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        .user-card .user-actions .btn-ban {
+            background: #ef4444;
+            color: white;
+        }
+
+        .user-card .user-actions .btn-ban:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .user-card .user-actions .btn-view {
+            background: #10b981;
+            color: white;
+        }
+
+        .user-card .user-actions .btn-view:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .user-card .user-actions .btn-delete-likes {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .user-card .user-actions .btn-delete-likes:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .user-card .user-actions .btn-delete-gifts {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .user-card .user-actions .btn-delete-gifts:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        .user-detail-view {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid #1e293b;
+        }
+
+        .user-detail-view .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #1e293b;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .user-detail-view .detail-row .label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .user-detail-view .detail-row .value {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .user-detail-view .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .user-detail-view .posts-grid .post-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .user-detail-view .posts-grid .post-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-detail-view .posts-grid .post-item .delete-post {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(239, 68, 68, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+
+        .user-detail-view .posts-grid .post-item .delete-post:hover {
+            background: #ef4444;
+            transform: scale(1.1);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideDown 0.3s ease;
+            max-width: 90vw;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.warning { background: #f59e0b; }
+        .toast.info { background: #3b82f6; }
+
+        @keyframes slideDown {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid #333;
+        }
+
+        .modal-content h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-content .form-group label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .modal-content .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #1e293b;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .modal-content .form-group input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-actions .btn-confirm {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .modal-actions .btn-confirm:hover {
+            background: #7c3aed;
+        }
+
+        .modal-actions .btn-cancel {
+            background: #333;
+            color: white;
+        }
+
+        .modal-actions .btn-cancel:hover {
+            background: #444;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .search-section .search-row {
+                flex-direction: column;
+            }
+
+            .search-section input {
+                min-width: unset;
+            }
+
+            .user-card .user-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-card .user-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .user-card .user-actions button {
+                width: 100%;
+                text-align: center;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-shield-alt" style="color:#ef4444;"></i> لوحة تحكم الأدمن</h1>
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-right"></i> العودة للرئيسية
+            </a>
+        </div>
+
+        <!-- Search -->
+        <div class="search-section">
+            <div class="search-row">
+                <input type="text" id="searchInput" placeholder="🔍 ابحث بالمعرف أو اسم المستخدم..." onkeypress="if(event.key==='Enter') adminSearch()">
+                <button onclick="adminSearch()"><i class="fas fa-search"></i> بحث</button>
+                <button onclick="adminSearch()" style="background:#10b981;"><i class="fas fa-sync-alt"></i> عرض الكل</button>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-container" id="resultsContainer">
+            <div class="placeholder">
+                <i class="fas fa-user-search"></i>
+                <p>ابحث عن مستخدم للبدء في إدارته</p>
+                <p style="font-size:0.8rem; color:#444;">يمكنك البحث بالمعرف الرقمي أو اسم المستخدم</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: إضافة لقب -->
+    <div id="badgeModal" class="modal">
+        <div class="modal-content">
+            <h2>👑 إضافة لقب</h2>
+            <div class="form-group">
+                <label>اللقب الجديد</label>
+                <input type="text" id="badgeInput" placeholder="أدخل اللقب...">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-confirm" onclick="confirmAddBadge()">إضافة</button>
+                <button class="btn-cancel" onclick="closeModal('badgeModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: حظر المستخدم -->
+    <div id="banModal" class="modal">
+        <div class="modal-content">
+            <h2>🚫 حظر المستخدم</h2>
+            <div class="form-group">
+                <label>سبب الحظر</label>
+                <input type="text" id="banReasonInput" placeholder="أدخل سبب الحظر...">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-confirm" onclick="confirmBan()" style="background:#ef4444;">حظر</button>
+                <button class="btn-cancel" onclick="closeModal('banModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+            authDomain: "vipclub-1d04a.firebaseapp.com",
+            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+            projectId: "vipclub-1d04a",
+            storageBucket: "vipclub-1d04a.firebasestorage.app",
+            messagingSenderId: "120667552740",
+            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        };
+
+        let database;
+        let selectedUserId = null;
+        let currentResults = [];
+
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            console.log('✅ Firebase connected');
+        } catch (error) {
+            console.error('❌ Firebase error:', error);
+        }
+
+        // ============================================================
+        // 🔍 SEARCH
+        // ============================================================
+        async function adminSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const container = document.getElementById('resultsContainer');
+
+            try {
+                const usersRef = database.ref('users');
+                let results = [];
+
+                if (!query) {
+                    // Get all users
+                    const snapshot = await usersRef.once('value');
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        for (const key in data) {
+                            results.push({ id: key, ...data[key] });
+                        }
+                    }
+                } else {
+                    // Search by numericId
+                    if (!isNaN(query)) {
+                        const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(query)).once('value');
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            for (const key in data) {
+                                results.push({ id: key, ...data[key] });
+                            }
+                        }
+                    }
+                    
+                    // Search by username
+                    const usernameSnapshot = await usersRef.orderByChild('username').equalTo(query).once('value');
+                    if (usernameSnapshot.exists()) {
+                        const data = usernameSnapshot.val();
+                        for (const key in data) {
+                            if (!results.find(u => u.id === key)) {
+                                results.push({ id: key, ...data[key] });
+                            }
+                        }
+                    }
+
+                    // Search by nickname
+                    const nicknameSnapshot = await usersRef.orderByChild('nickname').equalTo(query).once('value');
+                    if (nicknameSnapshot.exists()) {
+                        const data = nicknameSnapshot.val();
+                        for (const key in data) {
+                            if (!results.find(u => u.id === key)) {
+                                results.push({ id: key, ...data[key] });
+                            }
+                        }
+                    }
+                }
+
+                currentResults = results;
+
+                if (results.length === 0) {
+                    container.innerHTML = `
+                        <div class="placeholder">
+                            <i class="fas fa-user-slash"></i>
+                            <p>لم يتم العثور على مستخدمين</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = results.map(user => `
+                    <div class="user-card">
+                        <div class="user-header">
+                            <div class="user-avatar">
+                                ${user.avatar ? `<img src="${user.avatar}" alt="">` : user.nickname ? user.nickname.charAt(0).toUpperCase() : '👤'}
+                            </div>
+                            <div class="user-info">
+                                <div class="name">${user.nickname || user.username || 'مستخدم'} ${user.flag || ''}</div>
+                                <div class="id">🆔 ${user.numericId || '---'}</div>
+                                <div class="bio">${user.bio || 'لا توجد سيرة ذاتية'}</div>
+                            </div>
+                            <div style="font-size:0.8rem; color:#666;">
+                                ${user.isBanned ? '🚫 محظور' : '✅ نشط'}
+                            </div>
+                        </div>
+                        <div class="user-badges">
+                            ${(user.badges || []).map(b => `<span class="badge-tag">${b}</span>`).join('')}
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn-edit" onclick="openBadgeModal('${user.id}')">
+                                <i class="fas fa-tag"></i> لقب
+                            </button>
+                            <button class="btn-ban" onclick="openBanModal('${user.id}')">
+                                <i class="fas fa-ban"></i> حظر
+                            </button>
+                            <button class="btn-view" onclick="viewUserDetails('${user.id}')">
+                                <i class="fas fa-eye"></i> عرض
+                            </button>
+                            <button class="btn-delete-likes" onclick="deleteUserLikes('${user.id}')">
+                                <i class="fas fa-heart-broken"></i> إعجابات
+                            </button>
+                            <button class="btn-delete-gifts" onclick="deleteUserGifts('${user.id}')">
+                                <i class="fas fa-gift"></i> هدايا
+                            </button>
+                        </div>
+                        <div id="detail_${user.id}"></div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Search error:', error);
+                container.innerHTML = `
+                    <div class="placeholder">
+                        <i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i>
+                        <p>حدث خطأ في البحث</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================
+        // 👁️ VIEW USER DETAILS
+        // ============================================================
+        async function viewUserDetails(userId) {
+            try {
+                const snapshot = await database.ref('users/' + userId).once('value');
+                const user = snapshot.val();
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                // Get user posts
+                let posts = [];
+                const postsSnapshot = await database.ref('posts').orderByChild('userId').equalTo(user.numericId).once('value');
+                if (postsSnapshot.exists()) {
+                    const data = postsSnapshot.val();
+                    posts = Object.values(data);
+                }
+
+                const detailDiv = document.getElementById('detail_' + userId);
+                detailDiv.innerHTML = `
+                    <div class="user-detail-view">
+                        <div class="detail-row">
+                            <span class="label">🆔 المعرف</span>
+                            <span class="value">${user.numericId}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">📛 الاسم</span>
+                            <span class="value">${user.nickname || user.username}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">📝 السيرة الذاتية</span>
+                            <span class="value">${user.bio || 'لا يوجد'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">🏷️ الألقاب</span>
+                            <span class="value">${(user.badges || []).join(', ') || 'لا يوجد'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">❤️ الإعجابات</span>
+                            <span class="value">${user.likes || 0}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">🎁 الهدايا</span>
+                            <span class="value">${user.gifts || 0}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">👁️ الزيارات</span>
+                            <span class="value">${user.visits || 0}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">💰 رصيد EGP</span>
+                            <span class="value" style="color:#10b981;">${user.balanceEGP || 0}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">💰 رصيد USD</span>
+                            <span class="value" style="color:#60a5fa;">${user.balanceUSD || 0}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">🚫 محظور</span>
+                            <span class="value" style="color:${user.isBanned ? '#ef4444' : '#10b981'};">${user.isBanned ? 'نعم' : 'لا'}</span>
+                        </div>
+                        ${user.banReason ? `
+                            <div class="detail-row">
+                                <span class="label">سبب الحظر</span>
+                                <span class="value" style="color:#ef4444;">${user.banReason}</span>
+                            </div>
+                        ` : ''}
+                        ${posts.length > 0 ? `
+                            <div style="margin-top:15px; border-top:1px solid #1e293b; padding-top:15px;">
+                                <h4 style="color:#aaa; margin-bottom:10px;">📸 الصور المنشورة (${posts.length})</h4>
+                                <div class="posts-grid">
+                                    ${posts.map(post => `
+                                        <div class="post-item">
+                                            <img src="${post.image}" alt="صورة">
+                                            <button class="delete-post" onclick="deletePost('${post.id}', '${userId}')" title="حذف الصورة">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div style="margin-top:15px; display:flex; gap:8px; flex-wrap:wrap;">
+                            <button onclick="closeUserDetail('${userId}')" style="padding:8px 16px; background:#333; color:white; border:none; border-radius:8px; cursor:pointer;">
+                                <i class="fas fa-times"></i> إغلاق
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error viewing user:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        function closeUserDetail(userId) {
+            document.getElementById('detail_' + userId).innerHTML = '';
+        }
+
+        // ============================================================
+        // 👑 BADGE MANAGEMENT
+        // ============================================================
+        function openBadgeModal(userId) {
+            selectedUserId = userId;
+            document.getElementById('badgeInput').value = '';
+            document.getElementById('badgeModal').classList.add('active');
+        }
+
+        async function confirmAddBadge() {
+            const badge = document.getElementById('badgeInput').value.trim();
+            if (!badge) {
+                showToast('⚠️ يرجى إدخال لقب', 'warning');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users/' + selectedUserId).once('value');
+                const user = snapshot.val();
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const currentBadges = user.badges || [];
+                if (currentBadges.includes(badge)) {
+                    showToast('⚠️ هذا اللقب موجود بالفعل', 'warning');
+                    return;
+                }
+
+                currentBadges.push(badge);
+                await database.ref('users/' + selectedUserId).update({ badges: currentBadges });
+                
+                showToast('✅ تم إضافة اللقب بنجاح', 'success');
+                closeModal('badgeModal');
+                adminSearch();
+
+            } catch (error) {
+                console.error('Error adding badge:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🚫 BAN MANAGEMENT
+        // ============================================================
+        function openBanModal(userId) {
+            selectedUserId = userId;
+            document.getElementById('banReasonInput').value = '';
+            document.getElementById('banModal').classList.add('active');
+        }
+
+        async function confirmBan() {
+            const reason = document.getElementById('banReasonInput').value.trim() || 'غير محدد';
+
+            try {
+                await database.ref('users/' + selectedUserId).update({
+                    isBanned: true,
+                    banReason: reason,
+                    banDate: new Date().toISOString()
+                });
+                
+                showToast('✅ تم حظر المستخدم بنجاح', 'success');
+                closeModal('banModal');
+                adminSearch();
+
+            } catch (error) {
+                console.error('Error banning user:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🗑️ DELETE ACTIONS
+        // ============================================================
+        async function deleteUserLikes(userId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف جميع الإعجابات لهذا المستخدم؟')) return;
+
+            try {
+                await database.ref('users/' + userId).update({ likes: 0 });
+                showToast('✅ تم حذف جميع الإعجابات', 'success');
+                adminSearch();
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function deleteUserGifts(userId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف جميع الهدايا لهذا المستخدم؟')) return;
+
+            try {
+                await database.ref('users/' + userId).update({ gifts: 0 });
+                showToast('✅ تم حذف جميع الهدايا', 'success');
+                adminSearch();
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function deletePost(postId, userId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذه الصورة؟')) return;
+
+            try {
+                await database.ref('posts/' + postId).remove();
+                showToast('✅ تم حذف الصورة', 'success');
+                viewUserDetails(userId);
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖥️ MODAL FUNCTIONS
+        // ============================================================
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // ============================================================
+        // 🔔 TOAST
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ============================================================
+        // 🚀 INIT
+        // ============================================================
+        window.onload = function() {
+            console.log('🛡️ Admin Panel loaded');
+            // Load all users by default
+            adminSearch();
+        };
+    </script>
+</body>
+</html>
