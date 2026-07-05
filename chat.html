@@ -48,7 +48,7 @@
             flex-direction: column;
         }
 
-        /* ===== HEADER مع لوجو في المنتصف ===== */
+        /* ===== HEADER ===== */
         header {
             background: linear-gradient(135deg, var(--gradient-start) 0%, #16213e 50%, var(--gradient-end) 100%);
             color: white;
@@ -141,22 +141,22 @@
             text-align: center;
         }
 
-        /* ===== PROFILE DROPDOWN ===== */
+        /* ===== PROFILE DROPDOWN - موسعة ===== */
         .profile-dropdown {
             position: absolute;
-            top: 50px;
-            right: 0;
-            width: 320px;
+            top: 55px;
+            right: 10px;
+            width: 380px;
             max-width: 92vw;
             background: #1a1a2e;
-            border-radius: 16px;
+            border-radius: 20px;
             border: 1px solid #333;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.8);
             display: none;
             flex-direction: column;
             z-index: 1001;
             overflow: hidden;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
             max-height: 85vh;
             overflow-y: auto;
@@ -169,13 +169,13 @@
 
         .profile-dropdown .profile-avatar-container {
             position: relative;
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             margin: 0 auto 12px;
             border-radius: 50%;
             overflow: hidden;
             border: 3px solid #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
             cursor: pointer;
             flex-shrink: 0;
         }
@@ -192,7 +192,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             color: #ffd700;
             background: linear-gradient(135deg, #4f46e5, #8b5cf6);
         }
@@ -203,8 +203,8 @@
             left: 0;
             right: 0;
             background: rgba(0,0,0,0.7);
-            padding: 5px;
-            font-size: 0.6rem;
+            padding: 6px;
+            font-size: 0.65rem;
             color: white;
             cursor: pointer;
             transition: 0.3s;
@@ -213,6 +213,536 @@
 
         .profile-dropdown .profile-avatar-container .upload-overlay:hover {
             background: rgba(139, 92, 246, 0.8);
+        }
+
+        .profile-dropdown .profile-name {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .profile-dropdown .profile-bio-wrapper {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin: 8px 0 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown .profile-bio-wrapper:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 4px 25px rgba(139, 92, 246, 0.1);
+        }
+
+        .profile-dropdown .profile-bio {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            word-break: break-word;
+            cursor: pointer;
+            transition: 0.3s;
+            min-height: 20px;
+            outline: none;
+            background: transparent;
+            border: none;
+            width: 100%;
+            color: #ddd;
+            font-family: inherit;
+        }
+
+        .profile-dropdown .profile-bio:focus {
+            outline: none;
+            color: #fff;
+        }
+
+        .profile-dropdown .country-selector-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .profile-dropdown .country-selector-wrapper .country-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+
+        .profile-dropdown .country-selector-wrapper .country-display:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--primary);
+        }
+
+        .profile-dropdown .country-selector-wrapper .country-display .flag-emoji {
+            font-size: 1.8rem;
+        }
+
+        .profile-dropdown .country-selector-wrapper .country-display .country-name {
+            color: #ddd;
+            font-size: 0.85rem;
+        }
+
+        .flag-search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 280px;
+            max-width: 90vw;
+            background: #1a1a2e;
+            border-radius: 16px;
+            border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            padding: 15px;
+            display: none;
+            z-index: 1002;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .flag-search-dropdown.active {
+            display: block;
+        }
+
+        .flag-search-dropdown input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #1e293b;
+            background: #0f172a;
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .flag-search-dropdown input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .flag-search-dropdown .flag-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .flag-search-dropdown .flag-list .flag-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        .flag-search-dropdown .flag-list .flag-item:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: scale(1.05);
+        }
+
+        .flag-search-dropdown .flag-list .flag-item .flag-emoji {
+            font-size: 1.8rem;
+        }
+
+        .flag-search-dropdown .flag-list .flag-item .flag-name {
+            font-size: 0.55rem;
+            margin-top: 2px;
+        }
+
+        .profile-dropdown .user-id-numeric {
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 10px auto;
+            display: inline-block;
+            min-width: 140px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-dropdown .badges-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .profile-dropdown .badge-item {
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 3px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .profile-dropdown .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .profile-dropdown .stats-row .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 60px;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .profile-dropdown .stats-row .stat-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .profile-dropdown .stats-row .stat-item .stat-number {
+            color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .profile-dropdown .stats-row .stat-item .stat-label {
+            color: var(--text-dim);
+            font-size: 0.7rem;
+        }
+
+        .profile-dropdown .action-buttons-row {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .profile-dropdown .action-buttons-row button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            font-size: 0.8rem;
+            min-width: 60px;
+        }
+
+        .profile-dropdown .action-buttons-row .btn-like {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .profile-dropdown .action-buttons-row .btn-like:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-dropdown .action-buttons-row .btn-report {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .profile-dropdown .action-buttons-row .btn-report:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-dropdown .action-buttons-row .btn-gifts {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .profile-dropdown .action-buttons-row .btn-gifts:hover {
+            transform: scale(1.05);
+        }
+
+        .recent-visitors {
+            margin: 10px 0;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            border: 1px solid #2a2a3e;
+        }
+
+        .recent-visitors .visitors-title {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            text-align: right;
+        }
+
+        .recent-visitors .visitors-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .recent-visitors .visitor-item {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            transition: 0.3s;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .recent-visitors .visitor-item:hover {
+            transform: scale(1.15);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .recent-visitors .visitor-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recent-visitors .visitor-item .visitor-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .recent-visitors .visitor-item .visitor-tooltip {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+        .recent-visitors .visitor-item:hover .visitor-tooltip {
+            opacity: 1;
+        }
+
+        .profile-dropdown .balance-card {
+            background: rgba(255,255,255,0.03);
+            padding: 14px;
+            border-radius: 14px;
+            margin: 10px 0;
+            border: 1px solid #334155;
+            width: 100%;
+        }
+
+        .profile-dropdown .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        .profile-dropdown .balance-row .balance-egp {
+            color: #10b981;
+        }
+
+        .profile-dropdown .balance-row .balance-usd {
+            color: #60a5fa;
+        }
+
+        .profile-dropdown .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .profile-dropdown .action-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .profile-dropdown .btn-logout {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .profile-dropdown .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .profile-dropdown .btn-profile {
+            background: var(--primary);
+            color: white;
+        }
+
+        .profile-dropdown .btn-profile:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        /* ===== NOTIFICATION DROPDOWN - موسعة ===== */
+        .notif-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 10px;
+            width: 400px;
+            max-width: 92vw;
+            background: #1a1a2e;
+            border-radius: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.8);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+            max-height: 80vh;
+        }
+
+        .notif-dropdown.active {
+            display: flex;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .notif-header {
+            padding: 15px 20px;
+            background: #16213e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .notif-header h3 {
+            color: #ffd700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notif-actions {
+            display: flex;
+            gap: 12px;
+            font-size: 0.8rem;
+        }
+
+        .notif-actions span {
+            cursor: pointer;
+            color: #aaa;
+            transition: 0.3s;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .notif-actions span:hover {
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+        }
+
+        .notif-actions .delete-all:hover {
+            color: #ff4757;
+            background: rgba(255,71,87,0.1);
+        }
+
+        #notifList {
+            overflow-y: auto;
+            max-height: 350px;
+            min-height: 100px;
+        }
+
+        .notif-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid #2a2a3e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            cursor: default;
+        }
+
+        .notif-item:hover {
+            background: #2a2a3e;
+        }
+
+        .notif-item.unread {
+            background: #1e2a4a;
+            border-right: 4px solid #ffd700;
+        }
+
+        .notif-item .notif-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-item .notif-text {
+            color: #eee;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .notif-item .notif-time {
+            color: #777;
+            font-size: 0.7rem;
+            margin-top: 3px;
+        }
+
+        .empty-notif {
+            padding: 40px 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .empty-notif i {
+            font-size: 2.5rem;
+            color: #444;
+            margin-bottom: 10px;
         }
 
         /* ===== CROP MODAL ===== */
@@ -295,402 +825,270 @@
             background: #444;
         }
 
-        .profile-dropdown .profile-name {
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin: 3px 0;
-        }
-
-        .profile-dropdown .profile-bio {
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            margin: 3px 0 10px;
-            padding: 0 5px;
-            word-break: break-word;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: 8px;
-            padding: 5px;
-        }
-
-        .profile-dropdown .profile-bio:hover {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .profile-dropdown .profile-bio:focus {
-            outline: 2px solid var(--primary);
-            background: rgba(255,255,255,0.1);
-        }
-
-        .profile-dropdown .country-flag {
-            font-size: 1.8rem;
-            margin: 3px 0;
-            cursor: pointer;
-            transition: 0.3s;
-            display: inline-block;
-        }
-
-        .profile-dropdown .country-flag:hover {
-            transform: scale(1.2);
-        }
-
-        .profile-dropdown .user-id-numeric {
-            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-align: center;
-            margin: 8px auto;
-            display: inline-block;
-            min-width: 120px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-
-        .profile-dropdown .badges-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+        /* ===== GIFTS MODAL ===== */
+        .gifts-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            align-items: center;
             justify-content: center;
-            margin: 8px 0;
+            padding: 20px;
+            backdrop-filter: blur(10px);
         }
 
-        .profile-dropdown .badge-item {
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 16px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3);
-        }
-
-        .profile-dropdown .stats-row {
+        .gifts-modal.active {
             display: flex;
-            justify-content: space-around;
-            margin: 10px 0;
-            padding: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            flex-wrap: wrap;
-            gap: 5px;
         }
 
-        .profile-dropdown .stats-row .stat-item {
-            text-align: center;
-            flex: 1;
-            min-width: 60px;
+        .gifts-modal .gifts-container {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid #333;
         }
 
-        .profile-dropdown .stats-row .stat-item .stat-number {
+        .gifts-modal .gifts-container h2 {
             color: #ffd700;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .profile-dropdown .stats-row .stat-item .stat-label {
-            color: var(--text-dim);
-            font-size: 0.65rem;
-        }
-
-        .recent-visitors {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-            border: 1px solid #2a2a3e;
-        }
-
-        .recent-visitors .visitors-title {
-            color: var(--text-dim);
-            font-size: 0.7rem;
-            margin-bottom: 8px;
-            text-align: right;
-        }
-
-        .recent-visitors .visitors-list {
+            text-align: center;
+            margin-bottom: 20px;
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            align-items: center;
             justify-content: center;
+            gap: 10px;
         }
 
-        .recent-visitors .visitor-item {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid var(--primary);
-            cursor: pointer;
+        .gifts-modal .gifts-container .gift-total {
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        .gifts-modal .gifts-container .gift-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
             transition: 0.3s;
-            flex-shrink: 0;
-            position: relative;
         }
 
-        .recent-visitors .visitor-item:hover {
-            transform: scale(1.15);
-            border-color: #ffd700;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        .gifts-modal .gifts-container .gift-item:hover {
+            border-color: var(--primary);
+            background: rgba(139,92,246,0.05);
         }
 
-        .recent-visitors .visitor-item img {
+        .gifts-modal .gifts-container .gift-item .gift-sender {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .gifts-modal .gifts-container .gift-item .gift-sender .sender-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.7rem;
+            overflow: hidden;
+        }
+
+        .gifts-modal .gifts-container .gift-item .gift-sender .sender-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .recent-visitors .visitor-item .visitor-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            color: white;
-            font-size: 0.8rem;
+        .gifts-modal .gifts-container .gift-item .gift-sender .sender-name {
+            color: #fff;
             font-weight: bold;
         }
 
-        .recent-visitors .visitor-item .visitor-tooltip {
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a1a2e;
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
-            opacity: 0;
-            transition: 0.3s;
-            pointer-events: none;
-        }
-
-        .recent-visitors .visitor-item:hover .visitor-tooltip {
-            opacity: 1;
-        }
-
-        .profile-dropdown .balance-card {
-            background: rgba(255,255,255,0.03);
-            padding: 12px;
-            border-radius: 12px;
-            margin: 10px 0;
-            border: 1px solid #334155;
-            width: 100%;
-        }
-
-        .profile-dropdown .balance-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 3px 0;
-            font-size: 0.85rem;
-            color: #ddd;
-        }
-
-        .profile-dropdown .balance-row .balance-egp {
-            color: #10b981;
-        }
-
-        .profile-dropdown .balance-row .balance-usd {
-            color: #60a5fa;
-        }
-
-        .profile-dropdown .profile-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .profile-dropdown .action-btn {
-            width: 100%;
-            padding: 10px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .profile-dropdown .btn-logout {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .profile-dropdown .btn-logout:hover {
-            background: rgba(239, 68, 68, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .profile-dropdown .btn-profile {
-            background: var(--primary);
-            color: white;
-        }
-
-        .profile-dropdown .btn-profile:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-        }
-
-        /* ===== NOTIFICATION DROPDOWN ===== */
-        .notif-dropdown {
-            position: absolute;
-            top: 50px;
-            right: 0;
-            width: 340px;
-            max-width: 92vw;
-            background: #1a1a2e;
-            border-radius: 16px;
-            border: 1px solid #333;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-            display: none;
-            flex-direction: column;
-            z-index: 1001;
-            overflow: hidden;
-            max-height: 80vh;
-        }
-
-        .notif-dropdown.active {
-            display: flex;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .notif-header {
-            padding: 12px 16px;
-            background: #16213e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .notif-header h3 {
-            color: #ffd700;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .notif-actions {
-            display: flex;
-            gap: 8px;
+        .gifts-modal .gifts-container .gift-item .gift-sender .sender-id {
+            color: #666;
             font-size: 0.7rem;
+            font-family: monospace;
         }
 
-        .notif-actions span {
-            cursor: pointer;
-            color: #aaa;
-            transition: 0.3s;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .notif-actions span:hover {
-            color: #ffd700;
-            background: rgba(255,215,0,0.1);
-        }
-
-        .notif-actions .delete-all:hover {
-            color: #ff4757;
-            background: rgba(255,71,87,0.1);
-        }
-
-        #notifList {
-            overflow-y: auto;
-            max-height: 300px;
-            min-height: 80px;
-        }
-
-        .notif-item {
-            padding: 10px 16px;
-            border-bottom: 1px solid #2a2a3e;
+        .gifts-modal .gifts-container .gift-item .gift-details {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            cursor: default;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
-        .notif-item:hover {
-            background: #2a2a3e;
+        .gifts-modal .gifts-container .gift-item .gift-details .gift-value {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1rem;
         }
 
-        .notif-item.unread {
-            background: #1e2a4a;
-            border-right: 3px solid #ffd700;
+        .gifts-modal .gifts-container .gift-item .gift-details .gift-time {
+            color: #666;
+            font-size: 0.75rem;
         }
 
-        .notif-item .notif-content {
-            flex: 1;
-            min-width: 0;
+        .gifts-modal .gifts-container .gift-item .gift-reason {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
         }
 
-        .notif-item .notif-text {
-            color: #eee;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            word-break: break-word;
-        }
-
-        .notif-item .notif-time {
-            color: #777;
-            font-size: 0.65rem;
-            margin-top: 2px;
-        }
-
-        .empty-notif {
-            padding: 30px 20px;
+        .gifts-modal .gifts-container .no-gifts {
             text-align: center;
+            padding: 40px 20px;
             color: #666;
         }
 
-        .empty-notif i {
-            font-size: 2rem;
-            color: #444;
-            margin-bottom: 8px;
+        .gifts-modal .gifts-container .no-gifts i {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 10px;
         }
 
-        /* ===== FLAG SELECTOR ===== */
-        .flag-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
-            gap: 6px;
-            padding: 8px;
-            background: rgba(255,255,255,0.05);
+        .gifts-modal .gifts-container .close-gifts {
+            width: 100%;
+            padding: 12px;
+            border: none;
             border-radius: 10px;
-            margin: 8px 0;
-        }
-
-        .flag-selector .flag-option {
-            font-size: 1.6rem;
+            background: #333;
+            color: white;
+            font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            padding: 4px;
-            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .gifts-modal .gifts-container .close-gifts:hover {
+            background: #444;
+        }
+
+        /* ===== REPORT MODAL ===== */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .report-modal.active {
+            display: flex;
+        }
+
+        .report-modal .report-container {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid #333;
+        }
+
+        .report-modal .report-container h2 {
+            color: #ffd700;
             text-align: center;
+            margin-bottom: 20px;
         }
 
-        .flag-selector .flag-option:hover {
-            background: rgba(139, 92, 246, 0.2);
-            transform: scale(1.15);
+        .report-modal .report-container .form-group {
+            margin-bottom: 15px;
         }
 
-        .flag-selector .flag-option.selected {
-            background: rgba(139, 92, 246, 0.3);
-            border: 2px solid var(--primary);
+        .report-modal .report-container .form-group label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .report-modal .report-container .form-group select,
+        .report-modal .report-container .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #1e293b;
+            background: #0f172a;
+            color: white;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .report-modal .report-container .form-group select:focus,
+        .report-modal .report-container .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .report-modal .report-container .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .report-modal .report-container .report-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .report-modal .report-container .report-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .report-modal .report-container .report-actions .btn-report-submit {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .report-modal .report-container .report-actions .btn-report-submit:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .report-modal .report-container .report-actions .btn-report-cancel {
+            background: #333;
+            color: white;
+        }
+
+        .report-modal .report-container .report-actions .btn-report-cancel:hover {
+            background: #444;
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -1219,16 +1617,16 @@
             }
 
             .profile-dropdown {
-                width: 300px;
+                width: 340px;
                 max-width: 92vw;
-                right: -5px;
-                padding: 15px;
+                right: 5px;
+                padding: 18px;
             }
 
             .notif-dropdown {
-                width: 300px;
+                width: 340px;
                 max-width: 92vw;
-                right: -5px;
+                right: 5px;
             }
 
             .rooms-grid {
@@ -1271,13 +1669,18 @@
             }
 
             .profile-dropdown .profile-avatar-container {
-                width: 65px;
-                height: 65px;
+                width: 70px;
+                height: 70px;
             }
 
             .recent-visitors .visitor-item {
-                width: 35px;
-                height: 35px;
+                width: 38px;
+                height: 38px;
+            }
+
+            .gifts-modal .gifts-container {
+                padding: 18px;
+                max-width: 95%;
             }
         }
 
@@ -1311,36 +1714,36 @@
             }
 
             .profile-dropdown {
-                width: 280px;
+                width: 300px;
                 max-width: 95vw;
-                padding: 12px;
-                right: -8px;
+                padding: 15px;
+                right: 0;
             }
 
             .notif-dropdown {
-                width: 280px;
+                width: 300px;
                 max-width: 95vw;
-                right: -8px;
+                right: 0;
             }
 
             .profile-dropdown .profile-avatar-container {
-                width: 55px;
-                height: 55px;
+                width: 60px;
+                height: 60px;
             }
 
             .profile-dropdown .profile-name {
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
 
             .profile-dropdown .user-id-numeric {
-                font-size: 0.85rem;
-                padding: 6px 12px;
+                font-size: 0.9rem;
+                padding: 8px 15px;
                 min-width: 100px;
             }
 
             .recent-visitors .visitor-item {
-                width: 30px;
-                height: 30px;
+                width: 32px;
+                height: 32px;
             }
 
             .floating-create-room,
@@ -1400,6 +1803,16 @@
                 top: 60px;
                 right: 10px;
             }
+
+            .gifts-modal .gifts-container {
+                padding: 15px;
+                max-width: 98%;
+            }
+
+            .gifts-modal .gifts-container .gift-item .gift-details {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -1423,15 +1836,12 @@
 </head>
 <body>
 
-    <!-- ===== HEADER مع لوجو في المنتصف ===== -->
+    <!-- ===== HEADER ===== -->
     <header>
         <div class="header-left">
-            <!-- أيقونة الملف الشخصي -->
             <button class="icon-btn" onclick="toggleProfileDropdown()" title="الملف الشخصي">
                 <i class="fas fa-user-circle"></i>
             </button>
-
-            <!-- أيقونة الإشعارات -->
             <button class="icon-btn" onclick="toggleNotifs()" title="الإشعارات" id="notifBtn">
                 <i class="fas fa-bell"></i>
                 <span class="badge" id="notifBadge" style="display: none;">0</span>
@@ -1446,7 +1856,7 @@
         </div>
 
         <div class="header-right">
-            <!-- مساحة فارغة للموازنة -->
+            <!-- مساحة فارغة -->
         </div>
 
         <!-- ===== PROFILE DROPDOWN ===== -->
@@ -1462,24 +1872,25 @@
             </div>
             
             <div class="profile-name" id="p_nickname">تحميل...</div>
-            <div class="profile-bio" id="p_bio" contenteditable="true" onblur="updateProfileBio()">
-                اضغط لتعديل السيرة الذاتية
+            
+            <div class="profile-bio-wrapper">
+                <div class="profile-bio" id="p_bio" contenteditable="true" onblur="updateProfileBio()">
+                    اضغط لتعديل السيرة الذاتية
+                </div>
             </div>
             
-            <div class="country-flag" id="p_flag" onclick="toggleFlagSelector()">🌍</div>
-            <div id="flagSelector" class="flag-selector" style="display:none;">
-                <span class="flag-option" onclick="selectFlag('🇪🇬')">🇪🇬</span>
-                <span class="flag-option" onclick="selectFlag('🇸🇦')">🇸🇦</span>
-                <span class="flag-option" onclick="selectFlag('🇦🇪')">🇦🇪</span>
-                <span class="flag-option" onclick="selectFlag('🇺🇸')">🇺🇸</span>
-                <span class="flag-option" onclick="selectFlag('🇬🇧')">🇬🇧</span>
-                <span class="flag-option" onclick="selectFlag('🇫🇷')">🇫🇷</span>
-                <span class="flag-option" onclick="selectFlag('🇩🇪')">🇩🇪</span>
-                <span class="flag-option" onclick="selectFlag('🇹🇷')">🇹🇷</span>
-                <span class="flag-option" onclick="selectFlag('🇯🇴')">🇯🇴</span>
-                <span class="flag-option" onclick="selectFlag('🇵🇸')">🇵🇸</span>
-                <span class="flag-option" onclick="selectFlag('🇶🇦')">🇶🇦</span>
-                <span class="flag-option" onclick="selectFlag('🇰🇼')">🇰🇼</span>
+            <div class="country-selector-wrapper">
+                <div class="country-display" onclick="toggleFlagSearch()">
+                    <span class="flag-emoji" id="p_flag_emoji">🌍</span>
+                    <span class="country-name" id="p_country_name">العالم</span>
+                    <i class="fas fa-chevron-down" style="font-size:0.7rem; color:#666;"></i>
+                </div>
+                <div class="flag-search-dropdown" id="flagSearchDropdown">
+                    <input type="text" id="flagSearchInput" placeholder="🔍 ابحث عن بلد..." oninput="filterFlags()">
+                    <div class="flag-list" id="flagList">
+                        <!-- سيتم تعبئتها بواسطة JavaScript -->
+                    </div>
+                </div>
             </div>
 
             <span class="id-label" style="font-size:0.75rem; color:#aaa; display:block;">المعرف الخاص بك</span>
@@ -1494,18 +1905,30 @@
             </div>
 
             <div class="stats-row">
+                <div class="stat-item" onclick="showGiftsModal()">
+                    <div class="stat-number" id="p_gifts">0</div>
+                    <div class="stat-label">🎁 هدايا</div>
+                </div>
                 <div class="stat-item">
                     <div class="stat-number" id="p_likes">0</div>
                     <div class="stat-label">❤️ إعجابات</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number" id="p_gifts">0</div>
-                    <div class="stat-label">🎁 هدايا</div>
-                </div>
-                <div class="stat-item">
                     <div class="stat-number" id="p_visits">0</div>
                     <div class="stat-label">👁️ زيارات</div>
                 </div>
+            </div>
+
+            <div class="action-buttons-row">
+                <button class="btn-like" onclick="sendLike()">
+                    <i class="fas fa-heart"></i> إعجاب
+                </button>
+                <button class="btn-report" onclick="openReportModal()">
+                    <i class="fas fa-flag"></i> إبلاغ
+                </button>
+                <button class="btn-gifts" onclick="showGiftsModal()">
+                    <i class="fas fa-gift"></i> الهدايا
+                </button>
             </div>
 
             <div class="recent-visitors" id="recentVisitors">
@@ -1523,9 +1946,6 @@
             <div class="profile-actions">
                 <button class="action-btn btn-profile" onclick="viewFullProfile()">
                     <i class="fas fa-id-card"></i> الملف الشخصي الكامل
-                </button>
-                <button class="action-btn btn-profile" onclick="openAdminPanel()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
-                    <i class="fas fa-shield-alt"></i> لوحة الأدمن
                 </button>
                 <button class="action-btn btn-logout" onclick="logout()">تسجيل الخروج</button>
             </div>
@@ -1564,11 +1984,56 @@
                 <img id="cropImage" src="" alt="صورة للقص">
             </div>
             <div style="text-align:center; color:#aaa; font-size:0.8rem; margin:10px 0;">
-                اضغط واسحب لتحديد الجزء المطلوب
+                سيتم قص الصورة بشكل دائري تلقائياً
             </div>
             <div class="crop-actions">
                 <button class="btn-crop" onclick="cropImage()">✅ قص وحفظ</button>
                 <button class="btn-cancel-crop" onclick="closeCropModal()">❌ إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== GIFTS MODAL ===== -->
+    <div id="giftsModal" class="gifts-modal">
+        <div class="gifts-container">
+            <h2><i class="fas fa-gift" style="color:#ffd700;"></i> الهدايا المتلقاة</h2>
+            <div class="gift-total" id="giftTotal">
+                مجموع قيمة الهدايا: <span id="totalGiftValue">0</span> 💰
+            </div>
+            <div id="giftsList">
+                <div class="no-gifts">
+                    <i class="fas fa-gift"></i>
+                    <p>لا توجد هدايا حتى الآن</p>
+                </div>
+            </div>
+            <button class="close-gifts" onclick="closeGiftsModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- ===== REPORT MODAL ===== -->
+    <div id="reportModal" class="report-modal">
+        <div class="report-container">
+            <h2><i class="fas fa-flag" style="color:#f59e0b;"></i> الإبلاغ عن الملف الشخصي</h2>
+            <div class="form-group">
+                <label>نوع البلاغ</label>
+                <select id="reportType">
+                    <option value="محتوى غير لائق">محتوى غير لائق</option>
+                    <option value="تحريض على العنف">تحريض على العنف</option>
+                    <option value="انتحال شخصية">انتحال شخصية</option>
+                    <option value="مضايقة">مضايقة</option>
+                    <option value="صور غير لائقة">صور غير لائقة</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>وصف البلاغ</label>
+                <textarea id="reportDescription" placeholder="أدخل تفاصيل البلاغ..."></textarea>
+            </div>
+            <div class="report-actions">
+                <button class="btn-report-submit" onclick="submitReport()">
+                    <i class="fas fa-paper-plane"></i> إرسال البلاغ
+                </button>
+                <button class="btn-report-cancel" onclick="closeReportModal()">إلغاء</button>
             </div>
         </div>
     </div>
@@ -1687,7 +2152,44 @@
         let currentUser = null;
         let currentUserId = null;
         let selectedFile = null;
-        let croppedImageData = null;
+
+        // ============================================================
+        // 🌍 COUNTRIES DATA
+        // ============================================================
+        const countries = [
+            { emoji: '🇪🇬', name: 'مصر' },
+            { emoji: '🇸🇦', name: 'السعودية' },
+            { emoji: '🇦🇪', name: 'الإمارات' },
+            { emoji: '🇺🇸', name: 'الولايات المتحدة' },
+            { emoji: '🇬🇧', name: 'المملكة المتحدة' },
+            { emoji: '🇫🇷', name: 'فرنسا' },
+            { emoji: '🇩🇪', name: 'ألمانيا' },
+            { emoji: '🇹🇷', name: 'تركيا' },
+            { emoji: '🇯🇴', name: 'الأردن' },
+            { emoji: '🇵🇸', name: 'فلسطين' },
+            { emoji: '🇶🇦', name: 'قطر' },
+            { emoji: '🇰🇼', name: 'الكويت' },
+            { emoji: '🇧🇭', name: 'البحرين' },
+            { emoji: '🇴🇲', name: 'عمان' },
+            { emoji: '🇱🇧', name: 'لبنان' },
+            { emoji: '🇮🇶', name: 'العراق' },
+            { emoji: '🇸🇾', name: 'سوريا' },
+            { emoji: '🇾🇪', name: 'اليمن' },
+            { emoji: '🇱🇾', name: 'ليبيا' },
+            { emoji: '🇹🇳', name: 'تونس' },
+            { emoji: '🇩🇿', name: 'الجزائر' },
+            { emoji: '🇲🇦', name: 'المغرب' },
+            { emoji: '🇸🇩', name: 'السودان' },
+            { emoji: '🇵🇰', name: 'باكستان' },
+            { emoji: '🇮🇳', name: 'الهند' },
+            { emoji: '🇨🇳', name: 'الصين' },
+            { emoji: '🇯🇵', name: 'اليابان' },
+            { emoji: '🇷🇺', name: 'روسيا' },
+            { emoji: '🇨🇦', name: 'كندا' },
+            { emoji: '🇦🇺', name: 'أستراليا' },
+            { emoji: '🇧🇷', name: 'البرازيل' },
+            { emoji: '🇿🇦', name: 'جنوب أفريقيا' }
+        ];
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
@@ -1728,13 +2230,15 @@
                     isGuest: true,
                     bio: 'مرحباً! أنا جديد في VipChat',
                     flag: '🌍',
+                    countryName: 'العالم',
                     likes: 0,
                     gifts: 0,
                     visits: 0,
                     badges: ['🏆 مميز'],
                     balanceEGP: '0',
                     balanceUSD: '0',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    giftsList: []
                 };
                 localStorage.setItem('currentUser', JSON.stringify(user));
             }
@@ -2109,7 +2613,69 @@
         }
 
         // ============================================================
-        // 👤 PROFILE FUNCTIONS مع Crop Image
+        // 🌍 FLAG SELECTOR
+        // ============================================================
+        function initFlagSelector() {
+            const flagList = document.getElementById('flagList');
+            flagList.innerHTML = countries.map(c => `
+                <div class="flag-item" onclick="selectCountry('${c.emoji}', '${c.name}')">
+                    <span class="flag-emoji">${c.emoji}</span>
+                    <span class="flag-name">${c.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function toggleFlagSearch() {
+            const dropdown = document.getElementById('flagSearchDropdown');
+            dropdown.classList.toggle('active');
+            if (dropdown.classList.contains('active')) {
+                document.getElementById('flagSearchInput').value = '';
+                document.getElementById('flagSearchInput').focus();
+                filterFlags();
+            }
+        }
+
+        function filterFlags() {
+            const query = document.getElementById('flagSearchInput').value.toLowerCase();
+            const items = document.querySelectorAll('#flagList .flag-item');
+            items.forEach(item => {
+                const name = item.querySelector('.flag-name').textContent.toLowerCase();
+                item.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        async function selectCountry(emoji, name) {
+            document.getElementById('p_flag_emoji').textContent = emoji;
+            document.getElementById('p_country_name').textContent = name;
+            document.getElementById('flagSearchDropdown').classList.remove('active');
+            
+            try {
+                const user = await getOrCreateUserData();
+                if (database && user.numericId) {
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+                    
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0];
+                        await database.ref('users/' + userId).update({ 
+                            flag: emoji,
+                            countryName: name
+                        });
+                        user.flag = emoji;
+                        user.countryName = name;
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        showToast(`✅ تم اختيار ${name} ${emoji}`, 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 👤 PROFILE FUNCTIONS
         // ============================================================
         function handleFileSelect(event) {
             const file = event.target.files[0];
@@ -2143,7 +2709,6 @@
         function cropImage() {
             const img = document.getElementById('cropImage');
             
-            // Create a canvas to crop the image (centered square crop)
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
@@ -2238,7 +2803,8 @@
 
                 document.getElementById('p_nickname').innerText = user.nickname || user.username || 'مستخدم';
                 document.getElementById('p_bio').innerText = user.bio || 'اضغط لتعديل السيرة الذاتية';
-                document.getElementById('p_flag').innerText = user.flag || '🌍';
+                document.getElementById('p_flag_emoji').textContent = user.flag || '🌍';
+                document.getElementById('p_country_name').textContent = user.countryName || 'العالم';
                 document.getElementById('p_id').innerText = String(user.numericId || '000000').padStart(6, '0');
                 document.getElementById('p_egp').innerText = user.balanceEGP || '0';
                 document.getElementById('p_usd').innerText = user.balanceUSD || '0';
@@ -2298,36 +2864,6 @@
             }
         }
 
-        function toggleFlagSelector() {
-            const selector = document.getElementById('flagSelector');
-            selector.style.display = selector.style.display === 'none' ? 'grid' : 'none';
-        }
-
-        async function selectFlag(flag) {
-            document.getElementById('p_flag').innerText = flag;
-            document.getElementById('flagSelector').style.display = 'none';
-            
-            try {
-                const user = await getOrCreateUserData();
-                if (database && user.numericId) {
-                    const usersRef = database.ref('users');
-                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-                    
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        const userId = Object.keys(userData)[0];
-                        await database.ref('users/' + userId).update({ flag: flag });
-                        user.flag = flag;
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                        showToast('✅ تم تحديث العلم', 'success');
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
         async function updateProfileBio() {
             const bio = document.getElementById('p_bio').innerText;
             
@@ -2380,6 +2916,151 @@
         }
 
         // ============================================================
+        // ❤️ LIKE FUNCTION
+        // ============================================================
+        async function sendLike() {
+            try {
+                const user = await getOrCreateUserData();
+                if (!user || !user.numericId) {
+                    showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                    return;
+                }
+
+                // Get the user being viewed (self for now)
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const userId = Object.keys(userData)[0];
+                    const currentLikes = userData[userId].likes || 0;
+                    await database.ref('users/' + userId).update({
+                        likes: currentLikes + 1
+                    });
+                    
+                    showToast('❤️ تم إرسال الإعجاب!', 'success');
+                    await loadProfileData();
+                }
+            } catch (error) {
+                console.error('Error sending like:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🎁 GIFTS MODAL
+        // ============================================================
+        async function showGiftsModal() {
+            const modal = document.getElementById('giftsModal');
+            modal.classList.add('active');
+            
+            try {
+                const user = await getOrCreateUserData();
+                const giftsList = document.getElementById('giftsList');
+                const totalSpan = document.getElementById('totalGiftValue');
+                
+                // Get gifts from Firebase
+                let gifts = user.giftsList || [];
+                let total = 0;
+                
+                if (database && user.numericId) {
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0];
+                        const fullUser = userData[userId];
+                        gifts = fullUser.giftsList || [];
+                        total = gifts.reduce((sum, g) => sum + (g.value || 0), 0);
+                    }
+                }
+
+                totalSpan.textContent = total;
+
+                if (gifts.length === 0) {
+                    giftsList.innerHTML = `
+                        <div class="no-gifts">
+                            <i class="fas fa-gift"></i>
+                            <p>لا توجد هدايا حتى الآن</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                giftsList.innerHTML = gifts.map(gift => `
+                    <div class="gift-item">
+                        <div class="gift-sender">
+                            <div class="sender-avatar">
+                                ${gift.senderAvatar ? `<img src="${gift.senderAvatar}" alt="">` : gift.senderName.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="sender-name">${gift.senderName || 'غير معروف'}</div>
+                                <div class="sender-id">🆔 ${gift.senderId || '---'}</div>
+                            </div>
+                        </div>
+                        <div class="gift-details">
+                            <span class="gift-value">💰 ${gift.value || 0}</span>
+                            <span class="gift-time">📅 ${gift.date || new Date().toLocaleString('ar-EG')}</span>
+                        </div>
+                        ${gift.reason ? `<div class="gift-reason">📝 ${gift.reason}</div>` : ''}
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading gifts:', error);
+                showToast('❌ حدث خطأ في تحميل الهدايا', 'error');
+            }
+        }
+
+        function closeGiftsModal() {
+            document.getElementById('giftsModal').classList.remove('active');
+        }
+
+        // ============================================================
+        // 📝 REPORT MODAL
+        // ============================================================
+        function openReportModal() {
+            document.getElementById('reportModal').classList.add('active');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+            document.getElementById('reportDescription').value = '';
+        }
+
+        async function submitReport() {
+            const type = document.getElementById('reportType').value;
+            const description = document.getElementById('reportDescription').value.trim();
+
+            if (!description) {
+                showToast('⚠️ يرجى كتابة وصف للبلاغ', 'warning');
+                return;
+            }
+
+            try {
+                const user = await getOrCreateUserData();
+                
+                const reportData = {
+                    reporterId: user.numericId,
+                    reporterName: user.nickname || user.username,
+                    type: type,
+                    description: description,
+                    reportedAt: new Date().toISOString(),
+                    status: 'قيد المراجعة'
+                };
+
+                await database.ref('reports').push(reportData);
+                
+                showToast('✅ تم إرسال البلاغ بنجاح! سيتم مراجعته', 'success');
+                closeReportModal();
+
+            } catch (error) {
+                console.error('Error submitting report:', error);
+                showToast('❌ حدث خطأ في إرسال البلاغ', 'error');
+            }
+        }
+
+        // ============================================================
         // 🖥️ FULL PROFILE VIEW
         // ============================================================
         async function viewFullProfile() {
@@ -2401,6 +3082,8 @@
                 }
 
                 const recentVisitors = user.recentVisitors || [];
+                const gifts = user.giftsList || [];
+                const totalGifts = gifts.reduce((sum, g) => sum + (g.value || 0), 0);
 
                 content.innerHTML = `
                     <div style="text-align:center; margin-bottom:15px;">
@@ -2408,7 +3091,7 @@
                             ${user.avatar ? `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:linear-gradient(135deg,#4f46e5,#8b5cf6);color:white;"><i class="fas fa-user"></i></div>`}
                         </div>
                         <h3 style="color:#1a1a2e; font-size:1.1rem;">${user.nickname || user.username}</h3>
-                        <div style="font-size:1.8rem;">${user.flag || '🌍'}</div>
+                        <div style="font-size:1.8rem;">${user.flag || '🌍'} ${user.countryName || ''}</div>
                         <p style="color:#666; margin:8px 0; font-size:0.9rem;">${user.bio || 'لا توجد سيرة ذاتية'}</p>
                         <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:8px 0;">
                             ${(user.badges || []).map(b => `<span style="background:linear-gradient(135deg,#4f46e5,#8b5cf6); color:white; padding:4px 10px; border-radius:16px; font-size:0.75rem;">${b}</span>`).join('')}
@@ -2430,6 +3113,20 @@
                                 </div>
                             </div>
                         ` : ''}
+                        ${gifts.length > 0 ? `
+                            <div style="margin:10px 0; padding:10px; background:rgba(16,185,129,0.05); border-radius:10px; border:1px solid rgba(16,185,129,0.1);">
+                                <div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">🎁 الهدايا المتلقاة (${gifts.length}) - المجموع: ${totalGifts}</div>
+                                <div style="max-height:150px; overflow-y:auto;">
+                                    ${gifts.slice(0, 5).map(g => `
+                                        <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.75rem;">
+                                            <span>${g.senderName || 'غير معروف'}</span>
+                                            <span style="color:#10b981;">💰 ${g.value || 0}</span>
+                                        </div>
+                                    `).join('')}
+                                    ${gifts.length > 5 ? `<div style="text-align:center; color:#666; font-size:0.7rem; margin-top:4px;">+ ${gifts.length - 5} هدايا أخرى</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
                         <div style="background:#f0f7ff; padding:12px; border-radius:10px; margin:10px 0;">
                             <div style="display:flex; justify-content:space-between; margin:3px 0; font-size:0.85rem;">
                                 <span>💰 رصيد EGP</span>
@@ -2439,11 +3136,6 @@
                                 <span>💰 رصيد USD</span>
                                 <span style="color:#60a5fa; font-weight:bold;">${user.balanceUSD || 0}</span>
                             </div>
-                        </div>
-                        <div style="margin-top:12px;">
-                            <button onclick="openAdminPanel()" style="padding:8px 18px; background:linear-gradient(135deg,#ef4444,#dc2626); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:0.85rem;">
-                                <i class="fas fa-shield-alt"></i> لوحة الأدمن
-                            </button>
                         </div>
                     </div>
                     ${userPosts.length > 0 ? `
@@ -2470,7 +3162,7 @@
         }
 
         // ============================================================
-        // 🛡️ ADMIN PANEL - توجيه إلى صفحة منفصلة
+        // 🛡️ ADMIN PANEL
         // ============================================================
         function openAdminPanel() {
             closeModal('fullProfileModal');
@@ -2548,7 +3240,7 @@
             if (!header.contains(event.target)) {
                 document.getElementById('profileDropdown').classList.remove('active');
                 document.getElementById('notifDropdown').classList.remove('active');
-                document.getElementById('flagSelector').style.display = 'none';
+                document.getElementById('flagSearchDropdown').classList.remove('active');
             }
         });
 
@@ -2574,6 +3266,7 @@
         window.onload = async function() {
             currentUser = await getOrCreateUserData();
             loadRooms();
+            initFlagSelector();
 
             if (currentUser) {
                 updateNotifBadge();
@@ -2586,11 +3279,11 @@
             }
 
             console.log('🎙️ VipChat جاهز!');
-            console.log('✅ لوجو في المنتصف');
-            console.log('✅ أيقونات الملف الشخصي والإشعارات في اليسار');
-            console.log('✅ نظام قص الصور (Crop)');
-            console.log('✅ حفظ العلم في Firebase');
-            console.log('✅ صفحة أدمن منفصلة: profile_admin.html');
+            console.log('✅ تم توسيع نافذة الملف الشخصي والإشعارات');
+            console.log('✅ إضافة نظام الهدايا مع التفاصيل');
+            console.log('✅ إضافة زر الإعجاب والإبلاغ');
+            console.log('✅ تحسين السيرة الذاتية مع مربع مائي');
+            console.log('✅ نظام اختيار العلم مع البحث');
         };
 
         async function updateNotifBadge() {
@@ -2642,9 +3335,18 @@
                 document.querySelectorAll('.modal.active').forEach(modal => {
                     modal.classList.remove('active');
                 });
+                document.querySelectorAll('.crop-modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+                document.querySelectorAll('.gifts-modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+                document.querySelectorAll('.report-modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
                 document.getElementById('profileDropdown').classList.remove('active');
                 document.getElementById('notifDropdown').classList.remove('active');
-                document.getElementById('cropModal').classList.remove('active');
+                document.getElementById('flagSearchDropdown').classList.remove('active');
             }
         });
     </script>
