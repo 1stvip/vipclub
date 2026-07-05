@@ -52,7 +52,7 @@
 
         .admin-header .back-btn {
             padding: 10px 20px;
-            background: var(--primary, #8b5cf6);
+            background: #8b5cf6;
             color: white;
             border: none;
             border-radius: 10px;
@@ -169,6 +169,12 @@
             font-size: 1.3rem;
             color: white;
             flex-shrink: 0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .user-card .user-avatar:hover {
+            transform: scale(1.05);
         }
 
         .user-card .user-avatar img {
@@ -262,13 +268,23 @@
             transform: translateY(-2px);
         }
 
-        .user-card .user-actions .btn-delete-likes {
+        .user-card .user-actions .btn-gift {
             background: #f59e0b;
             color: white;
         }
 
-        .user-card .user-actions .btn-delete-likes:hover {
+        .user-card .user-actions .btn-gift:hover {
             background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .user-card .user-actions .btn-delete-likes {
+            background: #ef4444;
+            color: white;
+        }
+
+        .user-card .user-actions .btn-delete-likes:hover {
+            background: #dc2626;
             transform: translateY(-2px);
         }
 
@@ -309,6 +325,99 @@
             font-weight: 500;
         }
 
+        .user-detail-view .detail-row .value .edit-input {
+            background: #0f172a;
+            border: 2px solid #1e293b;
+            border-radius: 6px;
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.85rem;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .user-detail-view .detail-row .value .edit-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        .user-detail-view .detail-row .value .save-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-right: 5px;
+        }
+
+        .user-detail-view .detail-row .value .save-btn:hover {
+            background: #059669;
+        }
+
+        .user-detail-view .gifts-list {
+            margin-top: 15px;
+            border-top: 1px solid #1e293b;
+            padding-top: 15px;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-info .sender {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-info .sender-id {
+            color: #666;
+            font-size: 0.7rem;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-info .details {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-actions button {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-actions .btn-delete-gift {
+            background: #ef4444;
+            color: white;
+        }
+
+        .user-detail-view .gifts-list .gift-item-admin .gift-actions .btn-delete-gift:hover {
+            background: #dc2626;
+        }
+
         .user-detail-view .posts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -347,6 +456,22 @@
         .user-detail-view .posts-grid .post-item .delete-post:hover {
             background: #ef4444;
             transform: scale(1.1);
+        }
+
+        .user-detail-view .change-avatar-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
+
+        .user-detail-view .change-avatar-btn:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
         }
 
         .toast {
@@ -417,7 +542,9 @@
             font-size: 0.9rem;
         }
 
-        .modal-content .form-group input {
+        .modal-content .form-group input,
+        .modal-content .form-group textarea,
+        .modal-content .form-group select {
             width: 100%;
             padding: 10px 14px;
             border-radius: 10px;
@@ -425,11 +552,19 @@
             background: #0f172a;
             color: white;
             font-size: 1rem;
+            font-family: inherit;
         }
 
-        .modal-content .form-group input:focus {
+        .modal-content .form-group input:focus,
+        .modal-content .form-group textarea:focus,
+        .modal-content .form-group select:focus {
             outline: none;
             border-color: #8b5cf6;
+        }
+
+        .modal-content .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
         }
 
         .modal-actions {
@@ -497,6 +632,20 @@
             .modal-content {
                 padding: 20px;
             }
+
+            .user-detail-view .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-detail-view .detail-row .value .edit-input {
+                max-width: 100%;
+            }
+
+            .user-detail-view .gifts-list .gift-item-admin {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -560,6 +709,40 @@
         </div>
     </div>
 
+    <!-- Modal: إرسال هدية -->
+    <div id="giftModal" class="modal">
+        <div class="modal-content">
+            <h2>🎁 إرسال هدية</h2>
+            <div class="form-group">
+                <label>قيمة الهدية</label>
+                <input type="number" id="giftValueInput" placeholder="أدخل قيمة الهدية..." min="1">
+            </div>
+            <div class="form-group">
+                <label>سبب الإرسال</label>
+                <textarea id="giftReasonInput" placeholder="أدخل سبب إرسال الهدية..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-confirm" onclick="confirmSendGift()" style="background:#f59e0b;">إرسال</button>
+                <button class="btn-cancel" onclick="closeModal('giftModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: تغيير الصورة -->
+    <div id="avatarModal" class="modal">
+        <div class="modal-content">
+            <h2>📸 تغيير الصورة الشخصية</h2>
+            <div class="form-group">
+                <label>اختر صورة جديدة</label>
+                <input type="file" id="avatarFileInput" accept="image/*">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-confirm" onclick="confirmChangeAvatar()" style="background:#10b981;">تغيير</button>
+                <button class="btn-cancel" onclick="closeModal('avatarModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
         // 🔥 FIREBASE CONFIG
@@ -574,7 +757,7 @@
             appId: "1:120667552740:web:02085765fd43eb0080e5f1"
         };
 
-        let database;
+        let database, storage;
         let selectedUserId = null;
         let currentResults = [];
 
@@ -583,6 +766,7 @@
                 firebase.initializeApp(firebaseConfig);
             }
             database = firebase.database();
+            storage = firebase.storage();
             console.log('✅ Firebase connected');
         } catch (error) {
             console.error('❌ Firebase error:', error);
@@ -600,7 +784,6 @@
                 let results = [];
 
                 if (!query) {
-                    // Get all users
                     const snapshot = await usersRef.once('value');
                     if (snapshot.exists()) {
                         const data = snapshot.val();
@@ -609,7 +792,6 @@
                         }
                     }
                 } else {
-                    // Search by numericId
                     if (!isNaN(query)) {
                         const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(query)).once('value');
                         if (snapshot.exists()) {
@@ -620,7 +802,6 @@
                         }
                     }
                     
-                    // Search by username
                     const usernameSnapshot = await usersRef.orderByChild('username').equalTo(query).once('value');
                     if (usernameSnapshot.exists()) {
                         const data = usernameSnapshot.val();
@@ -631,7 +812,6 @@
                         }
                     }
 
-                    // Search by nickname
                     const nicknameSnapshot = await usersRef.orderByChild('nickname').equalTo(query).once('value');
                     if (nicknameSnapshot.exists()) {
                         const data = nicknameSnapshot.val();
@@ -658,7 +838,7 @@
                 container.innerHTML = results.map(user => `
                     <div class="user-card">
                         <div class="user-header">
-                            <div class="user-avatar">
+                            <div class="user-avatar" onclick="viewUserDetails('${user.id}')">
                                 ${user.avatar ? `<img src="${user.avatar}" alt="">` : user.nickname ? user.nickname.charAt(0).toUpperCase() : '👤'}
                             </div>
                             <div class="user-info">
@@ -683,11 +863,14 @@
                             <button class="btn-view" onclick="viewUserDetails('${user.id}')">
                                 <i class="fas fa-eye"></i> عرض
                             </button>
+                            <button class="btn-gift" onclick="openGiftModal('${user.id}')">
+                                <i class="fas fa-gift"></i> هدية
+                            </button>
                             <button class="btn-delete-likes" onclick="deleteUserLikes('${user.id}')">
                                 <i class="fas fa-heart-broken"></i> إعجابات
                             </button>
                             <button class="btn-delete-gifts" onclick="deleteUserGifts('${user.id}')">
-                                <i class="fas fa-gift"></i> هدايا
+                                <i class="fas fa-trash"></i> هدايا
                             </button>
                         </div>
                         <div id="detail_${user.id}"></div>
@@ -717,7 +900,6 @@
                     return;
                 }
 
-                // Get user posts
                 let posts = [];
                 const postsSnapshot = await database.ref('posts').orderByChild('userId').equalTo(user.numericId).once('value');
                 if (postsSnapshot.exists()) {
@@ -725,24 +907,47 @@
                     posts = Object.values(data);
                 }
 
+                const gifts = user.giftsList || [];
+                const totalGifts = gifts.reduce((sum, g) => sum + (g.value || 0), 0);
+
                 const detailDiv = document.getElementById('detail_' + userId);
                 detailDiv.innerHTML = `
                     <div class="user-detail-view">
                         <div class="detail-row">
                             <span class="label">🆔 المعرف</span>
-                            <span class="value">${user.numericId}</span>
+                            <span class="value">
+                                <span id="edit_id_${userId}">${user.numericId}</span>
+                                <input class="edit-input" id="edit_id_input_${userId}" value="${user.numericId}" style="display:none;">
+                                <button class="save-btn" onclick="editField('${userId}', 'numericId', 'edit_id_${userId}', 'edit_id_input_${userId}')">تعديل</button>
+                            </span>
                         </div>
                         <div class="detail-row">
                             <span class="label">📛 الاسم</span>
-                            <span class="value">${user.nickname || user.username}</span>
+                            <span class="value">
+                                <span id="edit_name_${userId}">${user.nickname || user.username}</span>
+                                <input class="edit-input" id="edit_name_input_${userId}" value="${user.nickname || user.username}" style="display:none;">
+                                <button class="save-btn" onclick="editField('${userId}', 'nickname', 'edit_name_${userId}', 'edit_name_input_${userId}')">تعديل</button>
+                            </span>
                         </div>
                         <div class="detail-row">
                             <span class="label">📝 السيرة الذاتية</span>
-                            <span class="value">${user.bio || 'لا يوجد'}</span>
+                            <span class="value">
+                                <span id="edit_bio_${userId}">${user.bio || 'لا يوجد'}</span>
+                                <input class="edit-input" id="edit_bio_input_${userId}" value="${user.bio || ''}" style="display:none;">
+                                <button class="save-btn" onclick="editField('${userId}', 'bio', 'edit_bio_${userId}', 'edit_bio_input_${userId}')">تعديل</button>
+                            </span>
                         </div>
                         <div class="detail-row">
                             <span class="label">🏷️ الألقاب</span>
                             <span class="value">${(user.badges || []).join(', ') || 'لا يوجد'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">📸 الصورة الشخصية</span>
+                            <span class="value">
+                                <button class="change-avatar-btn" onclick="openAvatarModal('${userId}')">
+                                    <i class="fas fa-camera"></i> تغيير الصورة
+                                </button>
+                            </span>
                         </div>
                         <div class="detail-row">
                             <span class="label">❤️ الإعجابات</span>
@@ -750,7 +955,7 @@
                         </div>
                         <div class="detail-row">
                             <span class="label">🎁 الهدايا</span>
-                            <span class="value">${user.gifts || 0}</span>
+                            <span class="value">${user.gifts || 0} (المجموع: ${totalGifts})</span>
                         </div>
                         <div class="detail-row">
                             <span class="label">👁️ الزيارات</span>
@@ -758,11 +963,19 @@
                         </div>
                         <div class="detail-row">
                             <span class="label">💰 رصيد EGP</span>
-                            <span class="value" style="color:#10b981;">${user.balanceEGP || 0}</span>
+                            <span class="value" style="color:#10b981;">
+                                <span id="edit_egp_${userId}">${user.balanceEGP || 0}</span>
+                                <input class="edit-input" id="edit_egp_input_${userId}" value="${user.balanceEGP || 0}" style="display:none;">
+                                <button class="save-btn" onclick="editField('${userId}', 'balanceEGP', 'edit_egp_${userId}', 'edit_egp_input_${userId}')">تعديل</button>
+                            </span>
                         </div>
                         <div class="detail-row">
                             <span class="label">💰 رصيد USD</span>
-                            <span class="value" style="color:#60a5fa;">${user.balanceUSD || 0}</span>
+                            <span class="value" style="color:#60a5fa;">
+                                <span id="edit_usd_${userId}">${user.balanceUSD || 0}</span>
+                                <input class="edit-input" id="edit_usd_input_${userId}" value="${user.balanceUSD || 0}" style="display:none;">
+                                <button class="save-btn" onclick="editField('${userId}', 'balanceUSD', 'edit_usd_${userId}', 'edit_usd_input_${userId}')">تعديل</button>
+                            </span>
                         </div>
                         <div class="detail-row">
                             <span class="label">🚫 محظور</span>
@@ -774,6 +987,33 @@
                                 <span class="value" style="color:#ef4444;">${user.banReason}</span>
                             </div>
                         ` : ''}
+
+                        <!-- سجل الهدايا -->
+                        <div class="gifts-list">
+                            <h4 style="color:#ffd700; margin-bottom:10px;">🎁 سجل الهدايا (${gifts.length})</h4>
+                            ${gifts.length === 0 ? '<div style="color:#666; text-align:center;">لا توجد هدايا</div>' : 
+                                gifts.map((gift, index) => `
+                                    <div class="gift-item-admin">
+                                        <div class="gift-info">
+                                            <div>
+                                                <span class="sender">${gift.senderName || 'غير معروف'}</span>
+                                                <span class="sender-id">🆔 ${gift.senderId || '---'}</span>
+                                            </div>
+                                            <div class="details">
+                                                💰 ${gift.value || 0} | 📅 ${gift.date || new Date().toLocaleString('ar-EG')}
+                                                ${gift.reason ? `| 📝 ${gift.reason}` : ''}
+                                            </div>
+                                        </div>
+                                        <div class="gift-actions">
+                                            <button class="btn-delete-gift" onclick="deleteSingleGift('${userId}', ${index})">
+                                                <i class="fas fa-trash"></i> حذف
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+
                         ${posts.length > 0 ? `
                             <div style="margin-top:15px; border-top:1px solid #1e293b; padding-top:15px;">
                                 <h4 style="color:#aaa; margin-bottom:10px;">📸 الصور المنشورة (${posts.length})</h4>
@@ -803,8 +1043,196 @@
             }
         }
 
-        function closeUserDetail(userId) {
-            document.getElementById('detail_' + userId).innerHTML = '';
+        // ============================================================
+        // ✏️ EDIT FIELD
+        // ============================================================
+        function editField(userId, field, displayId, inputId) {
+            const display = document.getElementById(displayId);
+            const input = document.getElementById(inputId);
+            
+            if (input.style.display === 'none') {
+                // Show input
+                display.style.display = 'none';
+                input.style.display = 'inline-block';
+                input.focus();
+                // Change button text
+                const btn = display.parentElement.querySelector('.save-btn');
+                btn.textContent = 'حفظ';
+                btn.style.background = '#10b981';
+            } else {
+                // Save
+                const newValue = input.value.trim();
+                if (!newValue && field !== 'bio' && field !== 'balanceEGP' && field !== 'balanceUSD') {
+                    showToast('⚠️ لا يمكن ترك هذا الحقل فارغاً', 'warning');
+                    return;
+                }
+
+                // Update Firebase
+                const updateData = {};
+                if (field === 'numericId') {
+                    updateData[field] = parseInt(newValue);
+                } else if (field === 'balanceEGP' || field === 'balanceUSD') {
+                    updateData[field] = newValue;
+                } else {
+                    updateData[field] = newValue;
+                }
+
+                database.ref('users/' + userId).update(updateData).then(() => {
+                    display.textContent = newValue;
+                    display.style.display = 'inline';
+                    input.style.display = 'none';
+                    const btn = display.parentElement.querySelector('.save-btn');
+                    btn.textContent = 'تعديل';
+                    btn.style.background = '#10b981';
+                    showToast('✅ تم التحديث بنجاح', 'success');
+                }).catch(error => {
+                    console.error('Error updating:', error);
+                    showToast('❌ حدث خطأ', 'error');
+                });
+            }
+        }
+
+        // ============================================================
+        // 📸 CHANGE AVATAR
+        // ============================================================
+        function openAvatarModal(userId) {
+            selectedUserId = userId;
+            document.getElementById('avatarFileInput').value = '';
+            document.getElementById('avatarModal').classList.add('active');
+        }
+
+        async function confirmChangeAvatar() {
+            const fileInput = document.getElementById('avatarFileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                showToast('⚠️ يرجى اختيار صورة', 'warning');
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                showToast('❌ يرجى اختيار صورة صالحة', 'error');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('❌ حجم الصورة كبير جداً (حد أقصى 5 ميجابايت)', 'error');
+                return;
+            }
+
+            try {
+                showToast('⏳ جاري رفع الصورة...', 'info');
+                closeModal('avatarModal');
+
+                const storageRef = storage.ref('avatars/' + selectedUserId + '/' + Date.now() + '.jpg');
+                const uploadTask = await storageRef.put(file);
+                const downloadURL = await uploadTask.ref.getDownloadURL();
+
+                await database.ref('users/' + selectedUserId).update({
+                    avatar: downloadURL
+                });
+
+                showToast('✅ تم تغيير الصورة الشخصية بنجاح', 'success');
+                adminSearch();
+
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                showToast('❌ حدث خطأ في رفع الصورة', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🎁 SEND GIFT
+        // ============================================================
+        function openGiftModal(userId) {
+            selectedUserId = userId;
+            document.getElementById('giftValueInput').value = '';
+            document.getElementById('giftReasonInput').value = '';
+            document.getElementById('giftModal').classList.add('active');
+        }
+
+        async function confirmSendGift() {
+            const value = parseInt(document.getElementById('giftValueInput').value);
+            const reason = document.getElementById('giftReasonInput').value.trim() || 'هدية من الإدارة';
+
+            if (!value || value <= 0) {
+                showToast('⚠️ يرجى إدخال قيمة صحيحة للهدية', 'warning');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users/' + selectedUserId).once('value');
+                const user = snapshot.val();
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const giftsList = user.giftsList || [];
+                const adminId = 1; // معرف الإدارة
+
+                giftsList.push({
+                    senderId: adminId,
+                    senderName: 'الإدارة',
+                    senderAvatar: '',
+                    value: value,
+                    reason: reason,
+                    date: new Date().toLocaleString('ar-EG'),
+                    timestamp: new Date().toISOString()
+                });
+
+                await database.ref('users/' + selectedUserId).update({
+                    giftsList: giftsList,
+                    gifts: (user.gifts || 0) + 1
+                });
+
+                // Send notification to user
+                const notification = {
+                    text: `🎁 تم إرسال هدية بقيمة ${value} من الإدارة${reason ? ` (${reason})` : ''}`,
+                    date: new Date().toLocaleString('ar-EG'),
+                    read: false,
+                    type: 'gift'
+                };
+
+                const notifRef = database.ref('users/' + selectedUserId + '/notifications');
+                await notifRef.push(notification);
+
+                showToast('✅ تم إرسال الهدية بنجاح', 'success');
+                closeModal('giftModal');
+                adminSearch();
+
+            } catch (error) {
+                console.error('Error sending gift:', error);
+                showToast('❌ حدث خطأ في إرسال الهدية', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🗑️ DELETE SINGLE GIFT
+        // ============================================================
+        async function deleteSingleGift(userId, index) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذه الهدية؟')) return;
+
+            try {
+                const snapshot = await database.ref('users/' + userId).once('value');
+                const user = snapshot.val();
+                if (!user) return;
+
+                const giftsList = user.giftsList || [];
+                if (index >= giftsList.length) return;
+
+                giftsList.splice(index, 1);
+                await database.ref('users/' + userId).update({
+                    giftsList: giftsList,
+                    gifts: giftsList.length
+                });
+
+                showToast('✅ تم حذف الهدية', 'success');
+                viewUserDetails(userId);
+
+            } catch (error) {
+                console.error('Error deleting gift:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
         }
 
         // ============================================================
@@ -899,7 +1327,10 @@
             if (!confirm('⚠️ هل أنت متأكد من حذف جميع الهدايا لهذا المستخدم؟')) return;
 
             try {
-                await database.ref('users/' + userId).update({ gifts: 0 });
+                await database.ref('users/' + userId).update({ 
+                    giftsList: [],
+                    gifts: 0
+                });
                 showToast('✅ تم حذف جميع الهدايا', 'success');
                 adminSearch();
             } catch (error) {
@@ -919,6 +1350,10 @@
                 console.error('Error:', error);
                 showToast('❌ حدث خطأ', 'error');
             }
+        }
+
+        function closeUserDetail(userId) {
+            document.getElementById('detail_' + userId).innerHTML = '';
         }
 
         // ============================================================
@@ -958,7 +1393,6 @@
         // ============================================================
         window.onload = function() {
             console.log('🛡️ Admin Panel loaded');
-            // Load all users by default
             adminSearch();
         };
     </script>
