@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     
     <style>
+        /* نفس الستايلات السابقة مع إضافات جديدة */
         * {
             margin: 0;
             padding: 0;
@@ -50,6 +51,33 @@
             font-size: 1.5rem;
         }
 
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tabs .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            background: #1e293b;
+            color: #aaa;
+        }
+
+        .admin-tabs .tab-btn:hover {
+            background: #334155;
+            color: #fff;
+        }
+
+        .admin-tabs .tab-btn.active {
+            background: var(--primary, #8b5cf6);
+            color: white;
+        }
+
         .admin-header .back-btn {
             padding: 10px 20px;
             background: #8b5cf6;
@@ -68,6 +96,14 @@
         .admin-header .back-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .search-section {
@@ -278,24 +314,188 @@
             transform: translateY(-2px);
         }
 
-        .user-card .user-actions .btn-delete-likes {
+        /* ===== Reports Section ===== */
+        .report-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border: 1px solid #1e293b;
+            transition: 0.3s;
+        }
+
+        .report-card:hover {
+            border-color: #f59e0b;
+        }
+
+        .report-card .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .report-card .report-id {
+            color: #ffd700;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .report-card .report-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .report-card .report-status.pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .report-card .report-status.investigating {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .report-card .report-status.resolved {
+            background: #10b981;
+            color: white;
+        }
+
+        .report-card .report-status.closed {
+            background: #6b7280;
+            color: white;
+        }
+
+        .report-card .report-details {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+
+        .report-card .report-details .detail-row {
+            display: flex;
+            gap: 10px;
+            padding: 3px 0;
+            flex-wrap: wrap;
+        }
+
+        .report-card .report-details .detail-row .label {
+            color: #888;
+            font-size: 0.8rem;
+            min-width: 100px;
+        }
+
+        .report-card .report-details .detail-row .value {
+            color: #ddd;
+            font-size: 0.85rem;
+        }
+
+        .report-card .report-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .report-card .report-actions button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
+
+        .report-card .report-actions .btn-investigate {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .report-card .report-actions .btn-investigate:hover {
+            background: #2563eb;
+        }
+
+        .report-card .report-actions .btn-resolve {
+            background: #10b981;
+            color: white;
+        }
+
+        .report-card .report-actions .btn-resolve:hover {
+            background: #059669;
+        }
+
+        .report-card .report-actions .btn-close {
+            background: #6b7280;
+            color: white;
+        }
+
+        .report-card .report-actions .btn-close:hover {
+            background: #4b5563;
+        }
+
+        .report-card .report-actions .btn-delete {
             background: #ef4444;
             color: white;
         }
 
-        .user-card .user-actions .btn-delete-likes:hover {
+        .report-card .report-actions .btn-delete:hover {
             background: #dc2626;
-            transform: translateY(-2px);
         }
 
-        .user-card .user-actions .btn-delete-gifts {
-            background: #8b5cf6;
-            color: white;
+        /* ===== Cancelled Gifts Section ===== */
+        .cancelled-gift-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid #1e293b;
+            transition: 0.3s;
         }
 
-        .user-card .user-actions .btn-delete-gifts:hover {
-            background: #7c3aed;
-            transform: translateY(-2px);
+        .cancelled-gift-card:hover {
+            border-color: #ef4444;
+        }
+
+        .cancelled-gift-card .gift-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .cancelled-gift-card .gift-info .gift-sender {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .cancelled-gift-card .gift-info .gift-receiver {
+            color: #60a5fa;
+        }
+
+        .cancelled-gift-card .gift-info .gift-value {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .cancelled-gift-card .gift-details {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .cancelled-gift-card .cancellation-reason {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(239,68,68,0.1);
+            border-radius: 6px;
+            border-right: 3px solid #ef4444;
+            color: #fca5a5;
+            font-size: 0.85rem;
         }
 
         .user-detail-view {
@@ -601,9 +801,32 @@
             background: #444;
         }
 
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
         @media (max-width: 768px) {
             .admin-header h1 {
                 font-size: 1.2rem;
+            }
+
+            .admin-tabs {
+                width: 100%;
+            }
+
+            .admin-tabs .tab-btn {
+                flex: 1;
+                text-align: center;
+                font-size: 0.8rem;
+                padding: 8px 12px;
             }
 
             .search-section .search-row {
@@ -646,6 +869,26 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+
+            .report-card .report-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .report-card .report-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .report-card .report-actions button {
+                width: 100%;
+                text-align: center;
+            }
+
+            .cancelled-gift-card .gift-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -655,31 +898,76 @@
         <!-- Header -->
         <div class="admin-header">
             <h1><i class="fas fa-shield-alt" style="color:#ef4444;"></i> لوحة تحكم الأدمن</h1>
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab('users')" id="tabUsers">
+                    <i class="fas fa-users"></i> المستخدمين
+                </button>
+                <button class="tab-btn" onclick="switchTab('reports')" id="tabReports">
+                    <i class="fas fa-flag"></i> البلاغات
+                </button>
+                <button class="tab-btn" onclick="switchTab('cancelled')" id="tabCancelled">
+                    <i class="fas fa-gift"></i> الهدايا الملغاة
+                </button>
+            </div>
             <a href="index.html" class="back-btn">
-                <i class="fas fa-arrow-right"></i> العودة للرئيسية
+                <i class="fas fa-arrow-right"></i> العودة
             </a>
         </div>
 
-        <!-- Search -->
-        <div class="search-section">
-            <div class="search-row">
-                <input type="text" id="searchInput" placeholder="🔍 ابحث بالمعرف أو اسم المستخدم..." onkeypress="if(event.key==='Enter') adminSearch()">
-                <button onclick="adminSearch()"><i class="fas fa-search"></i> بحث</button>
-                <button onclick="adminSearch()" style="background:#10b981;"><i class="fas fa-sync-alt"></i> عرض الكل</button>
+        <!-- ===== TAB: USERS ===== -->
+        <div class="tab-content active" id="tabUsersContent">
+            <div class="search-section">
+                <div class="search-row">
+                    <input type="text" id="searchInput" placeholder="🔍 ابحث بالمعرف أو اسم المستخدم..." onkeypress="if(event.key==='Enter') adminSearch()">
+                    <button onclick="adminSearch()"><i class="fas fa-search"></i> بحث</button>
+                    <button onclick="adminSearch()" style="background:#10b981;"><i class="fas fa-sync-alt"></i> عرض الكل</button>
+                </div>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <div class="placeholder">
+                    <i class="fas fa-user-search"></i>
+                    <p>ابحث عن مستخدم للبدء في إدارته</p>
+                </div>
             </div>
         </div>
 
-        <!-- Results -->
-        <div class="results-container" id="resultsContainer">
-            <div class="placeholder">
-                <i class="fas fa-user-search"></i>
-                <p>ابحث عن مستخدم للبدء في إدارته</p>
-                <p style="font-size:0.8rem; color:#444;">يمكنك البحث بالمعرف الرقمي أو اسم المستخدم</p>
+        <!-- ===== TAB: REPORTS ===== -->
+        <div class="tab-content" id="tabReportsContent">
+            <div class="search-section">
+                <div class="search-row">
+                    <button onclick="loadReports()" style="background:#f59e0b;">
+                        <i class="fas fa-sync-alt"></i> تحديث البلاغات
+                    </button>
+                </div>
+            </div>
+            <div class="results-container" id="reportsContainer">
+                <div class="placeholder">
+                    <i class="fas fa-flag"></i>
+                    <p>لا توجد بلاغات</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: CANCELLED GIFTS ===== -->
+        <div class="tab-content" id="tabCancelledContent">
+            <div class="search-section">
+                <div class="search-row">
+                    <button onclick="loadCancelledGifts()" style="background:#ef4444;">
+                        <i class="fas fa-sync-alt"></i> تحديث الهدايا الملغاة
+                    </button>
+                </div>
+            </div>
+            <div class="results-container" id="cancelledGiftsContainer">
+                <div class="placeholder">
+                    <i class="fas fa-gift"></i>
+                    <p>لا توجد هدايا ملغاة</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal: إضافة لقب -->
+    <!-- Modals -->
     <div id="badgeModal" class="modal">
         <div class="modal-content">
             <h2>👑 إضافة لقب</h2>
@@ -694,7 +982,6 @@
         </div>
     </div>
 
-    <!-- Modal: حظر المستخدم -->
     <div id="banModal" class="modal">
         <div class="modal-content">
             <h2>🚫 حظر المستخدم</h2>
@@ -709,7 +996,6 @@
         </div>
     </div>
 
-    <!-- Modal: إرسال هدية -->
     <div id="giftModal" class="modal">
         <div class="modal-content">
             <h2>🎁 إرسال هدية</h2>
@@ -728,7 +1014,6 @@
         </div>
     </div>
 
-    <!-- Modal: تغيير الصورة -->
     <div id="avatarModal" class="modal">
         <div class="modal-content">
             <h2>📸 تغيير الصورة الشخصية</h2>
@@ -739,6 +1024,20 @@
             <div class="modal-actions">
                 <button class="btn-confirm" onclick="confirmChangeAvatar()" style="background:#10b981;">تغيير</button>
                 <button class="btn-cancel" onclick="closeModal('avatarModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cancelGiftModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ إلغاء الهدية</h2>
+            <div class="form-group">
+                <label>سبب الإلغاء</label>
+                <textarea id="cancelReasonInput" placeholder="أدخل سبب إلغاء الهدية..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-confirm" onclick="confirmCancelGift()" style="background:#ef4444;">تأكيد الإلغاء</button>
+                <button class="btn-cancel" onclick="closeModal('cancelGiftModal')">إلغاء</button>
             </div>
         </div>
     </div>
@@ -759,6 +1058,7 @@
 
         let database, storage;
         let selectedUserId = null;
+        let selectedGiftIndex = null;
         let currentResults = [];
 
         try {
@@ -773,7 +1073,21 @@
         }
 
         // ============================================================
-        // 🔍 SEARCH
+        // 🗂️ TAB SWITCHING
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Content').classList.add('active');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            
+            if (tab === 'reports') loadReports();
+            if (tab === 'cancelled') loadCancelledGifts();
+        }
+
+        // ============================================================
+        // 🔍 USER SEARCH
         // ============================================================
         async function adminSearch() {
             const query = document.getElementById('searchInput').value.trim();
@@ -865,12 +1179,6 @@
                             </button>
                             <button class="btn-gift" onclick="openGiftModal('${user.id}')">
                                 <i class="fas fa-gift"></i> هدية
-                            </button>
-                            <button class="btn-delete-likes" onclick="deleteUserLikes('${user.id}')">
-                                <i class="fas fa-heart-broken"></i> إعجابات
-                            </button>
-                            <button class="btn-delete-gifts" onclick="deleteUserGifts('${user.id}')">
-                                <i class="fas fa-trash"></i> هدايا
                             </button>
                         </div>
                         <div id="detail_${user.id}"></div>
@@ -1005,8 +1313,8 @@
                                             </div>
                                         </div>
                                         <div class="gift-actions">
-                                            <button class="btn-delete-gift" onclick="deleteSingleGift('${userId}', ${index})">
-                                                <i class="fas fa-trash"></i> حذف
+                                            <button class="btn-delete-gift" onclick="openCancelGiftModal('${userId}', ${index})">
+                                                <i class="fas fa-times"></i> إلغاء
                                             </button>
                                         </div>
                                     </div>
@@ -1051,23 +1359,19 @@
             const input = document.getElementById(inputId);
             
             if (input.style.display === 'none') {
-                // Show input
                 display.style.display = 'none';
                 input.style.display = 'inline-block';
                 input.focus();
-                // Change button text
                 const btn = display.parentElement.querySelector('.save-btn');
                 btn.textContent = 'حفظ';
                 btn.style.background = '#10b981';
             } else {
-                // Save
                 const newValue = input.value.trim();
                 if (!newValue && field !== 'bio' && field !== 'balanceEGP' && field !== 'balanceUSD') {
                     showToast('⚠️ لا يمكن ترك هذا الحقل فارغاً', 'warning');
                     return;
                 }
 
-                // Update Firebase
                 const updateData = {};
                 if (field === 'numericId') {
                     updateData[field] = parseInt(newValue);
@@ -1168,7 +1472,7 @@
                 }
 
                 const giftsList = user.giftsList || [];
-                const adminId = 1; // معرف الإدارة
+                const adminId = 1;
 
                 giftsList.push({
                     senderId: adminId,
@@ -1185,7 +1489,6 @@
                     gifts: (user.gifts || 0) + 1
                 });
 
-                // Send notification to user
                 const notification = {
                     text: `🎁 تم إرسال هدية بقيمة ${value} من الإدارة${reason ? ` (${reason})` : ''}`,
                     date: new Date().toLocaleString('ar-EG'),
@@ -1207,31 +1510,229 @@
         }
 
         // ============================================================
-        // 🗑️ DELETE SINGLE GIFT
+        // ❌ CANCEL GIFT (إلغاء هدية)
         // ============================================================
-        async function deleteSingleGift(userId, index) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذه الهدية؟')) return;
+        function openCancelGiftModal(userId, index) {
+            selectedUserId = userId;
+            selectedGiftIndex = index;
+            document.getElementById('cancelReasonInput').value = '';
+            document.getElementById('cancelGiftModal').classList.add('active');
+        }
+
+        async function confirmCancelGift() {
+            const reason = document.getElementById('cancelReasonInput').value.trim() || 'تم الإلغاء من قبل الإدارة';
 
             try {
-                const snapshot = await database.ref('users/' + userId).once('value');
+                const snapshot = await database.ref('users/' + selectedUserId).once('value');
                 const user = snapshot.val();
                 if (!user) return;
 
                 const giftsList = user.giftsList || [];
-                if (index >= giftsList.length) return;
+                if (selectedGiftIndex >= giftsList.length) return;
 
-                giftsList.splice(index, 1);
-                await database.ref('users/' + userId).update({
+                const cancelledGift = giftsList[selectedGiftIndex];
+
+                // تسجيل الهدية الملغاة
+                const cancelledGiftData = {
+                    gift: cancelledGift,
+                    userId: selectedUserId,
+                    userName: user.nickname || user.username,
+                    userNumericId: user.numericId,
+                    cancellationReason: reason,
+                    cancelledAt: new Date().toISOString(),
+                    cancelledDate: new Date().toLocaleString('ar-EG')
+                };
+
+                await database.ref('cancelled_gifts').push(cancelledGiftData);
+
+                // حذف الهدية من قائمة المستخدم
+                giftsList.splice(selectedGiftIndex, 1);
+                await database.ref('users/' + selectedUserId).update({
                     giftsList: giftsList,
                     gifts: giftsList.length
                 });
 
-                showToast('✅ تم حذف الهدية', 'success');
-                viewUserDetails(userId);
+                // إرسال إشعار للمستخدم
+                const notification = {
+                    text: `❌ تم إلغاء هدية بقيمة ${cancelledGift.value || 0}${cancelledGift.reason ? ` (${cancelledGift.reason})` : ''}\nالسبب: ${reason}`,
+                    date: new Date().toLocaleString('ar-EG'),
+                    read: false,
+                    type: 'gift_cancelled'
+                };
+
+                await database.ref('users/' + selectedUserId + '/notifications').push(notification);
+
+                showToast('✅ تم إلغاء الهدية وتسجيلها', 'success');
+                closeModal('cancelGiftModal');
+                viewUserDetails(selectedUserId);
+                loadCancelledGifts();
 
             } catch (error) {
-                console.error('Error deleting gift:', error);
-                showToast('❌ حدث خطأ', 'error');
+                console.error('Error cancelling gift:', error);
+                showToast('❌ حدث خطأ في إلغاء الهدية', 'error');
+            }
+        }
+
+        // ============================================================
+        // 📋 LOAD CANCELLED GIFTS
+        // ============================================================
+        async function loadCancelledGifts() {
+            const container = document.getElementById('cancelledGiftsContainer');
+
+            try {
+                const snapshot = await database.ref('cancelled_gifts').once('value');
+
+                if (!snapshot.exists()) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-gift"></i>
+                            <p>لا توجد هدايا ملغاة</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const data = snapshot.val();
+                const gifts = Object.values(data).reverse();
+
+                container.innerHTML = gifts.map(g => `
+                    <div class="cancelled-gift-card">
+                        <div class="gift-info">
+                            <div>
+                                <span class="gift-sender">${g.gift.senderName || 'غير معروف'}</span>
+                                <span style="color:#666; font-size:0.8rem;">→</span>
+                                <span class="gift-receiver">${g.userName || 'مستخدم'}</span>
+                                <span style="color:#666; font-size:0.7rem;">🆔 ${g.userNumericId || '---'}</span>
+                            </div>
+                            <span class="gift-value">💰 ${g.gift.value || 0}</span>
+                        </div>
+                        <div class="gift-details">
+                            📅 الإلغاء: ${g.cancelledDate || new Date().toLocaleString('ar-EG')}
+                            ${g.gift.reason ? ` | 📝 سبب الإرسال: ${g.gift.reason}` : ''}
+                        </div>
+                        <div class="cancellation-reason">
+                            ❌ سبب الإلغاء: ${g.cancellationReason || 'غير محدد'}
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading cancelled gifts:', error);
+                container.innerHTML = `
+                    <div class="placeholder">
+                        <i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i>
+                        <p>حدث خطأ في تحميل الهدايا الملغاة</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================
+        // 📋 LOAD REPORTS
+        // ============================================================
+        async function loadReports() {
+            const container = document.getElementById('reportsContainer');
+
+            try {
+                const snapshot = await database.ref('reports').once('value');
+
+                if (!snapshot.exists()) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-flag"></i>
+                            <p>لا توجد بلاغات</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const data = snapshot.val();
+                const reports = Object.entries(data).map(([key, value]) => ({ id: key, ...value })).reverse();
+
+                container.innerHTML = reports.map(report => `
+                    <div class="report-card">
+                        <div class="report-header">
+                            <span class="report-id">📋 بلاغ #${report.id.slice(0, 8)}</span>
+                            <span class="report-status ${report.status === 'قيد المراجعة' ? 'pending' : report.status === 'قيد التحقيق' ? 'investigating' : report.status === 'تم الحل' ? 'resolved' : 'closed'}">
+                                ${report.status || 'قيد المراجعة'}
+                            </span>
+                        </div>
+                        <div class="report-details">
+                            <div class="detail-row">
+                                <span class="label">👤 المبلغ:</span>
+                                <span class="value">${report.reporterName || 'غير معروف'} (🆔 ${report.reporterId || '---'})</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">📌 النوع:</span>
+                                <span class="value">${report.type || 'غير محدد'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">📝 الوصف:</span>
+                                <span class="value">${report.description || 'لا يوجد وصف'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">📅 التاريخ:</span>
+                                <span class="value">${report.reportedAt ? new Date(report.reportedAt).toLocaleString('ar-EG') : '---'}</span>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-investigate" onclick="updateReportStatus('${report.id}', 'قيد التحقيق')">
+                                <i class="fas fa-search"></i> قيد التحقيق
+                            </button>
+                            <button class="btn-resolve" onclick="updateReportStatus('${report.id}', 'تم الحل')">
+                                <i class="fas fa-check"></i> تم الحل
+                            </button>
+                            <button class="btn-close" onclick="updateReportStatus('${report.id}', 'مغلق')">
+                                <i class="fas fa-times"></i> إغلاق
+                            </button>
+                            <button class="btn-delete" onclick="deleteReport('${report.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading reports:', error);
+                container.innerHTML = `
+                    <div class="placeholder">
+                        <i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i>
+                        <p>حدث خطأ في تحميل البلاغات</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================
+        // 📝 UPDATE REPORT STATUS
+        // ============================================================
+        async function updateReportStatus(reportId, status) {
+            try {
+                await database.ref('reports/' + reportId).update({
+                    status: status,
+                    updatedAt: new Date().toISOString()
+                });
+                showToast(`✅ تم تحديث حالة البلاغ إلى: ${status}`, 'success');
+                loadReports();
+            } catch (error) {
+                console.error('Error updating report:', error);
+                showToast('❌ حدث خطأ في تحديث البلاغ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🗑️ DELETE REPORT
+        // ============================================================
+        async function deleteReport(reportId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا البلاغ نهائياً؟')) return;
+
+            try {
+                await database.ref('reports/' + reportId).remove();
+                showToast('✅ تم حذف البلاغ', 'success');
+                loadReports();
+            } catch (error) {
+                console.error('Error deleting report:', error);
+                showToast('❌ حدث خطأ في حذف البلاغ', 'error');
             }
         }
 
@@ -1308,37 +1809,8 @@
         }
 
         // ============================================================
-        // 🗑️ DELETE ACTIONS
+        // 🗑️ DELETE POST
         // ============================================================
-        async function deleteUserLikes(userId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف جميع الإعجابات لهذا المستخدم؟')) return;
-
-            try {
-                await database.ref('users/' + userId).update({ likes: 0 });
-                showToast('✅ تم حذف جميع الإعجابات', 'success');
-                adminSearch();
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        async function deleteUserGifts(userId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف جميع الهدايا لهذا المستخدم؟')) return;
-
-            try {
-                await database.ref('users/' + userId).update({ 
-                    giftsList: [],
-                    gifts: 0
-                });
-                showToast('✅ تم حذف جميع الهدايا', 'success');
-                adminSearch();
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
         async function deletePost(postId, userId) {
             if (!confirm('⚠️ هل أنت متأكد من حذف هذه الصورة؟')) return;
 
@@ -1394,6 +1866,8 @@
         window.onload = function() {
             console.log('🛡️ Admin Panel loaded');
             adminSearch();
+            loadReports();
+            loadCancelledGifts();
         };
     </script>
 </body>
