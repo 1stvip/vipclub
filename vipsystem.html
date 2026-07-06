@@ -32,7 +32,48 @@
             margin: 0 auto;
         }
 
-        /* Header */
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== HEADER ===== */
         .header {
             display: flex;
             justify-content: space-between;
@@ -79,7 +120,7 @@
             box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
         }
 
-        /* User Info */
+        /* ===== USER INFO ===== */
         .user-info {
             background: rgba(255,255,255,0.05);
             border-radius: 16px;
@@ -150,22 +191,25 @@
             color: #94a3b8;
         }
 
-        /* VIP Cards */
+        /* ===== VIP CARDS - ENHANCED ===== */
         .vip-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
             margin-top: 20px;
         }
 
         .vip-card {
             background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 25px;
+            border-radius: 24px;
+            padding: 30px 25px 25px;
             border: 1px solid rgba(255,255,255,0.08);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
         }
 
         .vip-card:hover {
@@ -178,11 +222,12 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            padding: 5px 15px;
+            padding: 6px 18px;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: bold;
             text-transform: uppercase;
+            z-index: 2;
         }
 
         .vip-card .vip-badge.vip1 {
@@ -207,12 +252,14 @@
 
         .vip-card .vip-video-container {
             width: 100%;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             position: relative;
             background: #0a0a1a;
             aspect-ratio: 16/9;
+            min-height: 200px;
+            flex-shrink: 0;
         }
 
         .vip-card .vip-video-container video {
@@ -242,7 +289,7 @@
         }
 
         .vip-card .vip-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: bold;
             margin-bottom: 8px;
             color: #ffd700;
@@ -250,9 +297,10 @@
 
         .vip-card .vip-description {
             color: #94a3b8;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             line-height: 1.6;
             margin-bottom: 15px;
+            flex-grow: 1;
         }
 
         .vip-card .vip-requirements {
@@ -260,6 +308,7 @@
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 15px;
+            flex-shrink: 0;
         }
 
         .vip-card .vip-requirements .req-item {
@@ -295,17 +344,19 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            flex-shrink: 0;
         }
 
         .vip-card .vip-actions button {
             flex: 1;
-            padding: 12px;
+            padding: 12px 16px;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
             min-width: 100px;
+            font-size: 0.9rem;
         }
 
         .vip-card .vip-actions .btn-activate {
@@ -349,6 +400,8 @@
             border-radius: 10px;
             margin-bottom: 15px;
             font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
         }
 
         .vip-card .vip-status-text.active {
@@ -369,18 +422,164 @@
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        /* Toast */
+        /* ===== FRAMES SECTION ===== */
+        .frames-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .frame-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .frame-card:hover {
+            transform: translateY(-10px);
+            border-color: #ffd700;
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.1);
+        }
+
+        .frame-card .frame-preview {
+            width: 100%;
+            max-width: 345px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #0a0a1a;
+            margin-bottom: 15px;
+        }
+
+        .frame-card .frame-preview iframe {
+            width: 100%;
+            height: auto;
+            min-height: 200px;
+            border: none;
+        }
+
+        .frame-card .frame-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .frame-card .frame-price {
+            font-size: 1.1rem;
+            color: #10b981;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .frame-card .frame-duration {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .frame-card .frame-status {
+            padding: 6px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .frame-card .frame-status.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .frame-card .frame-status.inactive {
+            background: rgba(107, 114, 128, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .frame-card .frame-status.owned {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .frame-card .frame-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .frame-card .frame-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            min-width: 80px;
+            font-size: 0.85rem;
+        }
+
+        .frame-card .frame-actions .btn-buy {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .frame-card .frame-actions .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .frame-card .frame-actions .btn-buy.owned {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .frame-card .frame-actions .btn-buy.owned:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .frame-card .frame-actions .btn-use {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .frame-card .frame-actions .btn-use:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .frame-card .frame-actions .btn-use.active {
+            background: #10b981;
+        }
+
+        .frame-card .frame-actions .btn-use.active:hover {
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
             color: white;
             font-weight: 600;
             z-index: 9999;
             animation: slideDown 0.3s ease;
             max-width: 90vw;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
 
         .toast.success { background: #10b981; }
@@ -393,44 +592,55 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Responsive */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .vip-grid {
                 grid-template-columns: 1fr;
             }
-
+            .frames-grid {
+                grid-template-columns: 1fr 1fr;
+            }
             .user-info {
                 flex-direction: column;
                 align-items: flex-start;
             }
-
             .header .logo {
                 font-size: 1.3rem;
             }
-
+            .vip-card {
+                min-height: 450px;
+            }
             .vip-card .vip-video-container {
-                aspect-ratio: 4/3;
+                min-height: 150px;
+            }
+            .tabs .tab-btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
             }
         }
 
         @media (max-width: 480px) {
             .vip-card {
                 padding: 18px;
+                min-height: 400px;
             }
-
             .vip-card .vip-title {
                 font-size: 1.1rem;
             }
-
             .vip-card .vip-actions button {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
                 padding: 10px;
             }
-
+            .frames-grid {
+                grid-template-columns: 1fr;
+            }
             .user-info .user-details {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
+            }
+            .frame-card .frame-preview iframe {
+                min-height: 150px;
             }
         }
     </style>
@@ -476,88 +686,107 @@
             </div>
         </div>
 
-        <!-- VIP Cards -->
-        <div class="vip-grid" id="vipGrid">
-            <!-- VIP 1 Card -->
-            <div class="vip-card" id="vip1Card">
-                <span class="vip-badge vip1">VIP 1</span>
-                <div class="vip-video-container">
-                    <video id="vip1Video" autoplay loop muted playsinline>
-                        <source src="images/vipsystem/car.mp4" type="video/mp4">
-                    </video>
-                    <div class="video-overlay">
-                        <i class="fas fa-play-circle"></i>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('vip')" id="tabVip">
+                <i class="fas fa-crown"></i> الدخلات المميزة
+            </button>
+            <button class="tab-btn" onclick="switchTab('frames')" id="tabFrames">
+                <i class="fas fa-image"></i> الأطارات
+            </button>
+        </div>
+
+        <!-- VIP Tab -->
+        <div class="tab-content active" id="tabContentVip">
+            <div class="vip-grid" id="vipGrid">
+                <!-- VIP 1 Card -->
+                <div class="vip-card" id="vip1Card">
+                    <span class="vip-badge vip1">VIP 1</span>
+                    <div class="vip-video-container">
+                        <video id="vip1Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/car.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="vip-title">🚗 VIP 1 - السيارة الرياضية</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض سيارة رياضية فاخرة عند دخولك الغرفة.
+                        تميز نفسك بأناقة وسرعة!
+                    </div>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip1Requirement">1000 ج.م أو 20 دولار</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">30 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip1Status">غير مفعل</span>
+                        </div>
+                    </div>
+                    <div class="vip-status-text" id="vip1StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions">
+                        <button class="btn-activate" id="vip1ActivateBtn" onclick="activateVIP(1)">
+                            <i class="fas fa-crown"></i> تفعيل VIP 1
+                        </button>
+                        <button class="btn-deactivate hidden" id="vip1DeactivateBtn" onclick="deactivateVIP(1)">
+                            <i class="fas fa-pause"></i> إيقاف مؤقت
+                        </button>
                     </div>
                 </div>
-                <div class="vip-title">🚗 VIP 1 - السيارة الرياضية</div>
-                <div class="vip-description">
-                    دخلة مميزة للغرف الصوتية تعرض سيارة رياضية فاخرة عند دخولك الغرفة.
-                    تميز نفسك بأناقة وسرعة!
-                </div>
-                <div class="vip-requirements">
-                    <div class="req-item">
-                        <span class="req-label">💰 المطلوب للتفعيل</span>
-                        <span class="req-value" id="vip1Requirement">1000 ج.م أو 20 دولار</span>
+
+                <!-- VIP 2 Card -->
+                <div class="vip-card" id="vip2Card">
+                    <span class="vip-badge vip2">VIP 2</span>
+                    <div class="vip-video-container">
+                        <video id="vip2Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/lion.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
                     </div>
-                    <div class="req-item">
-                        <span class="req-label">⏱️ مدة التفعيل</span>
-                        <span class="req-value">30 يوم</span>
+                    <div class="vip-title">🦁 VIP 2 - هيبة الأسد</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض هيبة وقوة الأسد عند دخولك الغرفة.
+                        أظهر قوتك وهيبتك!
                     </div>
-                    <div class="req-item">
-                        <span class="req-label">📊 حالتك الحالية</span>
-                        <span class="req-value" id="vip1Status">غير مفعل</span>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip2Requirement">2500 ج.م</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">60 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip2Status">غير مفعل</span>
+                        </div>
                     </div>
-                </div>
-                <div class="vip-status-text" id="vip1StatusText">🔒 غير متاح</div>
-                <div class="vip-actions">
-                    <button class="btn-activate" id="vip1ActivateBtn" onclick="activateVIP(1)">
-                        <i class="fas fa-crown"></i> تفعيل VIP 1
-                    </button>
-                    <button class="btn-deactivate hidden" id="vip1DeactivateBtn" onclick="deactivateVIP(1)">
-                        <i class="fas fa-times"></i> إلغاء التفعيل
-                    </button>
+                    <div class="vip-status-text" id="vip2StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions">
+                        <button class="btn-activate" id="vip2ActivateBtn" onclick="activateVIP(2)">
+                            <i class="fas fa-crown"></i> تفعيل VIP 2
+                        </button>
+                        <button class="btn-deactivate hidden" id="vip2DeactivateBtn" onclick="deactivateVIP(2)">
+                            <i class="fas fa-pause"></i> إيقاف مؤقت
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- VIP 2 Card -->
-            <div class="vip-card" id="vip2Card">
-                <span class="vip-badge vip2">VIP 2</span>
-                <div class="vip-video-container">
-                    <video id="vip2Video" autoplay loop muted playsinline>
-                        <source src="images/vipsystem/lion.mp4" type="video/mp4">
-                    </video>
-                    <div class="video-overlay">
-                        <i class="fas fa-play-circle"></i>
-                    </div>
-                </div>
-                <div class="vip-title">🦁 VIP 2 - هيبة الأسد</div>
-                <div class="vip-description">
-                    دخلة مميزة للغرف الصوتية تعرض هيبة وقوة الأسد عند دخولك الغرفة.
-                    أظهر قوتك وهيبتك!
-                </div>
-                <div class="vip-requirements">
-                    <div class="req-item">
-                        <span class="req-label">💰 المطلوب للتفعيل</span>
-                        <span class="req-value" id="vip2Requirement">2500 ج.م</span>
-                    </div>
-                    <div class="req-item">
-                        <span class="req-label">⏱️ مدة التفعيل</span>
-                        <span class="req-value">60 يوم</span>
-                    </div>
-                    <div class="req-item">
-                        <span class="req-label">📊 حالتك الحالية</span>
-                        <span class="req-value" id="vip2Status">غير مفعل</span>
-                    </div>
-                </div>
-                <div class="vip-status-text" id="vip2StatusText">🔒 غير متاح</div>
-                <div class="vip-actions">
-                    <button class="btn-activate" id="vip2ActivateBtn" onclick="activateVIP(2)">
-                        <i class="fas fa-crown"></i> تفعيل VIP 2
-                    </button>
-                    <button class="btn-deactivate hidden" id="vip2DeactivateBtn" onclick="deactivateVIP(2)">
-                        <i class="fas fa-times"></i> إلغاء التفعيل
-                    </button>
-                </div>
+        <!-- Frames Tab -->
+        <div class="tab-content" id="tabContentFrames">
+            <div class="frames-grid" id="framesGrid">
+                <!-- سيتم إنشاء البطاقات بواسطة JavaScript -->
             </div>
         </div>
     </div>
@@ -579,6 +808,44 @@
         let database;
         let currentUser = null;
         let userVIPData = null;
+
+        // ============================================================
+        // 📋 FRAMES DATA
+        // ============================================================
+        const FRAMES = [
+            {
+                id: 'frame1',
+                name: 'إطار فاخر 1',
+                price: 50,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=875809458798946321',
+                height: 405
+            },
+            {
+                id: 'frame2',
+                name: 'إطار فاخر 2',
+                price: 50,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=601723200255670870',
+                height: 445
+            },
+            {
+                id: 'frame3',
+                name: 'إطار فاخر 3',
+                price: 100,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669',
+                height: 445
+            },
+            {
+                id: 'frame4',
+                name: 'إطار فاخر 4',
+                price: 150,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964',
+                height: 438
+            }
+        ];
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
@@ -638,12 +905,8 @@
                 emoji: '🚗',
                 title: 'السيارة الرياضية',
                 video: 'images/vipsystem/car.mp4',
-                duration: 30, // days
-                requirements: {
-                    EGP: 1000,
-                    USD: 20
-                },
-                description: 'دخلة مميزة للغرف الصوتية تعرض سيارة رياضية فاخرة'
+                duration: 30,
+                requirements: { EGP: 1000, USD: 20 }
             },
             2: {
                 level: 2,
@@ -651,12 +914,8 @@
                 emoji: '🦁',
                 title: 'هيبة الأسد',
                 video: 'images/vipsystem/lion.mp4',
-                duration: 60, // days
-                requirements: {
-                    EGP: 2500,
-                    USD: null
-                },
-                description: 'دخلة مميزة للغرف الصوتية تعرض هيبة وقوة الأسد'
+                duration: 60,
+                requirements: { EGP: 2500, USD: null }
             }
         };
 
@@ -678,7 +937,6 @@
                     const userId = Object.keys(userData)[0];
                     const fullUser = userData[userId];
                     
-                    // Update UI
                     document.getElementById('userName').textContent = fullUser.nickname || fullUser.username || 'مستخدم';
                     document.getElementById('userId').textContent = '🆔 ' + (fullUser.numericId || '---');
                     
@@ -686,9 +944,9 @@
                         document.getElementById('userAvatar').innerHTML = `<img src="${fullUser.avatar}" alt="">`;
                     }
 
-                    // Load VIP data
                     userVIPData = fullUser.vip || { active: null, expiresAt: null };
                     updateVIPUI(fullUser);
+                    renderFrames(fullUser);
                 }
             } catch (error) {
                 console.error('Error loading user:', error);
@@ -702,16 +960,21 @@
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
             const now = new Date();
             const isExpired = expiresAt && expiresAt < now;
+            const isPaused = vipData.paused === true;
 
-            // Update VIP level display
             const vipLevelEl = document.getElementById('vipLevel');
             const vipStatusEl = document.getElementById('vipStatus');
 
-            if (activeVIP && !isExpired) {
+            if (activeVIP && !isExpired && !isPaused) {
                 const vipConfig = VIP_CONFIG[activeVIP];
                 vipLevelEl.textContent = `${vipConfig.emoji} VIP ${activeVIP}`;
                 vipStatusEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
                 vipStatusEl.style.color = '#10b981';
+            } else if (isPaused && activeVIP) {
+                const vipConfig = VIP_CONFIG[activeVIP];
+                vipLevelEl.textContent = `${vipConfig.emoji} VIP ${activeVIP}`;
+                vipStatusEl.textContent = '⏸️ موقف مؤقت';
+                vipStatusEl.style.color = '#f59e0b';
             } else if (activeVIP && isExpired) {
                 vipLevelEl.textContent = 'VIP 0';
                 vipStatusEl.textContent = '⏳ منتهي الصلاحية';
@@ -722,7 +985,6 @@
                 vipStatusEl.style.color = '#94a3b8';
             }
 
-            // Update each VIP card
             updateVIPCard(1, user);
             updateVIPCard(2, user);
         }
@@ -734,14 +996,14 @@
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
             const now = new Date();
             const isExpired = expiresAt && expiresAt < now;
-            const isCurrentlyActive = isActive && !isExpired;
+            const isPaused = vipData.paused === true;
+            const isCurrentlyActive = isActive && !isExpired && !isPaused;
 
             const statusEl = document.getElementById(`vip${level}Status`);
             const statusTextEl = document.getElementById(`vip${level}StatusText`);
             const activateBtn = document.getElementById(`vip${level}ActivateBtn`);
             const deactivateBtn = document.getElementById(`vip${level}DeactivateBtn`);
 
-            // Check if user can afford
             let canAfford = false;
             let affordMessage = '';
             
@@ -757,7 +1019,6 @@
                 affordMessage = `❌ رصيد غير كافٍ (مطلوب ${neededEGP} ج.م أو ${neededUSD} دولار)`;
             }
 
-            // Update status
             if (isCurrentlyActive) {
                 statusEl.textContent = '✅ مفعل';
                 statusEl.style.color = '#10b981';
@@ -767,6 +1028,17 @@
                 activateBtn.className = 'btn-activate active';
                 activateBtn.disabled = true;
                 deactivateBtn.classList.remove('hidden');
+                deactivateBtn.textContent = '⏸️ إيقاف مؤقت';
+            } else if (isPaused) {
+                statusEl.textContent = '⏸️ موقف';
+                statusEl.style.color = '#f59e0b';
+                statusTextEl.textContent = `⏸️ موقف مؤقت - متبقي ${Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24))} يوم`;
+                statusTextEl.className = 'vip-status-text inactive';
+                activateBtn.textContent = `▶️ استئناف VIP ${level}`;
+                activateBtn.className = 'btn-activate';
+                activateBtn.disabled = false;
+                deactivateBtn.classList.remove('hidden');
+                deactivateBtn.textContent = '❌ إلغاء';
             } else if (isActive && isExpired) {
                 statusEl.textContent = '⏳ منتهي';
                 statusEl.style.color = '#ef4444';
@@ -787,7 +1059,6 @@
                 deactivateBtn.classList.add('hidden');
             }
 
-            // Update requirement display
             const reqEl = document.getElementById(`vip${level}Requirement`);
             if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
                 reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
@@ -799,7 +1070,7 @@
         }
 
         // ============================================================
-        // 🎯 ACTIVATE/DEACTIVATE VIP
+        // 🎯 ACTIVATE/DEACTIVATE VIP (FIXED)
         // ============================================================
         async function activateVIP(level) {
             if (!currentUser) {
@@ -814,7 +1085,6 @@
             }
 
             try {
-                // Get fresh user data
                 const usersRef = database.ref('users');
                 const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
                 
@@ -827,12 +1097,21 @@
                 const userId = Object.keys(userData)[0];
                 const user = userData[userId];
 
-                // Check if already active
-                const currentVIP = user.vip || { active: null, expiresAt: null };
-                if (currentVIP.active === level) {
+                const currentVIP = user.vip || { active: null, expiresAt: null, paused: false };
+                
+                // If paused, resume it
+                if (currentVIP.active === level && currentVIP.paused === true) {
+                    await database.ref('users/' + userId + '/vip/paused').set(false);
+                    showToast(`✅ تم استئناف VIP ${level}`, 'success');
+                    await loadUserData();
+                    return;
+                }
+
+                // If already active, don't reactivate
+                if (currentVIP.active === level && currentVIP.paused !== true) {
                     const expiresAt = currentVIP.expiresAt ? new Date(currentVIP.expiresAt) : null;
                     if (expiresAt && expiresAt > new Date()) {
-                        showToast(`⚠️ VIP ${level} مفعل بالفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`, 'warning');
+                        showToast(`⚠️ VIP ${level} مفعل بالفعل`, 'warning');
                         return;
                     }
                 }
@@ -851,7 +1130,6 @@
                     return;
                 }
 
-                // Deduct balance
                 const newBalance = useUSD ? 
                     (user.balanceUSD || 0) - costUSD : 
                     (user.balanceEGP || 0) - costEGP;
@@ -863,7 +1141,6 @@
                     updateData.balanceEGP = newBalance;
                 }
 
-                // Set VIP expiration
                 const now = new Date();
                 const expiresAt = new Date(now);
                 expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
@@ -873,11 +1150,11 @@
                 updateData['vip/activatedAt'] = now.toISOString();
                 updateData['vip/activatedWith'] = useUSD ? 'USD' : 'EGP';
                 updateData['vip/amount'] = useUSD ? costUSD : costEGP;
+                updateData['vip/paused'] = false;
                 updateData.updatedAt = now.toISOString();
 
                 await database.ref('users/' + userId).update(updateData);
 
-                // Send notification
                 const notification = {
                     id: Date.now(),
                     text: `👑 تم تفعيل VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
@@ -889,8 +1166,6 @@
                 await database.ref('users/' + userId + '/notifications').push(notification);
 
                 showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
-
-                // Reload data
                 await loadUserData();
 
             } catch (error) {
@@ -905,7 +1180,119 @@
                 return;
             }
 
-            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل VIP ${level}؟`)) return;
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const user = userData[userId];
+                const currentVIP = user.vip || { active: null, paused: false };
+
+                // If paused, cancel it (remove VIP)
+                if (currentVIP.paused === true) {
+                    if (!confirm(`⚠️ هل أنت متأكد من إلغاء VIP ${level} نهائياً؟`)) return;
+                    
+                    await database.ref('users/' + userId + '/vip').set({
+                        active: null,
+                        expiresAt: null,
+                        paused: false,
+                        cancelledAt: new Date().toISOString()
+                    });
+                    showToast('✅ تم إلغاء VIP', 'success');
+                    await loadUserData();
+                    return;
+                }
+
+                // If active, pause it
+                if (currentVIP.active === level) {
+                    await database.ref('users/' + userId + '/vip/paused').set(true);
+                    showToast(`⏸️ تم إيقاف VIP ${level} مؤقتاً`, 'warning');
+                    await loadUserData();
+                    return;
+                }
+
+            } catch (error) {
+                console.error('Error deactivating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ FRAMES SYSTEM
+        // ============================================================
+        function renderFrames(user) {
+            const grid = document.getElementById('framesGrid');
+            const userFrames = user.frames || {};
+            const activeFrame = user.activeFrame || null;
+
+            grid.innerHTML = FRAMES.map(frame => {
+                const owned = userFrames[frame.id] || false;
+                const isActive = activeFrame === frame.id;
+                const isOwned = owned === true || (userFrames[frame.id] && userFrames[frame.id].owned === true);
+                const expiresAt = userFrames[frame.id]?.expiresAt ? new Date(userFrames[frame.id].expiresAt) : null;
+                const isExpired = expiresAt && expiresAt < new Date();
+                const isValid = isOwned && !isExpired;
+
+                let statusText = 'غير مملوك';
+                let statusClass = 'inactive';
+                
+                if (isActive && isValid) {
+                    statusText = '✅ مفعل حالياً';
+                    statusClass = 'active';
+                } else if (isValid) {
+                    statusText = '📦 مملوك';
+                    statusClass = 'owned';
+                } else if (isOwned && isExpired) {
+                    statusText = '⏳ منتهي الصلاحية';
+                    statusClass = 'inactive';
+                }
+
+                const canAfford = user.balanceEGP >= frame.price;
+
+                return `
+                    <div class="frame-card">
+                        <div class="frame-preview">
+                            <iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>
+                        </div>
+                        <div class="frame-name">${frame.name}</div>
+                        <div class="frame-price">💰 ${frame.price} ج.م</div>
+                        <div class="frame-duration">⏱️ مدة التفعيل: ${frame.duration} يوم</div>
+                        <div class="frame-status ${statusClass}">${statusText}</div>
+                        <div class="frame-actions">
+                            ${!isValid ? `
+                                <button class="btn-buy ${!canAfford ? 'owned' : ''}" 
+                                    onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')"
+                                    ${!canAfford ? 'disabled' : ''}>
+                                    ${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}
+                                </button>
+                            ` : ''}
+                            ${isValid && !isActive ? `
+                                <button class="btn-use" onclick="useFrame('${frame.id}')">
+                                    <i class="fas fa-check"></i> تفعيل
+                                </button>
+                            ` : ''}
+                            ${isActive ? `
+                                <button class="btn-use active" onclick="useFrame(null)">
+                                    <i class="fas fa-times"></i> إلغاء التفعيل
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function buyFrame(frameId, price, name) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
 
             try {
                 const usersRef = database.ref('users');
@@ -918,20 +1305,115 @@
 
                 const userData = snapshot.val();
                 const userId = Object.keys(userData)[0];
+                const user = userData[userId];
 
-                await database.ref('users/' + userId + '/vip').set({
-                    active: null,
-                    expiresAt: null,
-                    deactivatedAt: new Date().toISOString()
-                });
+                if (user.balanceEGP < price) {
+                    showToast(`⚠️ رصيد غير كافٍ (تحتاج ${price} ج.م)`, 'warning');
+                    return;
+                }
 
-                showToast('✅ تم إلغاء تفعيل VIP', 'success');
+                if (!confirm(`تأكيد شراء "${name}" مقابل ${price} ج.م؟`)) return;
+
+                const newBalance = (user.balanceEGP || 0) - price;
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + 30);
+
+                const updateData = {
+                    balanceEGP: newBalance,
+                    updatedAt: now.toISOString()
+                };
+
+                // Add frame to user's frames
+                const frames = user.frames || {};
+                frames[frameId] = {
+                    owned: true,
+                    purchasedAt: now.toISOString(),
+                    expiresAt: expiresAt.toISOString()
+                };
+                updateData.frames = frames;
+
+                await database.ref('users/' + userId).update(updateData);
+
+                const notification = {
+                    id: Date.now(),
+                    text: `🖼️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'frame_purchased',
+                    createdAt: now.toISOString()
+                };
+                await database.ref('users/' + userId + '/notifications').push(notification);
+
+                showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
                 await loadUserData();
 
             } catch (error) {
-                console.error('Error deactivating VIP:', error);
-                showToast('❌ حدث خطأ في إلغاء التفعيل', 'error');
+                console.error('Error buying frame:', error);
+                showToast('❌ حدث خطأ في الشراء', 'error');
             }
+        }
+
+        async function useFrame(frameId) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const user = userData[userId];
+
+                // If frameId is null, deactivate frame
+                if (frameId === null) {
+                    await database.ref('users/' + userId + '/activeFrame').set(null);
+                    showToast('✅ تم إلغاء تفعيل الإطار', 'success');
+                    await loadUserData();
+                    return;
+                }
+
+                // Check if frame is owned and not expired
+                const frames = user.frames || {};
+                const frame = frames[frameId];
+                if (!frame || !frame.owned) {
+                    showToast('⚠️ هذا الإطار غير مملوك', 'warning');
+                    return;
+                }
+
+                const expiresAt = frame.expiresAt ? new Date(frame.expiresAt) : null;
+                if (expiresAt && expiresAt < new Date()) {
+                    showToast('⏳ صلاحية هذا الإطار منتهية', 'warning');
+                    return;
+                }
+
+                await database.ref('users/' + userId + '/activeFrame').set(frameId);
+                showToast(`✅ تم تفعيل الإطار بنجاح`, 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error using frame:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 📑 TABS
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tabContent${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+            document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
         }
 
         // ============================================================
