@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <style>
         /* ===== RESET & BASE ===== */
@@ -2086,9 +2087,123 @@
             .room-card .room-banner .vip-text { font-size: 1rem; }
             .room-card .room-banner .room-id-badge { font-size: 0.45rem; padding: 1px 6px; }
         }
+
+        /* ===== LOGIN REQUIRED OVERLAY ===== */
+        .login-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-overlay.active {
+            display: flex;
+        }
+
+        .login-overlay .login-box {
+            background: #1a1a2e;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-overlay .login-box .login-icon {
+            font-size: 4rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .login-overlay .login-box h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .login-overlay .login-box p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .login-overlay .login-box .login-btn-main {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffd700, #f0c000);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-overlay .login-box .login-btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .login-overlay .login-box .login-btn-main i {
+            margin-left: 8px;
+        }
+
+        /* ===== LOGIN STATUS IN HEADER ===== */
+        .auth-status-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .auth-status-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .auth-status-btn.logged-in {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .auth-status-btn.logged-in:hover {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
     </style>
 </head>
 <body>
+
+    <!-- ===== LOGIN OVERLAY ===== -->
+    <div id="loginOverlay" class="login-overlay active">
+        <div class="login-box">
+            <div class="login-icon"><i class="fas fa-crown"></i></div>
+            <h2>مرحباً بك في VipChat</h2>
+            <p>يرجى تسجيل الدخول للاستمتاع بجميع مميزات التطبيق وإنشاء الغرف والمشاركة في الدردشة الصوتية.</p>
+            <button class="login-btn-main" onclick="redirectToLogin()">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+            </button>
+        </div>
+    </div>
 
     <!-- ===== HEADER ===== -->
     <header class="header">
@@ -2110,7 +2225,9 @@
         </div>
 
         <div class="header-right">
-            <!-- تم إلغاء أيقونات البحث والموصى به والقوائم -->
+            <button id="authStatusBtn" class="auth-status-btn" onclick="handleAuthClick()">
+                <i class="fas fa-spinner fa-spin"></i> جاري التحقق...
+            </button>
         </div>
 
         <!-- ===== PROFILE DROPDOWN ===== -->
@@ -2427,12 +2544,11 @@
             <span>الرسائل</span>
             <span class="nav-badge" id="msgBadge">0</span>
         </button>
-        <!-- تم إلغاء أيقونة اللحظات -->
     </div>
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG
+        // 🔥 FIREBASE CONFIG (نفس الكونفج في vip-system)
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
@@ -2444,8 +2560,10 @@
             appId: "1:120667552740:web:02085765fd43eb0080e5f1"
         };
 
-        let database, storage;
+        let database, storage, auth;
         let currentUser = null;
+        let currentFirebaseUser = null;
+        let isAuthenticated = false;
         let currentUserId = null;
         let selectedFile = null;
         let hasLiked = false;
@@ -2453,7 +2571,6 @@
         let currentSearch = '';
         let bannerInterval = null;
         let currentBanner = 0;
-        let isLoggedIn = false;
 
         // ============================================================
         // 🌍 COUNTRIES DATA
@@ -2502,57 +2619,44 @@
             }
             database = firebase.database();
             storage = firebase.storage();
-            console.log('✅ Firebase connected');
+            auth = firebase.auth();
+            console.log('✅ Firebase connected with Auth');
         } catch (error) {
             console.error('❌ Firebase error:', error);
         }
 
         // ============================================================
-        // 👤 USER MANAGEMENT
+        // 🔐 AUTHENTICATION (نفس نظام vip-system)
         // ============================================================
-        function getCurrentUser() {
-            try {
-                const user = JSON.parse(localStorage.getItem('currentUser'));
-                if (user && !user.isGuest) {
-                    return user;
-                }
-                return null;
-            } catch (e) {
-                return null;
-            }
+        function redirectToLogin() {
+            window.location.href = 'loginchat.html';
         }
 
-        // التحقق من حالة تسجيل الدخول
-        function checkLoginStatus() {
-            const user = getCurrentUser();
-            isLoggedIn = !!(user && user.numericId);
-            
-            // تحديث زر تسجيل الخروج/الدخول
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (isLoggedIn) {
-                logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل الخروج';
-                logoutBtn.className = 'action-btn btn-logout';
+        function handleAuthClick() {
+            if (isAuthenticated) {
+                logout();
             } else {
-                logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                logoutBtn.className = 'action-btn btn-profile';
+                redirectToLogin();
             }
-            
-            return isLoggedIn;
         }
 
+        // ============================================================
+        // 👤 USER MANAGEMENT مع Firebase Auth
+        // ============================================================
         function generateNumericId() {
             return Math.floor(100000 + Math.random() * 900000);
         }
 
-        function redirectToLogin() {
-            window.location.href = 'loginchat.html';
+        function formatNumericId(id) {
+            if (!id) return "000000";
+            return id.toString().padStart(6, '0');
         }
 
         // ============================================================
         // 🛡️ CHECK LOGIN BEFORE ACTIONS
         // ============================================================
         function requireLogin(action) {
-            if (!checkLoginStatus()) {
+            if (!isAuthenticated) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 setTimeout(() => redirectToLogin(), 1500);
                 return false;
@@ -2561,106 +2665,7 @@
         }
 
         // ============================================================
-        // 💬 MESSAGES SYSTEM
-        // ============================================================
-        async function addWelcomeMessage(userId) {
-            try {
-                const welcomeMsg = {
-                    senderName: 'الإدارة',
-                    senderId: '1',
-                    senderAvatar: '',
-                    text: '🎉 مرحباً بك في VipChat! نتمنى لك أوقاتاً ممتعة في نادي كبار الشخصيات. استمتع بالغرف الصوتية وتواصل مع الأعضاء.',
-                    date: new Date().toLocaleString('ar-EG'),
-                    isWelcome: true
-                };
-
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
-
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    const userKey = Object.keys(userData)[0];
-                    const messagesRef = database.ref('users/' + userKey + '/messages');
-                    await messagesRef.push(welcomeMsg);
-                }
-            } catch (error) {
-                console.error('Error adding welcome message:', error);
-            }
-        }
-
-        async function loadMessages() {
-            if (!requireLogin('loadMessages')) {
-                document.getElementById('messagesList').innerHTML = `
-                    <div style="text-align:center; color:#666; padding:40px 20px;">
-                        <i class="fas fa-sign-in-alt" style="font-size:2rem; margin-bottom:10px;"></i>
-                        <p>يرجى تسجيل الدخول لعرض الرسائل</p>
-                        <button onclick="redirectToLogin()" style="margin-top:10px; padding:8px 20px; background:#ffd700; color:#1a1a2e; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">تسجيل الدخول</button>
-                    </div>
-                `;
-                return;
-            }
-
-            const user = getCurrentUser();
-            try {
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-
-                let messages = [];
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    const userId = Object.keys(userData)[0];
-                    const fullUser = userData[userId];
-                    messages = fullUser.messages || [];
-                    
-                    const badge = document.getElementById('msgBadge');
-                    if (messages.length > 0) {
-                        badge.textContent = messages.length;
-                        badge.style.display = 'block';
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                }
-
-                const list = document.getElementById('messagesList');
-
-                if (messages.length === 0) {
-                    list.innerHTML = `
-                        <div style="text-align:center; color:#666; padding:40px 20px;">
-                            <i class="fas fa-inbox" style="font-size:2rem; margin-bottom:10px;"></i>
-                            <p>لا توجد رسائل</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                list.innerHTML = messages.slice().reverse().map(msg => `
-                    <div class="msg-item ${msg.isWelcome ? 'welcome' : ''}">
-                        <div class="msg-sender">
-                            <div class="sender-avatar">
-                                ${msg.senderAvatar ? `<img src="${msg.senderAvatar}" alt="">` : msg.senderName.charAt(0).toUpperCase()}
-                            </div>
-                            <span class="sender-name">${msg.senderName || 'مستخدم'}</span>
-                            <span class="sender-id">🆔 ${msg.senderId || '---'}</span>
-                            ${msg.isWelcome ? '<span style="color:#ffd700; font-size:0.65rem; background:rgba(255,215,0,0.1); padding:2px 10px; border-radius:10px;">🎉 ترحيب</span>' : ''}
-                        </div>
-                        <div class="msg-text">${msg.text}</div>
-                        <div class="msg-time">📅 ${msg.date || new Date().toLocaleString('ar-EG')}</div>
-                    </div>
-                `).join('');
-
-            } catch (error) {
-                console.error('Error loading messages:', error);
-                document.getElementById('messagesList').innerHTML = `
-                    <div style="text-align:center; color:#ef4444; padding:40px 20px;">
-                        <i class="fas fa-exclamation-triangle" style="font-size:2rem; margin-bottom:10px;"></i>
-                        <p>خطأ في تحميل الرسائل</p>
-                    </div>
-                `;
-            }
-        }
-
-        // ============================================================
-        // 📋 ROOMS MANAGEMENT (مع Firebase)
+        // 📋 ROOMS MANAGEMENT
         // ============================================================
         function generateRoomId() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -2809,7 +2814,7 @@
         }
 
         // ============================================================
-        // 📝 SUBMIT ROOM REQUEST (مع التحقق من تسجيل الدخول)
+        // 📝 SUBMIT ROOM REQUEST
         // ============================================================
         async function submitRoomRequest() {
             if (!requireLogin('submitRoomRequest')) return;
@@ -2822,7 +2827,7 @@
                 return;
             }
 
-            const user = getCurrentUser();
+            const user = currentUser;
 
             const roomId = generateRoomId();
             const requestData = {
@@ -2875,7 +2880,7 @@
         }
 
         // ============================================================
-        // 🎯 JOIN ROOM (مع التحقق من تسجيل الدخول)
+        // 🎯 JOIN ROOM
         // ============================================================
         function joinRoom(roomId) {
             if (!requireLogin('joinRoom')) return;
@@ -2926,7 +2931,7 @@
             const list = document.getElementById('notifList');
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 const usersRef = database.ref('users');
                 const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
 
@@ -3027,7 +3032,7 @@
             if (!requireLogin('markAllRead')) return;
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 const usersRef = database.ref('users');
                 const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
 
@@ -3071,7 +3076,7 @@
             if (!requireLogin('deleteAllNotifs')) return;
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 const usersRef = database.ref('users');
                 const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
 
@@ -3103,10 +3108,7 @@
         }
 
         function toggleFlagSearch() {
-            if (!checkLoginStatus()) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
+            if (!requireLogin('toggleFlagSearch')) return;
             const dropdown = document.getElementById('flagSearchDropdown');
             dropdown.classList.toggle('active');
             if (dropdown.classList.contains('active')) {
@@ -3133,7 +3135,7 @@
             document.getElementById('flagSearchDropdown').classList.remove('active');
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 if (database && user.numericId) {
                     const usersRef = database.ref('users');
                     const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
@@ -3229,7 +3231,7 @@
         }
 
         async function uploadCroppedImage(blob) {
-            const user = getCurrentUser();
+            const user = currentUser;
             if (!user || !user.numericId) {
                 showToast('❌ يرجى تسجيل الدخول أولاً', 'error');
                 return;
@@ -3261,7 +3263,7 @@
 
         async function toggleProfileDropdown() {
             // التحقق من تسجيل الدخول
-            if (!checkLoginStatus()) {
+            if (!isAuthenticated) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 setTimeout(() => redirectToLogin(), 1500);
                 return;
@@ -3282,7 +3284,7 @@
         }
 
         async function loadProfileData() {
-            const user = getCurrentUser();
+            const user = currentUser;
             if (!user) return;
 
             try {
@@ -3346,7 +3348,7 @@
 
         async function checkIfLiked() {
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 if (!user || !user.numericId) {
                     hasLiked = false;
                     document.getElementById('likeButton').classList.remove('liked');
@@ -3409,7 +3411,7 @@
             const bio = document.getElementById('p_bio').innerText;
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 if (database && user.numericId) {
                     const usersRef = database.ref('users');
                     const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
@@ -3465,7 +3467,7 @@
             if (!requireLogin('sendLike')) return;
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 if (!user || !user.numericId) {
                     showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                     return;
@@ -3490,7 +3492,7 @@
             modal.classList.add('active');
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 const giftsList = document.getElementById('giftsList');
                 const totalSpan = document.getElementById('totalGiftValue');
 
@@ -3578,7 +3580,7 @@
             modal.classList.add('active');
 
             try {
-                const user = getCurrentUser();
+                const user = currentUser;
                 const content = document.getElementById('fullProfileContent');
 
                 let userPosts = [];
@@ -3798,7 +3800,7 @@
         }
 
         function toggleNotifs() {
-            if (!checkLoginStatus()) {
+            if (!isAuthenticated) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 setTimeout(() => redirectToLogin(), 1500);
                 return;
@@ -3828,69 +3830,239 @@
         });
 
         // ============================================================
-        // 🚀 LOGOUT
+        // 🚀 LOAD USER DATA FROM FIREBASE
         // ============================================================
-        async function logout() {
-            const user = getCurrentUser();
-            if (!user) {
-                // إذا لم يكن هناك مستخدم مسجل الدخول، التوجه إلى صفحة تسجيل الدخول
-                redirectToLogin();
+        async function loadUserData(uid) {
+            try {
+                const userRef = database.ref('users').orderByChild('uid').equalTo(uid);
+                const snapshot = await userRef.once('value');
+
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    const userId = Object.keys(users)[0];
+                    const userData = users[userId];
+
+                    currentUser = {
+                        ...userData,
+                        firebaseKey: userId,
+                        uid: uid
+                    };
+
+                    // حفظ في localStorage للتوافق
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                    // تحديث الواجهة
+                    updateUIForLoggedIn(currentUser);
+                    loadRooms();
+                    loadMessages();
+
+                    return currentUser;
+                } else {
+                    // إنشاء مستخدم جديد إذا لم يكن موجوداً
+                    await createUser(uid);
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showToast('❌ حدث خطأ في تحميل البيانات', 'error');
+            }
+        }
+
+        async function createUser(uid) {
+            try {
+                const authUser = auth.currentUser;
+                if (!authUser) return null;
+
+                const numericId = generateNumericId();
+                const newUserRef = database.ref('users').push();
+                const firebaseKey = newUserRef.key;
+
+                const userData = {
+                    uid: uid,
+                    numericId: numericId,
+                    username: authUser.displayName || `user_${numericId}`,
+                    nickname: authUser.displayName || `user_${numericId}`,
+                    email: authUser.email || '',
+                    avatar: authUser.photoURL || '',
+                    balanceEGP: 0,
+                    balanceUSD: 0,
+                    likes: 0,
+                    gifts: 0,
+                    visits: 0,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    vip: { active: null, expiresAt: null },
+                    frames: {},
+                    chatStyles: {},
+                    vipPurchased: {},
+                    notifications: {},
+                    messages: []
+                };
+
+                await newUserRef.set(userData);
+
+                currentUser = {
+                    ...userData,
+                    firebaseKey: firebaseKey
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showToast('✅ تم إنشاء حسابك بنجاح!', 'success');
+
+                updateUIForLoggedIn(currentUser);
+                loadRooms();
+                loadMessages();
+
+                return currentUser;
+
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showToast('❌ حدث خطأ في إنشاء الحساب', 'error');
+                return null;
+            }
+        }
+
+        function updateUIForLoggedIn(user) {
+            if (!user) return;
+
+            // تحديث معلومات المستخدم في الواجهة
+            document.getElementById('p_nickname').innerText = user.nickname || user.username || 'مستخدم';
+            document.getElementById('p_id').innerText = formatNumericId(user.numericId);
+            document.getElementById('p_egp').innerText = user.balanceEGP || '0';
+            document.getElementById('p_usd').innerText = user.balanceUSD || '0';
+            document.getElementById('p_likes').innerText = user.likes || 0;
+            document.getElementById('p_gifts').innerText = user.gifts || 0;
+            document.getElementById('p_visits').innerText = user.visits || 0;
+
+            if (user.avatar) {
+                document.getElementById('profileAvatarDisplay').innerHTML =
+                    `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
+            }
+
+            // تحديث حالة VIP
+            const vipData = user.vip || { active: null, expiresAt: null };
+            const activeVIP = vipData.active;
+            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
+            const now = new Date();
+            const isExpired = expiresAt && expiresAt < now;
+
+            const vipLevelEl = document.getElementById('vipLevel');
+            const vipStatusEl = document.getElementById('vipStatus');
+
+            if (activeVIP && !isExpired) {
+                const vipConfig = { 1: { emoji: '🚗' }, 2: { emoji: '🦁' } }[activeVIP];
+                vipLevelEl.textContent = `${vipConfig?.emoji || '👑'} VIP ${activeVIP}`;
+                vipStatusEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
+                vipStatusEl.style.color = '#3b82f6';
+            } else if (activeVIP && isExpired) {
+                vipLevelEl.textContent = 'VIP 0';
+                vipStatusEl.textContent = '⏳ منتهي الصلاحية';
+                vipStatusEl.style.color = '#ef4444';
+            } else {
+                vipLevelEl.textContent = 'VIP 0';
+                vipStatusEl.textContent = 'غير مفعل';
+                vipStatusEl.style.color = '#94a3b8';
+            }
+
+            // إخفاء الـ Login Overlay
+            document.getElementById('loginOverlay').classList.remove('active');
+
+            // تحديث زر الحالة
+            const authBtn = document.getElementById('authStatusBtn');
+            authBtn.className = 'auth-status-btn logged-in';
+            authBtn.innerHTML = `<i class="fas fa-user-check"></i> ${user.nickname || user.username}`;
+        }
+
+        // ============================================================
+        // 💬 MESSAGES
+        // ============================================================
+        async function loadMessages() {
+            if (!isAuthenticated || !currentUser) {
+                document.getElementById('messagesList').innerHTML = `
+                    <div style="text-align:center; color:#666; padding:40px 20px;">
+                        <i class="fas fa-sign-in-alt" style="font-size:2rem; margin-bottom:10px;"></i>
+                        <p>يرجى تسجيل الدخول لعرض الرسائل</p>
+                        <button onclick="redirectToLogin()" style="margin-top:10px; padding:8px 20px; background:#ffd700; color:#1a1a2e; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">تسجيل الدخول</button>
+                    </div>
+                `;
                 return;
             }
 
             try {
-                // حذف بيانات المستخدم بالكامل من localStorage
-                localStorage.removeItem('currentUser');
-                isLoggedIn = false;
-                currentUser = null;
-                
-                document.getElementById('profileDropdown').classList.remove('active');
-                
-                // تحديث زر تسجيل الخروج ليصبح تسجيل الدخول
-                const logoutBtn = document.getElementById('logoutBtn');
-                logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                logoutBtn.className = 'action-btn btn-profile';
-                logoutBtn.onclick = function() { redirectToLogin(); };
-                
-                showToast('👋 تم تسجيل الخروج بنجاح', 'success');
-                
-                // إعادة تحميل الصفحة لتحديث الواجهة
-                setTimeout(() => location.reload(), 1000);
+                const user = currentUser;
+                let messages = user.messages || [];
+
+                const badge = document.getElementById('msgBadge');
+                if (messages.length > 0) {
+                    badge.textContent = messages.length;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                const list = document.getElementById('messagesList');
+
+                if (messages.length === 0) {
+                    list.innerHTML = `
+                        <div style="text-align:center; color:#666; padding:40px 20px;">
+                            <i class="fas fa-inbox" style="font-size:2rem; margin-bottom:10px;"></i>
+                            <p>لا توجد رسائل</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                list.innerHTML = messages.slice().reverse().map(msg => `
+                    <div class="msg-item ${msg.isWelcome ? 'welcome' : ''}">
+                        <div class="msg-sender">
+                            <div class="sender-avatar">
+                                ${msg.senderAvatar ? `<img src="${msg.senderAvatar}" alt="">` : msg.senderName?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            <span class="sender-name">${msg.senderName || 'مستخدم'}</span>
+                            <span class="sender-id">🆔 ${msg.senderId || '---'}</span>
+                            ${msg.isWelcome ? '<span style="color:#ffd700; font-size:0.65rem; background:rgba(255,215,0,0.1); padding:2px 10px; border-radius:10px;">🎉 ترحيب</span>' : ''}
+                        </div>
+                        <div class="msg-text">${msg.text}</div>
+                        <div class="msg-time">📅 ${msg.date || new Date().toLocaleString('ar-EG')}</div>
+                    </div>
+                `).join('');
+
             } catch (error) {
-                console.error('Logout error:', error);
-                showToast('❌ حدث خطأ', 'error');
+                console.error('Error loading messages:', error);
+                document.getElementById('messagesList').innerHTML = `
+                    <div style="text-align:center; color:#ef4444; padding:40px 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:2rem; margin-bottom:10px;"></i>
+                        <p>خطأ في تحميل الرسائل</p>
+                    </div>
+                `;
             }
         }
 
         // ============================================================
-        // 🚀 INIT ON PAGE LOAD
+        // 🚪 LOGOUT
         // ============================================================
-        window.onload = async function() {
-            // التحقق من حالة تسجيل الدخول
-            checkLoginStatus();
-            
-            // إذا كان المستخدم مسجل الدخول، تحميل بياناته
-            if (isLoggedIn) {
-                currentUser = getCurrentUser();
-                initFlagSelector();
+        async function logout() {
+            try {
+                await auth.signOut();
+                showToast('👋 تم تسجيل الخروج بنجاح', 'success');
+                isAuthenticated = false;
+                currentUser = null;
+                currentFirebaseUser = null;
 
-                if (database) {
-                    await loadRooms();
+                // إظهار شاشة تسجيل الدخول
+                document.getElementById('loginOverlay').classList.add('active');
 
-                    database.ref('rooms').on('value', () => {
-                        if (document.getElementById('homePage').classList.contains('active')) {
-                            loadRooms();
-                        }
-                    });
+                // تحديث زر الحالة
+                const authBtn = document.getElementById('authStatusBtn');
+                authBtn.className = 'auth-status-btn';
+                authBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
 
-                    await loadMessages();
-                }
+                // حذف localStorage
+                localStorage.removeItem('currentUser');
 
-                if (currentUser) {
-                    updateNotifBadge();
-                }
-            } else {
-                // عرض رسالة للمستخدم غير المسجل
+                // إخفاء البروفايل
+                document.getElementById('profileDropdown').classList.remove('active');
+
+                // عرض رسالة للزوار في الغرف
                 document.getElementById('roomsGrid').innerHTML = `
                     <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
                         <i class="fas fa-sign-in-alt" style="font-size:3.5rem; color:#333; margin-bottom:15px;"></i>
@@ -3901,60 +4073,101 @@
                         </button>
                     </div>
                 `;
-            }
 
-            // بدء سلايدر البانر
+                document.getElementById('messagesList').innerHTML = `
+                    <div style="text-align:center; color:#666; padding:40px 20px;">
+                        <i class="fas fa-sign-in-alt" style="font-size:2rem; margin-bottom:10px;"></i>
+                        <p>يرجى تسجيل الدخول لعرض الرسائل</p>
+                        <button onclick="redirectToLogin()" style="margin-top:10px; padding:8px 20px; background:#ffd700; color:#1a1a2e; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">تسجيل الدخول</button>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Logout error:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🚀 AUTH STATE LISTENER - قلب النظام (نفس نظام vip-system)
+        // ============================================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // ✅ مستخدم مسجل
+                console.log('✅ مستخدم مسجل:', user.uid);
+                isAuthenticated = true;
+                currentFirebaseUser = user;
+
+                // تحديث زر الحالة
+                const authBtn = document.getElementById('authStatusBtn');
+                authBtn.className = 'auth-status-btn logged-in';
+                authBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+
+                // تحميل بيانات المستخدم
+                await loadUserData(user.uid);
+
+                // بدء السلايدر
+                startBannerSlider();
+
+            } else {
+                // ❌ مستخدم غير مسجل
+                console.log('👤 لا يوجد مستخدم مسجل');
+                isAuthenticated = false;
+                currentUser = null;
+                currentFirebaseUser = null;
+
+                // تحديث زر الحالة
+                const authBtn = document.getElementById('authStatusBtn');
+                authBtn.className = 'auth-status-btn';
+                authBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+
+                // إظهار شاشة تسجيل الدخول
+                document.getElementById('loginOverlay').classList.add('active');
+
+                // عرض رسالة للزوار
+                document.getElementById('roomsGrid').innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
+                        <i class="fas fa-sign-in-alt" style="font-size:3.5rem; color:#333; margin-bottom:15px;"></i>
+                        <h3 style="color:#888;">يرجى تسجيل الدخول</h3>
+                        <p style="font-size:0.9rem;">سجل الدخول للاستمتاع بجميع مميزات VipChat</p>
+                        <button onclick="redirectToLogin()" style="margin-top:15px; padding:12px 30px; background:linear-gradient(135deg,#ffd700,#f0c000); color:#1a1a2e; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer;">
+                            <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                        </button>
+                    </div>
+                `;
+
+                document.getElementById('messagesList').innerHTML = `
+                    <div style="text-align:center; color:#666; padding:40px 20px;">
+                        <i class="fas fa-sign-in-alt" style="font-size:2rem; margin-bottom:10px;"></i>
+                        <p>يرجى تسجيل الدخول لعرض الرسائل</p>
+                        <button onclick="redirectToLogin()" style="margin-top:10px; padding:8px 20px; background:#ffd700; color:#1a1a2e; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">تسجيل الدخول</button>
+                    </div>
+                `;
+
+                localStorage.removeItem('currentUser');
+
+                // إخفاء البروفايل
+                document.getElementById('profileDropdown').classList.remove('active');
+
+                // إيقاف السلايدر
+                stopBannerSlider();
+            }
+        });
+
+        // ============================================================
+        // 🚀 INIT ON PAGE LOAD
+        // ============================================================
+        window.onload = function() {
+            // تهيئة الفلاج
+            initFlagSelector();
+
+            // بدء السلايدر (سيتم التحكم فيه بواسطة Auth Listener)
             startBannerSlider();
 
             console.log('🎙️ VipChat جاهز!');
-            console.log('✅ تم إضافة نظام تسجيل الدخول الإجباري');
-            console.log('✅ لا يمكن استخدام التطبيق بدون تسجيل دخول');
-            console.log('✅ زر تسجيل الخروج يتحول إلى تسجيل الدخول بعد الخروج');
+            console.log('✅ يستخدم Firebase Authentication مثل vip-system');
+            console.log('✅ جلسة واحدة موحدة بين جميع الصفحات');
         };
-
-        async function updateNotifBadge() {
-            try {
-                const user = getCurrentUser();
-                if (!user || !user.numericId) {
-                    document.getElementById('notifBadge').style.display = 'none';
-                    return;
-                }
-
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-
-                if (!snapshot.exists()) {
-                    document.getElementById('notifBadge').style.display = 'none';
-                    return;
-                }
-
-                const userData = snapshot.val();
-                const userId = Object.keys(userData)[0];
-                const notifRef = database.ref('users/' + userId + '/notifications');
-                const notifSnapshot = await notifRef.once('value');
-
-                if (!notifSnapshot.exists()) {
-                    document.getElementById('notifBadge').style.display = 'none';
-                    return;
-                }
-
-                let unreadCount = 0;
-                notifSnapshot.forEach(child => {
-                    if (!child.val().read) unreadCount++;
-                });
-
-                const badge = document.getElementById('notifBadge');
-                if (unreadCount > 0) {
-                    badge.textContent = unreadCount;
-                    badge.style.display = 'block';
-                } else {
-                    badge.style.display = 'none';
-                }
-
-            } catch (error) {
-                console.error('Error updating badge:', error);
-            }
-        }
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
