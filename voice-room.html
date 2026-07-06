@@ -468,6 +468,11 @@
             max-width: 85%;
             word-wrap: break-word;
             animation: fadeInMsg 0.2s ease;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 40px;
         }
         @keyframes fadeInMsg { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -485,7 +490,6 @@
             opacity: 0.8;
         }
         .chat-messages .message.own {
-            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.15));
             align-self: flex-end;
             border: 1px solid rgba(102,126,234,0.1);
             border-radius: 16px 16px 4px 16px;
@@ -493,7 +497,6 @@
             text-align: right;
         }
         .chat-messages .message.other {
-            background: rgba(255,255,255,0.04);
             align-self: flex-start;
             border: 1px solid rgba(255,255,255,0.04);
             border-radius: 16px 16px 16px 4px;
@@ -501,11 +504,52 @@
             text-align: left;
         }
 
-        .chat-messages .message .msg-sender { font-size: 0.5rem; color: #94a3b8; margin-bottom: 1px; }
+        .chat-messages .message .msg-sender { 
+            font-size: 0.55rem; 
+            color: #fff; 
+            margin-bottom: 2px; 
+            font-weight: bold;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
         .chat-messages .message .msg-sender.owner { color: #ffd700; }
-        .chat-messages .message .msg-text { font-size: 0.8rem; }
-        .chat-messages .message .msg-time { font-size: 0.45rem; color: #666; margin-top: 1px; }
-        .chat-messages .message .msg-badge { font-size: 0.45rem; background: #ffd700; color: #1a1a2e; padding: 1px 8px; border-radius: 8px; margin-left: 4px; }
+        .chat-messages .message .msg-text { 
+            font-size: 0.85rem; 
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 1;
+        }
+        .chat-messages .message .msg-time { 
+            font-size: 0.45rem; 
+            color: rgba(255,255,255,0.6); 
+            margin-top: 2px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 1;
+        }
+        .chat-messages .message .msg-badge { 
+            font-size: 0.45rem; 
+            background: #ffd700; 
+            color: #1a1a2e; 
+            padding: 1px 8px; 
+            border-radius: 8px; 
+            margin-left: 4px; 
+        }
+        
+        /* طبقة خلفية شفافة للرسالة */
+        .chat-messages .message .msg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            background: rgba(0,0,0,0.45);
+            z-index: 0;
+        }
+        .chat-messages .message .msg-content {
+            position: relative;
+            z-index: 1;
+        }
 
         .scroll-down-btn {
             position: absolute;
@@ -1942,7 +1986,7 @@
     }
 
     // ============================================================
-    // 💬 CHAT - مع دعم صور أشكال الكتابة
+    // 💬 CHAT - مع دعم صور أشكال الكتابة كخلفية
     // ============================================================
     function listenChat() {
         if (!database) return;
@@ -1971,34 +2015,31 @@
         div.className = className;
         div.setAttribute('data-msg-id', msg.id || Date.now());
         
-        // بناء محتوى الرسالة
-        let styleImageHTML = '';
-        let styleNameHTML = '';
+        // بناء محتوى الرسالة مع خلفية الصورة
+        let styleImage = '';
+        let styleName = '';
         
-        // إذا كان هناك أسلوب كتابة، أضف الصورة تحت النص
         if (msg.styleId) {
             const style = CHAT_STYLES.find(s => s.id === msg.styleId);
             if (style) {
-                styleNameHTML = ` <span style="font-size:0.5rem; color:#ffd700;">✍️ ${style.name}</span>`;
-                // إضافة الصورة تحت النص - مصغرة
-                styleImageHTML = `
-                    <div style="display:flex; justify-content:${isOwn ? 'flex-end' : 'flex-start'}; margin-top:4px;">
-                        <img src="${style.image}" alt="${style.name}" 
-                             style="max-width:80px; max-height:30px; object-fit:contain; opacity:0.7; border-radius:4px;">
-                    </div>
-                `;
+                styleName = ` ✍️ ${style.name}`;
+                styleImage = `background-image: url('${style.image}'); background-size: cover; background-position: center;`;
             }
         }
         
+        div.style.cssText = styleImage;
+        
         div.innerHTML = `
-            <div class="msg-sender ${msg.isOwner ? 'owner' : ''}">
-                ${msg.isOwner ? '<span class="msg-badge">👑 مالك</span>' : ''}
-                ${msg.username || 'مستخدم'}
-                ${styleNameHTML}
+            <div class="msg-overlay"></div>
+            <div class="msg-content">
+                <div class="msg-sender ${msg.isOwner ? 'owner' : ''}">
+                    ${msg.isOwner ? '<span class="msg-badge">👑 مالك</span>' : ''}
+                    ${msg.username || 'مستخدم'}
+                    ${styleName}
+                </div>
+                <div class="msg-text">${msg.text}</div>
+                <div class="msg-time">${msg.time || ''}</div>
             </div>
-            <div class="msg-text">${msg.text}</div>
-            ${styleImageHTML}
-            <div class="msg-time">${msg.time || ''}</div>
         `;
         container.appendChild(div);
     }
