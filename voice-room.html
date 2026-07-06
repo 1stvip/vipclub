@@ -157,6 +157,73 @@
         .seats-row.row-3 { max-width: 580px; }
         .seats-row.row-4 { max-width: 780px; }
 
+        /* ===== SEAT WRAPPER WITH FRAME ===== */
+        .seat-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ===== FRAME AROUND SEAT ===== */
+        .seat-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            overflow: hidden;
+        }
+
+        .seat-frame.active {
+            opacity: 1;
+            animation: framePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes framePulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.03); }
+        }
+
+        .seat-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 50%;
+            pointer-events: none;
+            background: transparent;
+        }
+
+        .seat-frame::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,0.15), transparent 70%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            filter: blur(10px);
+        }
+
+        .seat-frame.active::before {
+            opacity: 1;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
         .seat-circle {
             position: relative;
             width: 95px;
@@ -172,6 +239,7 @@
             background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
             border: 3px solid rgba(255,255,255,0.06);
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 2;
         }
         .seat-circle::before {
             content: '';
@@ -225,6 +293,8 @@
             border: 2px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 3;
+            position: relative;
         }
         .seat-circle.owner-seat .seat-avatar {
             border-color: #ffd700;
@@ -248,9 +318,11 @@
             white-space: nowrap;
             text-align: center;
             font-weight: 500;
+            z-index: 3;
+            position: relative;
         }
         .seat-circle .seat-username.owner-name { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        .seat-circle .seat-number { font-size: 0.5rem; color: #555; margin-top: 1px; }
+        .seat-circle .seat-number { font-size: 0.5rem; color: #555; margin-top: 1px; z-index: 3; position: relative; }
 
         .seat-circle .crown-icon {
             position: absolute;
@@ -259,6 +331,7 @@
             font-size: 1.6rem;
             filter: drop-shadow(0 0 15px rgba(255,215,0,0.5));
             animation: crown-float 2.5s ease-in-out infinite;
+            z-index: 4;
         }
         @keyframes crown-float {
             0%, 100% { transform: rotate(-10deg) scale(1); }
@@ -321,6 +394,7 @@
             padding: 4px;
             border: 2px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(5px);
+            z-index: 4;
         }
         .seat-circle .mic-indicator.on { color: #10b981; }
         .seat-circle .mic-indicator.off { color: #ef4444; }
@@ -351,6 +425,7 @@
             border-radius: 10px;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.05);
+            z-index: 5;
         }
         .seat-circle:hover .owner-actions { opacity: 1; }
         .seat-circle .owner-actions button {
@@ -939,6 +1014,7 @@
             .seats-row { gap: 15px; }
             .seat-circle { width: 80px; height: 80px; }
             .seat-circle .seat-avatar { width: 44px; height: 44px; font-size: 1.2rem; }
+            .seat-frame { width: 110px; height: 110px; }
         }
 
         @media (max-width: 768px) {
@@ -956,6 +1032,7 @@
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
             #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 18px; }
             #notifDropdown { right: 10px; width: 320px; }
+            .seat-frame { width: 95px; height: 95px; }
         }
 
         @media (max-width: 480px) {
@@ -969,6 +1046,7 @@
             .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
             #vipEntrance .vip-title { font-size: 1rem; padding: 6px 12px; white-space: normal; }
             #notifDropdown { right: 5px; width: 290px; }
+            .seat-frame { width: 80px; height: 80px; }
         }
     </style>
 </head>
@@ -1201,6 +1279,16 @@
     };
 
     // ============================================================
+    // 📋 FRAMES DATA (مطابق لصفحة VIP)
+    // ============================================================
+    const FRAMES = [
+        { id: 'frame1', name: 'إطار فاخر 1', price: 50, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=875809458798946321', height: 405 },
+        { id: 'frame2', name: 'إطار فاخر 2', price: 50, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=601723200255670870', height: 445 },
+        { id: 'frame3', name: 'إطار فاخر 3', price: 100, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669', height: 445 },
+        { id: 'frame4', name: 'إطار فاخر 4', price: 150, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964', height: 438 }
+    ];
+
+    // ============================================================
     // 📋 VARIABLES
     // ============================================================
     let database;
@@ -1376,18 +1464,14 @@
             listenSeats();
             setupChatScroll();
             
-            // FIRST: Get current user's VIP level
-            await loadMyVIPLevel();
-            
-            // SECOND: Listen for new users
+            // Listen for new users
             listenForNewUsers();
             
-            // THIRD: Show MY VIP entrance to all users (including myself)
-            if (myVIPLevel && !hasShownMyVIP) {
-                hasShownMyVIP = true;
-                const username = currentUser?.nickname || currentUser?.username || 'مستخدم';
+            // Show VIP entrance for current user
+            if (currentUser?.numericId) {
+                const username = currentUser.nickname || currentUser.username || 'مستخدم';
                 setTimeout(() => {
-                    showVIPEntranceForUser(currentUser.numericId, username);
+                    checkAndShowVIPEntrance(currentUser.numericId, username);
                 }, 1500);
             }
             
@@ -1397,43 +1481,21 @@
     }
 
     // ============================================================
-    // 👑 VIP SYSTEM - FIXED
+    // 👑 VIP ENTRANCE
     // ============================================================
-    async function loadMyVIPLevel() {
-        try {
-            if (!currentUser?.numericId) return;
-            const user = await getCurrentUserFullData();
-            if (!user) return;
-            const vipData = user.vip || { active: null, expiresAt: null };
-            const activeVIP = vipData.active;
-            if (!activeVIP) return;
-            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
-            if (expiresAt && expiresAt < new Date()) return;
-            myVIPLevel = activeVIP;
-            console.log('👑 My VIP Level:', myVIPLevel);
-        } catch(e) { console.error('Error loading VIP level:', e); }
-    }
-
     function listenForNewUsers() {
         if (!database || !roomId) return;
         
-        // Listen for new seats being added
         database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
             const seat = snapshot.val();
             if (seat && seat.userId) {
                 const userId = seat.userId;
                 const username = seat.username || 'مستخدم';
                 
-                // Don't process if already shown
                 if (vipShownForUsers[userId]) return;
-                
-                // Don't show for myself (already shown)
                 if (userId == currentUser?.numericId) return;
                 
-                // Mark as shown
                 vipShownForUsers[userId] = true;
-                
-                // Add to queue
                 vipQueue.push({ userId, username });
                 processVIPQueue();
             }
@@ -1446,49 +1508,36 @@
         const item = vipQueue.shift();
         isProcessingJoin = true;
         
-        // Show VIP entrance for this user
-        showVIPEntranceForUser(item.userId, item.username).finally(() => {
+        checkAndShowVIPEntrance(item.userId, item.username).finally(() => {
             isProcessingJoin = false;
-            // Process next in queue after a delay
             setTimeout(processVIPQueue, 1000);
         });
     }
 
-    async function showVIPEntranceForUser(userId, username) {
+    async function checkAndShowVIPEntrance(userId, username) {
         if (!database || isVIPEntranceActive) return;
         
         try {
-            // Get user data to check VIP status
             const usersRef = database.ref('users');
             const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
-            
             if (!snapshot.exists()) return;
-            
             const userData = snapshot.val();
             const userKey = Object.keys(userData)[0];
             const user = userData[userKey];
-            
-            // Check VIP status
             const vipData = user.vip || { active: null, expiresAt: null };
             const activeVIP = vipData.active;
-            
             if (!activeVIP) return;
-            
-            // Check expiration
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
             if (expiresAt && expiresAt < new Date()) return;
-            
             const vipConfig = VIP_CONFIG[activeVIP];
             if (!vipConfig) return;
             
-            // Show VIP video for all users in the room
             isVIPEntranceActive = true;
             const entrance = document.getElementById('vipEntrance');
             const video = document.getElementById('vipVideoPlayer');
             const title = document.getElementById('vipTitle');
             const userDisplay = document.getElementById('vipEntranceUser');
             
-            // Reset video
             video.pause();
             video.currentTime = 0;
             video.muted = false;
@@ -1499,9 +1548,8 @@
             userDisplay.textContent = `👤 ${username}`;
             entrance.classList.add('active');
             
-            try { await video.play(); } catch(e) { console.log('Video play error:', e); }
+            try { await video.play(); } catch(e) {}
             
-            // Auto skip after 8 seconds
             return new Promise((resolve) => {
                 if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
                 vipEntranceTimeout = setTimeout(() => {
@@ -1531,12 +1579,46 @@
     }
 
     // ============================================================
-    // 💺 SEATS FUNCTIONS
+    // 💺 SEATS FUNCTIONS WITH FRAMES
     // ============================================================
-    function renderSeats(seats) {
+    async function getUserFrame(userId) {
+        try {
+            const usersRef = database.ref('users');
+            const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
+            if (!snapshot.exists()) return null;
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            const activeFrame = user.activeFrame || null;
+            const frames = user.frames || {};
+            
+            if (!activeFrame) return null;
+            const frameData = frames[activeFrame];
+            if (!frameData || !frameData.owned) return null;
+            const expiresAt = frameData.expiresAt ? new Date(frameData.expiresAt) : null;
+            if (expiresAt && expiresAt < new Date()) return null;
+            
+            const frameConfig = FRAMES.find(f => f.id === activeFrame);
+            return frameConfig || null;
+        } catch(e) { console.error('Error getting user frame:', e); return null; }
+    }
+
+    async function renderSeats(seats) {
         const container = document.getElementById('seatsContainer');
         let html = '', occupied = 0, globalIndex = 0;
         const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
+        
+        // Load frames for occupied seats
+        const seatsWithFrames = {};
+        for (const index in seats) {
+            const seat = seats[index];
+            if (seat && seat.userId) {
+                const frame = await getUserFrame(seat.userId);
+                if (frame) {
+                    seatsWithFrames[index] = frame.id;
+                }
+            }
+        }
         
         SEATS_LAYOUT.forEach((rowData, rowIndex) => {
             html += `<div class="seats-row row-${rowIndex + 1}">`;
@@ -1559,6 +1641,8 @@
                 const userColor = seat?.color || colors[globalIndex % colors.length];
                 const displayName = seat ? seat.username : '';
                 const avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
+                const hasFrame = seatsWithFrames[globalIndex] ? true : false;
+                const frameConfig = hasFrame ? FRAMES.find(f => f.id === seatsWithFrames[globalIndex]) : null;
                 
                 let seatClass = 'seat-circle';
                 if (!isOccupied) seatClass += ' empty';
@@ -1572,46 +1656,55 @@
                     (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${globalIndex})"` : '';
                 
                 html += `
-                    <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
-                        <div class="gradient-ring"></div>
-                        ${isOccupied ? `
-                            ${(isOwnerSeat || isSeatOwner) ? `<div class="crown-icon">👑</div>` : ''}
-                            <div class="seat-avatar" style="background:${userColor} !important;">
-                                ${avatarLetter}
+                    <div class="seat-wrapper">
+                        ${hasFrame && frameConfig ? `
+                            <div class="seat-frame active">
+                                <iframe src="${frameConfig.embedUrl}" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
                             </div>
-                            <div class="seat-username ${(isOwnerSeat || isSeatOwner) ? 'owner-name' : ''}">${displayName}</div>
-                            <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
-                                <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
-                            </div>
-                            ${isSpeaking ? `
-                                <div class="sound-waves">
-                                    <div class="wave"></div>
-                                    <div class="wave"></div>
-                                    <div class="wave"></div>
-                                </div>
-                            ` : ''}
-                            ${isOwner && !isSeatOwner && isOccupied ? `
-                                <div class="owner-actions" onclick="event.stopPropagation();">
-                                    <button class="btn-mute" onclick="event.stopPropagation();muteUser(${globalIndex})">🔇</button>
-                                    <button class="btn-kick" onclick="event.stopPropagation();kickUser(${globalIndex})">✖</button>
-                                </div>
-                            ` : ''}
                         ` : `
-                            ${isOwnerSeat ? `
-                                <div style="position:absolute;top:-8px;right:-4px;font-size:1.4rem;filter:drop-shadow(0 0 10px rgba(255,215,0,0.3));">👑</div>
-                                <div class="seat-avatar" style="border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
-                                    <i class="fas fa-crown"></i>
-                                </div>
-                                <div style="font-size:0.55rem;color:#ffd700;font-weight:bold;">مالك</div>
-                                ${isOwner ? '<div style="font-size:0.5rem;color:#888;">اضغط للجلوس</div>' : ''}
-                            ` : `
-                                <div class="seat-avatar" style="background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <div style="font-size:0.5rem;color:#555;">مقعد</div>
-                            `}
-                            <div class="seat-number">${globalIndex + 1}</div>
+                            <div class="seat-frame"></div>
                         `}
+                        <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
+                            <div class="gradient-ring"></div>
+                            ${isOccupied ? `
+                                ${(isOwnerSeat || isSeatOwner) ? `<div class="crown-icon">👑</div>` : ''}
+                                <div class="seat-avatar" style="background:${userColor} !important;">
+                                    ${avatarLetter}
+                                </div>
+                                <div class="seat-username ${(isOwnerSeat || isSeatOwner) ? 'owner-name' : ''}">${displayName}</div>
+                                <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
+                                    <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
+                                </div>
+                                ${isSpeaking ? `
+                                    <div class="sound-waves">
+                                        <div class="wave"></div>
+                                        <div class="wave"></div>
+                                        <div class="wave"></div>
+                                    </div>
+                                ` : ''}
+                                ${isOwner && !isSeatOwner && isOccupied ? `
+                                    <div class="owner-actions" onclick="event.stopPropagation();">
+                                        <button class="btn-mute" onclick="event.stopPropagation();muteUser(${globalIndex})">🔇</button>
+                                        <button class="btn-kick" onclick="event.stopPropagation();kickUser(${globalIndex})">✖</button>
+                                    </div>
+                                ` : ''}
+                            ` : `
+                                ${isOwnerSeat ? `
+                                    <div style="position:absolute;top:-8px;right:-4px;font-size:1.4rem;filter:drop-shadow(0 0 10px rgba(255,215,0,0.3));">👑</div>
+                                    <div class="seat-avatar" style="border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <div style="font-size:0.55rem;color:#ffd700;font-weight:bold;">مالك</div>
+                                    ${isOwner ? '<div style="font-size:0.5rem;color:#888;">اضغط للجلوس</div>' : ''}
+                                ` : `
+                                    <div class="seat-avatar" style="background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div style="font-size:0.5rem;color:#555;">مقعد</div>
+                                `}
+                                <div class="seat-number">${globalIndex + 1}</div>
+                            `}
+                        </div>
                     </div>
                 `;
                 globalIndex++;
@@ -1664,6 +1757,11 @@
             showToast('⚠️ مقعد المالك فقط', 'warning');
             return;
         }
+        
+        // Get user's active frame
+        const user = await getCurrentUserFullData();
+        const activeFrame = user?.activeFrame || null;
+        
         const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
         const seatData = {
             userId: currentUser.numericId,
@@ -1674,7 +1772,8 @@
             color: colors[Math.floor(Math.random() * colors.length)],
             speaking: false,
             joinedAt: new Date().toISOString(),
-            peerId: myPeerId || currentUser.numericId
+            peerId: myPeerId || currentUser.numericId,
+            activeFrame: activeFrame || null
         };
         await database.ref('rooms/' + roomId + '/seats/' + seatIndex).set(seatData);
         mySeatIndex = seatIndex;
@@ -2637,4 +2736,3 @@
 </script>
 </body>
 </html>
-دي صفحة الغرف الصوتية واللي مش مهيأ لعرض الأطارات حول المستخدمين لما يقعدوا علي أحد المقاعد عاوز الأطار الخاص بيه المفعل لديه يتعرض حولين المقعد بتاعه بشكل دائري الأطار فقط دون خلفية الأطار انا عاوز الاطار الموجود في الكود اللي هبعتهوك لما يكون المستخدم مفعله يظهر في صفحة الغرف الصوتية اطلب مني الكود 
