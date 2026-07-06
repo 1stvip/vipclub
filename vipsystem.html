@@ -140,10 +140,6 @@
             color: white;
         }
 
-        .header .auth-btn.logout-btn:hover {
-            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
-        }
-
         /* ===== USER INFO ===== */
         .user-info {
             background: rgba(255,255,255,0.05);
@@ -640,6 +636,75 @@
             box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
         }
 
+        /* ===== LOGIN OVERLAY ===== */
+        .login-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-overlay.active {
+            display: flex;
+        }
+
+        .login-overlay .login-box {
+            background: #1a1a2e;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-overlay .login-box .login-icon {
+            font-size: 4rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .login-overlay .login-box h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .login-overlay .login-box p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .login-overlay .login-box .login-btn-main {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffd700, #f0c000);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-overlay .login-box .login-btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .vip-grid { grid-template-columns: 1fr; }
@@ -650,6 +715,9 @@
             .vip-card .vip-video-container { min-height: 280px; }
             .tabs .tab-btn { padding: 10px 15px; font-size: 0.8rem; }
             .chatstyle-card { min-height: 350px; }
+            .login-overlay .login-box { padding: 30px 20px; }
+            .login-overlay .login-box .login-icon { font-size: 3rem; }
+            .login-overlay .login-box h2 { font-size: 1.2rem; }
         }
 
         @media (max-width: 480px) {
@@ -664,6 +732,18 @@
     </style>
 </head>
 <body>
+
+    <!-- ===== LOGIN OVERLAY ===== -->
+    <div id="loginOverlay" class="login-overlay active">
+        <div class="login-box">
+            <div class="login-icon"><i class="fas fa-crown"></i></div>
+            <h2>نظام VIP</h2>
+            <p>يرجى تسجيل الدخول للاستمتاع بجميع مميزات نظام VIP وشراء الدخلات المميزة والأطارات.</p>
+            <button class="login-btn-main" onclick="redirectToLogin()">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+            </button>
+        </div>
+    </div>
 
     <div class="container">
         <!-- Header -->
@@ -751,7 +831,7 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG
+        // 🔥 FIREBASE CONFIG - مشروع vipclub-1d04a (نفس المشروع)
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
@@ -765,7 +845,6 @@
 
         let database, auth;
         let currentUser = null;
-        let currentFirebaseUser = null;
         let isAuthenticated = false;
 
         // ============================================================
@@ -797,21 +876,23 @@
             }
             database = firebase.database();
             auth = firebase.auth();
-            console.log('✅ Firebase connected with Auth');
+            console.log('✅ Firebase connected with Auth - مشروع vipclub-1d04a');
         } catch (error) {
             console.error('❌ Firebase error:', error);
         }
 
         // ============================================================
-        // 🔐 AUTHENTICATION - موحد مع جميع الصفحات
+        // 🔐 AUTHENTICATION
         // ============================================================
+        function redirectToLogin() {
+            window.location.href = 'loginchat.html';
+        }
+
         function handleAuth() {
             if (isAuthenticated) {
-                // تسجيل الخروج
                 logout();
             } else {
-                // تسجيل الدخول - التوجه لصفحة تسجيل الدخول
-                window.location.href = 'loginchat.html';
+                redirectToLogin();
             }
         }
 
@@ -821,15 +902,14 @@
                 showToast('👋 تم تسجيل الخروج بنجاح', 'success');
                 isAuthenticated = false;
                 currentUser = null;
-                currentFirebaseUser = null;
-                updateUIForGuest();
+                document.getElementById('loginOverlay').classList.add('active');
                 document.getElementById('authBtn').className = 'auth-btn';
                 document.getElementById('authBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                // حذف localStorage لتأكيد تسجيل الخروج
                 localStorage.removeItem('currentUser');
+                updateUIForGuest();
             } catch (error) {
                 console.error('Logout error:', error);
-                showToast('❌ حدث خطأ في تسجيل الخروج', 'error');
+                showToast('❌ حدث خطأ', 'error');
             }
         }
 
@@ -862,36 +942,30 @@
         // ============================================================
         async function loadUserData(uid) {
             try {
-                // محاولة جلب المستخدم من Firebase Database
                 const userRef = database.ref('users').orderByChild('uid').equalTo(uid);
                 const snapshot = await userRef.once('value');
-                
+
                 if (snapshot.exists()) {
                     const users = snapshot.val();
                     const userId = Object.keys(users)[0];
                     const userData = users[userId];
-                    
+
                     currentUser = {
                         ...userData,
                         firebaseKey: userId,
                         uid: uid
                     };
-                    
-                    // تحديث localStorage للحفاظ على التوافق مع الصفحات الأخرى
+
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
-                    // تحديث الواجهة
                     updateUI(currentUser);
                     renderVIPCards(currentUser);
                     renderFrames(currentUser);
                     renderChatStyles(currentUser);
+                    document.getElementById('loginOverlay').classList.remove('active');
                     
                     return currentUser;
                 } else {
-                    // المستخدم غير موجود - إنشاء مستخدم جديد
-                    showToast('⚠️ جاري إنشاء حسابك...', 'info');
-                    const newUser = await createUser(uid);
-                    return newUser;
+                    await createUser(uid);
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
@@ -902,21 +976,20 @@
 
         async function createUser(uid) {
             try {
-                const user = auth.currentUser;
-                if (!user) return null;
+                const authUser = auth.currentUser;
+                if (!authUser) return null;
 
-                // إنشاء مستخدم جديد في Firebase Database
-                const numericId = generateNumericId();
+                const numericId = Math.floor(100000 + Math.random() * 900000);
                 const newUserRef = database.ref('users').push();
                 const firebaseKey = newUserRef.key;
 
                 const userData = {
                     uid: uid,
                     numericId: numericId,
-                    username: user.displayName || `user_${numericId}`,
-                    nickname: user.displayName || `user_${numericId}`,
-                    email: user.email || '',
-                    avatar: user.photoURL || '',
+                    username: authUser.displayName || `user_${numericId}`,
+                    nickname: authUser.displayName || `user_${numericId}`,
+                    email: authUser.email || '',
+                    avatar: authUser.photoURL || '',
                     balanceEGP: 0,
                     balanceUSD: 0,
                     likes: 0,
@@ -928,38 +1001,33 @@
                     frames: {},
                     chatStyles: {},
                     vipPurchased: {},
-                    notifications: {}
+                    notifications: {},
+                    messages: []
                 };
 
                 await newUserRef.set(userData);
 
-                const mergedUser = {
+                currentUser = {
                     ...userData,
                     firebaseKey: firebaseKey
                 };
 
-                currentUser = mergedUser;
-                localStorage.setItem('currentUser', JSON.stringify(mergedUser));
-
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 showToast('✅ تم إنشاء حسابك بنجاح!', 'success');
-                
-                // تحديث الواجهة
-                updateUI(mergedUser);
-                renderVIPCards(mergedUser);
-                renderFrames(mergedUser);
-                renderChatStyles(mergedUser);
 
-                return mergedUser;
+                updateUI(currentUser);
+                renderVIPCards(currentUser);
+                renderFrames(currentUser);
+                renderChatStyles(currentUser);
+                document.getElementById('loginOverlay').classList.remove('active');
+
+                return currentUser;
 
             } catch (error) {
                 console.error('Error creating user:', error);
                 showToast('❌ حدث خطأ في إنشاء الحساب', 'error');
                 return null;
             }
-        }
-
-        function generateNumericId() {
-            return Math.floor(100000 + Math.random() * 900000);
         }
 
         // ============================================================
@@ -976,7 +1044,6 @@
                 document.getElementById('userAvatar').innerHTML = `<img src="${user.avatar}" alt="">`;
             }
             
-            // تحديث VIP
             const vipData = user.vip || { active: null, expiresAt: null };
             const activeVIP = vipData.active;
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
@@ -1000,10 +1067,13 @@
                 vipStatusEl.textContent = 'غير مفعل';
                 vipStatusEl.style.color = '#94a3b8';
             }
+
+            document.getElementById('authBtn').className = 'auth-btn logout-btn';
+            document.getElementById('authBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل الخروج';
         }
 
         // ============================================================
-        // 📊 RENDER FUNCTIONS (VIP, FRAMES, CHAT STYLES)
+        // 📊 RENDER VIP CARDS
         // ============================================================
         function renderVIPCards(user) {
             const grid = document.getElementById('vipGrid');
@@ -1363,7 +1433,7 @@
         }
 
         // ============================================================
-        // 🎯 VIP ACTIONS (مع Firebase Auth)
+        // 🎯 VIP ACTIONS
         // ============================================================
         async function buyVIP(level) {
             if (!isAuthenticated || !currentUser) {
@@ -1434,24 +1504,20 @@
 
                 await userRef.update(updateData);
 
-                // تحديث currentUser
                 currentUser = { ...currentUser, ...updateData };
                 currentUser.balanceEGP = newBalance;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-                const notification = {
+                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push({
                     id: Date.now(),
                     text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
                     read: false,
                     date: new Date().toLocaleString('ar-EG'),
                     type: 'vip_purchased',
                     createdAt: now.toISOString()
-                };
-                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push(notification);
+                });
 
                 showToast(`✅ تم شراء VIP ${level} بنجاح!`, 'success');
-                
-                // إعادة تحميل البيانات
                 renderVIPCards(currentUser);
                 updateUI(currentUser);
 
@@ -1491,8 +1557,6 @@
                 });
 
                 showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
-                
-                // إعادة تحميل البيانات
                 currentUser.vip = { active: level, expiresAt: expiresAt.toISOString() };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 renderVIPCards(currentUser);
@@ -1520,7 +1584,6 @@
                 });
 
                 showToast('✅ تم إلغاء تفعيل VIP', 'success');
-                
                 currentUser.vip.active = null;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 renderVIPCards(currentUser);
@@ -1578,18 +1641,16 @@
                     updatedAt: now.toISOString()
                 });
 
-                const notification = {
+                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push({
                     id: Date.now(),
                     text: `🖼️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
                     read: false,
                     date: new Date().toLocaleString('ar-EG'),
                     type: 'frame_purchased',
                     createdAt: now.toISOString()
-                };
-                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push(notification);
+                });
 
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
-                
                 currentUser.frames = frames;
                 currentUser.balanceEGP = newBalance;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
@@ -1628,7 +1689,6 @@
                 await userRef.update({ activeFrame: frameId });
 
                 showToast(`✅ تم تفعيل الإطار بنجاح`, 'success');
-                
                 currentUser.activeFrame = frameId;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 renderFrames(currentUser);
@@ -1652,7 +1712,6 @@
                 await userRef.update({ activeFrame: null });
 
                 showToast('✅ تم إلغاء تفعيل الإطار', 'success');
-                
                 currentUser.activeFrame = null;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 renderFrames(currentUser);
@@ -1703,18 +1762,16 @@
                     updatedAt: now.toISOString()
                 });
 
-                const notification = {
+                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push({
                     id: Date.now(),
                     text: `✍️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
                     read: false,
                     date: new Date().toLocaleString('ar-EG'),
                     type: 'chatstyle_purchased',
                     createdAt: now.toISOString()
-                };
-                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push(notification);
+                });
 
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
-                
                 currentUser.chatStyles = chatStyles;
                 currentUser.balanceEGP = newBalance;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
@@ -1753,7 +1810,6 @@
                 await userRef.update({ activeChatStyle: styleId });
 
                 showToast(`✅ تم تفعيل أسلوب الكتابة بنجاح`, 'success');
-                
                 currentUser.activeChatStyle = styleId;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 renderChatStyles(currentUser);
@@ -1777,7 +1833,6 @@
                 await userRef.update({ activeChatStyle: null });
 
                 showToast('✅ تم إلغاء تفعيل أسلوب الكتابة', 'success');
-                
                 currentUser.activeChatStyle = null;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 renderChatStyles(currentUser);
@@ -1833,34 +1888,22 @@
         }
 
         // ============================================================
-        // 🚀 AUTH STATE LISTENER - قلب النظام
+        // 🚀 AUTH STATE LISTENER
         // ============================================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
-                // ✅ مستخدم مسجل الدخول - نفس المستخدم في كل الصفحات
                 console.log('✅ مستخدم مسجل:', user.uid);
                 isAuthenticated = true;
-                currentFirebaseUser = user;
-                
-                // تغيير زر تسجيل الدخول إلى تسجيل الخروج
                 document.getElementById('authBtn').className = 'auth-btn logout-btn';
-                document.getElementById('authBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل الخروج';
-                
-                // تحميل بيانات المستخدم من Firebase Database
+                document.getElementById('authBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
                 await loadUserData(user.uid);
-                
             } else {
-                // ❌ مستخدم غير مسجل
                 console.log('👤 لا يوجد مستخدم مسجل');
                 isAuthenticated = false;
                 currentUser = null;
-                currentFirebaseUser = null;
-                
-                // تغيير زر تسجيل الخروج إلى تسجيل الدخول
                 document.getElementById('authBtn').className = 'auth-btn';
                 document.getElementById('authBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                
-                // حذف localStorage لتأكيد عدم وجود مستخدم
+                document.getElementById('loginOverlay').classList.add('active');
                 localStorage.removeItem('currentUser');
                 updateUIForGuest();
             }
@@ -1869,9 +1912,9 @@
         // ============================================================
         // 🚀 INIT
         // ============================================================
-        console.log('👑 VIP System loaded with Firebase Authentication');
-        console.log('✅ نفس جلسة المستخدم ستشارك بين جميع الصفحات');
-        console.log('✅ يمكن تسجيل الدخول من أي صفحة والدخول لأي صفحة أخرى');
+        console.log('👑 VIP System loaded');
+        console.log('✅ يستخدم Firebase Authentication - مشروع vipclub-1d04a');
+        console.log('✅ نفس جلسة المستخدم مع chat.html');
     </script>
 
 </body>
