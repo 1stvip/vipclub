@@ -110,7 +110,6 @@
             min-height: 500px;
         }
 
-        /* ===== منطقة المقاعد - سوداء خالصة ===== */
         .seats-area {
             flex: 1;
             background: #000000 !important;
@@ -146,11 +145,10 @@
             padding: 10px 0;
         }
 
-        /* ===== تباعد أكبر بين المقاعد ===== */
         .seats-row {
             display: flex;
             justify-content: center;
-            gap: 110px !important;
+            gap: 90px !important;
             width: 100%;
         }
         .seats-row.row-1 { max-width: 180px; }
@@ -158,7 +156,6 @@
         .seats-row.row-3 { max-width: 640px; }
         .seats-row.row-4 { max-width: 860px; }
 
-        /* ===== SEAT WRAPPER ===== */
         .seat-wrapper {
             position: relative;
             display: flex;
@@ -168,7 +165,6 @@
             flex-shrink: 0;
         }
 
-        /* ===== SEAT ===== */
         .seat-circle {
             position: relative;
             width: 100px !important;
@@ -187,13 +183,11 @@
             z-index: 2;
         }
 
-        /* إزالة الخلفية الشعاعية */
         .seat-circle::before {
             display: none !important;
             content: none !important;
         }
 
-        /* عند وجود إطار - إخفاء خلفية المقعد */
         .seat-wrapper.has-frame .seat-circle {
             background: transparent !important;
             border: none !important;
@@ -276,7 +270,7 @@
             text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
 
-        /* ===== FRAME ===== */
+        /* ===== FRAME - يدعم الفيديو و iframe ===== */
         .seat-frame {
             position: absolute;
             top: 50%;
@@ -310,6 +304,15 @@
             outline: none !important;
             box-shadow: none !important;
             opacity: 0.9;
+        }
+
+        .seat-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 50%;
+            pointer-events: none;
+            background: transparent !important;
         }
 
         .seat-frame::before,
@@ -1269,13 +1272,45 @@
     };
 
     // ============================================================
-    // 📋 FRAMES DATA
+    // 📋 FRAMES DATA - يدعم الفيديو و iframe
     // ============================================================
     const FRAMES = [
-        { id: 'frame1', name: 'إطار فاخر 1', price: 50, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', height: 405 },
-        { id: 'frame2', name: 'إطار فاخر 2', price: 50, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=601723200255670870', height: 445 },
-        { id: 'frame3', name: 'إطار فاخر 3', price: 100, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669', height: 445 },
-        { id: 'frame4', name: 'إطار فاخر 4', price: 150, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964', height: 438 }
+        { 
+            id: 'frame1', 
+            name: 'إطار فاخر 1', 
+            price: 50, 
+            duration: 30, 
+            embedUrl: 'images/vipsystem/manager.mp4', 
+            height: 405,
+            isVideo: true 
+        },
+        { 
+            id: 'frame2', 
+            name: 'إطار فاخر 2', 
+            price: 50, 
+            duration: 30, 
+            embedUrl: 'images/vipsystem/warrior.mp4', 
+            height: 445,
+            isVideo: true 
+        },
+        { 
+            id: 'frame3', 
+            name: 'إطار فاخر 3', 
+            price: 100, 
+            duration: 30, 
+            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669', 
+            height: 445,
+            isVideo: false 
+        },
+        { 
+            id: 'frame4', 
+            name: 'إطار فاخر 4', 
+            price: 150, 
+            duration: 30, 
+            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964', 
+            height: 438,
+            isVideo: false 
+        }
     ];
 
     // ============================================================
@@ -1569,7 +1604,7 @@
     }
 
     // ============================================================
-    // 💺 SEATS FUNCTIONS WITH FRAMES
+    // 💺 SEATS FUNCTIONS WITH FRAMES (يدعم الفيديو و iframe)
     // ============================================================
     async function getUserFrame(userId) {
         try {
@@ -1647,17 +1682,31 @@
                 
                 const wrapperClass = hasFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
                 
-                html += `
-                    <div class="${wrapperClass}">
-                        ${hasFrame && frameConfig ? `
+                // توليد الإطار - يدعم الفيديو و iframe
+                let frameHTML = '';
+                if (hasFrame && frameConfig) {
+                    if (frameConfig.isVideo) {
+                        frameHTML = `
                             <div class="seat-frame active">
                                 <video autoplay loop muted playsinline>
                                     <source src="${frameConfig.embedUrl}" type="video/mp4">
                                 </video>
                             </div>
-                        ` : `
-                            <div class="seat-frame"></div>
-                        `}
+                        `;
+                    } else {
+                        frameHTML = `
+                            <div class="seat-frame active">
+                                <iframe src="${frameConfig.embedUrl}" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+                            </div>
+                        `;
+                    }
+                } else {
+                    frameHTML = `<div class="seat-frame"></div>`;
+                }
+                
+                html += `
+                    <div class="${wrapperClass}">
+                        ${frameHTML}
                         <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
                             ${isOccupied ? `
                                 ${(isOwnerSeat || isSeatOwner) ? `<div class="crown-icon">👑</div>` : ''}
