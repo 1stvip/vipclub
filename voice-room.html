@@ -27,7 +27,6 @@
             overflow-x: hidden;
         }
 
-        /* ===== NAVBAR ===== */
         .navbar {
             background: rgba(10, 10, 30, 0.95);
             backdrop-filter: blur(15px);
@@ -99,7 +98,6 @@
             min-width: 18px; text-align: center;
         }
 
-        /* ===== MAIN LAYOUT ===== */
         .main-layout {
             display: flex;
             flex: 1;
@@ -112,7 +110,6 @@
             min-height: 500px;
         }
 
-        /* ===== SEATS AREA ===== */
         .seats-area {
             flex: 1;
             background: rgba(255,255,255,0.02);
@@ -160,7 +157,6 @@
         .seats-row.row-3 { max-width: 580px; }
         .seats-row.row-4 { max-width: 780px; }
 
-        /* ===== SEAT CIRCLE ===== */
         .seat-circle {
             position: relative;
             width: 95px;
@@ -269,7 +265,6 @@
             50% { transform: rotate(10deg) scale(1.1); }
         }
 
-        /* ===== SOUND WAVES ===== */
         .sound-waves {
             position: absolute;
             top: 50%;
@@ -330,7 +325,6 @@
         .seat-circle .mic-indicator.on { color: #10b981; }
         .seat-circle .mic-indicator.off { color: #ef4444; }
 
-        /* ===== GRADIENT RING ===== */
         .seat-circle .gradient-ring {
             position: absolute;
             inset: -4px;
@@ -345,7 +339,6 @@
         .seat-circle.owner-seat .gradient-ring { opacity: 0.4; }
         .seat-circle.speaking .gradient-ring { opacity: 0.6; }
 
-        /* ===== OWNER ACTIONS ===== */
         .seat-circle .owner-actions {
             position: absolute;
             bottom: -22px;
@@ -374,7 +367,6 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
-        /* ===== CHAT AREA ===== */
         .chat-area {
             width: 380px;
             min-width: 300px;
@@ -566,7 +558,6 @@
         }
         .emoji-picker .emoji-item:hover { background: rgba(255,255,255,0.08); transform: scale(1.15); }
 
-        /* ===== AUDIO CONTROLS ===== */
         .audio-controls {
             position: fixed;
             bottom: 30px;
@@ -644,7 +635,6 @@
         }
         .btn-leave-seat:hover .tooltip { opacity: 1; }
 
-        /* ===== TOAST ===== */
         .toast-message {
             position: fixed;
             top: 70px;
@@ -667,7 +657,6 @@
         .toast-message.info { background: rgba(59,130,246,0.9); }
         @keyframes slideDown { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* ===== VIP ENTRANCE ===== */
         #vipEntrance {
             display: none;
             position: fixed;
@@ -750,7 +739,6 @@
         }
         #vipEntrance .vip-skip-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); border-color: rgba(255,215,0,0.3); }
 
-        /* ===== MODALS ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -807,7 +795,6 @@
         .modal .btn-secondary { background: #1e293b; color: white; border: 1px solid #334155; }
         .modal .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
 
-        /* ===== GIFT MODAL ===== */
         .gift-options-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -850,7 +837,6 @@
         }
         .gift-receiver-select option { background: #1a1a2e; color: white; }
 
-        /* ===== NOTIFICATIONS DROPDOWN ===== */
         .dropdown-overlay {
             position: fixed;
             top: 75px;
@@ -946,7 +932,6 @@
         }
         .notif-actions button:hover { background: #334155; }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
             .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 250px; }
@@ -1041,7 +1026,6 @@
 
 <!-- ===== MAIN LAYOUT ===== -->
 <div class="main-layout">
-    <!-- SEATS -->
     <div class="seats-area">
         <div class="seats-title">
             <i class="fas fa-chair"></i> المقاعد <span id="seatsCount" style="color:#94a3b8;">(0/10)</span>
@@ -1049,7 +1033,6 @@
         <div class="seats-container" id="seatsContainer"></div>
     </div>
 
-    <!-- CHAT -->
     <div class="chat-area">
         <div class="chat-header">
             <h3><i class="fas fa-comment-dots"></i> الشات</h3>
@@ -1246,6 +1229,7 @@
     let selectedCurrency = 'EGP';
     let vipShownForUsers = {};
     let isProcessingJoin = false;
+    let vipQueue = [];
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -1408,7 +1392,7 @@
     }
 
     // ============================================================
-    // 👑 VIP SYSTEM - FIXED
+    // 👑 VIP SYSTEM - FIXED FOR ALL USERS
     // ============================================================
     function listenForNewUsers() {
         if (!database || !roomId) return;
@@ -1426,28 +1410,36 @@
                 // Mark as shown
                 vipShownForUsers[userId] = true;
                 
-                // Show VIP entrance for this user to all
-                setTimeout(() => showVIPEntranceForUser(userId, username), 800);
+                // Add to queue and process
+                vipQueue.push({ userId, username });
+                processVIPQueue();
             }
+        });
+    }
+
+    function processVIPQueue() {
+        if (isProcessingJoin || vipQueue.length === 0) return;
+        
+        const item = vipQueue.shift();
+        isProcessingJoin = true;
+        
+        // Show VIP entrance for this user
+        showVIPEntranceForUser(item.userId, item.username).finally(() => {
+            isProcessingJoin = false;
+            // Process next in queue after a delay
+            setTimeout(processVIPQueue, 1000);
         });
     }
 
     async function showVIPEntranceForUser(userId, username) {
         if (!database || isVIPEntranceActive) return;
         
-        // Don't show if already processing
-        if (isProcessingJoin) return;
-        isProcessingJoin = true;
-        
         try {
             // Get user data to check VIP status
             const usersRef = database.ref('users');
             const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
             
-            if (!snapshot.exists()) {
-                isProcessingJoin = false;
-                return;
-            }
+            if (!snapshot.exists()) return;
             
             const userData = snapshot.val();
             const userKey = Object.keys(userData)[0];
@@ -1457,23 +1449,14 @@
             const vipData = user.vip || { active: null, expiresAt: null };
             const activeVIP = vipData.active;
             
-            if (!activeVIP) {
-                isProcessingJoin = false;
-                return;
-            }
+            if (!activeVIP) return;
             
             // Check expiration
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
-            if (expiresAt && expiresAt < new Date()) {
-                isProcessingJoin = false;
-                return;
-            }
+            if (expiresAt && expiresAt < new Date()) return;
             
             const vipConfig = VIP_CONFIG[activeVIP];
-            if (!vipConfig) {
-                isProcessingJoin = false;
-                return;
-            }
+            if (!vipConfig) return;
             
             // Show VIP video for all users in the room
             isVIPEntranceActive = true;
@@ -1496,16 +1479,17 @@
             try { await video.play(); } catch(e) { console.log('Video play error:', e); }
             
             // Auto skip after 8 seconds
-            if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
-            vipEntranceTimeout = setTimeout(() => {
-                skipVIPEntrance();
-                isProcessingJoin = false;
-            }, 8000);
+            return new Promise((resolve) => {
+                if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
+                vipEntranceTimeout = setTimeout(() => {
+                    skipVIPEntrance();
+                    resolve();
+                }, 8000);
+            });
             
         } catch(error) { 
             console.error('VIP entrance error:', error); 
             isVIPEntranceActive = false;
-            isProcessingJoin = false;
         }
     }
 
