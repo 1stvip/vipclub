@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 نظام VIP - VipSystem</title>
+    <link rel="shortcut icon" href="images/videoslogo/vip.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .logo i {
+            color: #ffd700;
+        }
+
+        .header .back-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        /* ===== USER INFO ===== */
+        .user-info {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .user-info .user-details {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            overflow: hidden;
+        }
+
+        .user-info .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info .user-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .user-info .user-id {
+            color: #94a3b8;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .user-info .user-vip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 20px;
+            border-radius: 12px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .user-info .user-vip .vip-level {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .user-info .user-vip .vip-status {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* ===== VIP CARDS - TALL FOR FULL VIDEO ===== */
+        .vip-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .vip-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 650px;
+        }
+
+        .vip-card:hover {
+            transform: translateY(-8px);
+            border-color: #ffd700;
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.1);
+        }
+
+        .vip-card .vip-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .vip-card .vip-badge.vip1 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .vip-card .vip-badge.vip2 {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .vip-card .vip-badge.owned {
+            background: #10b981;
+            color: white;
+        }
+
+        .vip-card .vip-badge.expired {
+            background: #6b7280;
+            color: white;
+        }
+
+        .vip-card .vip-badge.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .vip-card .vip-video-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 18px;
+            position: relative;
+            background: #0a0a1a;
+            aspect-ratio: 9/16;
+            min-height: 350px;
+            flex-shrink: 0;
+        }
+
+        .vip-card .vip-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #0a0a1a;
+        }
+
+        .vip-card .vip-video-container .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+        .vip-card .vip-video-container:hover .video-overlay {
+            opacity: 1;
+        }
+
+        .vip-card .vip-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #ffd700;
+        }
+
+        .vip-card .vip-description {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .vip-card .vip-requirements {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .vip-card .vip-requirements .req-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+        }
+
+        .vip-card .vip-requirements .req-item:last-child {
+            border-bottom: none;
+        }
+
+        .vip-card .vip-requirements .req-item .req-label {
+            color: #94a3b8;
+        }
+
+        .vip-card .vip-requirements .req-item .req-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .vip-card .vip-requirements .req-item .req-value.met {
+            color: #10b981;
+        }
+
+        .vip-card .vip-requirements .req-item .req-value.unmet {
+            color: #ef4444;
+        }
+
+        .vip-card .vip-status-text {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .vip-card .vip-status-text.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .vip-card .vip-status-text.owned {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .vip-card .vip-status-text.inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .vip-card .vip-status-text.locked {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .vip-card .vip-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .vip-card .vip-actions button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            min-width: 100px;
+            font-size: 0.9rem;
+        }
+
+        .vip-card .vip-actions .btn-buy {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .vip-card .vip-actions .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .vip-card .vip-actions .btn-buy.disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .vip-card .vip-actions .btn-buy.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .vip-card .vip-actions .btn-activate {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .vip-card .vip-actions .btn-activate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .vip-card .vip-actions .btn-deactivate {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .vip-card .vip-actions .btn-deactivate:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .vip-card .vip-actions .btn-deactivate.active {
+            background: #ef4444;
+            color: white;
+            border: none;
+        }
+
+        .vip-card .vip-actions .btn-deactivate.active:hover {
+            background: #dc2626;
+        }
+
+        /* ===== FRAMES SECTION - FULL DISPLAY ===== */
+        .frames-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .frame-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 500px;
+        }
+
+        .frame-card:hover {
+            transform: translateY(-8px);
+            border-color: #ffd700;
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.1);
+        }
+
+        .frame-card .frame-preview {
+            width: 100%;
+            max-width: 345px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #0a0a1a;
+            margin-bottom: 15px;
+            aspect-ratio: 1/1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .frame-card .frame-preview iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            border: none;
+            border-radius: 12px;
+        }
+
+        .frame-card .frame-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .frame-card .frame-price {
+            font-size: 1.1rem;
+            color: #10b981;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .frame-card .frame-duration {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .frame-card .frame-status {
+            padding: 6px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .frame-card .frame-status.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .frame-card .frame-status.owned {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .frame-card .frame-status.inactive {
+            background: rgba(107, 114, 128, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .frame-card .frame-status.expired {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .frame-card .frame-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .frame-card .frame-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            min-width: 80px;
+            font-size: 0.85rem;
+        }
+
+        .frame-card .frame-actions .btn-buy {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .frame-card .frame-actions .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .frame-card .frame-actions .btn-buy.disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .frame-card .frame-actions .btn-buy.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .frame-card .frame-actions .btn-activate {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .frame-card .frame-actions .btn-activate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .frame-card .frame-actions .btn-deactivate {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .frame-card .frame-actions .btn-deactivate:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .frame-card .frame-actions .btn-deactivate.active {
+            background: #ef4444;
+            color: white;
+            border: none;
+        }
+
+        .frame-card .frame-actions .btn-deactivate.active:hover {
+            background: #dc2626;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideDown 0.3s ease;
+            max-width: 90vw;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.warning { background: #f59e0b; }
+        .toast.info { background: #3b82f6; }
+
+        @keyframes slideDown {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .vip-grid {
+                grid-template-columns: 1fr;
+            }
+            .frames-grid {
+                grid-template-columns: 1fr;
+            }
+            .user-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header .logo {
+                font-size: 1.3rem;
+            }
+            .vip-card {
+                min-height: 550px;
+            }
+            .vip-card .vip-video-container {
+                min-height: 280px;
+            }
+            .tabs .tab-btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+            .frame-card {
+                min-height: 420px;
+            }
+            .frame-card .frame-preview iframe {
+                min-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .vip-card {
+                padding: 18px;
+                min-height: 480px;
+            }
+            .vip-card .vip-title {
+                font-size: 1.1rem;
+            }
+            .vip-card .vip-actions button {
+                font-size: 0.8rem;
+                padding: 10px;
+            }
+            .vip-card .vip-video-container {
+                min-height: 220px;
+            }
+            .user-info .user-details {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .frame-card {
+                padding: 18px;
+                min-height: 380px;
+            }
+            .frame-card .frame-preview iframe {
+                min-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                نظام VIP
+            </div>
+            <div>
+                <a href="chat.html" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> العودة للغرف
+                </a>
+                <a href="index.html" class="back-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); margin-right: 10px;">
+                    <i class="fas fa-home"></i> الرئيسية
+                </a>
+            </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info" id="userInfo">
+            <div class="user-details">
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div class="user-name" id="userName">تحميل...</div>
+                    <div class="user-id" id="userId">🆔 ---</div>
+                </div>
+            </div>
+            <div class="user-vip">
+                <div>
+                    <div class="vip-level" id="vipLevel">VIP 0</div>
+                    <div class="vip-status" id="vipStatus">غير مفعل</div>
+                </div>
+                <div style="font-size:2rem;">
+                    <i class="fas fa-crown" style="color: #ffd700;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('vip')" id="tabVip">
+                <i class="fas fa-crown"></i> الدخلات المميزة
+            </button>
+            <button class="tab-btn" onclick="switchTab('frames')" id="tabFrames">
+                <i class="fas fa-image"></i> الأطارات
+            </button>
+        </div>
+
+        <!-- VIP Tab -->
+        <div class="tab-content active" id="tabContentVip">
+            <div class="vip-grid" id="vipGrid">
+                <!-- VIP 1 Card -->
+                <div class="vip-card" id="vip1Card">
+                    <span class="vip-badge vip1" id="vip1Badge">VIP 1</span>
+                    <div class="vip-video-container">
+                        <video id="vip1Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/car.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="vip-title">🚗 VIP 1 - السيارة الرياضية</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض سيارة رياضية فاخرة عند دخولك الغرفة.
+                        تميز نفسك بأناقة وسرعة!
+                    </div>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip1Requirement">1000 ج.م أو 20 دولار</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">30 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip1Status">غير مفعل</span>
+                        </div>
+                    </div>
+                    <div class="vip-status-text" id="vip1StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions" id="vip1Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
+                    </div>
+                </div>
+
+                <!-- VIP 2 Card -->
+                <div class="vip-card" id="vip2Card">
+                    <span class="vip-badge vip2" id="vip2Badge">VIP 2</span>
+                    <div class="vip-video-container">
+                        <video id="vip2Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/lion.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="vip-title">🦁 VIP 2 - هيبة الأسد</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض هيبة وقوة الأسد عند دخولك الغرفة.
+                        أظهر قوتك وهيبتك!
+                    </div>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip2Requirement">2500 ج.م</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">60 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip2Status">غير مفعل</span>
+                        </div>
+                    </div>
+                    <div class="vip-status-text" id="vip2StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions" id="vip2Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frames Tab -->
+        <div class="tab-content" id="tabContentFrames">
+            <div class="frames-grid" id="framesGrid">
+                <!-- سيتم إنشاء البطاقات بواسطة JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+            authDomain: "vipclub-1d04a.firebaseapp.com",
+            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+            projectId: "vipclub-1d04a",
+            storageBucket: "vipclub-1d04a.firebasestorage.app",
+            messagingSenderId: "120667552740",
+            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        };
+
+        let database;
+        let currentUser = null;
+
+        // ============================================================
+        // 📋 FRAMES & VIP DATA
+        // ============================================================
+        const FRAMES = [
+            {
+                id: 'frame1',
+                name: 'إطار فاخر 1',
+                price: 50,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=875809458798946321',
+                height: 405
+            },
+            {
+                id: 'frame2',
+                name: 'إطار فاخر 2',
+                price: 50,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=601723200255670870',
+                height: 445
+            },
+            {
+                id: 'frame3',
+                name: 'إطار فاخر 3',
+                price: 100,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669',
+                height: 445
+            },
+            {
+                id: 'frame4',
+                name: 'إطار فاخر 4',
+                price: 150,
+                duration: 30,
+                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964',
+                height: 438
+            }
+        ];
+
+        const VIP_CONFIG = {
+            1: {
+                level: 1,
+                name: 'VIP 1',
+                emoji: '🚗',
+                title: 'السيارة الرياضية',
+                video: 'images/vipsystem/car.mp4',
+                duration: 30,
+                requirements: { EGP: 1000, USD: 20 }
+            },
+            2: {
+                level: 2,
+                name: 'VIP 2',
+                emoji: '🦁',
+                title: 'هيبة الأسد',
+                video: 'images/vipsystem/lion.mp4',
+                duration: 60,
+                requirements: { EGP: 2500, USD: null }
+            }
+        };
+
+        // ============================================================
+        // 🚀 INITIALIZE FIREBASE
+        // ============================================================
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            console.log('✅ Firebase connected');
+        } catch (error) {
+            console.error('❌ Firebase error:', error);
+        }
+
+        // ============================================================
+        // 👤 USER MANAGEMENT
+        // ============================================================
+        function getCurrentUser() {
+            try {
+                return JSON.parse(localStorage.getItem('currentUser'));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+            
+            const oldToast = document.querySelector('.toast');
+            if (oldToast) oldToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ============================================================
+        // 📊 VIP SYSTEM - BUY → ACTIVATE → DEACTIVATE
+        // ============================================================
+        async function loadUserData() {
+            currentUser = getCurrentUser();
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                document.getElementById('userName').textContent = 'زائر';
+                document.getElementById('userId').textContent = '🆔 ---';
+                return;
+            }
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const userId = Object.keys(userData)[0];
+                    const fullUser = userData[userId];
+                    
+                    document.getElementById('userName').textContent = fullUser.nickname || fullUser.username || 'مستخدم';
+                    document.getElementById('userId').textContent = '🆔 ' + (fullUser.numericId || '---');
+                    
+                    if (fullUser.avatar) {
+                        document.getElementById('userAvatar').innerHTML = `<img src="${fullUser.avatar}" alt="">`;
+                    }
+
+                    updateVIPUI(fullUser);
+                    renderVIPActions(fullUser);
+                    renderFrames(fullUser);
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+                showToast('❌ حدث خطأ في تحميل البيانات', 'error');
+            }
+        }
+
+        function updateVIPUI(user) {
+            const vipData = user.vip || { active: null, expiresAt: null };
+            const activeVIP = vipData.active;
+            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
+            const now = new Date();
+            const isExpired = expiresAt && expiresAt < now;
+
+            const vipLevelEl = document.getElementById('vipLevel');
+            const vipStatusEl = document.getElementById('vipStatus');
+
+            if (activeVIP && !isExpired) {
+                const vipConfig = VIP_CONFIG[activeVIP];
+                vipLevelEl.textContent = `${vipConfig.emoji} VIP ${activeVIP}`;
+                vipStatusEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
+                vipStatusEl.style.color = '#3b82f6';
+            } else if (activeVIP && isExpired) {
+                vipLevelEl.textContent = 'VIP 0';
+                vipStatusEl.textContent = '⏳ منتهي الصلاحية';
+                vipStatusEl.style.color = '#ef4444';
+            } else {
+                vipLevelEl.textContent = 'VIP 0';
+                vipStatusEl.textContent = 'غير مفعل';
+                vipStatusEl.style.color = '#94a3b8';
+            }
+        }
+
+        function renderVIPActions(user) {
+            for (let level = 1; level <= 2; level++) {
+                const vipConfig = VIP_CONFIG[level];
+                const vipData = user.vip || { active: null, expiresAt: null };
+                const isActive = vipData.active === level;
+                const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
+                const now = new Date();
+                const isExpired = expiresAt && expiresAt < now;
+                const isCurrentlyActive = isActive && !isExpired;
+                const isOwned = user.vipPurchased && user.vipPurchased[level] === true;
+
+                const actionsEl = document.getElementById(`vip${level}Actions`);
+                const badgeEl = document.getElementById(`vip${level}Badge`);
+                const statusEl = document.getElementById(`vip${level}Status`);
+                const statusTextEl = document.getElementById(`vip${level}StatusText`);
+
+                // Update badge
+                if (isCurrentlyActive) {
+                    badgeEl.textContent = '✅ مفعل';
+                    badgeEl.className = 'vip-badge active';
+                } else if (isOwned && isExpired) {
+                    badgeEl.textContent = '⏳ منتهي';
+                    badgeEl.className = 'vip-badge expired';
+                } else if (isOwned) {
+                    badgeEl.textContent = '📦 مملوك';
+                    badgeEl.className = 'vip-badge owned';
+                } else {
+                    badgeEl.textContent = `VIP ${level}`;
+                    badgeEl.className = `vip-badge vip${level}`;
+                }
+
+                // Check if user can afford
+                let canAfford = false;
+                let affordMessage = '';
+                
+                if (vipConfig.requirements.EGP && user.balanceEGP >= vipConfig.requirements.EGP) {
+                    canAfford = true;
+                    affordMessage = `✅ رصيدك كافي (${user.balanceEGP} ج.م)`;
+                } else if (vipConfig.requirements.USD && user.balanceUSD >= vipConfig.requirements.USD) {
+                    canAfford = true;
+                    affordMessage = `✅ رصيدك كافي (${user.balanceUSD} دولار)`;
+                } else {
+                    const neededEGP = vipConfig.requirements.EGP || 0;
+                    const neededUSD = vipConfig.requirements.USD || 0;
+                    affordMessage = `❌ رصيد غير كافٍ (مطلوب ${neededEGP} ج.م أو ${neededUSD} دولار)`;
+                }
+
+                // Update status text
+                if (isCurrentlyActive) {
+                    statusEl.textContent = '✅ مفعل';
+                    statusEl.style.color = '#3b82f6';
+                    statusTextEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
+                    statusTextEl.className = 'vip-status-text active';
+                } else if (isOwned && isExpired) {
+                    statusEl.textContent = '⏳ منتهي';
+                    statusEl.style.color = '#ef4444';
+                    statusTextEl.textContent = '⏳ صلاحية منتهية - قم بالشراء مجدداً';
+                    statusTextEl.className = 'vip-status-text locked';
+                } else if (isOwned) {
+                    statusEl.textContent = '📦 مملوك';
+                    statusEl.style.color = '#ffd700';
+                    statusTextEl.textContent = '📦 تم شراؤه - قم بالتفعيل';
+                    statusTextEl.className = 'vip-status-text owned';
+                } else {
+                    statusEl.textContent = canAfford ? '🔓 متاح' : '🔒 غير متاح';
+                    statusEl.style.color = canAfford ? '#10b981' : '#ef4444';
+                    statusTextEl.textContent = canAfford ? '🔓 متاح للشراء' : affordMessage;
+                    statusTextEl.className = canAfford ? 'vip-status-text active' : 'vip-status-text locked';
+                }
+
+                // Generate actions
+                let actionsHTML = '';
+
+                if (isCurrentlyActive) {
+                    actionsHTML = `
+                        <button class="btn-deactivate active" onclick="deactivateVIP(${level})">
+                            <i class="fas fa-times"></i> إلغاء التفعيل
+                        </button>
+                    `;
+                } else if (isOwned && !isExpired) {
+                    actionsHTML = `
+                        <button class="btn-activate" onclick="activateOwnedVIP(${level})">
+                            <i class="fas fa-play"></i> تفعيل
+                        </button>
+                    `;
+                } else if (isOwned && isExpired) {
+                    actionsHTML = `
+                        <button class="btn-buy" onclick="buyVIP(${level})">
+                            <i class="fas fa-sync"></i> شراء مجدد (${vipConfig.requirements.EGP || vipConfig.requirements.USD} ${vipConfig.requirements.EGP ? 'ج.م' : 'دولار'})
+                        </button>
+                    `;
+                } else {
+                    actionsHTML = `
+                        <button class="btn-buy ${!canAfford ? 'disabled' : ''}" 
+                            onclick="buyVIP(${level})" ${!canAfford ? 'disabled' : ''}>
+                            ${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}
+                        </button>
+                    `;
+                }
+
+                actionsEl.innerHTML = actionsHTML;
+
+                // Update requirement display
+                const reqEl = document.getElementById(`vip${level}Requirement`);
+                if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
+                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
+                } else if (vipConfig.requirements.EGP) {
+                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م`;
+                } else if (vipConfig.requirements.USD) {
+                    reqEl.textContent = `${vipConfig.requirements.USD} دولار`;
+                }
+            }
+        }
+
+        // ============================================================
+        // 🎯 VIP ACTIONS
+        // ============================================================
+        async function buyVIP(level) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            const vipConfig = VIP_CONFIG[level];
+            if (!vipConfig) {
+                showToast('❌ مستوى VIP غير صحيح', 'error');
+                return;
+            }
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const user = userData[userId];
+
+                // Check if already active
+                const currentVIP = user.vip || { active: null, expiresAt: null };
+                if (currentVIP.active === level) {
+                    const expiresAt = currentVIP.expiresAt ? new Date(currentVIP.expiresAt) : null;
+                    if (expiresAt && expiresAt > new Date()) {
+                        showToast(`⚠️ VIP ${level} مفعل بالفعل`, 'warning');
+                        return;
+                    }
+                }
+
+                // Check requirements
+                let costEGP = vipConfig.requirements.EGP || 0;
+                let costUSD = vipConfig.requirements.USD || 0;
+                let useUSD = false;
+
+                if (costUSD > 0 && user.balanceUSD >= costUSD) {
+                    useUSD = true;
+                } else if (costEGP > 0 && user.balanceEGP >= costEGP) {
+                    useUSD = false;
+                } else {
+                    showToast(`❌ رصيد غير كافٍ (مطلوب ${costEGP} ج.م أو ${costUSD} دولار)`, 'error');
+                    return;
+                }
+
+                if (!confirm(`تأكيد شراء VIP ${level} (${vipConfig.title}) مقابل ${useUSD ? costUSD + ' دولار' : costEGP + ' ج.م'}؟`)) return;
+
+                const newBalance = useUSD ? 
+                    (user.balanceUSD || 0) - costUSD : 
+                    (user.balanceEGP || 0) - costEGP;
+
+                const updateData = {};
+                if (useUSD) {
+                    updateData.balanceUSD = newBalance;
+                } else {
+                    updateData.balanceEGP = newBalance;
+                }
+
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
+
+                // Store as purchased
+                const vipPurchased = user.vipPurchased || {};
+                vipPurchased[level] = true;
+
+                // If user already has this VIP purchased but expired, just update
+                updateData['vip/active'] = level;
+                updateData['vip/expiresAt'] = expiresAt.toISOString();
+                updateData['vip/activatedAt'] = now.toISOString();
+                updateData['vip/activatedWith'] = useUSD ? 'USD' : 'EGP';
+                updateData['vip/amount'] = useUSD ? costUSD : costEGP;
+                updateData.vipPurchased = vipPurchased;
+                updateData.updatedAt = now.toISOString();
+
+                await database.ref('users/' + userId).update(updateData);
+
+                const notification = {
+                    id: Date.now(),
+                    text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'vip_purchased',
+                    createdAt: now.toISOString()
+                };
+                await database.ref('users/' + userId + '/notifications').push(notification);
+
+                showToast(`✅ تم شراء VIP ${level} بنجاح!`, 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error buying VIP:', error);
+                showToast('❌ حدث خطأ في الشراء', 'error');
+            }
+        }
+
+        async function activateOwnedVIP(level) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const user = userData[userId];
+
+                const vipPurchased = user.vipPurchased || {};
+
+                if (!vipPurchased[level]) {
+                    showToast('⚠️ هذا الـ VIP غير مملوك', 'warning');
+                    return;
+                }
+
+                const vipConfig = VIP_CONFIG[level];
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
+
+                await database.ref('users/' + userId + '/vip').update({
+                    active: level,
+                    expiresAt: expiresAt.toISOString(),
+                    activatedAt: now.toISOString()
+                });
+
+                showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error activating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function deactivateVIP(level) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل VIP ${level}؟`)) return;
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+
+                // Deactivate VIP but keep purchased status
+                await database.ref('users/' + userId + '/vip').update({
+                    active: null,
+                    deactivatedAt: new Date().toISOString()
+                });
+
+                showToast('✅ تم إلغاء تفعيل VIP', 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error deactivating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ FRAMES SYSTEM - FULL DISPLAY
+        // ============================================================
+        function renderFrames(user) {
+            const grid = document.getElementById('framesGrid');
+            const userFrames = user.frames || {};
+            const activeFrame = user.activeFrame || null;
+
+            grid.innerHTML = FRAMES.map(frame => {
+                const frameData = userFrames[frame.id] || null;
+                const isOwned = frameData && frameData.owned === true;
+                const isActive = activeFrame === frame.id;
+                const expiresAt = frameData?.expiresAt ? new Date(frameData.expiresAt) : null;
+                const isExpired = expiresAt && expiresAt < new Date();
+                const isValid = isOwned && !isExpired;
+
+                let statusText = 'غير مملوك';
+                let statusClass = 'inactive';
+                
+                if (isActive && isValid) {
+                    statusText = '✅ مفعل حالياً';
+                    statusClass = 'active';
+                } else if (isValid) {
+                    statusText = '📦 مملوك';
+                    statusClass = 'owned';
+                } else if (isOwned && isExpired) {
+                    statusText = '⏳ منتهي الصلاحية';
+                    statusClass = 'expired';
+                }
+
+                const canAfford = user.balanceEGP >= frame.price;
+
+                let actionsHTML = '';
+
+                if (isActive) {
+                    actionsHTML = `
+                        <button class="btn-deactivate active" onclick="deactivateFrame('${frame.id}')">
+                            <i class="fas fa-times"></i> إلغاء التفعيل
+                        </button>
+                    `;
+                } else if (isValid) {
+                    actionsHTML = `
+                        <button class="btn-activate" onclick="activateFrame('${frame.id}')">
+                            <i class="fas fa-play"></i> تفعيل
+                        </button>
+                    `;
+                } else if (isOwned && isExpired) {
+                    actionsHTML = `
+                        <button class="btn-buy" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')">
+                            <i class="fas fa-sync"></i> شراء مجدد (${frame.price} ج.م)
+                        </button>
+                    `;
+                } else {
+                    actionsHTML = `
+                        <button class="btn-buy ${!canAfford ? 'disabled' : ''}" 
+                            onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')"
+                            ${!canAfford ? 'disabled' : ''}>
+                            ${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}
+                        </button>
+                    `;
+                }
+
+                return `
+                    <div class="frame-card">
+                        <div class="frame-preview">
+                            <iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>
+                        </div>
+                        <div class="frame-name">${frame.name}</div>
+                        <div class="frame-price">💰 ${frame.price} ج.م</div>
+                        <div class="frame-duration">⏱️ مدة التفعيل: ${frame.duration} يوم</div>
+                        <div class="frame-status ${statusClass}">${statusText}</div>
+                        <div class="frame-actions">
+                            ${actionsHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function buyFrame(frameId, price, name) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const user = userData[userId];
+
+                if (user.balanceEGP < price) {
+                    showToast(`⚠️ رصيد غير كافٍ (تحتاج ${price} ج.م)`, 'warning');
+                    return;
+                }
+
+                if (!confirm(`تأكيد شراء "${name}" مقابل ${price} ج.م؟`)) return;
+
+                const newBalance = (user.balanceEGP || 0) - price;
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + 30);
+
+                const updateData = {
+                    balanceEGP: newBalance,
+                    updatedAt: now.toISOString()
+                };
+
+                const frames = user.frames || {};
+                frames[frameId] = {
+                    owned: true,
+                    purchasedAt: now.toISOString(),
+                    expiresAt: expiresAt.toISOString()
+                };
+                updateData.frames = frames;
+
+                await database.ref('users/' + userId).update(updateData);
+
+                const notification = {
+                    id: Date.now(),
+                    text: `🖼️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'frame_purchased',
+                    createdAt: now.toISOString()
+                };
+                await database.ref('users/' + userId + '/notifications').push(notification);
+
+                showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error buying frame:', error);
+                showToast('❌ حدث خطأ في الشراء', 'error');
+            }
+        }
+
+        async function activateFrame(frameId) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const user = userData[userId];
+
+                const frames = user.frames || {};
+                const frame = frames[frameId];
+                if (!frame || !frame.owned) {
+                    showToast('⚠️ هذا الإطار غير مملوك', 'warning');
+                    return;
+                }
+
+                const expiresAt = frame.expiresAt ? new Date(frame.expiresAt) : null;
+                if (expiresAt && expiresAt < new Date()) {
+                    showToast('⏳ صلاحية هذا الإطار منتهية', 'warning');
+                    return;
+                }
+
+                await database.ref('users/' + userId + '/activeFrame').set(frameId);
+                showToast(`✅ تم تفعيل الإطار بنجاح`, 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error activating frame:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function deactivateFrame(frameId) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل هذا الإطار؟`)) return;
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+
+                await database.ref('users/' + userId + '/activeFrame').set(null);
+                showToast('✅ تم إلغاء تفعيل الإطار', 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error deactivating frame:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 📑 TABS
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tabContent${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+            document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+        }
+
+        // ============================================================
+        // 🚀 INIT
+        // ============================================================
+        window.onload = function() {
+            loadUserData();
+            console.log('👑 VIP System loaded');
+        };
+    </script>
+</body>
+</html>
