@@ -16,6 +16,7 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
+        /* ===== جميع الأنماط السابقة مع إضافات جديدة ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -81,6 +82,41 @@
         .btn-leave { padding: 5px 14px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.7rem; transition: 0.3s; }
         .btn-leave:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(239,68,68,0.3); }
 
+        /* ===== FLOATING JOIN NOTIFICATION ===== */
+        .floating-join-notif {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05));
+            border: 1px solid rgba(16,185,129,0.25);
+            color: #10b981;
+            padding: 10px 30px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            z-index: 99999;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 40px rgba(16,185,129,0.15);
+            animation: floatDown 0.5s ease-out, floatUp 0.5s ease-in 2.5s forwards;
+            pointer-events: none;
+            text-align: center;
+            direction: rtl;
+            display: none;
+        }
+        .floating-join-notif .notif-emoji { font-size: 1.2rem; margin-left: 8px; }
+        .floating-join-notif .notif-name { color: #fff; font-weight: 700; }
+        .floating-join-notif .notif-vip { color: #ffd700; font-size: 0.85rem; margin-right: 8px; }
+
+        @keyframes floatDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(0.9); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        }
+        @keyframes floatUp {
+            from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            to { opacity: 0; transform: translateX(-50%) translateY(-30px) scale(0.9); }
+        }
+
         /* ===== MAIN LAYOUT ===== */
         .main-layout {
             display: flex;
@@ -142,7 +178,7 @@
         .seats-row.row-3 { max-width: 580px; }
         .seats-row.row-4 { max-width: 780px; }
 
-        /* ===== SEAT CIRCLE - ENHANCED ===== */
+        /* ===== SEAT CIRCLE ===== */
         .seat-circle {
             position: relative;
             width: 95px;
@@ -312,7 +348,7 @@
         .seat-circle .mic-indicator.on { color: #10b981; }
         .seat-circle .mic-indicator.off { color: #ef4444; }
 
-        /* ===== GRADIENT RING FOR SEATS ===== */
+        /* ===== GRADIENT RING ===== */
         .seat-circle .gradient-ring {
             position: absolute;
             inset: -4px;
@@ -369,6 +405,7 @@
             backdrop-filter: blur(5px);
             height: 100%;
             overflow: hidden;
+            position: relative;
         }
 
         .chat-header {
@@ -791,7 +828,7 @@
         .modal .btn-secondary { background: #1e293b; color: white; border: 1px solid #334155; }
         .modal .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
 
-        /* ===== GIFT MODAL ENHANCED ===== */
+        /* ===== GIFT MODAL ===== */
         .gift-options-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -858,6 +895,7 @@
             .btn-leave-seat { width: 42px; height: 42px; font-size: 1rem; }
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
             #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 18px; }
+            .floating-join-notif { font-size: 0.8rem; padding: 8px 20px; top: 70px; }
         }
 
         @media (max-width: 480px) {
@@ -870,6 +908,7 @@
             .main-layout { padding: 5px; }
             .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
             #vipEntrance .vip-title { font-size: 1rem; padding: 6px 12px; white-space: normal; }
+            .floating-join-notif { font-size: 0.7rem; padding: 6px 15px; top: 65px; max-width: 90%; }
         }
     </style>
 </head>
@@ -908,6 +947,14 @@
         </button>
     </div>
 </nav>
+
+<!-- ===== FLOATING JOIN NOTIFICATION ===== -->
+<div class="floating-join-notif" id="floatingJoinNotif">
+    <span class="notif-emoji">👋</span>
+    <span class="notif-name" id="joinNotifName">مستخدم</span>
+    <span class="notif-vip" id="joinNotifVIP"></span>
+    <span>انضم للغرفة</span>
+</div>
 
 <!-- ===== VIP ENTRANCE ===== -->
 <div id="vipEntrance">
@@ -1022,7 +1069,7 @@
     <div id="usersList" style="max-height:400px; overflow-y:auto;"></div>
 </div>
 
-<!-- ===== GIFT MODAL ENHANCED ===== -->
+<!-- ===== GIFT MODAL ===== -->
 <div id="giftSendModal" class="modal">
     <h3><i class="fas fa-gift" style="color:#ffd700;"></i> إرسال هدية</h3>
     <p style="font-size:0.85rem;">اختر المستخدم والهدية المناسبة</p>
@@ -1128,6 +1175,8 @@
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
     let vipShownForUsers = {};
+    let joinNotifQueue = [];
+    let isShowingJoinNotif = false;
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -1266,21 +1315,22 @@
             if (isOwner) showToast('👑 مرحباً بك كمالك الغرفة!', 'success');
             else showToast(`👋 مرحباً بك في غرفة ${roomData.name}`, 'info');
             
-            addChatMessage('system', `🏠 مرحباً بك في غرفة "${roomData.name}"`, null, null, '');
-            addChatMessage('system', `👑 مالك الغرفة: ${roomData.creatorName || 'غير معروف'}`, null, null, '');
-            
             loadSeats();
             listenRoomUpdates();
             listenChat();
             listenSeats();
             setupChatScroll();
             
-            // Listen for new users joining to show VIP entrance
-            listenForNewUsers();
+            // Listen for room members to show join notifications and VIP
+            listenForRoomMembers();
             
-            // Show VIP entrance for current user if they have VIP
+            // Show join notification for current user
             if (currentUser?.numericId) {
-                setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, currentUser.nickname || currentUser.username), 1500);
+                const username = currentUser.nickname || currentUser.username || 'مستخدم';
+                showFloatingJoinNotification(username, null);
+                
+                // Check VIP for current user
+                setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, username), 1000);
             }
             
             setTimeout(initPeerJS, 1000);
@@ -1289,26 +1339,82 @@
     }
 
     // ============================================================
+    // 📢 FLOATING JOIN NOTIFICATION
+    // ============================================================
+    function showFloatingJoinNotification(username, vipLevel) {
+        const notif = document.getElementById('floatingJoinNotif');
+        const nameEl = document.getElementById('joinNotifName');
+        const vipEl = document.getElementById('joinNotifVIP');
+        
+        nameEl.textContent = username;
+        if (vipLevel) {
+            const vipConfig = VIP_CONFIG[vipLevel];
+            vipEl.textContent = vipConfig ? ` ${vipConfig.emoji} ${vipConfig.name}` : '';
+            vipEl.style.display = 'inline';
+        } else {
+            vipEl.textContent = '';
+            vipEl.style.display = 'none';
+        }
+        
+        // Reset animation
+        notif.style.animation = 'none';
+        notif.offsetHeight; // Trigger reflow
+        notif.style.display = 'block';
+        notif.style.animation = 'floatDown 0.5s ease-out, floatUp 0.5s ease-in 2.5s forwards';
+        
+        setTimeout(() => {
+            notif.style.display = 'none';
+        }, 3000);
+    }
+
+    // ============================================================
     // 👑 VIP ENTRANCE FOR ALL USERS
     // ============================================================
-    function listenForNewUsers() {
+    function listenForRoomMembers() {
         if (!database || !roomId) return;
-        // Listen for new seats being added (users joining)
+        // Listen for new users joining the room (seats being added)
         database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
             const seat = snapshot.val();
             if (seat && seat.userId) {
                 const userId = seat.userId;
                 const username = seat.username || 'مستخدم';
-                // Don't show for current user (already shown)
+                
+                // Show floating notification for new user
+                // Check if user has VIP
+                checkUserVIPAndNotify(userId, username);
+                
+                // Don't show VIP entrance for current user (already shown)
                 if (userId != currentUser?.numericId) {
                     // Check if VIP entrance already shown for this user
                     if (!vipShownForUsers[userId]) {
                         vipShownForUsers[userId] = true;
-                        setTimeout(() => checkAndShowVIPEntrance(userId, username), 500);
+                        setTimeout(() => checkAndShowVIPEntrance(userId, username), 800);
                     }
                 }
             }
         });
+    }
+
+    async function checkUserVIPAndNotify(userId, username) {
+        try {
+            const usersRef = database.ref('users');
+            const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
+            if (!snapshot.exists()) return;
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            const vipData = user.vip || { active: null, expiresAt: null };
+            const activeVIP = vipData.active;
+            if (!activeVIP) return;
+            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
+            if (expiresAt && expiresAt < new Date()) return;
+            
+            // Show floating notification with VIP badge
+            showFloatingJoinNotification(username, activeVIP);
+        } catch(e) {
+            // If error, show normal notification
+            showFloatingJoinNotification(username, null);
+        }
     }
 
     async function checkAndShowVIPEntrance(userId, username) {
@@ -1327,9 +1433,6 @@
             if (expiresAt && expiresAt < new Date()) return;
             const vipConfig = VIP_CONFIG[activeVIP];
             if (!vipConfig) return;
-            
-            // Send VIP entrance message to chat for all users
-            addChatMessage('system', `👑 **${username}** دخل الغرفة بـ ${vipConfig.emoji} ${vipConfig.title}!`, null, null, 'vip');
             
             // Show VIP video for all users in the room
             isVIPEntranceActive = true;
@@ -1526,10 +1629,6 @@
             connectToExistingPeers();
         }, 1000);
         showToast(seatIndex === 0 && isOwner ? '👑 جلست على مقعد المالك' : `✅ جلست على مقعد ${seatIndex + 1}`, 'success');
-        addChatMessage('system', `👋 **${currentUser.nickname || currentUser.username}** انضم للغرفة`, null, null, 'join');
-        
-        // Check if this user has VIP and show entrance
-        setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, currentUser.nickname || currentUser.username), 500);
     }
 
     async function leaveSeat() {
@@ -1547,7 +1646,6 @@
             document.getElementById('micBtn').className = 'audio-btn mic-inactive';
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
             showToast('✅ تم مغادرة المقعد', 'success');
-            addChatMessage('system', `🚪 **${seat?.username || 'مستخدم'}** غادر المقعد`, null, null, 'leave');
         } catch(error) { showToast('❌ حدث خطأ', 'error'); }
     }
 
@@ -1568,7 +1666,6 @@
             const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
             if (!seat) return;
             await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
-            addChatMessage('system', `🚫 **${seat.username}** تم طرده`, null, null, 'leave');
             showToast('✅ تم طرد المستخدم', 'success');
         } catch(e) { showToast('❌ حدث خطأ', 'error'); }
     }
@@ -1581,7 +1678,6 @@
             const newState = !seat.muted;
             await database.ref('rooms/' + roomId + '/seats/' + seatIndex + '/muted').set(newState);
             showToast(newState ? '🔇 تم كتم الميكروفون' : '🔊 تم فك الكتم', 'success');
-            addChatMessage('system', `${newState ? '🔇 تم كتم' : '🔊 تم فك كتم'} **${seat.username}**`, null, null, '');
         } catch(e) { showToast('❌ حدث خطأ', 'error'); }
     }
 
@@ -1732,7 +1828,7 @@
     }
 
     // ============================================================
-    // 🎁 ENHANCED GIFT SYSTEM
+    // 🎁 GIFT SYSTEM
     // ============================================================
     function openGiftModalFromNav() {
         if (!isLoggedIn()) {
@@ -1879,8 +1975,6 @@
                 type: 'gift_received',
                 createdAt: new Date().toISOString()
             });
-            
-            addChatMessage('system', `🎁 **${user.nickname || user.username}** أرسل ${selectedGift.emoji} ${selectedGift.name} إلى **${rUser.nickname || rUser.username}**`, null, null, '');
             
             showToast(`✅ تم إرسال ${selectedGift.emoji} ${selectedGift.name} بنجاح!`, 'success');
             
@@ -2129,7 +2223,6 @@
         document.getElementById('usersListContainer').style.display = 'none';
     }
 
-    // إغلاق النوافذ المنبثقة عند الضغط على الـ overlay
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('screenOverlay').addEventListener('click', function(e) {
             closeAll();
