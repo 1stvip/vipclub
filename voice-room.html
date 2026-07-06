@@ -16,7 +16,6 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
-        /* ===== جميع الأنماط السابقة مع إضافات جديدة ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -64,6 +63,24 @@
         .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.7rem; background: rgba(255,215,0,0.1); padding: 2px 10px; border-radius: 6px; }
         .room-info-box .room-owner { color: #ffd700; font-size: 0.75rem; }
         .room-info-box .member-count { color: #94a3b8; font-size: 0.75rem; }
+        .room-info-box .btn-leave-icon {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+        .room-info-box .btn-leave-icon:hover {
+            background: rgba(239,68,68,0.3);
+            transform: scale(1.1);
+        }
 
         .nav-icons { display: flex; align-items: center; gap: 8px; }
         .icon-btn {
@@ -74,47 +91,53 @@
         .icon-btn:hover { background: #8b5cf6; color: white; transform: translateY(-2px); }
         .icon-btn.gift-btn { background: rgba(255,215,0,0.08); color: #ffd700; }
         .icon-btn.gift-btn:hover { background: #ffd700; color: #1a1a2e; }
+        .icon-btn.notif-btn { background: rgba(59,130,246,0.08); color: #3b82f6; }
+        .icon-btn.notif-btn:hover { background: #3b82f6; color: white; }
         .badge {
             position: absolute; top: -5px; right: -5px; background: #ef4444; color: white;
             font-size: 0.55rem; padding: 2px 6px; border-radius: 50%; border: 2px solid #0f0c29;
             min-width: 18px; text-align: center;
         }
-        .btn-leave { padding: 5px 14px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.7rem; transition: 0.3s; }
-        .btn-leave:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(239,68,68,0.3); }
 
-        /* ===== FLOATING JOIN NOTIFICATION ===== */
-        .floating-join-notif {
+        /* ===== JOIN NOTIFICATION UNDER SEATS ===== */
+        .join-notif-container {
             position: fixed;
-            top: 80px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05));
-            border: 1px solid rgba(16,185,129,0.25);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            width: 100%;
+            max-width: 500px;
+        }
+        .join-notif-item {
+            background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04));
+            border: 1px solid rgba(16,185,129,0.2);
             color: #10b981;
-            padding: 10px 30px;
-            border-radius: 16px;
-            font-weight: bold;
-            font-size: 0.95rem;
-            z-index: 99999;
+            padding: 8px 20px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.85rem;
             backdrop-filter: blur(15px);
-            box-shadow: 0 8px 40px rgba(16,185,129,0.15);
-            animation: floatDown 0.5s ease-out, floatUp 0.5s ease-in 2.5s forwards;
+            box-shadow: 0 8px 30px rgba(16,185,129,0.1);
+            animation: joinNotifSlide 3s ease forwards;
             pointer-events: none;
             text-align: center;
-            direction: rtl;
-            display: none;
+            white-space: nowrap;
         }
-        .floating-join-notif .notif-emoji { font-size: 1.2rem; margin-left: 8px; }
-        .floating-join-notif .notif-name { color: #fff; font-weight: 700; }
-        .floating-join-notif .notif-vip { color: #ffd700; font-size: 0.85rem; margin-right: 8px; }
+        .join-notif-item .notif-emoji { margin-left: 6px; }
+        .join-notif-item .notif-name { color: #fff; font-weight: 700; }
+        .join-notif-item .notif-vip { color: #ffd700; margin-right: 6px; }
 
-        @keyframes floatDown {
-            from { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(0.9); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-        }
-        @keyframes floatUp {
-            from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-            to { opacity: 0; transform: translateX(-50%) translateY(-30px) scale(0.9); }
+        @keyframes joinNotifSlide {
+            0% { opacity: 0; transform: translateY(-10px) scale(0.9); }
+            15% { opacity: 1; transform: translateY(0) scale(1); }
+            75% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-10px) scale(0.9); }
         }
 
         /* ===== MAIN LAYOUT ===== */
@@ -452,8 +475,6 @@
             max-width: 80%;
             opacity: 0.8;
         }
-        .chat-messages .message.system.join { background: rgba(16,185,129,0.06); color: #10b981; border-color: rgba(16,185,129,0.06); }
-        .chat-messages .message.system.leave { background: rgba(239,68,68,0.04); color: #ef4444; border-color: rgba(239,68,68,0.05); }
         .chat-messages .message.system.vip { background: rgba(255,215,0,0.12); color: #ffd700; border-color: rgba(255,215,0,0.2); font-weight: bold; }
         .chat-messages .message.own {
             background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.15));
@@ -697,11 +718,11 @@
             width: 100%;
             height: 100%;
             z-index: 99999;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             pointer-events: none;
         }
         #vipEntrance.active { 
@@ -871,6 +892,102 @@
         }
         .gift-receiver-select option { background: #1a1a2e; color: white; }
 
+        /* ===== NOTIFICATIONS DROPDOWN ===== */
+        .dropdown-overlay {
+            position: fixed;
+            top: 75px;
+            width: 350px;
+            max-width: 90%;
+            background: #111827;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 10000;
+            border: 1px solid #334155;
+            overflow: hidden;
+        }
+        #notifDropdown { right: 20px; left: auto; }
+        #profileDropdown { right: 20px; left: auto; padding: 20px; text-align: center; }
+
+        .dropdown-overlay.active { display: flex !important; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .notif-header {
+            padding: 15px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        .refresh-btn {
+            cursor: pointer;
+            font-size: 1rem;
+            color: #94a3b8;
+            transition: 0.3s;
+            padding: 5px;
+        }
+        .refresh-btn:hover { color: #8b5cf6; transform: rotate(180deg); }
+        .refreshing { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        #notifList {
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .notif-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #1e293b;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+        .notif-item.unread { background: rgba(139,92,246,0.1); border-right: 4px solid #8b5cf6; }
+        .notif-item:hover { background: rgba(255,255,255,0.03); }
+
+        .delete-single-notif {
+            color: #ef4444;
+            cursor: pointer;
+            padding: 6px;
+            opacity: 0.6;
+            transition: 0.3s;
+            background: rgba(239,68,68,0.1);
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        .delete-single-notif:hover { opacity: 1; transform: scale(1.1); background: rgba(239,68,68,0.2); }
+
+        .notif-actions {
+            padding: 10px;
+            display: flex;
+            gap: 5px;
+            background: #0a0f1d;
+            border-top: 1px solid #1e293b;
+        }
+        .notif-actions button {
+            flex: 1;
+            font-size: 0.8rem;
+            padding: 10px;
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .notif-actions button:hover { background: #334155; }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
@@ -879,6 +996,7 @@
             .seats-row { gap: 15px; }
             .seat-circle { width: 80px; height: 80px; }
             .seat-circle .seat-avatar { width: 44px; height: 44px; font-size: 1.2rem; }
+            .join-notif-container { bottom: 90px; }
         }
 
         @media (max-width: 768px) {
@@ -895,7 +1013,9 @@
             .btn-leave-seat { width: 42px; height: 42px; font-size: 1rem; }
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
             #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 18px; }
-            .floating-join-notif { font-size: 0.8rem; padding: 8px 20px; top: 70px; }
+            .join-notif-container { bottom: 80px; }
+            .join-notif-item { font-size: 0.75rem; padding: 6px 16px; }
+            #notifDropdown { right: 10px; width: 320px; }
         }
 
         @media (max-width: 480px) {
@@ -908,7 +1028,9 @@
             .main-layout { padding: 5px; }
             .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
             #vipEntrance .vip-title { font-size: 1rem; padding: 6px 12px; white-space: normal; }
-            .floating-join-notif { font-size: 0.7rem; padding: 6px 15px; top: 65px; max-width: 90%; }
+            .join-notif-container { bottom: 70px; }
+            .join-notif-item { font-size: 0.65rem; padding: 5px 12px; white-space: normal; }
+            #notifDropdown { right: 5px; width: 290px; }
         }
     </style>
 </head>
@@ -934,11 +1056,13 @@
         <span class="room-id" id="roomIdDisplay">🔑 ---</span>
         <span class="room-owner" id="roomOwnerDisplay">👑 ---</span>
         <span class="member-count">👥 <span id="memberCount">0</span></span>
-        <button class="btn-leave" onclick="leaveRoom()"><i class="fas fa-sign-out-alt"></i> مغادرة</button>
+        <button class="btn-leave-icon" onclick="leaveRoom()" title="مغادرة الغرفة">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
     </div>
 
     <div class="nav-icons">
-        <button class="icon-btn" onclick="openNotifDropdown()" title="الإشعارات">
+        <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
             <i class="fas fa-bell"></i>
             <span class="badge" id="notifBadge">0</span>
         </button>
@@ -947,14 +1071,6 @@
         </button>
     </div>
 </nav>
-
-<!-- ===== FLOATING JOIN NOTIFICATION ===== -->
-<div class="floating-join-notif" id="floatingJoinNotif">
-    <span class="notif-emoji">👋</span>
-    <span class="notif-name" id="joinNotifName">مستخدم</span>
-    <span class="notif-vip" id="joinNotifVIP"></span>
-    <span>انضم للغرفة</span>
-</div>
 
 <!-- ===== VIP ENTRANCE ===== -->
 <div id="vipEntrance">
@@ -969,6 +1085,9 @@
         <i class="fas fa-forward"></i> تخطي
     </button>
 </div>
+
+<!-- ===== JOIN NOTIFICATION UNDER SEATS ===== -->
+<div class="join-notif-container" id="joinNotifContainer"></div>
 
 <!-- ===== MAIN LAYOUT ===== -->
 <div class="main-layout">
@@ -1031,8 +1150,8 @@
 </div>
 
 <!-- ===== PROFILE DROPDOWN ===== -->
-<div id="profileDropdown" style="display:none; position:fixed; top:70px; right:20px; width:300px; background:#111827; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.5); border:1px solid #334155; padding:20px; z-index:10000;">
-    <div style="text-align:center;">
+<div id="profileDropdown" class="dropdown-overlay">
+    <div style="text-align:center; padding:20px;">
         <div style="font-size:3rem; color:#8b5cf6;">👤</div>
         <h4 id="p_nickname" style="color:#fff;">تحميل...</h4>
         <div onclick="copyId()" style="background:linear-gradient(90deg,#4f46e5,#8b5cf6); padding:8px 20px; border-radius:12px; font-family:monospace; font-weight:bold; cursor:pointer; display:inline-block; margin:10px auto; color:white;">
@@ -1047,16 +1166,17 @@
     </div>
 </div>
 
-<!-- ===== NOTIFICATIONS ===== -->
-<div id="notifDropdown" style="display:none; position:fixed; top:70px; right:20px; width:350px; max-width:90%; background:#111827; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.5); border:1px solid #334155; z-index:10000; max-height:400px; overflow:hidden;">
-    <div style="padding:15px; border-bottom:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-weight:bold;">الإشعارات</span>
+<!-- ===== NOTIFICATIONS DROPDOWN ===== -->
+<div id="notifDropdown" class="dropdown-overlay">
+    <div class="notif-header">
+        <span>الإشعارات</span>
+        <i class="fas fa-sync-alt refresh-btn" id="refreshIcon" onclick="refreshNotifications()"></i>
         <span id="unreadCount" style="background:#ef4444; font-size:0.7rem; padding:2px 7px; border-radius:10px;">0</span>
     </div>
-    <div id="notifList" style="max-height:250px; overflow-y:auto; padding:10px;"></div>
-    <div style="padding:10px; display:flex; gap:5px; background:#0a0f1d; border-top:1px solid #1e293b;">
-        <button onclick="markAllRead()" style="flex:1; font-size:0.8rem; padding:8px; background:#1e293b; color:white; border:none; border-radius:8px; cursor:pointer;">قراءة الكل</button>
-        <button onclick="deleteAllNotifs()" style="flex:1; font-size:0.8rem; padding:8px; background:#1e293b; color:white; border:none; border-radius:8px; cursor:pointer;">حذف الكل</button>
+    <div id="notifList"></div>
+    <div class="notif-actions">
+        <button onclick="markAllRead()">قراءة الكل</button>
+        <button onclick="deleteAllNotifs()">حذف الكل</button>
     </div>
 </div>
 
@@ -1176,7 +1296,7 @@
     let selectedCurrency = 'EGP';
     let vipShownForUsers = {};
     let joinNotifQueue = [];
-    let isShowingJoinNotif = false;
+    let isProcessingNotif = false;
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -1321,16 +1441,16 @@
             listenSeats();
             setupChatScroll();
             
-            // Listen for room members to show join notifications and VIP
+            // Listen for room members
             listenForRoomMembers();
             
             // Show join notification for current user
             if (currentUser?.numericId) {
                 const username = currentUser.nickname || currentUser.username || 'مستخدم';
-                showFloatingJoinNotification(username, null);
+                showJoinNotification(username, null);
                 
                 // Check VIP for current user
-                setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, username), 1000);
+                setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, username), 1500);
             }
             
             setTimeout(initPeerJS, 1000);
@@ -1339,57 +1459,65 @@
     }
 
     // ============================================================
-    // 📢 FLOATING JOIN NOTIFICATION
+    // 📢 JOIN NOTIFICATION UNDER SEATS
     // ============================================================
-    function showFloatingJoinNotification(username, vipLevel) {
-        const notif = document.getElementById('floatingJoinNotif');
-        const nameEl = document.getElementById('joinNotifName');
-        const vipEl = document.getElementById('joinNotifVIP');
+    function showJoinNotification(username, vipLevel) {
+        const container = document.getElementById('joinNotifContainer');
         
-        nameEl.textContent = username;
+        let vipText = '';
         if (vipLevel) {
             const vipConfig = VIP_CONFIG[vipLevel];
-            vipEl.textContent = vipConfig ? ` ${vipConfig.emoji} ${vipConfig.name}` : '';
-            vipEl.style.display = 'inline';
-        } else {
-            vipEl.textContent = '';
-            vipEl.style.display = 'none';
+            if (vipConfig) {
+                vipText = `<span class="notif-vip">${vipConfig.emoji} ${vipConfig.name}</span>`;
+            }
         }
         
-        // Reset animation
-        notif.style.animation = 'none';
-        notif.offsetHeight; // Trigger reflow
-        notif.style.display = 'block';
-        notif.style.animation = 'floatDown 0.5s ease-out, floatUp 0.5s ease-in 2.5s forwards';
+        const notif = document.createElement('div');
+        notif.className = 'join-notif-item';
+        notif.innerHTML = `
+            <span class="notif-emoji">👋</span>
+            <span class="notif-name">${username}</span>
+            ${vipText}
+            <span>انضم للغرفة</span>
+        `;
         
+        container.appendChild(notif);
+        
+        // Remove after animation
         setTimeout(() => {
-            notif.style.display = 'none';
-        }, 3000);
+            if (notif.parentNode) {
+                notif.remove();
+            }
+        }, 3500);
+        
+        // Limit to 3 notifications at a time
+        while (container.children.length > 3) {
+            container.removeChild(container.firstChild);
+        }
     }
 
     // ============================================================
-    // 👑 VIP ENTRANCE FOR ALL USERS
+    // 👑 VIP ENTRANCE - FIXED FOR EACH USER ONCE
     // ============================================================
     function listenForRoomMembers() {
         if (!database || !roomId) return;
-        // Listen for new users joining the room (seats being added)
+        
+        // Listen for new seats being added
         database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
             const seat = snapshot.val();
             if (seat && seat.userId) {
                 const userId = seat.userId;
                 const username = seat.username || 'مستخدم';
                 
-                // Show floating notification for new user
+                // Show join notification for new user
                 // Check if user has VIP
                 checkUserVIPAndNotify(userId, username);
                 
-                // Don't show VIP entrance for current user (already shown)
-                if (userId != currentUser?.numericId) {
-                    // Check if VIP entrance already shown for this user
-                    if (!vipShownForUsers[userId]) {
-                        vipShownForUsers[userId] = true;
-                        setTimeout(() => checkAndShowVIPEntrance(userId, username), 800);
-                    }
+                // Show VIP entrance for new user (only once)
+                if (!vipShownForUsers[userId]) {
+                    vipShownForUsers[userId] = true;
+                    // Delay to show after join notification
+                    setTimeout(() => checkAndShowVIPEntrance(userId, username), 1200);
                 }
             }
         });
@@ -1409,11 +1537,11 @@
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
             if (expiresAt && expiresAt < new Date()) return;
             
-            // Show floating notification with VIP badge
-            showFloatingJoinNotification(username, activeVIP);
+            // Show join notification with VIP
+            showJoinNotification(username, activeVIP);
         } catch(e) {
             // If error, show normal notification
-            showFloatingJoinNotification(username, null);
+            showJoinNotification(username, null);
         }
     }
 
@@ -1750,7 +1878,7 @@
         const div = document.createElement('div');
         let className = 'message';
         if (msg.type === 'system') {
-            className += ' system' + (msg.subType === 'join' ? ' join' : msg.subType === 'leave' ? ' leave' : msg.subType === 'vip' ? ' vip' : '');
+            className += ' system' + (msg.subType === 'vip' ? ' vip' : '');
             div.className = className;
             div.setAttribute('data-msg-id', msg.id || Date.now());
             div.innerHTML = `<div class="msg-text">${msg.text}</div>`;
@@ -2203,16 +2331,16 @@
 
     function toggleDropdown(id) {
         const target = document.getElementById(id);
-        const isOpen = target.style.display === 'block';
+        const isOpen = target.classList.contains('active');
         closeAll();
         if (!isOpen) {
-            target.style.display = 'block';
+            target.classList.add('active');
             document.getElementById('screenOverlay').classList.add('active');
         }
     }
 
     function closeAll() {
-        document.querySelectorAll('.dropdown-overlay').forEach(m => m.style.display = 'none');
+        document.querySelectorAll('.dropdown-overlay').forEach(m => m.classList.remove('active'));
         document.querySelectorAll('.modal').forEach(m => {
             m.style.display = 'none';
             m.classList.remove('active');
@@ -2223,6 +2351,7 @@
         document.getElementById('usersListContainer').style.display = 'none';
     }
 
+    // Close dropdowns when clicking overlay
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('screenOverlay').addEventListener('click', function(e) {
             closeAll();
@@ -2293,6 +2422,7 @@
                         text: notif.text || '',
                         read: notif.read || false,
                         date: notif.date || new Date().toLocaleString('ar-EG'),
+                        type: notif.type || 'general',
                         key: key
                     });
                 }
@@ -2305,10 +2435,38 @@
                 list.innerHTML = '';
                 notifications.forEach(n => {
                     const div = document.createElement('div');
-                    div.style.cssText = `padding:10px 12px;border-bottom:1px solid #1e293b;font-size:0.8rem;${!n.read ? 'background:rgba(139,92,246,0.08);border-right:3px solid #8b5cf6;' : ''}`;
+                    div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+                    const iconMap = {
+                        purchase_approved: 'check-circle',
+                        purchase_rejected: 'times-circle',
+                        deposit: 'money-bill-wave',
+                        gift_received: 'gift',
+                        vip_activated: 'crown',
+                        general: 'info-circle'
+                    };
+                    const colorMap = {
+                        purchase_approved: '#10b981',
+                        purchase_rejected: '#ef4444',
+                        deposit: '#6366f1',
+                        gift_received: '#f59e0b',
+                        vip_activated: '#ffd700',
+                        general: '#94a3b8'
+                    };
+                    const icon = iconMap[n.type] || 'info-circle';
+                    const color = colorMap[n.type] || '#94a3b8';
                     div.innerHTML = `
-                        <div style="flex:1;">${n.text}<br><small style="opacity:0.6;">${n.date}</small></div>
-                        <button onclick="deleteSingleNotif('${user.firebaseKey}','${n.key}')" style="background:rgba(239,68,68,0.1);color:#ef4444;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:0.7rem;">✕</button>
+                        <div style="flex:1;">
+                            <div style="display:flex;align-items:flex-start;gap:10px;">
+                                <i class="fas fa-${icon}" style="color:${color};margin-top:2px;"></i>
+                                <div style="flex:1;">
+                                    ${n.text}<br>
+                                    <small style="opacity:0.6;">${n.date}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="delete-single-notif" onclick="deleteSingleNotif('${user.firebaseKey}','${n.key}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     `;
                     list.appendChild(div);
                 });
@@ -2349,6 +2507,12 @@
             showToast('✅ تم حذف جميع الإشعارات', 'success');
             loadNotifications();
         } catch(error) { showToast('❌ خطأ في حذف الإشعارات', 'error'); }
+    }
+
+    function refreshNotifications() {
+        const icon = document.getElementById('refreshIcon');
+        icon.classList.add('refreshing');
+        loadNotifications().then(() => setTimeout(() => icon.classList.remove('refreshing'), 500));
     }
 
     // ============================================================
