@@ -191,10 +191,10 @@
             color: #94a3b8;
         }
 
-        /* ===== VIP CARDS - ENHANCED ===== */
+        /* ===== VIP CARDS - FULL VIDEO ===== */
         .vip-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 30px;
             margin-top: 20px;
         }
@@ -202,18 +202,17 @@
         .vip-card {
             background: rgba(255,255,255,0.05);
             border-radius: 24px;
-            padding: 30px 25px 25px;
+            padding: 25px;
             border: 1px solid rgba(255,255,255,0.08);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
-            min-height: 550px;
             display: flex;
             flex-direction: column;
         }
 
         .vip-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             border-color: #ffd700;
             box-shadow: 0 20px 60px rgba(255, 215, 0, 0.1);
         }
@@ -240,12 +239,12 @@
             color: white;
         }
 
-        .vip-card .vip-badge.active {
+        .vip-card .vip-badge.owned {
             background: #10b981;
             color: white;
         }
 
-        .vip-card .vip-badge.inactive {
+        .vip-card .vip-badge.expired {
             background: #6b7280;
             color: white;
         }
@@ -258,14 +257,15 @@
             position: relative;
             background: #0a0a1a;
             aspect-ratio: 16/9;
-            min-height: 200px;
+            min-height: 220px;
             flex-shrink: 0;
         }
 
         .vip-card .vip-video-container video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            background: #0a0a1a;
         }
 
         .vip-card .vip-video-container .video-overlay {
@@ -282,6 +282,7 @@
             color: white;
             opacity: 0;
             transition: 0.3s;
+            pointer-events: none;
         }
 
         .vip-card .vip-video-container:hover .video-overlay {
@@ -340,6 +341,40 @@
             color: #ef4444;
         }
 
+        .vip-card .vip-status-text {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .vip-card .vip-status-text.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .vip-card .vip-status-text.inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .vip-card .vip-status-text.owned {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .vip-card .vip-status-text.locked {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
         .vip-card .vip-actions {
             display: flex;
             gap: 10px;
@@ -394,38 +429,48 @@
             display: none;
         }
 
-        .vip-card .vip-status-text {
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            flex-shrink: 0;
+        .vip-card .vip-actions .btn-buy {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
         }
 
-        .vip-card .vip-status-text.active {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
+        .vip-card .vip-actions .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
         }
 
-        .vip-card .vip-status-text.inactive {
-            background: rgba(107, 114, 128, 0.1);
-            color: #94a3b8;
-            border: 1px solid rgba(107, 114, 128, 0.2);
+        .vip-card .vip-actions .btn-buy.owned {
+            background: #6b7280;
+            cursor: not-allowed;
         }
 
-        .vip-card .vip-status-text.locked {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+        .vip-card .vip-actions .btn-buy.owned:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .vip-card .vip-actions .btn-use {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .vip-card .vip-actions .btn-use:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .vip-card .vip-actions .btn-use.active {
+            background: #10b981;
+        }
+
+        .vip-card .vip-actions .btn-use.active:hover {
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
         }
 
         /* ===== FRAMES SECTION ===== */
         .frames-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             margin-top: 20px;
         }
@@ -443,7 +488,7 @@
         }
 
         .frame-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             border-color: #ffd700;
             box-shadow: 0 20px 60px rgba(255, 215, 0, 0.1);
         }
@@ -510,6 +555,12 @@
             border: 1px solid rgba(255, 215, 0, 0.2);
         }
 
+        .frame-card .frame-status.expired {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
         .frame-card .frame-actions {
             display: flex;
             gap: 10px;
@@ -539,12 +590,12 @@
             box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
         }
 
-        .frame-card .frame-actions .btn-buy.owned {
+        .frame-card .frame-actions .btn-buy.disabled {
             background: #6b7280;
             cursor: not-allowed;
         }
 
-        .frame-card .frame-actions .btn-buy.owned:hover {
+        .frame-card .frame-actions .btn-buy.disabled:hover {
             transform: none;
             box-shadow: none;
         }
@@ -607,11 +658,8 @@
             .header .logo {
                 font-size: 1.3rem;
             }
-            .vip-card {
-                min-height: 450px;
-            }
             .vip-card .vip-video-container {
-                min-height: 150px;
+                min-height: 180px;
             }
             .tabs .tab-btn {
                 padding: 10px 20px;
@@ -622,7 +670,6 @@
         @media (max-width: 480px) {
             .vip-card {
                 padding: 18px;
-                min-height: 400px;
             }
             .vip-card .vip-title {
                 font-size: 1.1rem;
@@ -638,6 +685,9 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
+            }
+            .vip-card .vip-video-container {
+                min-height: 150px;
             }
             .frame-card .frame-preview iframe {
                 min-height: 150px;
@@ -701,7 +751,7 @@
             <div class="vip-grid" id="vipGrid">
                 <!-- VIP 1 Card -->
                 <div class="vip-card" id="vip1Card">
-                    <span class="vip-badge vip1">VIP 1</span>
+                    <span class="vip-badge vip1" id="vip1Badge">VIP 1</span>
                     <div class="vip-video-container">
                         <video id="vip1Video" autoplay loop muted playsinline>
                             <source src="images/vipsystem/car.mp4" type="video/mp4">
@@ -730,19 +780,14 @@
                         </div>
                     </div>
                     <div class="vip-status-text" id="vip1StatusText">🔒 غير متاح</div>
-                    <div class="vip-actions">
-                        <button class="btn-activate" id="vip1ActivateBtn" onclick="activateVIP(1)">
-                            <i class="fas fa-crown"></i> تفعيل VIP 1
-                        </button>
-                        <button class="btn-deactivate hidden" id="vip1DeactivateBtn" onclick="deactivateVIP(1)">
-                            <i class="fas fa-pause"></i> إيقاف مؤقت
-                        </button>
+                    <div class="vip-actions" id="vip1Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
                     </div>
                 </div>
 
                 <!-- VIP 2 Card -->
                 <div class="vip-card" id="vip2Card">
-                    <span class="vip-badge vip2">VIP 2</span>
+                    <span class="vip-badge vip2" id="vip2Badge">VIP 2</span>
                     <div class="vip-video-container">
                         <video id="vip2Video" autoplay loop muted playsinline>
                             <source src="images/vipsystem/lion.mp4" type="video/mp4">
@@ -771,13 +816,8 @@
                         </div>
                     </div>
                     <div class="vip-status-text" id="vip2StatusText">🔒 غير متاح</div>
-                    <div class="vip-actions">
-                        <button class="btn-activate" id="vip2ActivateBtn" onclick="activateVIP(2)">
-                            <i class="fas fa-crown"></i> تفعيل VIP 2
-                        </button>
-                        <button class="btn-deactivate hidden" id="vip2DeactivateBtn" onclick="deactivateVIP(2)">
-                            <i class="fas fa-pause"></i> إيقاف مؤقت
-                        </button>
+                    <div class="vip-actions" id="vip2Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
                     </div>
                 </div>
             </div>
@@ -810,7 +850,7 @@
         let userVIPData = null;
 
         // ============================================================
-        // 📋 FRAMES DATA
+        // 📋 FRAMES & VIP DATA
         // ============================================================
         const FRAMES = [
             {
@@ -846,6 +886,27 @@
                 height: 438
             }
         ];
+
+        const VIP_CONFIG = {
+            1: {
+                level: 1,
+                name: 'VIP 1',
+                emoji: '🚗',
+                title: 'السيارة الرياضية',
+                video: 'images/vipsystem/car.mp4',
+                duration: 30,
+                requirements: { EGP: 1000, USD: 20 }
+            },
+            2: {
+                level: 2,
+                name: 'VIP 2',
+                emoji: '🦁',
+                title: 'هيبة الأسد',
+                video: 'images/vipsystem/lion.mp4',
+                duration: 60,
+                requirements: { EGP: 2500, USD: null }
+            }
+        };
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
@@ -896,29 +957,8 @@
         }
 
         // ============================================================
-        // 📊 VIP SYSTEM
+        // 📊 VIP SYSTEM - ENHANCED
         // ============================================================
-        const VIP_CONFIG = {
-            1: {
-                level: 1,
-                name: 'VIP 1',
-                emoji: '🚗',
-                title: 'السيارة الرياضية',
-                video: 'images/vipsystem/car.mp4',
-                duration: 30,
-                requirements: { EGP: 1000, USD: 20 }
-            },
-            2: {
-                level: 2,
-                name: 'VIP 2',
-                emoji: '🦁',
-                title: 'هيبة الأسد',
-                video: 'images/vipsystem/lion.mp4',
-                duration: 60,
-                requirements: { EGP: 2500, USD: null }
-            }
-        };
-
         async function loadUserData() {
             currentUser = getCurrentUser();
             if (!currentUser) {
@@ -944,8 +984,9 @@
                         document.getElementById('userAvatar').innerHTML = `<img src="${fullUser.avatar}" alt="">`;
                     }
 
-                    userVIPData = fullUser.vip || { active: null, expiresAt: null };
+                    userVIPData = fullUser.vip || { active: null, expiresAt: null, paused: false };
                     updateVIPUI(fullUser);
+                    renderVIPActions(fullUser);
                     renderFrames(fullUser);
                 }
             } catch (error) {
@@ -955,7 +996,7 @@
         }
 
         function updateVIPUI(user) {
-            const vipData = user.vip || { active: null, expiresAt: null };
+            const vipData = user.vip || { active: null, expiresAt: null, paused: false };
             const activeVIP = vipData.active;
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
             const now = new Date();
@@ -984,95 +1025,134 @@
                 vipStatusEl.textContent = 'غير مفعل';
                 vipStatusEl.style.color = '#94a3b8';
             }
-
-            updateVIPCard(1, user);
-            updateVIPCard(2, user);
         }
 
-        function updateVIPCard(level, user) {
-            const vipConfig = VIP_CONFIG[level];
-            const vipData = user.vip || { active: null, expiresAt: null };
-            const isActive = vipData.active === level;
-            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
-            const now = new Date();
-            const isExpired = expiresAt && expiresAt < now;
-            const isPaused = vipData.paused === true;
-            const isCurrentlyActive = isActive && !isExpired && !isPaused;
+        function renderVIPActions(user) {
+            for (let level = 1; level <= 2; level++) {
+                const vipConfig = VIP_CONFIG[level];
+                const vipData = user.vip || { active: null, expiresAt: null, paused: false };
+                const isActive = vipData.active === level;
+                const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
+                const now = new Date();
+                const isExpired = expiresAt && expiresAt < now;
+                const isPaused = vipData.paused === true;
+                const isCurrentlyActive = isActive && !isExpired && !isPaused;
+                const isOwned = isActive || (user.vipPurchased && user.vipPurchased[level]);
 
-            const statusEl = document.getElementById(`vip${level}Status`);
-            const statusTextEl = document.getElementById(`vip${level}StatusText`);
-            const activateBtn = document.getElementById(`vip${level}ActivateBtn`);
-            const deactivateBtn = document.getElementById(`vip${level}DeactivateBtn`);
+                const actionsEl = document.getElementById(`vip${level}Actions`);
+                const badgeEl = document.getElementById(`vip${level}Badge`);
+                const statusEl = document.getElementById(`vip${level}Status`);
+                const statusTextEl = document.getElementById(`vip${level}StatusText`);
 
-            let canAfford = false;
-            let affordMessage = '';
-            
-            if (vipConfig.requirements.EGP && user.balanceEGP >= vipConfig.requirements.EGP) {
-                canAfford = true;
-                affordMessage = `✅ رصيدك كافي (${user.balanceEGP} ج.م)`;
-            } else if (vipConfig.requirements.USD && user.balanceUSD >= vipConfig.requirements.USD) {
-                canAfford = true;
-                affordMessage = `✅ رصيدك كافي (${user.balanceUSD} دولار)`;
-            } else {
-                const neededEGP = vipConfig.requirements.EGP || 0;
-                const neededUSD = vipConfig.requirements.USD || 0;
-                affordMessage = `❌ رصيد غير كافٍ (مطلوب ${neededEGP} ج.م أو ${neededUSD} دولار)`;
-            }
+                // Update badge
+                if (isCurrentlyActive) {
+                    badgeEl.textContent = '✅ مفعل';
+                    badgeEl.className = 'vip-badge owned';
+                } else if (isPaused) {
+                    badgeEl.textContent = '⏸️ موقف';
+                    badgeEl.className = 'vip-badge';
+                } else if (isOwned && isExpired) {
+                    badgeEl.textContent = '⏳ منتهي';
+                    badgeEl.className = 'vip-badge expired';
+                } else if (isOwned) {
+                    badgeEl.textContent = '📦 مملوك';
+                    badgeEl.className = 'vip-badge owned';
+                } else {
+                    badgeEl.textContent = `VIP ${level}`;
+                    badgeEl.className = `vip-badge vip${level}`;
+                }
 
-            if (isCurrentlyActive) {
-                statusEl.textContent = '✅ مفعل';
-                statusEl.style.color = '#10b981';
-                statusTextEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
-                statusTextEl.className = 'vip-status-text active';
-                activateBtn.textContent = '✅ مفعل حالياً';
-                activateBtn.className = 'btn-activate active';
-                activateBtn.disabled = true;
-                deactivateBtn.classList.remove('hidden');
-                deactivateBtn.textContent = '⏸️ إيقاف مؤقت';
-            } else if (isPaused) {
-                statusEl.textContent = '⏸️ موقف';
-                statusEl.style.color = '#f59e0b';
-                statusTextEl.textContent = `⏸️ موقف مؤقت - متبقي ${Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24))} يوم`;
-                statusTextEl.className = 'vip-status-text inactive';
-                activateBtn.textContent = `▶️ استئناف VIP ${level}`;
-                activateBtn.className = 'btn-activate';
-                activateBtn.disabled = false;
-                deactivateBtn.classList.remove('hidden');
-                deactivateBtn.textContent = '❌ إلغاء';
-            } else if (isActive && isExpired) {
-                statusEl.textContent = '⏳ منتهي';
-                statusEl.style.color = '#ef4444';
-                statusTextEl.textContent = '⏳ صلاحية منتهية - قم بالتفعيل مجدداً';
-                statusTextEl.className = 'vip-status-text locked';
-                activateBtn.textContent = `<i class="fas fa-crown"></i> تفعيل VIP ${level}`;
-                activateBtn.className = 'btn-activate';
-                activateBtn.disabled = false;
-                deactivateBtn.classList.add('hidden');
-            } else {
-                statusEl.textContent = canAfford ? '🔓 متاح' : '🔒 غير متاح';
-                statusEl.style.color = canAfford ? '#10b981' : '#ef4444';
-                statusTextEl.textContent = canAfford ? '🔓 متاح للتفعيل' : affordMessage;
-                statusTextEl.className = canAfford ? 'vip-status-text active' : 'vip-status-text locked';
-                activateBtn.textContent = `<i class="fas fa-crown"></i> تفعيل VIP ${level}`;
-                activateBtn.className = 'btn-activate';
-                activateBtn.disabled = false;
-                deactivateBtn.classList.add('hidden');
-            }
+                // Update status
+                let canAfford = false;
+                let affordMessage = '';
+                
+                if (vipConfig.requirements.EGP && user.balanceEGP >= vipConfig.requirements.EGP) {
+                    canAfford = true;
+                    affordMessage = `✅ رصيدك كافي (${user.balanceEGP} ج.م)`;
+                } else if (vipConfig.requirements.USD && user.balanceUSD >= vipConfig.requirements.USD) {
+                    canAfford = true;
+                    affordMessage = `✅ رصيدك كافي (${user.balanceUSD} دولار)`;
+                } else {
+                    const neededEGP = vipConfig.requirements.EGP || 0;
+                    const neededUSD = vipConfig.requirements.USD || 0;
+                    affordMessage = `❌ رصيد غير كافٍ (مطلوب ${neededEGP} ج.م أو ${neededUSD} دولار)`;
+                }
 
-            const reqEl = document.getElementById(`vip${level}Requirement`);
-            if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
-                reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
-            } else if (vipConfig.requirements.EGP) {
-                reqEl.textContent = `${vipConfig.requirements.EGP} ج.م`;
-            } else if (vipConfig.requirements.USD) {
-                reqEl.textContent = `${vipConfig.requirements.USD} دولار`;
+                if (isCurrentlyActive) {
+                    statusEl.textContent = '✅ مفعل';
+                    statusEl.style.color = '#10b981';
+                    statusTextEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
+                    statusTextEl.className = 'vip-status-text active';
+                } else if (isPaused) {
+                    statusEl.textContent = '⏸️ موقف';
+                    statusEl.style.color = '#f59e0b';
+                    statusTextEl.textContent = `⏸️ موقف مؤقت - متبقي ${Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24))} يوم`;
+                    statusTextEl.className = 'vip-status-text inactive';
+                } else if (isOwned && isExpired) {
+                    statusEl.textContent = '⏳ منتهي';
+                    statusEl.style.color = '#ef4444';
+                    statusTextEl.textContent = '⏳ صلاحية منتهية - قم بالشراء مجدداً';
+                    statusTextEl.className = 'vip-status-text expired';
+                } else if (isOwned) {
+                    statusEl.textContent = '📦 مملوك';
+                    statusEl.style.color = '#ffd700';
+                    statusTextEl.textContent = '📦 تم شراؤه - قم بالتفعيل';
+                    statusTextEl.className = 'vip-status-text owned';
+                } else {
+                    statusEl.textContent = canAfford ? '🔓 متاح' : '🔒 غير متاح';
+                    statusEl.style.color = canAfford ? '#10b981' : '#ef4444';
+                    statusTextEl.textContent = canAfford ? '🔓 متاح للشراء' : affordMessage;
+                    statusTextEl.className = canAfford ? 'vip-status-text active' : 'vip-status-text locked';
+                }
+
+                // Generate actions
+                let actionsHTML = '';
+
+                if (isCurrentlyActive) {
+                    actionsHTML = `
+                        <button class="btn-activate active" disabled>✅ مفعل حالياً</button>
+                        <button class="btn-deactivate" onclick="toggleVIPPause(${level})">⏸️ إيقاف مؤقت</button>
+                    `;
+                } else if (isPaused) {
+                    actionsHTML = `
+                        <button class="btn-activate" onclick="toggleVIPPause(${level})">▶️ استئناف</button>
+                        <button class="btn-deactivate" onclick="cancelVIP(${level})">❌ إلغاء</button>
+                    `;
+                } else if (isOwned && isExpired) {
+                    actionsHTML = `
+                        <button class="btn-buy" onclick="buyVIP(${level})">🔄 شراء مجدد (${vipConfig.requirements.EGP || vipConfig.requirements.USD} ${vipConfig.requirements.EGP ? 'ج.م' : 'دولار'})</button>
+                    `;
+                } else if (isOwned) {
+                    actionsHTML = `
+                        <button class="btn-use" onclick="activateOwnedVIP(${level})">▶️ تفعيل</button>
+                    `;
+                } else {
+                    actionsHTML = `
+                        <button class="btn-buy ${!canAfford ? 'disabled' : ''}" 
+                            onclick="buyVIP(${level})" ${!canAfford ? 'disabled' : ''}>
+                            ${canAfford ? '💰 شراء' : '❌ رصيد غير كافٍ'}
+                        </button>
+                    `;
+                }
+
+                actionsEl.innerHTML = actionsHTML;
+
+                // Update requirement display
+                const reqEl = document.getElementById(`vip${level}Requirement`);
+                if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
+                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
+                } else if (vipConfig.requirements.EGP) {
+                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م`;
+                } else if (vipConfig.requirements.USD) {
+                    reqEl.textContent = `${vipConfig.requirements.USD} دولار`;
+                }
             }
         }
 
         // ============================================================
-        // 🎯 ACTIVATE/DEACTIVATE VIP (FIXED)
+        // 🎯 VIP ACTIONS
         // ============================================================
-        async function activateVIP(level) {
+        async function buyVIP(level) {
             if (!currentUser) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 return;
@@ -1097,23 +1177,11 @@
                 const userId = Object.keys(userData)[0];
                 const user = userData[userId];
 
+                // Check if already active
                 const currentVIP = user.vip || { active: null, expiresAt: null, paused: false };
-                
-                // If paused, resume it
-                if (currentVIP.active === level && currentVIP.paused === true) {
-                    await database.ref('users/' + userId + '/vip/paused').set(false);
-                    showToast(`✅ تم استئناف VIP ${level}`, 'success');
-                    await loadUserData();
+                if (currentVIP.active === level && !currentVIP.paused) {
+                    showToast(`⚠️ VIP ${level} مفعل بالفعل`, 'warning');
                     return;
-                }
-
-                // If already active, don't reactivate
-                if (currentVIP.active === level && currentVIP.paused !== true) {
-                    const expiresAt = currentVIP.expiresAt ? new Date(currentVIP.expiresAt) : null;
-                    if (expiresAt && expiresAt > new Date()) {
-                        showToast(`⚠️ VIP ${level} مفعل بالفعل`, 'warning');
-                        return;
-                    }
                 }
 
                 // Check requirements
@@ -1130,6 +1198,8 @@
                     return;
                 }
 
+                if (!confirm(`تأكيد شراء VIP ${level} (${vipConfig.title}) مقابل ${useUSD ? costUSD + ' دولار' : costEGP + ' ج.م'}؟`)) return;
+
                 const newBalance = useUSD ? 
                     (user.balanceUSD || 0) - costUSD : 
                     (user.balanceEGP || 0) - costEGP;
@@ -1145,36 +1215,41 @@
                 const expiresAt = new Date(now);
                 expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
 
+                // Store as purchased
+                const vipPurchased = user.vipPurchased || {};
+                vipPurchased[level] = true;
+
                 updateData['vip/active'] = level;
                 updateData['vip/expiresAt'] = expiresAt.toISOString();
                 updateData['vip/activatedAt'] = now.toISOString();
                 updateData['vip/activatedWith'] = useUSD ? 'USD' : 'EGP';
                 updateData['vip/amount'] = useUSD ? costUSD : costEGP;
                 updateData['vip/paused'] = false;
+                updateData.vipPurchased = vipPurchased;
                 updateData.updatedAt = now.toISOString();
 
                 await database.ref('users/' + userId).update(updateData);
 
                 const notification = {
                     id: Date.now(),
-                    text: `👑 تم تفعيل VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
+                    text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
                     read: false,
                     date: new Date().toLocaleString('ar-EG'),
-                    type: 'vip_activated',
+                    type: 'vip_purchased',
                     createdAt: now.toISOString()
                 };
                 await database.ref('users/' + userId + '/notifications').push(notification);
 
-                showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
+                showToast(`✅ تم شراء VIP ${level} بنجاح!`, 'success');
                 await loadUserData();
 
             } catch (error) {
-                console.error('Error activating VIP:', error);
-                showToast('❌ حدث خطأ في تفعيل VIP', 'error');
+                console.error('Error buying VIP:', error);
+                showToast('❌ حدث خطأ في الشراء', 'error');
             }
         }
 
-        async function deactivateVIP(level) {
+        async function activateOwnedVIP(level) {
             if (!currentUser) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 return;
@@ -1192,33 +1267,99 @@
                 const userData = snapshot.val();
                 const userId = Object.keys(userData)[0];
                 const user = userData[userId];
-                const currentVIP = user.vip || { active: null, paused: false };
 
-                // If paused, cancel it (remove VIP)
-                if (currentVIP.paused === true) {
-                    if (!confirm(`⚠️ هل أنت متأكد من إلغاء VIP ${level} نهائياً؟`)) return;
-                    
-                    await database.ref('users/' + userId + '/vip').set({
-                        active: null,
-                        expiresAt: null,
-                        paused: false,
-                        cancelledAt: new Date().toISOString()
-                    });
-                    showToast('✅ تم إلغاء VIP', 'success');
-                    await loadUserData();
+                const vipConfig = VIP_CONFIG[level];
+                const vipPurchased = user.vipPurchased || {};
+
+                if (!vipPurchased[level]) {
+                    showToast('⚠️ هذا الـ VIP غير مملوك', 'warning');
                     return;
                 }
 
-                // If active, pause it
-                if (currentVIP.active === level) {
-                    await database.ref('users/' + userId + '/vip/paused').set(true);
-                    showToast(`⏸️ تم إيقاف VIP ${level} مؤقتاً`, 'warning');
-                    await loadUserData();
-                    return;
-                }
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
+
+                await database.ref('users/' + userId + '/vip').update({
+                    active: level,
+                    expiresAt: expiresAt.toISOString(),
+                    paused: false,
+                    activatedAt: now.toISOString()
+                });
+
+                showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
+                await loadUserData();
 
             } catch (error) {
-                console.error('Error deactivating VIP:', error);
+                console.error('Error activating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function toggleVIPPause(level) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+                const user = userData[userId];
+
+                const currentVIP = user.vip || { active: null, paused: false };
+                const newPaused = !currentVIP.paused;
+
+                await database.ref('users/' + userId + '/vip/paused').set(newPaused);
+
+                showToast(newPaused ? `⏸️ تم إيقاف VIP ${level} مؤقتاً` : `▶️ تم استئناف VIP ${level}`, newPaused ? 'warning' : 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error toggling VIP pause:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function cancelVIP(level) {
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            if (!confirm(`⚠️ هل أنت متأكد من إلغاء VIP ${level} نهائياً؟`)) return;
+
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(currentUser.numericId).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userId = Object.keys(userData)[0];
+
+                await database.ref('users/' + userId + '/vip').update({
+                    active: null,
+                    paused: false,
+                    cancelledAt: new Date().toISOString()
+                });
+
+                showToast('✅ تم إلغاء VIP', 'success');
+                await loadUserData();
+
+            } catch (error) {
+                console.error('Error cancelling VIP:', error);
                 showToast('❌ حدث خطأ', 'error');
             }
         }
@@ -1232,10 +1373,10 @@
             const activeFrame = user.activeFrame || null;
 
             grid.innerHTML = FRAMES.map(frame => {
-                const owned = userFrames[frame.id] || false;
+                const frameData = userFrames[frame.id] || null;
+                const isOwned = frameData && frameData.owned === true;
                 const isActive = activeFrame === frame.id;
-                const isOwned = owned === true || (userFrames[frame.id] && userFrames[frame.id].owned === true);
-                const expiresAt = userFrames[frame.id]?.expiresAt ? new Date(userFrames[frame.id].expiresAt) : null;
+                const expiresAt = frameData?.expiresAt ? new Date(frameData.expiresAt) : null;
                 const isExpired = expiresAt && expiresAt < new Date();
                 const isValid = isOwned && !isExpired;
 
@@ -1250,7 +1391,7 @@
                     statusClass = 'owned';
                 } else if (isOwned && isExpired) {
                     statusText = '⏳ منتهي الصلاحية';
-                    statusClass = 'inactive';
+                    statusClass = 'expired';
                 }
 
                 const canAfford = user.balanceEGP >= frame.price;
@@ -1265,11 +1406,16 @@
                         <div class="frame-duration">⏱️ مدة التفعيل: ${frame.duration} يوم</div>
                         <div class="frame-status ${statusClass}">${statusText}</div>
                         <div class="frame-actions">
-                            ${!isValid ? `
-                                <button class="btn-buy ${!canAfford ? 'owned' : ''}" 
+                            ${!isValid && !isOwned ? `
+                                <button class="btn-buy ${!canAfford ? 'disabled' : ''}" 
                                     onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')"
                                     ${!canAfford ? 'disabled' : ''}>
                                     ${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}
+                                </button>
+                            ` : ''}
+                            ${isOwned && isExpired ? `
+                                <button class="btn-buy" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')">
+                                    <i class="fas fa-sync"></i> شراء مجدد
                                 </button>
                             ` : ''}
                             ${isValid && !isActive ? `
@@ -1324,7 +1470,6 @@
                     updatedAt: now.toISOString()
                 };
 
-                // Add frame to user's frames
                 const frames = user.frames || {};
                 frames[frameId] = {
                     owned: true,
@@ -1373,7 +1518,6 @@
                 const userId = Object.keys(userData)[0];
                 const user = userData[userId];
 
-                // If frameId is null, deactivate frame
                 if (frameId === null) {
                     await database.ref('users/' + userId + '/activeFrame').set(null);
                     showToast('✅ تم إلغاء تفعيل الإطار', 'success');
@@ -1381,7 +1525,6 @@
                     return;
                 }
 
-                // Check if frame is owned and not expired
                 const frames = user.frames || {};
                 const frame = frames[frameId];
                 if (!frame || !frame.owned) {
