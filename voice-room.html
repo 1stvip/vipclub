@@ -110,20 +110,76 @@
             min-height: 500px;
         }
 
-        .seats-area {
-            flex: 1;
-            background: #000000 !important;
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.03) !important;
-            padding: 25px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            min-width: 0;
-        }
+       /* ===== المنطقة التي تحتوي على المقاعد ===== */
+.seats-area {
+    flex: 1;
+    background: #000000 !important;
+    border-radius: 24px;
+    border: 2px solid transparent !important; /* تغيير من 1px solid إلى transparent */
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-width: 0;
+    /* إضافة الإطار الذهبي المتحرك */
+    background-clip: padding-box !important;
+    animation: goldBorder 3s linear infinite;
+}
 
+/* ===== الإطار الذهبي المتحرك ===== */
+.seats-area::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 26px;
+    padding: 3px;
+    background: conic-gradient(from 0deg, 
+        #ffd700, 
+        #f59e0b, 
+        #ffd700, 
+        #f59e0b, 
+        #ffd700, 
+        #f59e0b, 
+        #ffd700
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 0;
+    animation: rotateBorder 4s linear infinite;
+    background-size: 300% 300%;
+}
+
+/* ===== حركة الدوران ===== */
+@keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== توهج ذهبي إضافي ===== */
+.seats-area::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 28px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.05), transparent 70%);
+    z-index: -1;
+    animation: glowPulseGold 3s ease-in-out infinite;
+}
+
+@keyframes glowPulseGold {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+/* ===== التأكد من ظهور المحتوى فوق الإطار ===== */
+.seats-area .seats-title,
+.seats-area .seats-container {
+    position: relative;
+    z-index: 1;
+}
         .seats-area .seats-title {
             position: absolute;
             top: 15px;
