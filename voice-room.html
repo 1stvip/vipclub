@@ -99,47 +99,6 @@
             min-width: 18px; text-align: center;
         }
 
-        /* ===== JOIN NOTIFICATION UNDER SEATS ===== */
-        .join-notif-container {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            pointer-events: none;
-            width: 100%;
-            max-width: 500px;
-        }
-        .join-notif-item {
-            background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04));
-            border: 1px solid rgba(16,185,129,0.2);
-            color: #10b981;
-            padding: 8px 20px;
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 8px 30px rgba(16,185,129,0.1);
-            animation: joinNotifSlide 3s ease forwards;
-            pointer-events: none;
-            text-align: center;
-            white-space: nowrap;
-        }
-        .join-notif-item .notif-emoji { margin-left: 6px; }
-        .join-notif-item .notif-name { color: #fff; font-weight: 700; }
-        .join-notif-item .notif-vip { color: #ffd700; margin-right: 6px; }
-
-        @keyframes joinNotifSlide {
-            0% { opacity: 0; transform: translateY(-10px) scale(0.9); }
-            15% { opacity: 1; transform: translateY(0) scale(1); }
-            75% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-10px) scale(0.9); }
-        }
-
         /* ===== MAIN LAYOUT ===== */
         .main-layout {
             display: flex;
@@ -475,7 +434,6 @@
             max-width: 80%;
             opacity: 0.8;
         }
-        .chat-messages .message.system.vip { background: rgba(255,215,0,0.12); color: #ffd700; border-color: rgba(255,215,0,0.2); font-weight: bold; }
         .chat-messages .message.own {
             background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.15));
             align-self: flex-end;
@@ -996,7 +954,6 @@
             .seats-row { gap: 15px; }
             .seat-circle { width: 80px; height: 80px; }
             .seat-circle .seat-avatar { width: 44px; height: 44px; font-size: 1.2rem; }
-            .join-notif-container { bottom: 90px; }
         }
 
         @media (max-width: 768px) {
@@ -1013,8 +970,6 @@
             .btn-leave-seat { width: 42px; height: 42px; font-size: 1rem; }
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
             #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 18px; }
-            .join-notif-container { bottom: 80px; }
-            .join-notif-item { font-size: 0.75rem; padding: 6px 16px; }
             #notifDropdown { right: 10px; width: 320px; }
         }
 
@@ -1028,8 +983,6 @@
             .main-layout { padding: 5px; }
             .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
             #vipEntrance .vip-title { font-size: 1rem; padding: 6px 12px; white-space: normal; }
-            .join-notif-container { bottom: 70px; }
-            .join-notif-item { font-size: 0.65rem; padding: 5px 12px; white-space: normal; }
             #notifDropdown { right: 5px; width: 290px; }
         }
     </style>
@@ -1085,9 +1038,6 @@
         <i class="fas fa-forward"></i> تخطي
     </button>
 </div>
-
-<!-- ===== JOIN NOTIFICATION UNDER SEATS ===== -->
-<div class="join-notif-container" id="joinNotifContainer"></div>
 
 <!-- ===== MAIN LAYOUT ===== -->
 <div class="main-layout">
@@ -1295,8 +1245,7 @@
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
     let vipShownForUsers = {};
-    let joinNotifQueue = [];
-    let isProcessingNotif = false;
+    let isProcessingJoin = false;
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -1441,16 +1390,16 @@
             listenSeats();
             setupChatScroll();
             
-            // Listen for room members
-            listenForRoomMembers();
+            // Listen for new users joining the room
+            listenForNewUsers();
             
-            // Show join notification for current user
+            // Check VIP for current user - show entrance to all
             if (currentUser?.numericId) {
                 const username = currentUser.nickname || currentUser.username || 'مستخدم';
-                showJoinNotification(username, null);
-                
-                // Check VIP for current user
-                setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, username), 1500);
+                // Mark current user as VIP shown
+                vipShownForUsers[currentUser.numericId] = true;
+                // Show VIP entrance for current user to all
+                setTimeout(() => showVIPEntranceForUser(currentUser.numericId, username), 1500);
             }
             
             setTimeout(initPeerJS, 1000);
@@ -1459,108 +1408,72 @@
     }
 
     // ============================================================
-    // 📢 JOIN NOTIFICATION UNDER SEATS
+    // 👑 VIP SYSTEM - FIXED
     // ============================================================
-    function showJoinNotification(username, vipLevel) {
-        const container = document.getElementById('joinNotifContainer');
-        
-        let vipText = '';
-        if (vipLevel) {
-            const vipConfig = VIP_CONFIG[vipLevel];
-            if (vipConfig) {
-                vipText = `<span class="notif-vip">${vipConfig.emoji} ${vipConfig.name}</span>`;
-            }
-        }
-        
-        const notif = document.createElement('div');
-        notif.className = 'join-notif-item';
-        notif.innerHTML = `
-            <span class="notif-emoji">👋</span>
-            <span class="notif-name">${username}</span>
-            ${vipText}
-            <span>انضم للغرفة</span>
-        `;
-        
-        container.appendChild(notif);
-        
-        // Remove after animation
-        setTimeout(() => {
-            if (notif.parentNode) {
-                notif.remove();
-            }
-        }, 3500);
-        
-        // Limit to 3 notifications at a time
-        while (container.children.length > 3) {
-            container.removeChild(container.firstChild);
-        }
-    }
-
-    // ============================================================
-    // 👑 VIP ENTRANCE - FIXED FOR EACH USER ONCE
-    // ============================================================
-    function listenForRoomMembers() {
+    function listenForNewUsers() {
         if (!database || !roomId) return;
         
-        // Listen for new seats being added
+        // Listen for new seats being added (users joining)
         database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
             const seat = snapshot.val();
             if (seat && seat.userId) {
                 const userId = seat.userId;
                 const username = seat.username || 'مستخدم';
                 
-                // Show join notification for new user
-                // Check if user has VIP
-                checkUserVIPAndNotify(userId, username);
+                // Don't process if already shown for this user
+                if (vipShownForUsers[userId]) return;
                 
-                // Show VIP entrance for new user (only once)
-                if (!vipShownForUsers[userId]) {
-                    vipShownForUsers[userId] = true;
-                    // Delay to show after join notification
-                    setTimeout(() => checkAndShowVIPEntrance(userId, username), 1200);
-                }
+                // Mark as shown
+                vipShownForUsers[userId] = true;
+                
+                // Show VIP entrance for this user to all
+                setTimeout(() => showVIPEntranceForUser(userId, username), 800);
             }
         });
     }
 
-    async function checkUserVIPAndNotify(userId, username) {
-        try {
-            const usersRef = database.ref('users');
-            const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
-            if (!snapshot.exists()) return;
-            const userData = snapshot.val();
-            const userKey = Object.keys(userData)[0];
-            const user = userData[userKey];
-            const vipData = user.vip || { active: null, expiresAt: null };
-            const activeVIP = vipData.active;
-            if (!activeVIP) return;
-            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
-            if (expiresAt && expiresAt < new Date()) return;
-            
-            // Show join notification with VIP
-            showJoinNotification(username, activeVIP);
-        } catch(e) {
-            // If error, show normal notification
-            showJoinNotification(username, null);
-        }
-    }
-
-    async function checkAndShowVIPEntrance(userId, username) {
+    async function showVIPEntranceForUser(userId, username) {
         if (!database || isVIPEntranceActive) return;
+        
+        // Don't show if already processing
+        if (isProcessingJoin) return;
+        isProcessingJoin = true;
+        
         try {
+            // Get user data to check VIP status
             const usersRef = database.ref('users');
             const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
-            if (!snapshot.exists()) return;
+            
+            if (!snapshot.exists()) {
+                isProcessingJoin = false;
+                return;
+            }
+            
             const userData = snapshot.val();
             const userKey = Object.keys(userData)[0];
             const user = userData[userKey];
+            
+            // Check VIP status
             const vipData = user.vip || { active: null, expiresAt: null };
             const activeVIP = vipData.active;
-            if (!activeVIP) return;
+            
+            if (!activeVIP) {
+                isProcessingJoin = false;
+                return;
+            }
+            
+            // Check expiration
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
-            if (expiresAt && expiresAt < new Date()) return;
+            if (expiresAt && expiresAt < new Date()) {
+                isProcessingJoin = false;
+                return;
+            }
+            
             const vipConfig = VIP_CONFIG[activeVIP];
-            if (!vipConfig) return;
+            if (!vipConfig) {
+                isProcessingJoin = false;
+                return;
+            }
             
             // Show VIP video for all users in the room
             isVIPEntranceActive = true;
@@ -1582,11 +1495,17 @@
             
             try { await video.play(); } catch(e) { console.log('Video play error:', e); }
             
+            // Auto skip after 8 seconds
             if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
-            vipEntranceTimeout = setTimeout(skipVIPEntrance, 8000);
+            vipEntranceTimeout = setTimeout(() => {
+                skipVIPEntrance();
+                isProcessingJoin = false;
+            }, 8000);
+            
         } catch(error) { 
             console.error('VIP entrance error:', error); 
             isVIPEntranceActive = false;
+            isProcessingJoin = false;
         }
     }
 
@@ -1597,7 +1516,11 @@
         video.pause();
         video.currentTime = 0;
         isVIPEntranceActive = false;
-        if (vipEntranceTimeout) { clearTimeout(vipEntranceTimeout); vipEntranceTimeout = null; }
+        if (vipEntranceTimeout) { 
+            clearTimeout(vipEntranceTimeout); 
+            vipEntranceTimeout = null; 
+        }
+        isProcessingJoin = false;
     }
 
     // ============================================================
@@ -1878,7 +1801,7 @@
         const div = document.createElement('div');
         let className = 'message';
         if (msg.type === 'system') {
-            className += ' system' + (msg.subType === 'vip' ? ' vip' : '');
+            className += ' system';
             div.className = className;
             div.setAttribute('data-msg-id', msg.id || Date.now());
             div.innerHTML = `<div class="msg-text">${msg.text}</div>`;
@@ -2351,7 +2274,6 @@
         document.getElementById('usersListContainer').style.display = 'none';
     }
 
-    // Close dropdowns when clicking overlay
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('screenOverlay').addEventListener('click', function(e) {
             closeAll();
