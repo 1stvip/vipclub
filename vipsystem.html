@@ -491,6 +491,13 @@
             justify-content: center;
         }
 
+        .frame-card .frame-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
         .frame-card .frame-preview iframe {
             width: 100%;
             height: 100%;
@@ -677,6 +684,9 @@
             .frame-card .frame-preview iframe {
                 min-height: 250px;
             }
+            .frame-card .frame-preview video {
+                min-height: 250px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -704,6 +714,9 @@
                 min-height: 380px;
             }
             .frame-card .frame-preview iframe {
+                min-height: 200px;
+            }
+            .frame-card .frame-preview video {
                 min-height: 200px;
             }
         }
@@ -871,16 +884,18 @@
                 name: 'إطار فاخر 1',
                 price: 50,
                 duration: 30,
-                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=875809458798946321',
-                height: 405
+                embedUrl: 'images/vipsystem/manager.mp4',
+                height: 405,
+                isVideo: true
             },
             {
                 id: 'frame2',
                 name: 'إطار فاخر 2',
                 price: 50,
                 duration: 30,
-                embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=601723200255670870',
-                height: 445
+                embedUrl: 'images/vipsystem/warrior.mp4',
+                height: 445,
+                isVideo: true
             },
             {
                 id: 'frame3',
@@ -888,7 +903,8 @@
                 price: 100,
                 duration: 30,
                 embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669',
-                height: 445
+                height: 445,
+                isVideo: false
             },
             {
                 id: 'frame4',
@@ -896,7 +912,8 @@
                 price: 150,
                 duration: 30,
                 embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964',
-                height: 438
+                height: 438,
+                isVideo: false
             }
         ];
 
@@ -1332,7 +1349,7 @@
         }
 
         // ============================================================
-        // 🖼️ FRAMES SYSTEM - FULL DISPLAY
+        // 🖼️ FRAMES SYSTEM - WITH VIDEO SUPPORT
         // ============================================================
         function renderFrames(user) {
             const grid = document.getElementById('framesGrid');
@@ -1393,10 +1410,24 @@
                     `;
                 }
 
+                // عرض الفيديو أو iframe حسب النوع
+                let previewHTML = '';
+                if (frame.isVideo) {
+                    previewHTML = `
+                        <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+                            <source src="${frame.embedUrl}" type="video/mp4">
+                        </video>
+                    `;
+                } else {
+                    previewHTML = `
+                        <iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>
+                    `;
+                }
+
                 return `
                     <div class="frame-card">
                         <div class="frame-preview">
-                            <iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>
+                            ${previewHTML}
                         </div>
                         <div class="frame-name">${frame.name}</div>
                         <div class="frame-price">💰 ${frame.price} ج.م</div>
