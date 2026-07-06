@@ -12,14 +12,14 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     
-    <!-- PeerJS للصوت بين الأجهزة -->
+    <!-- PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(145deg, #0a0a1a, #1a1040, #0f0c29);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -27,543 +27,756 @@
             overflow-x: hidden;
         }
 
+        /* ===== NAVBAR ===== */
         .navbar {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(15px);
             padding: 0.6rem 4%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 2px solid rgba(255,215,0,0.15);
             position: sticky;
             top: 0;
             z-index: 100;
             flex-wrap: wrap;
             gap: 8px;
-            min-height: 60px;
+            min-height: 65px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
 
         .logo-section { display: flex; align-items: center; gap: 15px; }
-        .logo { font-size: 1.1rem; font-weight: bold; color: #ffd700; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .logo i { font-size: 1.2rem; }
+        .logo { font-size: 1.2rem; font-weight: bold; color: #ffd700; display: flex; align-items: center; gap: 8px; cursor: pointer; text-shadow: 0 0 20px rgba(255,215,0,0.2); }
+        .logo i { font-size: 1.3rem; }
 
-        .nav-icons { display: flex; align-items: center; gap: 10px; }
+        .room-info-box {
+            background: rgba(255,255,255,0.05);
+            padding: 6px 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .room-info-box .room-name { font-weight: 700; color: #fff; font-size: 0.9rem; }
+        .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.7rem; background: rgba(255,215,0,0.1); padding: 2px 10px; border-radius: 6px; }
+        .room-info-box .room-owner { color: #ffd700; font-size: 0.75rem; }
+        .room-info-box .member-count { color: #94a3b8; font-size: 0.75rem; }
+
+        .nav-icons { display: flex; align-items: center; gap: 8px; }
         .icon-btn {
-            font-size: 1.2rem; color: #f8fafc; cursor: pointer; position: relative;
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: #f8fafc; cursor: pointer; position: relative;
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
             border-radius: 12px; transition: 0.3s; text-decoration: none; background: rgba(255,255,255,0.05); border: none;
         }
         .icon-btn:hover { background: #8b5cf6; color: white; transform: translateY(-2px); }
+        .icon-btn.vip-btn { background: rgba(255,215,0,0.1); color: #ffd700; }
+        .icon-btn.vip-btn:hover { background: #ffd700; color: #1a1a2e; }
         .badge {
             position: absolute; top: -5px; right: -5px; background: #ef4444; color: white;
-            font-size: 0.6rem; padding: 2px 6px; border-radius: 50%; border: 2px solid #0f0c29;
+            font-size: 0.55rem; padding: 2px 6px; border-radius: 50%; border: 2px solid #0f0c29;
             min-width: 18px; text-align: center;
         }
+        .btn-leave { padding: 5px 14px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.7rem; transition: 0.3s; }
+        .btn-leave:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(239,68,68,0.3); }
 
-        .room-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.75rem; }
-        .room-info .room-name { font-weight: 600; color: #fff; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .room-info .room-id { color: #888; font-family: monospace; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; font-size: 0.65rem; }
-        .room-info .room-owner { color: #ffd700; font-size: 0.7rem; }
-        .btn-leave { padding: 4px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.7rem; transition: 0.3s; }
-        .btn-leave:hover { background: #dc2626; }
-
-        /* ===== Profile Dropdown ===== */
-        .dropdown-overlay {
-            position: fixed; top: 70px; right: 20px; width: 320px; max-width: 90%;
-            background: #111827; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            display: none; flex-direction: column; z-index: 10000; border: 1px solid #334155;
-            overflow: hidden; padding: 20px; text-align: center;
-        }
-        .dropdown-overlay.active { display: flex !important; animation: slideDown 0.3s ease-out; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .dropdown-overlay .profile-avatar { font-size: 3rem; color: #8b5cf6; margin: 5px auto; }
-        .dropdown-overlay h4 { margin: 5px 0; color: #fff; }
-
-        .user-id-numeric {
-            background: linear-gradient(90deg, #4f46e5, #8b5cf6); color: white;
-            padding: 10px 20px; border-radius: 12px; font-family: 'Courier New', monospace;
-            font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; text-align: center;
-            margin: 10px auto; display: inline-block; min-width: 140px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1);
-            cursor: pointer; transition: 0.3s;
-        }
-        .user-id-numeric:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(79,70,229,0.4); }
-
-        .id-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block; }
-
-        .balance-card {
-            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px;
-            margin: 15px 0; border: 1px solid #334155; width: 100%;
-        }
-        .balance-row { display: flex; justify-content: space-between; margin: 5px 0; font-size: 0.95rem; }
-
-        .action-btn {
-            width: 100%; padding: 12px; border-radius: 14px; border: none; cursor: pointer;
-            font-weight: bold; transition: 0.3s; margin-top: 8px; font-family: inherit; font-size: 0.9rem;
-        }
-        .btn-primary { background: #8b5cf6; color: white; box-shadow: 0 4px 15px rgba(139,92,246,0.4); }
-        .btn-primary:hover { background: #7c3aed; transform: translateY(-2px); }
-        .btn-success { background: #10b981; color: white; }
-        .btn-success:hover { background: #059669; transform: translateY(-2px); }
-        .btn-logout { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
-        .btn-logout:hover { background: rgba(239,68,68,0.2); transform: translateY(-2px); }
-        .btn-secondary { background: #1e293b; color: white; }
-        .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
-
-        .copy-hint { font-size: 0.7rem; color: #94a3b8; margin-top: 5px; cursor: pointer; }
-        .copy-hint i { color: #8b5cf6; }
-
-        /* ===== Notifications ===== */
-        #notifDropdown { right: auto; left: 20px; padding: 0; }
-        .notif-header { padding: 15px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        .refresh-btn { cursor: pointer; font-size: 1rem; color: #94a3b8; transition: 0.3s; padding: 5px; }
-        .refresh-btn:hover { color: #8b5cf6; transform: rotate(180deg); }
-        .refreshing { animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        #notifList { max-height: 350px; overflow-y: auto; padding: 10px; }
-        .notif-item {
-            padding: 12px 15px; border-bottom: 1px solid #1e293b; font-size: 0.85rem;
-            display: flex; justify-content: space-between; align-items: center; gap: 10px;
-            position: relative; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 5px;
-        }
-        .notif-item.unread { background: rgba(139,92,246,0.1); border-right: 4px solid #8b5cf6; }
-        .notif-item:hover { background: rgba(255,255,255,0.03); }
-
-        .delete-single-notif {
-            color: #ef4444; cursor: pointer; padding: 6px; opacity: 0.6; transition: 0.3s;
-            background: rgba(239,68,68,0.1); border-radius: 6px; width: 30px; height: 30px;
-            display: flex; align-items: center; justify-content: center; border: none;
-        }
-        .delete-single-notif:hover { opacity: 1; transform: scale(1.1); background: rgba(239,68,68,0.2); }
-
-        .notif-actions { padding: 10px; display: flex; gap: 5px; background: #0a0f1d; border-top: 1px solid #1e293b; }
-        .notif-actions button { flex: 1; font-size: 0.8rem; padding: 10px; background: #1e293b; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .notif-actions button:hover { background: #334155; }
-        #unreadCount { background: #ef4444; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; }
-
-        /* ===== Modals ===== */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 9998; display: none;
-        }
-        .modal-overlay.active { display: block; }
-
-        .modal {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 400px; max-width: 95%; z-index: 10001; padding: 25px;
-            display: none; flex-direction: column; background: #1e293b; border-radius: 28px;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.6); border: 1px solid #334155; color: white;
-        }
-        .modal.active { display: flex !important; animation: popIn 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translate(-50%,-50%); } to { opacity: 1; transform: scale(1) translate(-50%,-50%); } }
-
-        .modal h3 { margin-top: 0; text-align: center; }
-        .modal p { color: #94a3b8; text-align: center; }
-        .modal select, .modal input {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155;
-            background: #0f172a; color: white; margin-top: 8px; box-sizing: border-box; font-family: inherit;
+        /* ===== MAIN LAYOUT ===== */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            padding: 15px 20px 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 85px);
+            min-height: 500px;
         }
 
-        .copy-box {
-            background: #0f172a; padding: 12px; border-radius: 12px;
-            display: flex; justify-content: space-between; align-items: center; margin: 10px 0;
-            border: 1px dashed #8b5cf6;
+        /* ===== SEATS AREA ===== */
+        .seats-area {
+            flex: 1;
+            background: rgba(255,255,255,0.02);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            backdrop-filter: blur(5px);
+            min-width: 0;
         }
-        .copy-btn { background: #8b5cf6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; }
-        .copy-btn:hover { background: #7c3aed; transform: translateY(-2px); }
 
-        /* ===== Seats ===== */
-        .seats-area { width: 100%; }
-        .seats-area h2 { font-size: 0.95rem; margin-bottom: 8px; color: #ffd700; display: flex; align-items: center; gap: 6px; }
+        .seats-area .seats-title {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .seats-area .seats-title i { color: #ffd700; }
 
         .seats-container {
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            padding: 15px; background: rgba(255,255,255,0.02); border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.05); width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            padding: 10px 0;
         }
 
-        .seats-row { display: flex; justify-content: center; gap: 14px; width: 100%; }
+        .seats-row {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            width: 100%;
+        }
         .seats-row.row-1 { max-width: 160px; }
-        .seats-row.row-2 { max-width: 340px; }
-        .seats-row.row-3 { max-width: 520px; }
-        .seats-row.row-4 { max-width: 700px; }
+        .seats-row.row-2 { max-width: 380px; }
+        .seats-row.row-3 { max-width: 580px; }
+        .seats-row.row-4 { max-width: 780px; }
 
-        .seat {
-            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 16px; padding: 14px 10px; text-align: center; transition: all 0.3s ease;
-            position: relative; min-height: 120px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; flex: 1; max-width: 130px; cursor: pointer;
+        /* ===== SEAT CIRCLE ===== */
+        .seat-circle {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(255,255,255,0.04);
+            border: 2.5px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
         }
-        .seat:hover { transform: translateY(-3px); }
-
-        .seat.owner-seat {
-            background: linear-gradient(145deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
-            border: 2px solid #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.15);
-            min-height: 140px; max-width: 150px;
+        .seat-circle:hover { transform: translateY(-5px) scale(1.03); }
+        .seat-circle.empty { border-style: dashed; border-color: rgba(255,255,255,0.12); }
+        .seat-circle.empty:hover { border-color: #ffd700; background: rgba(255,215,0,0.05); }
+        .seat-circle.occupied { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
+        .seat-circle.owner-seat {
+            border-color: #ffd700 !important;
+            background: radial-gradient(circle, rgba(255,215,0,0.15), rgba(255,215,0,0.02));
+            box-shadow: 0 0 40px rgba(255,215,0,0.1);
         }
-        .seat.owner-seat .seat-avatar { border-color: #ffd700 !important; background: linear-gradient(135deg, #ffd700, #f59e0b) !important; color: #1a1a2e !important; }
-        .seat.owner-seat .seat-crown { position: absolute; top: -16px; font-size: 1.8rem; animation: crown-glow 2s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); }
-        @keyframes crown-glow { 0%,100% { transform: scale(1) rotate(-5deg); } 50% { transform: scale(1.1) rotate(5deg); } }
-        .seat.owner-seat .seat-username { color: #ffd700 !important; font-size: 0.85rem; }
-        .seat.owner-seat .seat-badge-owner { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; padding: 2px 12px; border-radius: 12px; font-size: 0.55rem; font-weight: bold; margin-top: 3px; }
-
-        .seat.empty { border: 2px dashed rgba(255,255,255,0.12); cursor: pointer; background: rgba(255,255,255,0.02); }
-        .seat.empty:hover { border-color: #ffd700; background: rgba(255,215,0,0.05); }
-        .seat.empty .seat-avatar { border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
-
-        .seat.occupied { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
-        .seat.occupied .seat-avatar {
-            width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem; font-weight: bold; margin-bottom: 6px; border: 2px solid #10b981;
+        .seat-circle.speaking {
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 50px rgba(255,215,0,0.25), inset 0 0 30px rgba(255,215,0,0.05);
+            animation: pulse-gold 1.5s ease-in-out infinite;
         }
-
-        .seat .seat-avatar {
-            width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #666;
-            margin-bottom: 6px; border: 2px dashed rgba(255,255,255,0.08); transition: all 0.3s ease;
-        }
-        .seat .seat-number { font-size: 0.55rem; color: #555; margin-top: 3px; }
-        .seat .seat-username { font-size: 0.75rem; font-weight: 600; margin-top: 3px; color: #ccc; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .seat .seat-username.owner-name { color: #ffd700; }
-
-        .seat .seat-indicators { display: flex; gap: 6px; margin-top: 4px; justify-content: center; }
-        .seat .seat-indicators .indicator { font-size: 0.6rem; }
-        .seat .seat-indicators .indicator.mic-on { color: #10b981; }
-        .seat .seat-indicators .indicator.mic-off { color: #ef4444; }
-        .seat .seat-indicators .indicator.speaker-on { color: #3b82f6; }
-        .seat .seat-indicators .indicator.speaker-off { color: #6b7280; }
-
-        .seat .sound-waves {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            width: 100%; height: 100%; pointer-events: none; z-index: 0;
-        }
-        .seat .sound-waves .wave {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            border-radius: 50%; opacity: 0;
-        }
-        .seat .sound-waves .wave:nth-child(1) { width: 55%; height: 55%; border: 2px solid rgba(59,130,246,0.5); animation: water-wave 2s ease-in-out infinite; animation-delay: 0s; }
-        .seat .sound-waves .wave:nth-child(2) { width: 75%; height: 75%; border: 2px solid rgba(59,130,246,0.35); animation: water-wave 2s ease-in-out infinite; animation-delay: 0.4s; }
-        .seat .sound-waves .wave:nth-child(3) { width: 95%; height: 95%; border: 2px solid rgba(59,130,246,0.2); animation: water-wave 2s ease-in-out infinite; animation-delay: 0.8s; }
-        .seat .sound-waves .wave:nth-child(4) { width: 115%; height: 115%; border: 2px solid rgba(59,130,246,0.12); animation: water-wave 2s ease-in-out infinite; animation-delay: 1.2s; }
-
-        @keyframes water-wave {
-            0% { transform: translate(-50%,-50%) scale(0.6); opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { transform: translate(-50%,-50%) scale(1.5); opacity: 0; }
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.15), inset 0 0 20px rgba(255,215,0,0.02); }
+            50% { box-shadow: 0 0 60px rgba(255,215,0,0.3), inset 0 0 40px rgba(255,215,0,0.05); }
         }
 
-        .seat.speaking { border-color: rgba(59,130,246,0.5) !important; box-shadow: 0 0 30px rgba(59,130,246,0.15); }
-        .seat.speaking .seat-avatar { border-color: #3b82f6 !important; box-shadow: 0 0 20px rgba(59,130,246,0.2); }
+        .seat-circle .seat-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+        .seat-circle.owner-seat .seat-avatar {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #ffd700, #f59e0b) !important;
+            color: #1a1a2e;
+        }
+        .seat-circle.empty .seat-avatar {
+            background: rgba(255,255,255,0.03);
+            border: 2px dashed rgba(255,255,255,0.08);
+            color: #444;
+        }
+        .seat-circle .seat-username {
+            font-size: 0.6rem;
+            margin-top: 4px;
+            color: #94a3b8;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+            font-weight: 500;
+        }
+        .seat-circle .seat-username.owner-name { color: #ffd700; }
+        .seat-circle .seat-number { font-size: 0.5rem; color: #555; margin-top: 1px; }
 
-        .seat .seat-actions {
-            display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; justify-content: center;
+        .seat-circle .crown-icon {
+            position: absolute;
+            top: -12px;
+            right: -8px;
+            font-size: 1.4rem;
+            filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));
+            animation: crown-float 2s ease-in-out infinite;
         }
-        .seat .seat-actions button {
-            padding: 3px 8px; border: none; border-radius: 5px; font-size: 0.5rem;
-            cursor: pointer; transition: 0.3s; font-weight: 600;
+        @keyframes crown-float {
+            0%, 100% { transform: rotate(-8deg) scale(1); }
+            50% { transform: rotate(8deg) scale(1.1); }
         }
-        .seat .seat-actions .btn-kick { background: #ef4444; color: white; }
-        .seat .seat-actions .btn-kick:hover { background: #dc2626; }
-        .seat .seat-actions .btn-mute { background: #f59e0b; color: white; }
-        .seat .seat-actions .btn-mute:hover { background: #d97706; }
-        .seat .seat-actions .btn-ban { background: #7c3aed; color: white; }
-        .seat .seat-actions .btn-ban:hover { background: #6d28d9; }
 
-        /* ===== Users List ===== */
-        .users-list-container {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            background: #1a1a2e; border-radius: 20px; border: 1px solid #333;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.8); z-index: 10001;
-            width: 400px; max-width: 92vw; max-height: 80vh; overflow: hidden; padding: 20px;
+        /* ===== SOUND WAVES ===== */
+        .sound-waves {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 50%;
         }
-        .users-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .users-list-header h3 { color: #ffd700; font-size: 1rem; }
+        .sound-waves .wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid rgba(255,215,0,0);
+            opacity: 0;
+        }
+        .seat-circle.speaking .sound-waves .wave:nth-child(1) {
+            width: 80%;
+            height: 80%;
+            border-color: rgba(255,215,0,0.5);
+            animation: wave-expand 2s ease-out infinite;
+            animation-delay: 0s;
+        }
+        .seat-circle.speaking .sound-waves .wave:nth-child(2) {
+            width: 100%;
+            height: 100%;
+            border-color: rgba(255,215,0,0.3);
+            animation: wave-expand 2s ease-out infinite;
+            animation-delay: 0.4s;
+        }
+        .seat-circle.speaking .sound-waves .wave:nth-child(3) {
+            width: 120%;
+            height: 120%;
+            border-color: rgba(255,215,0,0.15);
+            animation: wave-expand 2s ease-out infinite;
+            animation-delay: 0.8s;
+        }
+        @keyframes wave-expand {
+            0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+        }
 
-        .users-list { max-height: 400px; overflow-y: auto; padding: 5px; }
-        .users-list .user-item {
-            display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px;
-            transition: 0.3s; cursor: pointer; border: 1px solid transparent;
+        .seat-circle .mic-indicator {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            font-size: 0.65rem;
+            background: rgba(0,0,0,0.7);
+            border-radius: 50%;
+            padding: 3px;
+            border: 2px solid rgba(255,255,255,0.1);
         }
-        .users-list .user-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(139,92,246,0.3); }
+        .seat-circle .mic-indicator.on { color: #10b981; }
+        .seat-circle .mic-indicator.off { color: #ef4444; }
 
-        .users-list .user-item .user-avatar-small {
-            width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;
-            color: white; overflow: hidden; flex-shrink: 0;
+        /* ===== OWNER ACTIONS ===== */
+        .seat-circle .owner-actions {
+            position: absolute;
+            bottom: -20px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: 0.3s;
+            background: rgba(0,0,0,0.8);
+            padding: 3px 6px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
         }
-        .users-list .user-item .user-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
-        .users-list .user-item .user-info-small { flex: 1; }
-        .users-list .user-item .user-info-small .user-name-small { font-weight: bold; font-size: 0.9rem; }
-        .users-list .user-item .user-info-small .user-id-small { font-size: 0.7rem; color: #94a3b8; font-family: monospace; }
-        .users-list .user-item .user-info-small .user-status-small { font-size: 0.65rem; color: #10b981; }
+        .seat-circle:hover .owner-actions { opacity: 1; }
+        .seat-circle .owner-actions button {
+            padding: 2px 6px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .seat-circle .owner-actions .btn-kick { background: #ef4444; color: white; }
+        .seat-circle .owner-actions .btn-kick:hover { background: #dc2626; }
+        .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
+        .seat-circle .owner-actions .btn-mute:hover { background: #d97706; }
 
-        .users-list .user-item .btn-send-gift {
-            padding: 6px 14px; background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.7rem;
-            font-weight: bold; transition: 0.3s;
-        }
-        .users-list .user-item .btn-send-gift:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(139,92,246,0.4); }
-
-        /* ===== Gift Options ===== */
-        .gift-options {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px; margin-top: 10px;
-        }
-        .gift-option {
-            background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.08);
-            border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease;
-        }
-        .gift-option:hover { border-color: #8b5cf6; transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139,92,246,0.2); }
-        .gift-option.selected { border-color: #ffd700; background: rgba(255,215,0,0.1); box-shadow: 0 0 30px rgba(255,215,0,0.1); }
-        .gift-option .gift-emoji { font-size: 2.5rem; display: block; margin-bottom: 5px; }
-        .gift-option .gift-name { font-size: 0.8rem; font-weight: bold; color: #fff; }
-        .gift-option .gift-price { font-size: 0.7rem; color: #10b981; font-weight: bold; }
-
-        /* ===== VIP Entrance ===== */
-        #vipEntrance {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 99999; background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
-            flex-direction: column; backdrop-filter: blur(5px); pointer-events: none;
-        }
-        #vipEntrance.active { display: flex !important; animation: vipFadeIn 0.5s ease; pointer-events: all; }
-        @keyframes vipFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        #vipEntrance .vip-video-container {
-            width: 70%; max-width: 500px; border-radius: 20px; overflow: hidden;
-            box-shadow: 0 0 60px rgba(255,215,0,0.3); position: relative; background: #000;
-        }
-        #vipEntrance .vip-video-container video { width: 100%; display: block; }
-
-        #vipEntrance .vip-title {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            color: #ffd700; font-size: 2rem; font-weight: 900;
-            text-shadow: 0 0 30px rgba(255,215,0,0.5), 0 0 60px rgba(255,215,0,0.2);
-            z-index: 10; text-align: center; background: rgba(0,0,0,0.4); padding: 10px 25px;
-            border-radius: 15px; backdrop-filter: blur(5px); border: 2px solid rgba(255,215,0,0.2);
-            letter-spacing: 3px;
-        }
-        #vipEntrance .vip-user {
-            margin-top: 15px; color: #fff; font-size: 1.1rem;
-            text-shadow: 0 0 20px rgba(0,0,0,0.8); background: rgba(0,0,0,0.5);
-            padding: 8px 25px; border-radius: 10px; backdrop-filter: blur(3px);
-        }
-        #vipEntrance .vip-skip-btn {
-            margin-top: 20px; padding: 10px 35px; background: rgba(255,255,255,0.15);
-            color: white; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px;
-            cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s;
-            backdrop-filter: blur(5px); pointer-events: all;
-        }
-        #vipEntrance .vip-skip-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); border-color: rgba(255,215,0,0.3); }
-
-        /* ===== Chat ===== */
+        /* ===== CHAT AREA ===== */
         .chat-area {
-            width: 50%; margin: 5px auto 0; background: rgba(255,255,255,0.03);
-            border-radius: 14px; border: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column; height: 220px; position: relative;
+            width: 380px;
+            min-width: 300px;
+            max-width: 420px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+            height: 100%;
+            overflow: hidden;
         }
+
         .chat-header {
-            padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
         }
-        .chat-header h3 { font-size: 0.75rem; color: #ffd700; display: flex; align-items: center; gap: 5px; }
-        .chat-header .online-count { font-size: 0.6rem; color: #888; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .chat-header h3 { font-size: 0.85rem; color: #ffd700; display: flex; align-items: center; gap: 6px; }
+        .chat-header .online-count { font-size: 0.7rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
         .chat-header .online-count:hover { color: #ffd700; }
 
         .chat-messages {
-            flex: 1; padding: 8px 12px; overflow-y: auto; display: flex;
-            flex-direction: column; gap: 4px; min-height: 0; scroll-behavior: smooth;
+            flex: 1;
+            padding: 12px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-height: 0;
+            scroll-behavior: smooth;
         }
+        .chat-messages .message {
+            padding: 6px 12px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: fadeInMsg 0.2s ease;
+        }
+        @keyframes fadeInMsg { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         .chat-messages .message.system {
-            background: rgba(255,215,0,0.06); color: #ffd700; text-align: center;
-            width: 100%; font-size: 0.6rem; border: 1px solid rgba(255,215,0,0.05);
-            border-radius: 12px; padding: 2px 10px; margin: 2px auto; max-width: 70%; opacity: 0.8;
+            background: rgba(255,215,0,0.06);
+            color: #ffd700;
+            text-align: center;
+            width: 100%;
+            font-size: 0.7rem;
+            border: 1px solid rgba(255,215,0,0.05);
+            border-radius: 12px;
+            padding: 4px 12px;
+            margin: 2px auto;
+            max-width: 80%;
+            opacity: 0.8;
         }
         .chat-messages .message.system.join { background: rgba(16,185,129,0.06); color: #10b981; border-color: rgba(16,185,129,0.06); }
         .chat-messages .message.system.leave { background: rgba(239,68,68,0.04); color: #ef4444; border-color: rgba(239,68,68,0.05); }
-        .chat-messages .message.own { background: rgba(102,126,234,0.15); align-self: flex-end; border: 1px solid rgba(102,126,234,0.08); border-radius: 12px 12px 4px 12px; direction: rtl; text-align: right; max-width: 80%; padding: 4px 10px; }
-        .chat-messages .message.other { background: rgba(255,255,255,0.04); align-self: flex-start; border: 1px solid rgba(255,255,255,0.04); border-radius: 12px 12px 12px 4px; direction: ltr; text-align: left; max-width: 80%; padding: 4px 10px; }
+        .chat-messages .message.own {
+            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.15));
+            align-self: flex-end;
+            border: 1px solid rgba(102,126,234,0.1);
+            border-radius: 16px 16px 4px 16px;
+            direction: rtl;
+            text-align: right;
+        }
+        .chat-messages .message.other {
+            background: rgba(255,255,255,0.04);
+            align-self: flex-start;
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px 16px 16px 4px;
+            direction: ltr;
+            text-align: left;
+        }
 
-        .chat-messages .message .msg-sender { font-size: 0.45rem; color: #888; margin-bottom: 1px; }
+        .chat-messages .message .msg-sender { font-size: 0.5rem; color: #94a3b8; margin-bottom: 1px; }
         .chat-messages .message .msg-sender.owner { color: #ffd700; }
-        .chat-messages .message .msg-text { font-size: 0.75rem; word-wrap: break-word; }
-        .chat-messages .message .msg-time { font-size: 0.4rem; color: #666; margin-top: 1px; }
-        .chat-messages .message .msg-badge { font-size: 0.4rem; background: #ffd700; color: #1a1a2e; padding: 1px 6px; border-radius: 8px; margin-left: 4px; }
+        .chat-messages .message .msg-text { font-size: 0.8rem; }
+        .chat-messages .message .msg-time { font-size: 0.45rem; color: #666; margin-top: 1px; }
+        .chat-messages .message .msg-badge { font-size: 0.45rem; background: #ffd700; color: #1a1a2e; padding: 1px 8px; border-radius: 8px; margin-left: 4px; }
 
         .scroll-down-btn {
-            position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
-            width: 30px; height: 30px; border-radius: 50%; background: rgba(102,126,234,0.3);
-            border: 2px solid rgba(102,126,234,0.2); color: white; font-size: 0.7rem;
-            cursor: pointer; transition: 0.3s; display: none; align-items: center; justify-content: center;
-            z-index: 50; backdrop-filter: blur(10px);
+            position: absolute;
+            bottom: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(102,126,234,0.3);
+            border: 2px solid rgba(102,126,234,0.2);
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            backdrop-filter: blur(10px);
         }
-        .scroll-down-btn:hover { background: rgba(102,126,234,0.5); transform: translateX(-50%) scale(1.1); }
-        .scroll-down-btn.visible { display: flex; animation: fadeInBtn 0.3s ease; }
+        .scroll-down-btn.visible { display: flex; }
 
         .chat-input-area {
-            padding: 5px 10px; border-top: 1px solid rgba(255,255,255,0.05);
-            display: flex; gap: 5px; align-items: center; flex-shrink: 0; position: relative;
+            padding: 8px 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.2);
         }
         .chat-input-area .input-wrapper {
-            flex: 1; display: flex; align-items: center; background: rgba(255,255,255,0.05);
-            border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);
-            padding: 0 8px; min-width: 80px; position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 0 8px;
+            position: relative;
         }
         .chat-input-area .input-wrapper input {
-            flex: 1; padding: 5px 8px; background: transparent; border: none;
-            color: white; outline: none; font-size: 0.75rem; min-width: 40px;
+            flex: 1;
+            padding: 8px 8px;
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            font-size: 0.8rem;
         }
-        .chat-input-area .input-wrapper input::placeholder { color: #666; font-size: 0.65rem; }
+        .chat-input-area .input-wrapper input::placeholder { color: #666; font-size: 0.7rem; }
 
         .chat-input-area .emoji-btn {
-            background: transparent; border: none; color: #888; font-size: 0.9rem;
-            cursor: pointer; padding: 3px 5px; transition: 0.3s; border-radius: 6px; position: relative;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 4px 6px;
+            transition: 0.3s;
+            border-radius: 6px;
         }
         .chat-input-area .emoji-btn:hover { color: #ffd700; background: rgba(255,215,0,0.1); }
-
         .chat-input-area .send-btn {
-            padding: 5px 12px; background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white; border: none; border-radius: 10px; cursor: pointer;
-            transition: 0.3s; font-weight: 600; font-size: 0.7rem; white-space: nowrap;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+            font-size: 0.8rem;
         }
-        .chat-input-area .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(102,126,234,0.3); }
+        .chat-input-area .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(102,126,234,0.3); }
 
         .emoji-picker {
-            display: none; position: absolute; bottom: 40px; left: 0;
-            background: #1a1a2e; border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px; padding: 8px; max-width: 220px; max-height: 120px;
-            overflow-y: auto; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            flex-wrap: wrap; gap: 3px; justify-content: center;
+            display: none;
+            position: absolute;
+            bottom: 45px;
+            left: 0;
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 6px;
+            max-width: 200px;
+            max-height: 100px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            flex-wrap: wrap;
+            gap: 2px;
+            justify-content: center;
         }
-        .emoji-picker.active { display: flex; animation: slideUp 0.25s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .emoji-picker.active { display: flex; }
         .emoji-picker .emoji-item {
-            font-size: 1rem; cursor: pointer; padding: 2px; border-radius: 6px;
-            transition: 0.2s; width: 26px; height: 26px; display: flex; align-items: center;
-            justify-content: center; flex-shrink: 0;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 4px;
+            transition: 0.2s;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .emoji-picker .emoji-item:hover { background: rgba(255,255,255,0.08); transform: scale(1.15); }
 
-        /* ===== Audio Controls ===== */
+        /* ===== AUDIO CONTROLS ===== */
         .audio-controls {
-            position: fixed; bottom: 80px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 999;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
         }
         .audio-btn {
-            width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.04); color: white; font-size: 1.1rem; cursor: pointer;
-            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px); position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            position: relative;
         }
         .audio-btn:hover { transform: scale(1.08); }
         .audio-btn.mic-active { border-color: #10b981; background: rgba(16,185,129,0.15); color: #10b981; }
         .audio-btn.mic-inactive { border-color: #ef4444; background: rgba(239,68,68,0.15); color: #ef4444; }
         .audio-btn.speaker-active { border-color: #3b82f6; background: rgba(59,130,246,0.15); color: #3b82f6; }
         .audio-btn.speaker-inactive { border-color: #6b7280; background: rgba(107,114,128,0.15); color: #6b7280; }
-
         .audio-btn .tooltip {
-            position: absolute; right: 50px; background: rgba(0,0,0,0.85); color: white;
-            padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; white-space: nowrap;
-            opacity: 0; transition: 0.3s; pointer-events: none;
+            position: absolute;
+            right: 55px;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
         }
         .audio-btn:hover .tooltip { opacity: 1; }
 
         .btn-leave-seat {
-            width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(255,215,0,0.25);
-            background: rgba(255,215,0,0.08); color: #ffd700; font-size: 1.1rem; cursor: pointer;
-            transition: all 0.3s ease; display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px); position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,215,0,0.2);
+            background: rgba(255,215,0,0.08);
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            position: relative;
         }
         .btn-leave-seat:hover { transform: scale(1.08); border-color: #ffd700; background: rgba(255,215,0,0.15); }
         .btn-leave-seat .tooltip {
-            position: absolute; right: 50px; background: rgba(0,0,0,0.85); color: white;
-            padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; white-space: nowrap;
-            opacity: 0; transition: 0.3s; pointer-events: none;
+            position: absolute;
+            right: 55px;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
         }
         .btn-leave-seat:hover .tooltip { opacity: 1; }
 
-        /* ===== Mic Overlay ===== */
-        .mic-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center;
-            justify-content: center; backdrop-filter: blur(15px); padding: 20px;
-        }
-        .mic-overlay .mic-box {
-            background: #1a1a2e; padding: 30px; border-radius: 20px; text-align: center;
-            max-width: 400px; width: 100%; border: 1px solid rgba(255,255,255,0.08);
-            animation: modalFadeIn 0.5s ease;
-        }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .mic-overlay .mic-box .mic-icon { font-size: 3rem; color: #ffd700; margin-bottom: 15px; display: block; animation: pulse-icon 2s infinite; }
-        @keyframes pulse-icon { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-        .mic-overlay .mic-box h2 { color: #fff; margin-bottom: 8px; font-size: 1.2rem; }
-        .mic-overlay .mic-box p { color: #999; margin-bottom: 15px; line-height: 1.6; font-size: 0.85rem; }
-        .mic-overlay .mic-box .mic-status { color: #888; font-size: 0.8rem; margin: 8px 0; padding: 6px; border-radius: 8px; background: rgba(255,255,255,0.03); }
-        .mic-overlay .mic-box .btn-allow { padding: 12px 30px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 8px; width: 100%; }
-        .mic-overlay .mic-box .btn-allow:hover { transform: scale(1.02); box-shadow: 0 5px 20px rgba(102,126,234,0.3); }
-        .mic-overlay .mic-box .btn-allow:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .mic-overlay .mic-box .btn-skip { margin-top: 8px; background: transparent; color: #666; border: none; cursor: pointer; font-size: 0.8rem; transition: 0.3s; width: 100%; }
-        .mic-overlay .mic-box .btn-skip:hover { color: #999; }
-
-        .connection-status {
-            position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-            padding: 6px 16px; border-radius: 20px; font-size: 0.7rem; z-index: 1000;
-            display: none; backdrop-filter: blur(10px); text-align: center; max-width: 90%;
-        }
-        .connection-status.connected { display: block; background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.3); color: #10b981; }
-        .connection-status.disconnected { display: block; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
-        .connection-status.connecting { display: block; background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; }
-
-        /* ===== Firebase Alert ===== */
-        .firebase-alert {
-            position: fixed; top: 80px; right: 20px; padding: 12px 18px; border-radius: 12px;
-            z-index: 10002; animation: slideInRight 0.3s ease; display: none; align-items: center;
-            gap: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); max-width: 400px; backdrop-filter: blur(10px);
-        }
-        .firebase-success { background: rgba(16,185,129,0.9); color: white; border-left: 4px solid #059669; }
-        .firebase-error { background: rgba(239,68,68,0.9); color: white; border-left: 4px solid #dc2626; }
-        .firebase-warning { background: rgba(245,158,11,0.9); color: white; border-left: 4px solid #d97706; }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
+        /* ===== TOAST ===== */
         .toast-message {
-            position: fixed; top: 60px; right: 15px; padding: 6px 14px; border-radius: 8px;
-            color: white; font-weight: 600; z-index: 10000; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            animation: slideDown 0.3s ease-out; max-width: 280px; direction: rtl; font-size: 0.75rem;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            animation: slideDown 0.3s ease-out;
+            max-width: 320px;
+            direction: rtl;
+            font-size: 0.8rem;
+            backdrop-filter: blur(10px);
+        }
+        .toast-message.success { background: rgba(16,185,129,0.9); }
+        .toast-message.error { background: rgba(239,68,68,0.9); }
+        .toast-message.warning { background: rgba(245,158,11,0.9); }
+        .toast-message.info { background: rgba(59,130,246,0.9); }
+        @keyframes slideDown { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* ===== VIP ENTRANCE ===== */
+        #vipEntrance {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            background: rgba(0,0,0,0.75);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+        #vipEntrance.active { display: flex !important; animation: vipFadeIn 0.5s ease; pointer-events: all; }
+        @keyframes vipFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        #vipEntrance .vip-video-container {
+            width: 60%;
+            max-width: 500px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 0 80px rgba(255,215,0,0.25);
+            position: relative;
+            background: #000;
+        }
+        #vipEntrance .vip-video-container video { width: 100%; display: block; }
+
+        #vipEntrance .vip-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffd700;
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-shadow: 0 0 30px rgba(255,215,0,0.4);
+            z-index: 10;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 25px;
+            border-radius: 14px;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255,215,0,0.15);
+            letter-spacing: 2px;
+        }
+        #vipEntrance .vip-user {
+            margin-top: 15px;
+            color: #fff;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(3px);
+        }
+        #vipEntrance .vip-skip-btn {
+            margin-top: 20px;
+            padding: 10px 35px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+            pointer-events: all;
+        }
+        #vipEntrance .vip-skip-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+
+        /* ===== MODALS ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            z-index: 9998;
+            display: none;
+        }
+        .modal-overlay.active { display: block; }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            max-width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 10001;
+            padding: 25px;
+            display: none;
+            flex-direction: column;
+            background: #1e293b;
+            border-radius: 28px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+            border: 1px solid #334155;
+            color: white;
+        }
+        .modal.active { display: flex !important; animation: popIn 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translate(-50%,-50%); } to { opacity: 1; transform: scale(1) translate(-50%,-50%); } }
+
+        .modal h3 { margin-top: 0; text-align: center; color: #ffd700; }
+        .modal p { color: #94a3b8; text-align: center; }
+        .modal .action-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .modal .btn-primary { background: #8b5cf6; color: white; }
+        .modal .btn-primary:hover { background: #7c3aed; transform: translateY(-2px); }
+        .modal .btn-success { background: #10b981; color: white; }
+        .modal .btn-success:hover { background: #059669; transform: translateY(-2px); }
+        .modal .btn-secondary { background: #1e293b; color: white; border: 1px solid #334155; }
+        .modal .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
+        .modal .btn-danger { background: #ef4444; color: white; }
+        .modal .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .main-layout { flex-direction: column; height: auto; padding: 10px; }
+            .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 250px; }
+            .seats-area { min-height: 400px; }
+            .seats-row { gap: 15px; }
+            .seat-circle { width: 75px; height: 75px; }
+            .seat-circle .seat-avatar { width: 42px; height: 42px; font-size: 1.1rem; }
         }
 
-        /* ===== Responsive ===== */
         @media (max-width: 768px) {
-            .seats-row { gap: 8px; }
-            .seat { max-width: 95px; min-height: 85px; padding: 10px 6px; }
-            .seat .seat-avatar { width: 42px; height: 42px; font-size: 1.1rem; }
-            .chat-area { width: 75%; height: 180px; }
-            .audio-controls { bottom: 75px; right: 12px; gap: 6px; }
-            .audio-btn { width: 38px; height: 38px; font-size: 1rem; }
-            .dropdown-overlay { width: 280px; right: 10px; }
-            #notifDropdown { left: 10px; right: auto; }
-            .navbar { padding: 0.4rem 3%; min-height: 50px; }
-            .room-info .room-name { max-width: 60px; font-size: 0.7rem; }
-            .room-info .room-id { font-size: 0.55rem; }
-            .users-list-container { width: 340px; }
+            .navbar { padding: 0.4rem 3%; min-height: 55px; }
+            .room-info-box { padding: 4px 12px; gap: 8px; }
+            .room-info-box .room-name { font-size: 0.75rem; }
+            .room-info-box .room-id { font-size: 0.6rem; }
+            .seat-circle { width: 65px; height: 65px; }
+            .seat-circle .seat-avatar { width: 36px; height: 36px; font-size: 0.9rem; }
+            .seats-row { gap: 12px; }
+            .chat-area { height: 280px; }
+            .audio-controls { bottom: 20px; right: 15px; gap: 8px; }
+            .audio-btn { width: 42px; height: 42px; font-size: 1rem; }
+            .btn-leave-seat { width: 42px; height: 42px; font-size: 1rem; }
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
-            #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 15px; }
+            #vipEntrance .vip-title { font-size: 1.2rem; padding: 6px 15px; }
         }
 
         @media (max-width: 480px) {
-            .seats-container { padding: 10px; gap: 8px; }
-            .seat { max-width: 75px; min-height: 70px; padding: 8px 4px; border-radius: 12px; }
-            .seat .seat-avatar { width: 34px; height: 34px; font-size: 0.9rem; }
-            .chat-area { width: 90%; height: 150px; }
-            .audio-controls { bottom: 65px; right: 10px; gap: 5px; }
-            .audio-btn { width: 34px; height: 34px; font-size: 0.85rem; }
-            .btn-leave-seat { width: 34px; height: 34px; font-size: 0.85rem; }
-            .dropdown-overlay { width: 260px; right: 5px; padding: 15px; }
-            #notifDropdown { left: 5px; }
-            .gift-options { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
-            .users-list-container { width: 300px; }
-            #vipEntrance .vip-video-container { width: 95%; max-width: 350px; }
-            #vipEntrance .vip-title { font-size: 1rem; padding: 5px 12px; }
-            #vipEntrance .vip-skip-btn { padding: 8px 20px; font-size: 0.8rem; }
+            .seat-circle { width: 55px; height: 55px; }
+            .seat-circle .seat-avatar { width: 30px; height: 30px; font-size: 0.7rem; }
+            .seats-row { gap: 8px; }
+            .seat-circle .seat-username { font-size: 0.5rem; max-width: 50px; }
+            .seat-circle .crown-icon { font-size: 1rem; top: -8px; right: -4px; }
+            .chat-area { height: 220px; }
+            .main-layout { padding: 5px; }
         }
     </style>
 </head>
@@ -578,43 +791,30 @@
         <button class="icon-btn" onclick="handleProfileClick()" title="الملف الشخصي">
             <i class="fas fa-user-circle"></i>
         </button>
-        <button class="icon-btn" onclick="toggleUsersList()" title="المستخدمين في الغرفة">
+        <button class="icon-btn" onclick="toggleUsersList()" title="المستخدمين">
             <i class="fas fa-users"></i>
             <span class="badge" id="usersBadge">0</span>
         </button>
     </div>
-    <div class="room-info">
+
+    <div class="room-info-box">
         <span class="room-name" id="roomNameDisplay">غرفة صوتية</span>
         <span class="room-id" id="roomIdDisplay">🔑 ---</span>
-        <span class="room-owner" id="roomOwnerDisplay">👑 المالك: ---</span>
-        <span style="color: #888; font-size: 0.65rem;">👥 <span id="memberCount">0</span></span>
+        <span class="room-owner" id="roomOwnerDisplay">👑 ---</span>
+        <span class="member-count">👥 <span id="memberCount">0</span></span>
         <button class="btn-leave" onclick="leaveRoom()"><i class="fas fa-sign-out-alt"></i> مغادرة</button>
     </div>
+
     <div class="nav-icons">
         <button class="icon-btn" onclick="openNotifDropdown()" title="الإشعارات">
             <i class="fas fa-bell"></i>
             <span class="badge" id="notifBadge">0</span>
         </button>
-        <button class="icon-btn" onclick="window.location.href='VipSystem.html'" title="نظام VIP" style="background: rgba(255,215,0,0.1); color: #ffd700;">
+        <button class="icon-btn vip-btn" onclick="window.location.href='VipSystem.html'" title="نظام VIP">
             <i class="fas fa-crown"></i>
         </button>
     </div>
 </nav>
-
-<!-- ===== CONNECTION STATUS ===== -->
-<div class="connection-status" id="connectionStatus">🔄 جاري الاتصال...</div>
-
-<!-- ===== MIC OVERLAY ===== -->
-<div class="mic-overlay" id="micOverlay">
-    <div class="mic-box">
-        <span class="mic-icon"><i class="fas fa-microphone-alt"></i></span>
-        <h2>🎙️ طلب أذن المايك والصوت</h2>
-        <p>للانضمام إلى الغرفة الصوتية، نحتاج إلى أذن استخدام الميكروفون والصوت.</p>
-        <div class="mic-status" id="micStatus"><i class="fas fa-info-circle"></i> اضغط على الزر أدناه للسماح</div>
-        <button class="btn-allow" id="micAllowBtn" onclick="requestMicPermission()"><i class="fas fa-check"></i> السماح بالميكروفون</button>
-        <br><button class="btn-skip" onclick="skipMic()">تخطي (دخول بدون صوت)</button>
-    </div>
-</div>
 
 <!-- ===== VIP ENTRANCE ===== -->
 <div id="vipEntrance">
@@ -630,150 +830,29 @@
     </button>
 </div>
 
-<!-- ===== PROFILE DROPDOWN ===== -->
-<div id="profileDropdown" class="dropdown-overlay">
-    <div class="profile-avatar"><i class="fas fa-user-circle"></i></div>
-    <h4 id="p_nickname">تحميل...</h4>
-    <span class="id-label">المعرف الخاص بك</span>
-    <div class="user-id-numeric" id="p_id" onclick="copyId()">000000</div>
-    <span class="copy-hint" onclick="copyId()"><i class="fas fa-copy"></i> انقر لنسخ المعرف</span>
-    <div class="balance-card">
-        <div class="balance-row"><span>رصيد ج.م: [EGP]</span> <span id="p_egp" style="color:#10b981;">0</span></div>
-        <div class="balance-row"><span>رصيد دولار: [USD]</span> <span id="p_usd" style="color:#60a5fa;">0</span></div>
-    </div>
-    <button class="action-btn btn-success" onclick="openCurrencySelection()">شحن الرصيد (إيداع)</button>
-    <button class="action-btn btn-logout" onclick="logout()">تسجيل الخروج</button>
-</div>
-
-<!-- ===== NOTIFICATIONS DROPDOWN ===== -->
-<div id="notifDropdown" class="dropdown-overlay">
-    <div class="notif-header">
-        <span>الإشعارات</span>
-        <i class="fas fa-sync-alt refresh-btn" id="refreshIcon" onclick="refreshNotifications()"></i>
-        <span id="unreadCount" style="background:#ef4444; font-size:0.7rem; padding:2px 7px; border-radius:10px;">0</span>
-    </div>
-    <div id="notifList"></div>
-    <div class="notif-actions">
-        <button onclick="markAllRead()">قراءة الكل</button>
-        <button onclick="deleteAllNotifs()">حذف الكل</button>
-    </div>
-</div>
-
-<!-- ===== USERS LIST ===== -->
-<div id="usersListContainer" class="users-list-container" style="display:none;">
-    <div class="users-list-header">
-        <h3><i class="fas fa-users"></i> المستخدمين في الغرفة</h3>
-        <button onclick="closeUsersList()" style="background:none; border:none; color:#888; font-size:1.2rem; cursor:pointer;">✕</button>
-    </div>
-    <div class="users-list" id="usersList">
-        <div style="text-align:center; padding:20px; color:#666;">جاري التحميل...</div>
-    </div>
-</div>
-
-<!-- ===== GIFT SEND MODAL ===== -->
-<div id="giftSendModal" class="modal">
-    <div class="modal-content" style="max-width: 450px; padding: 25px; background: #1e293b; border-radius: 28px; width: 100%;">
-        <h3 style="color:#ffd700; margin-bottom:15px; text-align:center;">🎁 إرسال هدية</h3>
-        <div style="text-align:center; margin-bottom:15px;">
-            <div style="font-size:1.1rem; color:#fff;">إلى: <span id="giftReceiverName">---</span></div>
-            <div style="font-size:0.85rem; color:#94a3b8;">🆔 <span id="giftReceiverId">---</span></div>
-        </div>
-        <div class="gift-options" id="giftOptions"></div>
-        <div style="margin-top:15px; padding:10px; background:rgba(255,255,255,0.03); border-radius:10px; text-align:center;">
-            <span style="color:#94a3b8;">رصيدك الحالي: </span>
-            <span id="giftSenderBalance" style="color:#10b981; font-weight:bold;">0 ج.م</span>
-        </div>
-        <div style="margin-top:15px; display:flex; gap:10px;">
-            <button onclick="closeGiftModal()" style="flex:1; padding:10px; background:#333; color:white; border:none; border-radius:8px; cursor:pointer;">إلغاء</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== CURRENCY MODAL ===== -->
-<div id="currencyModal" class="modal">
-    <h3>إيداع رصيد</h3>
-    <p>اختر العملة التي تود الإيداع بها:</p>
-    <button class="action-btn btn-primary" onclick="handleCurrencyChoice('EGP')">إيداع بالجنيه المصري (EGP)</button>
-    <button class="action-btn btn-success" onclick="handleCurrencyChoice('USD')">إيداع بالدولار (USD)</button>
-    <button class="action-btn btn-secondary" onclick="closeAll()">إلغاء</button>
-</div>
-
-<!-- ===== TOP UP MODAL ===== -->
-<div id="topUpModal" class="modal">
-    <h3 id="topUpTitle">شحن رصيد</h3>
-    <div id="selectedPaymentInfo" style="background:rgba(224,242,254,0.1); padding:12px; border-radius:12px; margin-bottom:15px; display:none; text-align:center; border:1px solid rgba(186,230,253,0.3);">
-        <strong>وسيلة الدفع المختارة: <span id="paymentMethodName">---</span></strong>
-    </div>
-    <div style="text-align:right; margin-bottom:15px;">
-        <label style="font-weight:bold; font-size:0.85rem;">اختر طريقة الدفع:</label>
-        <select id="paymentMethod" onchange="updatePaymentDetails(); updatePaymentMethodDisplay()"></select>
-    </div>
-    <div style="text-align:right; margin-bottom:15px;">
-        <label id="amountLabel" style="font-weight:bold; font-size:0.85rem;">المبلغ المراد إيداعه:</label>
-        <input type="number" id="topUpAmount" placeholder="أدخل المبلغ هنا" oninput="calculateRequiredAmount()">
-    </div>
-    <div id="calculationDisplay" style="background:rgba(139,92,246,0.1); padding:10px; border-radius:12px; margin-bottom:15px; display:none; text-align:center;">
-        <span style="font-size:0.85rem; font-weight:bold;">المبلغ المطلوب تحويله: </span>
-        <b id="finalRequiredAmount">0</b>
-    </div>
-    <div id="paymentDetails">
-        <p id="methodHint" style="font-size:0.8rem; margin-bottom:5px; color:#94a3b8;"></p>
-        <div class="copy-box" id="walletBox">
-            <b id="walletNumber">01022797043</b>
-            <button class="copy-btn" onclick="copyText('walletNumber')">نسخ</button>
-        </div>
-        <div id="binanceDetails" style="display:none; font-size:0.85rem; line-height:1.6;">
-            <div>المعرف: <b id="binanceID">803045359</b> <button class="copy-btn" style="padding:2px 5px;" onclick="copyText('binanceID')">نسخ</button></div>
-            <div>الاسم المستعار: <b id="binanceName">iMrJoe</b></div>
-        </div>
-    </div>
-    <div style="text-align:right; margin-bottom:15px;">
-        <label style="font-weight:bold; font-size:0.85rem;">ارفع إيصال التحويل:</label>
-        <input type="file" id="topUpReceipt" accept="image/*">
-    </div>
-    <button class="action-btn btn-primary" id="submitTopUpBtn" onclick="submitTopUp()">تأكيد وإرسال الإيصال</button>
-    <button class="action-btn btn-secondary" onclick="closeAll()">إلغاء</button>
-</div>
-
-<!-- ===== PURCHASE MODAL ===== -->
-<div id="purchaseModal" class="modal">
-    <h3 id="m_title">تأكيد الشراء</h3>
-    <div id="m_info" style="font-size:0.9rem; margin-bottom:15px; color:#94a3b8;"></div>
-    <p style="font-size:0.85rem; color:#94a3b8; background:rgba(255,247,237,0.1); padding:10px; border-radius:10px; border:1px solid rgba(255,237,213,0.2);">
-        سيتم خصم المبلغ من رصيدك الحالي وإرسال الطلب للمراجعة.
-    </p>
-    <button id="confirmPurchaseBtn" class="action-btn btn-primary">تأكيد الخصم والشراء</button>
-    <button class="action-btn btn-secondary" onclick="closeAll()">إلغاء</button>
-</div>
-
-<!-- ===== SCREEN OVERLAY ===== -->
-<div id="screenOverlay" class="modal-overlay" onclick="closeAll()"></div>
-
-<!-- ===== FIREBASE ALERT ===== -->
-<div id="firebaseAlert" class="firebase-alert" style="display:none;"></div>
-
-<!-- ===== MAIN CONTENT ===== -->
-<main>
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="main-layout">
+    <!-- SEATS -->
     <div class="seats-area">
-        <h2><i class="fas fa-chair"></i> المقاعد <span id="seatsCount" style="font-size: 0.75rem; color: #888;">(0/10)</span></h2>
+        <div class="seats-title">
+            <i class="fas fa-chair"></i> المقاعد <span id="seatsCount" style="color:#94a3b8;">(0/10)</span>
+        </div>
         <div class="seats-container" id="seatsContainer"></div>
     </div>
 
-    <div class="chat-area" id="chatArea">
+    <!-- CHAT -->
+    <div class="chat-area">
         <div class="chat-header">
             <h3><i class="fas fa-comment-dots"></i> الشات</h3>
-            <span class="online-count" id="chatOnlineCount" onclick="toggleUsersList()">👥 <span id="chatMemberCount">0</span> متصل</span>
+            <span class="online-count" id="chatOnlineCount" onclick="toggleUsersList()">👥 <span id="chatMemberCount">0</span></span>
         </div>
         <div class="chat-messages" id="chatMessages"></div>
-        <button class="scroll-down-btn" id="scrollDownBtn" onclick="scrollToBottom()" title="الذهاب لأحدث الرسائل">
+        <button class="scroll-down-btn" id="scrollDownBtn" onclick="scrollToBottom()">
             <i class="fas fa-arrow-down"></i>
         </button>
-
         <div class="chat-input-area">
             <div class="input-wrapper">
-                <button class="emoji-btn" onclick="toggleEmojiPicker()" title="إضافة إيموجي">
-                    <i class="fas fa-smile-wink"></i>
-                </button>
+                <button class="emoji-btn" onclick="toggleEmojiPicker()"><i class="fas fa-smile-wink"></i></button>
                 <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChatMessage()">
                 <div class="emoji-picker" id="emojiPicker">
                     <span class="emoji-item" onclick="insertEmoji('😊')">😊</span>
@@ -788,33 +867,18 @@
                     <span class="emoji-item" onclick="insertEmoji('😍')">😍</span>
                     <span class="emoji-item" onclick="insertEmoji('🥰')">🥰</span>
                     <span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
-                    <span class="emoji-item" onclick="insertEmoji('🤣')">🤣</span>
-                    <span class="emoji-item" onclick="insertEmoji('😅')">😅</span>
-                    <span class="emoji-item" onclick="insertEmoji('🙏')">🙏</span>
-                    <span class="emoji-item" onclick="insertEmoji('✨')">✨</span>
-                    <span class="emoji-item" onclick="insertEmoji('💯')">💯</span>
-                    <span class="emoji-item" onclick="insertEmoji('🎶')">🎶</span>
-                    <span class="emoji-item" onclick="insertEmoji('💀')">💀</span>
-                    <span class="emoji-item" onclick="insertEmoji('🤝')">🤝</span>
-                    <span class="emoji-item" onclick="insertEmoji('👀')">👀</span>
-                    <span class="emoji-item" onclick="insertEmoji('😴')">😴</span>
-                    <span class="emoji-item" onclick="insertEmoji('🤩')">🤩</span>
-                    <span class="emoji-item" onclick="insertEmoji('🥳')">🥳</span>
-                    <span class="emoji-item" onclick="insertEmoji('🤗')">🤗</span>
-                    <span class="emoji-item" onclick="insertEmoji('😇')">😇</span>
-                    <span class="emoji-item" onclick="insertEmoji('🤪')">🤪</span>
                 </div>
             </div>
             <button class="send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
-</main>
+</div>
 
 <!-- ===== AUDIO CONTROLS ===== -->
 <div class="audio-controls">
     <button class="audio-btn mic-inactive" id="micBtn" onclick="toggleMic()">
         <i class="fas fa-microphone-slash"></i>
-        <span class="tooltip">الميكروفون (مكتوم)</span>
+        <span class="tooltip">الميكروفون</span>
     </button>
     <button class="audio-btn speaker-active" id="speakerBtn" onclick="toggleSpeaker()">
         <i class="fas fa-volume-up"></i>
@@ -825,6 +889,96 @@
         <span class="tooltip">مغادرة المقعد</span>
     </button>
 </div>
+
+<!-- ===== PROFILE DROPDOWN ===== -->
+<div id="profileDropdown" class="dropdown-overlay" style="display:none; position:fixed; top:70px; right:20px; width:300px; background:#111827; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.5); border:1px solid #334155; padding:20px; z-index:10000;">
+    <div style="text-align:center;">
+        <div style="font-size:3rem; color:#8b5cf6;">👤</div>
+        <h4 id="p_nickname" style="color:#fff;">تحميل...</h4>
+        <div class="user-id-numeric" id="p_id" onclick="copyId()" style="background:linear-gradient(90deg,#4f46e5,#8b5cf6); padding:8px 20px; border-radius:12px; font-family:monospace; font-weight:bold; cursor:pointer; display:inline-block; margin:10px auto;">000000</div>
+        <div class="balance-card" style="background:rgba(255,255,255,0.03); padding:15px; border-radius:15px; margin:10px 0; border:1px solid #334155;">
+            <div style="display:flex; justify-content:space-between;"><span>رصيد ج.م:</span> <span id="p_egp" style="color:#10b981;">0</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>رصيد دولار:</span> <span id="p_usd" style="color:#60a5fa;">0</span></div>
+        </div>
+        <button class="action-btn btn-success" onclick="openCurrencySelection()" style="width:100%; padding:12px; border-radius:14px; border:none; cursor:pointer; font-weight:bold; background:#10b981; color:white; margin-top:8px;">شحن الرصيد</button>
+        <button class="action-btn btn-logout" onclick="logout()" style="width:100%; padding:12px; border-radius:14px; border:1px solid rgba(239,68,68,0.2); cursor:pointer; font-weight:bold; background:rgba(239,68,68,0.1); color:#ef4444; margin-top:8px;">تسجيل الخروج</button>
+    </div>
+</div>
+
+<!-- ===== NOTIFICATIONS ===== -->
+<div id="notifDropdown" style="display:none; position:fixed; top:70px; right:20px; width:350px; max-width:90%; background:#111827; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.5); border:1px solid #334155; z-index:10000; max-height:400px; overflow:hidden;">
+    <div style="padding:15px; border-bottom:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:bold;">الإشعارات</span>
+        <span id="unreadCount" style="background:#ef4444; font-size:0.7rem; padding:2px 7px; border-radius:10px;">0</span>
+    </div>
+    <div id="notifList" style="max-height:250px; overflow-y:auto; padding:10px;"></div>
+    <div style="padding:10px; display:flex; gap:5px; background:#0a0f1d; border-top:1px solid #1e293b;">
+        <button onclick="markAllRead()" style="flex:1; font-size:0.8rem; padding:8px; background:#1e293b; color:white; border:none; border-radius:8px; cursor:pointer;">قراءة الكل</button>
+        <button onclick="deleteAllNotifs()" style="flex:1; font-size:0.8rem; padding:8px; background:#1e293b; color:white; border:none; border-radius:8px; cursor:pointer;">حذف الكل</button>
+    </div>
+</div>
+
+<!-- ===== USERS LIST ===== -->
+<div id="usersListContainer" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#1a1a2e; border-radius:20px; border:1px solid #333; z-index:10001; width:400px; max-width:92vw; max-height:80vh; overflow:hidden; padding:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
+        <h3 style="color:#ffd700; font-size:1rem;"><i class="fas fa-users"></i> المستخدمين</h3>
+        <button onclick="closeUsersList()" style="background:none; border:none; color:#888; font-size:1.2rem; cursor:pointer;">✕</button>
+    </div>
+    <div class="users-list" id="usersList" style="max-height:400px; overflow-y:auto;"></div>
+</div>
+
+<!-- ===== GIFT MODAL ===== -->
+<div id="giftSendModal" class="modal" style="width:420px; max-width:95%;">
+    <h3 style="color:#ffd700; text-align:center;">🎁 إرسال هدية</h3>
+    <div style="text-align:center; margin:10px 0;">
+        <div style="font-size:1.1rem; color:#fff;">إلى: <span id="giftReceiverName">---</span></div>
+        <div style="font-size:0.85rem; color:#94a3b8;">🆔 <span id="giftReceiverId">---</span></div>
+    </div>
+    <div class="gift-options" id="giftOptions" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:8px; margin:10px 0;"></div>
+    <div style="padding:10px; background:rgba(255,255,255,0.03); border-radius:10px; text-align:center;">
+        <span style="color:#94a3b8;">رصيدك: </span>
+        <span id="giftSenderBalance" style="color:#10b981; font-weight:bold;">0 ج.م</span>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="closeGiftModal()" style="flex:1; padding:10px; background:#333; color:white; border:none; border-radius:8px; cursor:pointer;">إلغاء</button>
+    </div>
+</div>
+
+<!-- ===== CURRENCY MODAL ===== -->
+<div id="currencyModal" class="modal">
+    <h3>إيداع رصيد</h3>
+    <p>اختر العملة:</p>
+    <button class="action-btn btn-primary" onclick="handleCurrencyChoice('EGP')">جنيه مصري (EGP)</button>
+    <button class="action-btn btn-success" onclick="handleCurrencyChoice('USD')">دولار (USD)</button>
+    <button class="action-btn btn-secondary" onclick="closeAll()">إلغاء</button>
+</div>
+
+<!-- ===== TOP UP MODAL ===== -->
+<div id="topUpModal" class="modal" style="width:420px; max-width:95%;">
+    <h3 id="topUpTitle">شحن رصيد</h3>
+    <select id="paymentMethod" onchange="updatePaymentDetails()" style="width:100%; padding:10px; border-radius:10px; border:1px solid #334155; background:#0f172a; color:white; margin:10px 0;"></select>
+    <input type="number" id="topUpAmount" placeholder="المبلغ" oninput="calculateRequiredAmount()" style="width:100%; padding:10px; border-radius:10px; border:1px solid #334155; background:#0f172a; color:white; margin:5px 0;">
+    <div id="calculationDisplay" style="display:none; background:rgba(139,92,246,0.1); padding:10px; border-radius:12px; margin:10px 0; text-align:center;">
+        المبلغ المطلوب: <b id="finalRequiredAmount">0</b>
+    </div>
+    <div id="paymentDetails" style="margin:10px 0;">
+        <p id="methodHint" style="font-size:0.8rem; color:#94a3b8;"></p>
+        <div class="copy-box" id="walletBox" style="background:#0f172a; padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; border:1px dashed #8b5cf6;">
+            <b id="walletNumber">01022797043</b>
+            <button class="copy-btn" onclick="copyText('walletNumber')" style="background:#8b5cf6; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">نسخ</button>
+        </div>
+        <div id="binanceDetails" style="display:none; font-size:0.85rem; line-height:1.8;">
+            <div>المعرف: <b id="binanceID">803045359</b> <button class="copy-btn" onclick="copyText('binanceID')" style="background:#8b5cf6; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer;">نسخ</button></div>
+            <div>الاسم: <b id="binanceName">iMrJoe</b></div>
+        </div>
+    </div>
+    <input type="file" id="topUpReceipt" accept="image/*" style="width:100%; padding:8px; border-radius:10px; border:1px solid #334155; background:#0f172a; color:white; margin:5px 0;">
+    <button class="action-btn btn-primary" id="submitTopUpBtn" onclick="submitTopUp()">تأكيد وإرسال</button>
+    <button class="action-btn btn-secondary" onclick="closeAll()">إلغاء</button>
+</div>
+
+<!-- ===== OVERLAY ===== -->
+<div id="screenOverlay" class="modal-overlay" onclick="closeAll()"></div>
 
 <!-- ============================================================ -->
 <!-- ===== JAVASCRIPT ===== -->
@@ -844,41 +998,9 @@
     };
 
     // ============================================================
-    // 🎵 PEERJS CONFIG
-    // ============================================================
-    const PEER_CONFIG = {
-        debug: 2,
-        config: {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' },
-                {
-                    urls: [
-                        'turn:openrelay.metered.ca:80',
-                        'turn:openrelay.metered.ca:443',
-                        'turn:openrelay.metered.ca:443?transport=tcp'
-                    ],
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
-                },
-                {
-                    urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
-                    username: 'webrtc',
-                    credential: 'webrtc'
-                }
-            ],
-            iceTransportPolicy: 'all',
-            iceCandidatePoolSize: 10
-        }
-    };
-
-    // ============================================================
     // 📋 VARIABLES
     // ============================================================
-    let database, auth;
+    let database;
     let currentUser = null;
     let roomId = null;
     let roomData = null;
@@ -886,31 +1008,20 @@
     let mySeatIndex = -1;
     let isMicMuted = true;
     let mediaStream = null;
-    let chatListener = null;
-    let roomListener = null;
-    let seatsListener = null;
-    let roomInitialized = false;
     let audioContext = null;
     let isSpeakerActive = true;
-
     let peer = null;
     let myPeerId = null;
     let peerConnections = {};
     let peerStreams = {};
-    let isReconnecting = false;
-    let reconnectAttempts = 0;
-    const MAX_RECONNECT_ATTEMPTS = 5;
-
-    let isSubmittingTopUp = false;
-    let isProcessingPurchase = false;
-    let selectedCurrency = 'EGP';
-    let activeProduct = {};
-    let currentProductId = null;
-
-    let selectedGiftReceiver = null;
-    let selectedGift = null;
+    let chatListener = null;
+    let roomListener = null;
+    let seatsListener = null;
+    let roomInitialized = false;
     let vipEntranceTimeout = null;
     let isVIPEntranceActive = false;
+    let selectedGiftReceiver = null;
+    let selectedGift = null;
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -930,6 +1041,8 @@
         2: { level: 2, name: 'VIP 2', emoji: '🦁', title: 'VIP 2 - هيبة الأسد', video: 'images/vipsystem/lion.mp4', duration: 60, requirements: { EGP: 2500, USD: null } }
     };
 
+    const SEATS_LAYOUT = [{ row: 0, seats: 1 }, { row: 1, seats: 2 }, { row: 2, seats: 3 }, { row: 3, seats: 4 }];
+
     // ============================================================
     // 👤 USER FUNCTIONS
     // ============================================================
@@ -938,16 +1051,6 @@
     }
 
     function generateNumericId() { return Math.floor(100000 + Math.random() * 900000); }
-
-    function getOrCreateNumericId() {
-        let user = getCurrentUserFromStorage();
-        if (!user) return generateNumericId();
-        if (user.numericId) return user.numericId;
-        const newId = generateNumericId();
-        user.numericId = newId;
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        return newId;
-    }
 
     function formatNumericId(id) {
         if (!id) return "000000";
@@ -963,251 +1066,35 @@
             const localUser = getCurrentUserFromStorage();
             if (!localUser) return null;
             if (!database) return localUser;
-            const numericId = getOrCreateNumericId();
+            const numericId = localUser.numericId || generateNumericId();
+            if (!localUser.numericId) {
+                localUser.numericId = numericId;
+                localStorage.setItem('currentUser', JSON.stringify(localUser));
+            }
             const userRef = database.ref('users').orderByChild('numericId').equalTo(numericId);
             const snapshot = await userRef.once('value');
             if (snapshot.exists()) {
                 const users = snapshot.val();
                 const userId = Object.keys(users)[0];
                 const userData = users[userId];
-                const mergedUser = {
-                    ...localUser,
-                    ...userData,
-                    numericId: numericId,
-                    firebaseKey: userId,
-                    id: userId
-                };
-                localStorage.setItem('currentUser', JSON.stringify(mergedUser));
-                return mergedUser;
+                const merged = { ...localUser, ...userData, numericId: numericId, firebaseKey: userId };
+                localStorage.setItem('currentUser', JSON.stringify(merged));
+                return merged;
             }
-            return await createUserInFirebase(localUser, numericId);
-        } catch(error) {
-            console.error('Error fetching user:', error);
-            return getCurrentUserFromStorage();
-        }
-    }
-
-    async function createUserInFirebase(localUser, numericId) {
-        if (!database) return localUser;
-        const newUserRef = database.ref('users').push();
-        const firebaseKey = newUserRef.key;
-        const userData = {
-            numericId: numericId,
-            username: localUser.username || `user_${numericId}`,
-            nickname: localUser.nickname || localUser.username || `user_${numericId}`,
-            password: localUser.password || '123456',
-            email: localUser.email || '',
-            phone: localUser.phone || '',
-            isBanned: false,
-            banReason: '',
-            banExpiry: '',
-            balanceEGP: localUser.balanceEGP || '0.00',
-            balanceUSD: localUser.balanceUSD || '0.00',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            vip: { active: null, expiresAt: null }
-        };
-        await newUserRef.set(userData);
-        const mergedUser = {
-            ...localUser,
-            ...userData,
-            firebaseKey: firebaseKey,
-            id: firebaseKey
-        };
-        localStorage.setItem('currentUser', JSON.stringify(mergedUser));
-        return mergedUser;
+            return localUser;
+        } catch(e) { return getCurrentUserFromStorage(); }
     }
 
     // ============================================================
-    // 💰 TOP UP FUNCTIONS
-    // ============================================================
-    function openCurrencySelection() {
-        if (!isLoggedIn()) return;
-        closeAll();
-        document.getElementById('currencyModal').style.display = 'flex';
-        document.getElementById('currencyModal').classList.add('active');
-        document.getElementById('screenOverlay').classList.add('active');
-    }
-
-    function handleCurrencyChoice(currency) {
-        if (!isLoggedIn()) return;
-        selectedCurrency = currency;
-        closeAll();
-        const methodSelect = document.getElementById('paymentMethod');
-        methodSelect.innerHTML = '';
-        document.getElementById('topUpAmount').value = '';
-        document.getElementById('finalRequiredAmount').innerText = '0';
-        document.getElementById('calculationDisplay').style.display = 'none';
-        document.getElementById('selectedPaymentInfo').style.display = 'none';
-        
-        if (currency === 'USD') {
-            document.getElementById('topUpTitle').innerText = "شحن رصيد (دولار)";
-            document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (USD):";
-            ['binance','vodafone','instapay'].forEach(v => {
-                let el = document.createElement('option');
-                el.value = v;
-                el.innerText = v === 'binance' ? 'Binance Pay' : v === 'vodafone' ? 'فودافون كاش' : 'إنستا باي';
-                methodSelect.appendChild(el);
-            });
-        } else {
-            document.getElementById('topUpTitle').innerText = "شحن رصيد (جنيه مصري)";
-            document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (EGP):";
-            ['vodafone','instapay'].forEach(v => {
-                let el = document.createElement('option');
-                el.value = v;
-                el.innerText = v === 'vodafone' ? 'فودافون كاش' : 'إنستا باي';
-                methodSelect.appendChild(el);
-            });
-        }
-        updatePaymentDetails();
-        updatePaymentMethodDisplay();
-        document.getElementById('topUpModal').style.display = 'flex';
-        document.getElementById('topUpModal').classList.add('active');
-        document.getElementById('screenOverlay').classList.add('active');
-    }
-
-    function updatePaymentMethodDisplay() {
-        const method = document.getElementById('paymentMethod').value;
-        const display = document.getElementById('selectedPaymentInfo');
-        const nameSpan = document.getElementById('paymentMethodName');
-        const names = { vodafone: 'فودافون كاش', instapay: 'إنستا باي', binance: 'Binance Pay' };
-        if (method && names[method]) { nameSpan.textContent = names[method]; display.style.display = 'block'; }
-        else { display.style.display = 'none'; }
-    }
-
-    function calculateRequiredAmount() {
-        const amount = parseFloat(document.getElementById('topUpAmount').value) || 0;
-        const method = document.getElementById('paymentMethod').value;
-        const display = document.getElementById('calculationDisplay');
-        const finalLabel = document.getElementById('finalRequiredAmount');
-        if (amount <= 0) { display.style.display = 'none'; return; }
-        display.style.display = 'block';
-        if (selectedCurrency === 'USD') {
-            finalLabel.innerText = method === 'binance' ? amount + " USDT" : (amount * 50) + " جنيه مصري";
-        } else {
-            finalLabel.innerText = amount + " جنيه مصري";
-        }
-    }
-
-    function updatePaymentDetails() {
-        const method = document.getElementById('paymentMethod').value;
-        document.getElementById('walletBox').style.display = 'none';
-        document.getElementById('binanceDetails').style.display = 'none';
-        if (method === 'binance') {
-            document.getElementById('binanceDetails').style.display = 'block';
-            document.getElementById('methodHint').innerText = "بيانات الدفع عبر Binance Pay:";
-        } else {
-            document.getElementById('walletBox').style.display = 'flex';
-            document.getElementById('methodHint').innerText = "حول للرقم التالي:";
-            document.getElementById('walletNumber').innerText = "01022797043";
-        }
-        calculateRequiredAmount();
-        updatePaymentMethodDisplay();
-    }
-
-    async function submitTopUp() {
-        if (!isLoggedIn() || isSubmittingTopUp) return;
-        const amount = document.getElementById('topUpAmount').value;
-        const paymentMethod = document.getElementById('paymentMethod').value;
-        const fileInput = document.getElementById('topUpReceipt');
-        if (!amount || amount <= 0 || !paymentMethod || fileInput.files.length === 0) {
-            showToast('⚠️ يرجى ملء جميع الحقول', 'warning');
-            return;
-        }
-        isSubmittingTopUp = true;
-        const submitBtn = document.getElementById('submitTopUpBtn');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الإرسال...';
-        submitBtn.disabled = true;
-        try {
-            const user = await getCurrentUserFullData();
-            if (!user) { showToast('❌ يرجى تسجيل الدخول أولاً', 'error'); return; }
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    const generatedId = "DEP-" + Date.now();
-                    const methodNames = { vodafone: 'فودافون كاش', instapay: 'إنستا باي', binance: 'Binance Pay' };
-                    const methodName = methodNames[paymentMethod] || paymentMethod;
-                    const orderData = {
-                        orderId: generatedId,
-                        userId: user.numericId,
-                        username: user.username,
-                        nickname: user.nickname || user.username,
-                        product: `إيداع ${selectedCurrency} عبر ${methodName}`,
-                        price: `${amount} ${selectedCurrency}`,
-                        paymentMethod: paymentMethod,
-                        method: methodName,
-                        currency: selectedCurrency,
-                        receipt: e.target.result,
-                        status: 'قيد المراجعة',
-                        type: 'deposit',
-                        createdAt: new Date().toISOString()
-                    };
-                    await database.ref('orders').push(orderData);
-                    const notification = {
-                        id: Date.now(),
-                        text: `⏳ تم استلام إيصال الإيداع عبر ${methodName}. معرف الطلب: ${generatedId}. برجاء الانتظار لحين اكتمال الطلب من قبل الإدارة.`,
-                        read: false,
-                        date: new Date().toLocaleString('ar-EG'),
-                        type: 'deposit',
-                        createdAt: new Date().toISOString()
-                    };
-                    await database.ref('users/' + user.firebaseKey + '/notifications').push(notification);
-                    showToast(`✅ تم إرسال طلب الشحن عبر ${methodName} بنجاح`, 'success');
-                    closeAll();
-                    await updateUI();
-                } catch(error) {
-                    console.error('Top-up error:', error);
-                    showToast('❌ حدث خطأ أثناء معالجة الطلب', 'error');
-                } finally {
-                    isSubmittingTopUp = false;
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        } catch(error) {
-            console.error('Top-up error:', error);
-            showToast('❌ حدث خطأ', 'error');
-            isSubmittingTopUp = false;
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    }
-
-    // ============================================================
-    // 🚀 INIT FIREBASE
-    // ============================================================
-    async function initializeFirebase() {
-        try {
-            if (firebase.apps.length > 0) await firebase.app().delete();
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            auth = firebase.auth();
-            console.log('✅ Firebase initialized');
-            await database.ref('connection_test').set({
-                timestamp: new Date().toISOString(),
-                message: 'اتصال ناجح من الغرفة الصوتية'
-            });
-            auth.onAuthStateChanged((user) => {
-                if (user) console.log('👤 User logged in:', user.uid);
-                updateUI();
-            });
-        } catch(error) {
-            console.error('❌ Firebase error:', error);
-        }
-    }
-
-    // ============================================================
-    // 🍞 TOAST & ALERTS
+    // 🍞 TOAST
     // ============================================================
     function showToast(message, type = 'info') {
         const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
         const old = document.querySelector('.toast-message');
         if (old) old.remove();
         const toast = document.createElement('div');
-        toast.className = 'toast-message';
-        toast.style.cssText = `position:fixed;top:60px;right:15px;padding:6px 14px;border-radius:8px;color:white;font-weight:600;z-index:10000;box-shadow:0 8px 25px rgba(0,0,0,0.3);animation:slideDown 0.3s ease-out;max-width:280px;background:${colors[type] || colors.info};direction:rtl;font-size:0.75rem;`;
+        toast.className = `toast-message ${type}`;
+        toast.style.background = colors[type] || colors.info;
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => {
@@ -1218,257 +1105,264 @@
         }, 3500);
     }
 
-    function showFirebaseAlert(message, type = 'success') {
-        const alertDiv = document.getElementById('firebaseAlert');
-        const icons = { success: 'check-circle', error: 'exclamation-circle', warning: 'info-circle' };
-        alertDiv.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i><span>${message}</span>`;
-        alertDiv.className = `firebase-alert firebase-${type}`;
-        alertDiv.style.display = 'flex';
-        setTimeout(() => { alertDiv.style.display = 'none'; }, 4000);
+    // ============================================================
+    // 🔥 INIT FIREBASE
+    // ============================================================
+    async function initializeFirebase() {
+        try {
+            if (firebase.apps.length > 0) await firebase.app().delete();
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            console.log('✅ Firebase initialized');
+            await database.ref('connection_test').set({
+                timestamp: new Date().toISOString(),
+                message: 'اتصال ناجح من الغرفة الصوتية'
+            });
+        } catch(error) { console.error('❌ Firebase error:', error); }
     }
 
     // ============================================================
-    // 👤 PROFILE FUNCTIONS
+    // 🚀 ROOM INIT
     // ============================================================
-    function handleProfileClick() {
-        if (!isLoggedIn()) return;
-        toggleDropdown('profileDropdown');
+    function getRoomIdFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('room');
     }
 
-    function openNotifDropdown() {
-        if (!isLoggedIn()) return;
-        toggleDropdown('notifDropdown');
-        loadNotifications();
-    }
-
-    function toggleDropdown(id) {
-        const target = document.getElementById(id);
-        const isOpen = target.classList.contains('active');
-        closeAll();
-        if (!isOpen) {
-            target.classList.add('active');
-            document.getElementById('screenOverlay').classList.add('active');
+    function initRoom() {
+        if (roomInitialized) return;
+        roomInitialized = true;
+        roomId = getRoomIdFromURL();
+        if (!roomId) {
+            showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
+            setTimeout(() => window.location.href = 'chat.html', 2000);
+            return;
         }
+        currentUser = getCurrentUserFromStorage();
+        document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
+        renderSeats({});
+        loadRoomData();
     }
 
-    function closeAll() {
-        document.querySelectorAll('.dropdown-overlay').forEach(m => m.classList.remove('active'));
-        document.querySelectorAll('.modal').forEach(m => {
-            m.style.display = 'none';
-            m.classList.remove('active');
+    async function loadRoomData() {
+        if (!database) return;
+        try {
+            const snapshot = await database.ref('rooms/' + roomId).once('value');
+            if (!snapshot.exists()) {
+                showToast('❌ الغرفة غير موجودة', 'error');
+                setTimeout(() => window.location.href = 'chat.html', 2000);
+                return;
+            }
+            roomData = snapshot.val();
+            document.getElementById('roomNameDisplay').textContent = roomData.name || 'غرفة صوتية';
+            isOwner = roomData.creatorId == currentUser?.numericId;
+            document.getElementById('roomOwnerDisplay').textContent = '👑 ' + (roomData.creatorName || 'غير معروف');
+            if (isOwner) showToast('👑 مرحباً بك كمالك الغرفة!', 'success');
+            else showToast(`👋 مرحباً بك في غرفة ${roomData.name}`, 'info');
+            
+            addChatMessage('system', `🏠 مرحباً بك في غرفة "${roomData.name}"`, null, null, '');
+            addChatMessage('system', `👑 مالك الغرفة: ${roomData.creatorName || 'غير معروف'}`, null, null, '');
+            
+            loadSeats();
+            listenRoomUpdates();
+            listenChat();
+            listenSeats();
+            setupChatScroll();
+            
+            if (currentUser?.numericId) {
+                setTimeout(() => showVIPEntrance(currentUser.numericId, currentUser.nickname || currentUser.username), 1500);
+            }
+            
+            setTimeout(initPeerJS, 1000);
+            await updateUI();
+        } catch(error) { console.error('Error loading room:', error); }
+    }
+
+    // ============================================================
+    // 💺 SEATS FUNCTIONS
+    // ============================================================
+    function renderSeats(seats) {
+        const container = document.getElementById('seatsContainer');
+        let html = '', occupied = 0, globalIndex = 0;
+        const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
+        
+        SEATS_LAYOUT.forEach((rowData, rowIndex) => {
+            html += `<div class="seats-row row-${rowIndex + 1}">`;
+            for (let i = 0; i < rowData.seats; i++) {
+                const seat = seats[globalIndex] || null;
+                const isOccupied = seat !== null;
+                if (isOccupied) occupied++;
+                const isMySeat = seat && seat.userId == currentUser?.numericId;
+                if (isMySeat) {
+                    mySeatIndex = globalIndex;
+                    document.getElementById('leaveSeatBtn').style.display = 'flex';
+                    if (peer && myPeerId) {
+                        database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
+                    }
+                }
+                const isOwnerSeat = globalIndex === 0;
+                const isSeatOwner = seat && seat.isOwner === true;
+                const isMuted = seat?.muted === true;
+                const isSpeaking = seat?.speaking === true;
+                const userColor = seat?.color || colors[globalIndex % colors.length];
+                const displayName = seat ? seat.username : '';
+                const avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
+                
+                let seatClass = 'seat-circle';
+                if (!isOccupied) seatClass += ' empty';
+                else {
+                    seatClass += ' occupied';
+                    if (isOwnerSeat || isSeatOwner) seatClass += ' owner-seat';
+                    if (isSpeaking) seatClass += ' speaking';
+                }
+                
+                let clickHandler = isOccupied ? `onclick="openProfilePopup('${globalIndex}')"` :
+                    (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${globalIndex})"` : '';
+                
+                html += `
+                    <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
+                        ${isOccupied ? `
+                            ${(isOwnerSeat || isSeatOwner) ? `<div class="crown-icon">👑</div>` : ''}
+                            <div class="seat-avatar" style="background:${userColor} !important;">
+                                ${avatarLetter}
+                            </div>
+                            <div class="seat-username ${(isOwnerSeat || isSeatOwner) ? 'owner-name' : ''}">${displayName}</div>
+                            <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
+                                <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
+                            </div>
+                            ${isSpeaking ? `
+                                <div class="sound-waves">
+                                    <div class="wave"></div>
+                                    <div class="wave"></div>
+                                    <div class="wave"></div>
+                                </div>
+                            ` : ''}
+                            ${isOwner && !isSeatOwner && isOccupied ? `
+                                <div class="owner-actions" onclick="event.stopPropagation();">
+                                    <button class="btn-mute" onclick="event.stopPropagation();muteUser(${globalIndex})">🔇</button>
+                                    <button class="btn-kick" onclick="event.stopPropagation();kickUser(${globalIndex})">✖</button>
+                                </div>
+                            ` : ''}
+                        ` : `
+                            ${isOwnerSeat ? `
+                                <div style="position:absolute;top:-8px;right:-4px;font-size:1.4rem;filter:drop-shadow(0 0 10px rgba(255,215,0,0.3));">👑</div>
+                                <div class="seat-avatar" style="border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div style="font-size:0.55rem;color:#ffd700;font-weight:bold;">مالك</div>
+                                ${isOwner ? '<div style="font-size:0.5rem;color:#888;">اضغط للجلوس</div>' : ''}
+                            ` : `
+                                <div class="seat-avatar" style="background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <div style="font-size:0.5rem;color:#555;">مقعد</div>
+                            `}
+                            <div class="seat-number">${globalIndex + 1}</div>
+                        `}
+                    </div>
+                `;
+                globalIndex++;
+            }
+            html += `</div>`;
         });
-        document.getElementById('screenOverlay').classList.remove('active');
-        document.getElementById('giftSendModal').style.display = 'none';
-        document.getElementById('giftSendModal').classList.remove('active');
+        container.innerHTML = html;
+        document.getElementById('seatsCount').textContent = `(${occupied}/${globalIndex})`;
+        document.getElementById('memberCount').textContent = occupied;
+        document.getElementById('usersBadge').textContent = occupied;
+        document.getElementById('chatMemberCount').textContent = occupied;
+        document.getElementById('chatOnlineCount').innerHTML = `👥 <span id="chatMemberCount">${occupied}</span>`;
     }
 
-    function copyId() {
-        const text = document.getElementById('p_id').innerText;
-        navigator.clipboard.writeText(text).then(() => showFirebaseAlert('✅ تم نسخ المعرف: ' + text, 'success'))
-            .catch(() => showFirebaseAlert('❌ حدث خطأ في النسخ', 'error'));
+    function loadSeats() {
+        if (!database || !roomId) return;
+        database.ref('rooms/' + roomId + '/seats').once('value', (snapshot) => {
+            renderSeats(snapshot.val() || {});
+        });
     }
 
-    function copyText(id) {
-        const text = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(text).then(() => showFirebaseAlert('✅ تم نسخ: ' + text, 'success'))
-            .catch(() => showFirebaseAlert('❌ حدث خطأ في النسخ', 'error'));
+    function listenSeats() {
+        if (!database) return;
+        seatsListener = database.ref('rooms/' + roomId + '/seats').on('value', (snapshot) => {
+            const seats = snapshot.val() || {};
+            renderSeats(seats);
+            // Check if my seat is still there
+            if (mySeatIndex !== -1 && !seats[mySeatIndex]) {
+                mySeatIndex = -1;
+                document.getElementById('leaveSeatBtn').style.display = 'none';
+                if (mediaStream) mediaStream.getAudioTracks().forEach(t => t.enabled = false);
+                isMicMuted = true;
+                document.getElementById('micBtn').className = 'audio-btn mic-inactive';
+                document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
+            }
+        });
     }
 
-    async function updateUI() {
-        const logged = isLoggedIn();
-        if (!logged) {
-            document.getElementById('p_nickname').innerText = "زائر";
-            document.getElementById('p_id').innerText = "000000";
-            document.getElementById('p_egp').innerText = "0";
-            document.getElementById('p_usd').innerText = "0";
-            document.getElementById('notifBadge').innerText = "0";
+    async function joinSeat(seatIndex) {
+        if (!database || !roomId || !currentUser?.numericId) return;
+        const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
+        for (const key in seats) if (seats[key].userId == currentUser.numericId) {
+            showToast('⚠️ أنت بالفعل في مقعد', 'warning');
+            return;
+        }
+        if ((await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).exists()) {
+            showToast('⚠️ المقعد مشغول', 'warning');
+            return;
+        }
+        if (seatIndex === 0 && !isOwner) {
+            showToast('⚠️ مقعد المالك فقط', 'warning');
+            return;
+        }
+        const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
+        const seatData = {
+            userId: currentUser.numericId,
+            username: currentUser.nickname || currentUser.username || 'مستخدم',
+            isOwner: isOwner && seatIndex === 0,
+            muted: true,
+            speakerMuted: false,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            speaking: false,
+            joinedAt: new Date().toISOString(),
+            peerId: myPeerId || currentUser.numericId
+        };
+        await database.ref('rooms/' + roomId + '/seats/' + seatIndex).set(seatData);
+        mySeatIndex = seatIndex;
+        document.getElementById('leaveSeatBtn').style.display = 'flex';
+        isMicMuted = true;
+        document.getElementById('micBtn').className = 'audio-btn mic-inactive';
+        document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
+        setTimeout(() => {
+            if (peer && myPeerId) database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
+            connectToExistingPeers();
+        }, 1000);
+        showToast(seatIndex === 0 && isOwner ? '👑 جلست على مقعد المالك' : `✅ جلست على مقعد ${seatIndex + 1}`, 'success');
+        addChatMessage('system', `👋 **${currentUser.nickname || currentUser.username}** انضم للغرفة`, null, null, 'join');
+    }
+
+    async function leaveSeat() {
+        if (mySeatIndex === -1) {
+            showToast('⚠️ أنت لست جالساً', 'warning');
             return;
         }
         try {
-            const user = await getCurrentUserFullData();
-            if (!user) return;
-            document.getElementById('p_nickname').innerText = user.nickname || user.username;
-            document.getElementById('p_id').innerText = formatNumericId(user.numericId || getOrCreateNumericId());
-            document.getElementById('p_egp').innerText = user.balanceEGP || "0";
-            document.getElementById('p_usd').innerText = user.balanceUSD || "0";
-            if (database && user.firebaseKey) {
-                database.ref('users/' + user.firebaseKey + '/notifications').on('value', (snapshot) => {
-                    let unreadCount = 0;
-                    if (snapshot.exists()) {
-                        const notifData = snapshot.val();
-                        for (const key in notifData) if (!notifData[key].read) unreadCount++;
-                    }
-                    document.getElementById('notifBadge').innerText = unreadCount;
-                    document.getElementById('unreadCount').innerText = unreadCount;
-                });
-            }
-        } catch(error) { console.error('UI update error:', error); }
-    }
-
-    // ============================================================
-    // 🔔 NOTIFICATIONS
-    // ============================================================
-    async function loadNotifications() {
-        try {
-            const user = await getCurrentUserFullData();
-            if (!user || !database || !user.firebaseKey) {
-                document.getElementById('notifList').innerHTML = '<div style="padding:20px;text-align:center;color:#666;">لا توجد إشعارات</div>';
-                return;
-            }
-            const snapshot = await database.ref('users/' + user.firebaseKey + '/notifications').once('value');
-            let notifications = [];
-            if (snapshot.exists()) {
-                const notifData = snapshot.val();
-                for (const key in notifData) {
-                    const notif = notifData[key];
-                    notifications.push({
-                        id: notif.id || key,
-                        text: notif.text || '',
-                        read: notif.read || false,
-                        date: notif.date || new Date().toLocaleString('ar-EG'),
-                        type: notif.type || 'general',
-                        key: key
-                    });
-                }
-                notifications.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
-            }
-            const list = document.getElementById('notifList');
-            if (notifications.length === 0) {
-                list.innerHTML = '<div style="padding:20px;text-align:center;color:#666;">لا توجد إشعارات</div>';
-            } else {
-                list.innerHTML = '';
-                notifications.forEach(n => {
-                    const div = document.createElement('div');
-                    div.className = `notif-item ${!n.read ? 'unread' : ''}`;
-                    const icons = {
-                        purchase_approved: 'check-circle',
-                        purchase_rejected: 'times-circle',
-                        deposit: 'money-bill-wave',
-                        gift_received: 'gift',
-                        vip_activated: 'crown',
-                        general: 'info-circle'
-                    };
-                    const colors = {
-                        purchase_approved: '#10b981',
-                        purchase_rejected: '#ef4444',
-                        deposit: '#6366f1',
-                        gift_received: '#f59e0b',
-                        vip_activated: '#ffd700',
-                        general: '#94a3b8'
-                    };
-                    const icon = icons[n.type] || 'info-circle';
-                    const color = colors[n.type] || '#94a3b8';
-                    div.innerHTML = `
-                        <div style="flex:1;">
-                            <div style="display:flex;align-items:flex-start;gap:10px;">
-                                <i class="fas fa-${icon}" style="color:${color};margin-top:2px;"></i>
-                                <div style="flex:1;">
-                                    ${n.text}<br>
-                                    <small style="opacity:0.6;">${n.date}</small>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="delete-single-notif" onclick="deleteSingleNotif('${user.firebaseKey}','${n.key}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-        } catch(error) { console.error('Load notifications error:', error); }
-    }
-
-    async function deleteSingleNotif(userKey, notifKey) {
-        try {
-            await database.ref('users/' + userKey + '/notifications/' + notifKey).remove();
-            showFirebaseAlert('✅ تم حذف الإشعار', 'success');
-            loadNotifications();
-        } catch(error) { showFirebaseAlert('❌ خطأ في حذف الإشعار', 'error'); }
-    }
-
-    async function markAllRead() {
-        try {
-            const user = await getCurrentUserFullData();
-            if (!user || !database || !user.firebaseKey) return;
-            const snapshot = await database.ref('users/' + user.firebaseKey + '/notifications').once('value');
-            if (snapshot.exists()) {
-                const updates = {};
-                const notifData = snapshot.val();
-                for (const key in notifData) updates[key + '/read'] = true;
-                await database.ref('users/' + user.firebaseKey + '/notifications').update(updates);
-                showFirebaseAlert('✅ تم تعيين جميع الإشعارات كمقروءة', 'success');
-                loadNotifications();
-            }
-        } catch(error) { console.error('Mark all read error:', error); }
-    }
-
-    async function deleteAllNotifs() {
-        if (!confirm("هل تريد حذف جميع الإشعارات؟")) return;
-        try {
-            const user = await getCurrentUserFullData();
-            if (!user || !database || !user.firebaseKey) return;
-            await database.ref('users/' + user.firebaseKey + '/notifications').remove();
-            showFirebaseAlert('✅ تم حذف جميع الإشعارات', 'success');
-            loadNotifications();
-        } catch(error) { showFirebaseAlert('❌ خطأ في حذف الإشعارات', 'error'); }
-    }
-
-    function refreshNotifications() {
-        const icon = document.getElementById('refreshIcon');
-        icon.classList.add('refreshing');
-        loadNotifications().then(() => setTimeout(() => icon.classList.remove('refreshing'), 500));
-    }
-
-    // ============================================================
-    // 🚪 LOGOUT
-    // ============================================================
-    async function logout() {
-        try { if (auth) await auth.signOut(); } catch(e) {}
-        localStorage.removeItem('currentUser');
-        window.location.reload();
-    }
-
-    // ============================================================
-    // 🎤 MIC & SPEAKER FUNCTIONS
-    // ============================================================
-    async function requestMicPermission() {
-        const statusDiv = document.getElementById('micStatus');
-        const btn = document.getElementById('micAllowBtn');
-        btn.disabled = true;
-        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري طلب الإذن...';
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, sampleRate: 48000, channelCount: 1 },
-                video: false
-            });
-            mediaStream = stream;
-            mediaStream.getAudioTracks().forEach(track => track.enabled = false);
+            const seat = (await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).once('value')).val();
+            await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
+            mySeatIndex = -1;
+            document.getElementById('leaveSeatBtn').style.display = 'none';
+            if (mediaStream) mediaStream.getAudioTracks().forEach(t => track.enabled = false);
             isMicMuted = true;
             document.getElementById('micBtn').className = 'audio-btn mic-inactive';
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
-            statusDiv.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> ✅ تم الحصول على إذن الميكروفون!';
-            btn.innerHTML = '<i class="fas fa-check"></i> تم السماح ✅';
-            btn.style.background = '#10b981';
-            setTimeout(() => { document.getElementById('micOverlay').style.display = 'none'; initRoom(); }, 1000);
-        } catch(error) {
-            let msg = '❌ لا يمكن الوصول إلى الميكروفون.';
-            if (error.name === 'NotAllowedError') msg = '❌ تم رفض إذن الميكروفون. يرجى السماح يدوياً.';
-            else if (error.name === 'NotFoundError') msg = '❌ لا يوجد ميكروفون متصل.';
-            statusDiv.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> ${msg}`;
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-redo"></i> إعادة المحاولة';
-        }
+            showToast('✅ تم مغادرة المقعد', 'success');
+            addChatMessage('system', `🚪 **${seat?.username || 'مستخدم'}** غادر المقعد`, null, null, 'leave');
+        } catch(error) { showToast('❌ حدث خطأ', 'error'); }
     }
 
-    function skipMic() {
-        document.getElementById('micOverlay').style.display = 'none';
-        showToast('ℹ️ دخلت بدون ميكروفون (وضع الاستماع فقط)', 'info');
-        initRoom();
-    }
-
+    // ============================================================
+    // 🎤 MIC & SPEAKER
+    // ============================================================
     function toggleMic() {
         if (mySeatIndex === -1) {
-            showToast('⚠️ يجب الجلوس على مقعد أولاً لتفعيل الميكروفون', 'warning');
+            showToast('⚠️ يجب الجلوس على مقعد أولاً', 'warning');
             return;
         }
         if (!mediaStream) {
@@ -1547,7 +1441,7 @@
             try { await video.play(); } catch(e) {}
             if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
             vipEntranceTimeout = setTimeout(skipVIPEntrance, 7000);
-        } catch(error) { console.error('Error showing VIP entrance:', error); isVIPEntranceActive = false; }
+        } catch(error) { console.error('VIP entrance error:', error); isVIPEntranceActive = false; }
     }
 
     function skipVIPEntrance() {
@@ -1561,280 +1455,7 @@
     }
 
     // ============================================================
-    // 🚀 ROOM INIT
-    // ============================================================
-    function getRoomIdFromURL() {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('room');
-    }
-
-    function initRoom() {
-        if (roomInitialized) return;
-        roomInitialized = true;
-        roomId = getRoomIdFromURL();
-        if (!roomId) {
-            showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
-            setTimeout(() => window.location.href = 'chat.html', 2000);
-            return;
-        }
-        currentUser = getCurrentUserFromStorage();
-        document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
-        renderSeatsPyramid({});
-        loadRoomDataAndCheckBan();
-    }
-
-    async function loadRoomDataAndCheckBan() {
-        if (!database) return;
-        try {
-            const snapshot = await database.ref('rooms/' + roomId).once('value');
-            if (!snapshot.exists()) {
-                showToast('❌ الغرفة غير موجودة', 'error');
-                setTimeout(() => window.location.href = 'chat.html', 2000);
-                return;
-            }
-            roomData = snapshot.val();
-            document.getElementById('roomNameDisplay').textContent = roomData.name || 'غرفة صوتية';
-            isOwner = roomData.creatorId == currentUser?.numericId;
-            document.getElementById('roomOwnerDisplay').textContent = '👑 المالك: ' + (roomData.creatorName || 'غير معروف');
-            if (isOwner) showToast('👑 مرحباً بك كمالك الغرفة!', 'success');
-            else { showToast(`👋 مرحباً بك في غرفة ${roomData.name}`, 'info'); }
-            addChatMessage('system', `🏠 مرحباً بك في غرفة "${roomData.name}"`, null, null, '');
-            addChatMessage('system', `👑 مالك الغرفة: ${roomData.creatorName || 'غير معروف'}`, null, null, '');
-            addChatMessage('system', `🔑 معرف الغرفة: ${roomId}`, null, null, '');
-            loadSeats();
-            listenRoomUpdates();
-            listenChat();
-            listenSeats();
-            setupChatScrollMonitoring();
-            if (currentUser?.numericId) {
-                setTimeout(() => showVIPEntrance(currentUser.numericId, currentUser.nickname || currentUser.username), 1500);
-            }
-            if (mediaStream) initPeerJS();
-            else setTimeout(initPeerJS, 1000);
-        } catch(error) { console.error('Error loading room:', error); }
-    }
-
-    // ============================================================
-    // 💺 SEATS FUNCTIONS
-    // ============================================================
-    const SEATS_LAYOUT = [{ row: 0, seats: 1 }, { row: 1, seats: 2 }, { row: 2, seats: 3 }, { row: 3, seats: 4 }];
-
-    function listenSeats() {
-        if (!database) return;
-        seatsListener = database.ref('rooms/' + roomId + '/seats').on('value', (snapshot) => {
-            const seats = snapshot.val() || {};
-            renderSeatsPyramid(seats);
-            updateMemberCount(seats);
-        });
-    }
-
-    function loadSeats() {
-        if (!database || !roomId) return;
-        database.ref('rooms/' + roomId + '/seats').once('value', (snapshot) => {
-            renderSeatsPyramid(snapshot.val() || {});
-            updateMemberCount(snapshot.val() || {});
-        });
-    }
-
-    function updateMemberCount(seats) {
-        const count = Object.keys(seats).length;
-        document.getElementById('memberCount').textContent = count;
-        document.getElementById('usersBadge').textContent = count;
-        document.getElementById('chatMemberCount').textContent = count;
-        document.getElementById('chatOnlineCount').innerHTML = `👥 <span id="chatMemberCount">${count}</span> متصل`;
-    }
-
-    function renderSeatsPyramid(seats) {
-        const container = document.getElementById('seatsContainer');
-        let html = '', occupied = 0, globalIndex = 0;
-        SEATS_LAYOUT.forEach((rowData, rowIndex) => {
-            html += `<div class="seats-row row-${rowIndex + 1}">`;
-            for (let i = 0; i < rowData.seats; i++) {
-                const seat = seats[globalIndex] || null;
-                const isOccupied = seat !== null;
-                if (isOccupied) occupied++;
-                const isMySeat = seat && seat.userId == currentUser?.numericId;
-                if (isMySeat) {
-                    mySeatIndex = globalIndex;
-                    document.getElementById('leaveSeatBtn').style.display = 'flex';
-                    if (peer && myPeerId) {
-                        database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
-                    }
-                }
-                const isOwnerSeat = globalIndex === 0;
-                const isSeatOwner = seat && seat.isOwner === true;
-                let displayName = seat ? seat.username : 'مقعد فارغ';
-                let avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
-                let seatClass = 'seat' + (isOwnerSeat ? ' owner-seat' : '') + (isOccupied ? ' occupied' : ' empty');
-                const userColor = seat?.color || '#667eea';
-                const isMuted = seat?.muted === true;
-                let clickHandler = isOccupied ? `onclick="openProfilePopup('${globalIndex}')"` :
-                    (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${globalIndex})"` : '';
-                html += `
-                    <div class="${seatClass}" ${clickHandler}>
-                        ${isOccupied ? `
-                            ${isSeatOwner ? `<div class="seat-crown">👑</div>` : ''}
-                            <div class="seat-avatar" style="background:${userColor}!important;border-color:${isSeatOwner?'#ffd700':isMuted?'#ef4444':'#10b981'}!important;">
-                                ${avatarLetter}
-                            </div>
-                            <div class="seat-username ${isSeatOwner?'owner-name':''}">${displayName}</div>
-                            <div class="seat-indicators">
-                                <span class="indicator ${isMuted?'mic-off':'mic-on'}">
-                                    <i class="fas fa-microphone${isMuted?'-slash':''}"></i>
-                                </span>
-                            </div>
-                            <div class="seat-number">مقعد ${globalIndex + 1}</div>
-                            ${isOwner && !isSeatOwner && isOccupied ? `
-                                <div class="seat-actions" onclick="event.stopPropagation();">
-                                    <button class="btn-kick" onclick="event.stopPropagation();kickUser(${globalIndex})">✖ طرد</button>
-                                    <button class="btn-mute" onclick="event.stopPropagation();muteUser(${globalIndex})">🔇 كتم</button>
-                                    <button class="btn-ban" onclick="event.stopPropagation();banUser(${globalIndex})">🚫 حظر</button>
-                                </div>
-                            ` : ''}
-                        ` : `
-                            ${isOwnerSeat ? `
-                                <div class="seat-crown">👑</div>
-                                <div class="seat-avatar" style="border-color:#ffd700!important;">
-                                    <i class="fas fa-crown" style="color:#ffd700;"></i>
-                                </div>
-                                <div style="color:#ffd700;font-size:0.7rem;font-weight:bold;">مقعد المالك</div>
-                                ${isOwner ? '<div style="font-size:0.55rem;color:#888;">اضغط للجلوس</div>' : ''}
-                            ` : `
-                                <div class="seat-avatar"><i class="fas fa-plus" style="color:#666;"></i></div>
-                                <div style="color:#666;font-size:0.6rem;">مقعد فارغ</div>
-                            `}
-                            <div class="seat-number">مقعد ${globalIndex + 1}</div>
-                        `}
-                    </div>
-                `;
-                globalIndex++;
-            }
-            html += `</div>`;
-        });
-        container.innerHTML = html;
-        document.getElementById('seatsCount').textContent = `(${occupied}/${globalIndex})`;
-    }
-
-    function openProfilePopup(seatIndex) {
-        database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value').then(s => {
-            const seat = s.val();
-            if (!seat) return;
-            alert(`👤 الملف الشخصي\n\nاسم المستخدم: ${seat.username}\nالمعرف: ${seat.userId}\n${seat.isOwner ? '👑 مالك الغرفة' : '👤 عضو'}\n${seat.muted ? '🔇 ميكروفون مكتوم' : '🎤 ميكروفون نشط'}`);
-        });
-    }
-
-    async function joinSeat(seatIndex) {
-        if (!database || !roomId || !currentUser?.numericId) return;
-        const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
-        for (const key in seats) if (seats[key].userId == currentUser.numericId) {
-            showToast('⚠️ أنت بالفعل في مقعد', 'warning');
-            return;
-        }
-        if ((await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).exists()) {
-            showToast('⚠️ المقعد مشغول', 'warning');
-            return;
-        }
-        if (seatIndex === 0 && !isOwner) {
-            showToast('⚠️ مقعد المالك فقط', 'warning');
-            return;
-        }
-        const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
-        const seatData = {
-            userId: currentUser.numericId,
-            username: currentUser.nickname || currentUser.username || 'مستخدم',
-            isOwner: isOwner && seatIndex === 0,
-            muted: true,
-            speakerMuted: false,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            speaking: false,
-            seatNumber: seatIndex,
-            joinedAt: new Date().toISOString(),
-            peerId: myPeerId || currentUser.numericId
-        };
-        await database.ref('rooms/' + roomId + '/seats/' + seatIndex).set(seatData);
-        await database.ref('rooms/' + roomId + '/members').set(Object.keys(seats).length + 1);
-        mySeatIndex = seatIndex;
-        document.getElementById('leaveSeatBtn').style.display = 'flex';
-        isMicMuted = true;
-        document.getElementById('micBtn').className = 'audio-btn mic-inactive';
-        document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
-        setTimeout(() => {
-            if (peer && myPeerId) database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
-            connectToExistingPeers();
-        }, 1000);
-        showToast(seatIndex === 0 && isOwner ? '👑 جلست على مقعد المالك' : `✅ جلست على مقعد ${seatIndex + 1}`, 'success');
-        addChatMessage('system', `👋 **${currentUser.nickname || currentUser.username}** انضم للغرفة`, null, null, 'join');
-    }
-
-    async function leaveSeat() {
-        if (mySeatIndex === -1) {
-            showToast('⚠️ أنت لست جالساً', 'warning');
-            return;
-        }
-        try {
-            const seat = (await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).once('value')).val();
-            await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
-            const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
-            await database.ref('rooms/' + roomId + '/members').set(Object.keys(seats).length);
-            mySeatIndex = -1;
-            document.getElementById('leaveSeatBtn').style.display = 'none';
-            if (mediaStream) mediaStream.getAudioTracks().forEach(track => track.enabled = false);
-            isMicMuted = true;
-            document.getElementById('micBtn').className = 'audio-btn mic-inactive';
-            document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
-            showToast('✅ تم مغادرة المقعد', 'success');
-            addChatMessage('system', `🚪 **${seat?.username || 'مستخدم'}** غادر المقعد`, null, null, 'leave');
-        } catch(error) { showToast('❌ حدث خطأ', 'error'); }
-    }
-
-    // ============================================================
-    // 👑 OWNER FUNCTIONS
-    // ============================================================
-    async function kickUser(seatIndex) {
-        if (!isOwner || !confirm('طرد المستخدم؟')) return;
-        try {
-            const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
-            if (!seat) return;
-            await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
-            addChatMessage('system', `🚫 **${seat.username}** تم طرده`, null, null, 'leave');
-            const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
-            await database.ref('rooms/' + roomId + '/members').set(Object.keys(seats).length);
-            showToast('✅ تم طرد المستخدم', 'success');
-        } catch(e) { showToast('❌ حدث خطأ', 'error'); }
-    }
-
-    async function banUser(seatIndex) {
-        if (!isOwner || !confirm('حظر المستخدم نهائياً؟')) return;
-        try {
-            const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
-            if (!seat || seat.isOwner) return;
-            await database.ref('rooms/' + roomId + '/banned_users/' + seat.userId).set({
-                username: seat.username,
-                bannedAt: new Date().toISOString(),
-                bannedBy: currentUser.numericId
-            });
-            await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
-            addChatMessage('system', `🚫 **${seat.username}** تم حظره نهائياً`, null, null, 'leave');
-            const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
-            await database.ref('rooms/' + roomId + '/members').set(Object.keys(seats).length);
-            showToast('✅ تم حظر المستخدم', 'success');
-        } catch(e) { showToast('❌ حدث خطأ', 'error'); }
-    }
-
-    async function muteUser(seatIndex) {
-        if (!isOwner) return;
-        try {
-            const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
-            if (!seat) return;
-            const newState = !seat.muted;
-            await database.ref('rooms/' + roomId + '/seats/' + seatIndex + '/muted').set(newState);
-            showToast(newState ? '🔇 تم كتم الميكروفون' : '🔊 تم فك الكتم', 'success');
-            addChatMessage('system', `${newState ? '🔇 تم كتم' : '🔊 تم فك كتم'} **${seat.username}**`, null, null, '');
-        } catch(e) { showToast('❌ حدث خطأ', 'error'); }
-    }
-
-    // ============================================================
-    // 💬 CHAT FUNCTIONS
+    // 💬 CHAT
     // ============================================================
     function listenChat() {
         if (!database) return;
@@ -1898,33 +1519,24 @@
         setTimeout(scrollToBottom, 50);
     }
 
-    // ============================================================
-    // 📜 CHAT SCROLL
-    // ============================================================
-    function isUserAtBottom() {
-        const container = document.getElementById('chatMessages');
-        return container.scrollHeight - container.scrollTop - container.clientHeight < 30;
-    }
-
     function scrollToBottom() {
         const container = document.getElementById('chatMessages');
         container.scrollTop = container.scrollHeight;
         document.getElementById('scrollDownBtn').classList.remove('visible');
     }
 
-    function checkScrollPosition() {
-        const btn = document.getElementById('scrollDownBtn');
-        if (!isUserAtBottom()) btn.classList.add('visible');
-        else btn.classList.remove('visible');
+    function setupChatScroll() {
+        const container = document.getElementById('chatMessages');
+        container.addEventListener('scroll', () => {
+            const btn = document.getElementById('scrollDownBtn');
+            if (container.scrollHeight - container.scrollTop - container.clientHeight < 30) {
+                btn.classList.remove('visible');
+            } else {
+                btn.classList.add('visible');
+            }
+        });
     }
 
-    function setupChatScrollMonitoring() {
-        document.getElementById('chatMessages').addEventListener('scroll', checkScrollPosition);
-    }
-
-    // ============================================================
-    // 😊 EMOJI FUNCTIONS
-    // ============================================================
     function toggleEmojiPicker() {
         document.getElementById('emojiPicker').classList.toggle('active');
     }
@@ -1964,39 +1576,26 @@
                         username: seat.username || 'مستخدم',
                         isOwner: seat.isOwner || false,
                         muted: seat.muted || false,
-                        color: seat.color || '#667eea',
-                        avatar: seat.avatar || null,
-                        isInSeat: true
+                        color: seat.color || '#667eea'
                     });
                 }
-            }
-            if (roomData?.creatorId && !users.some(u => u.userId == roomData.creatorId)) {
-                users.push({
-                    userId: roomData.creatorId,
-                    username: roomData.creatorName || 'المالك',
-                    isOwner: true,
-                    muted: false,
-                    color: '#ffd700',
-                    avatar: null,
-                    isInSeat: false
-                });
             }
             if (users.length === 0) {
                 list.innerHTML = '<div style="text-align:center;padding:20px;color:#666;">لا يوجد مستخدمين</div>';
                 return;
             }
             list.innerHTML = users.map(u => `
-                <div class="user-item">
-                    <div class="user-avatar-small" style="background:${u.color};">
-                        ${u.avatar ? `<img src="${u.avatar}">` : u.username.charAt(0).toUpperCase()}
+                <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid transparent;transition:0.3s;cursor:pointer;border-color:${u.isOwner ? 'rgba(255,215,0,0.1)' : 'transparent'};">
+                    <div style="width:40px;height:40px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;flex-shrink:0;">
+                        ${u.username.charAt(0).toUpperCase()}
                     </div>
-                    <div class="user-info-small">
-                        <div class="user-name-small">${u.username} ${u.isOwner ? '👑' : ''} ${u.isInSeat ? '🪑' : ''}</div>
-                        <div class="user-id-small">🆔 ${u.userId}</div>
-                        <div class="user-status-small">${u.muted ? '🔇 مكتوم' : '🎤 نشط'}</div>
+                    <div style="flex:1;">
+                        <div style="font-weight:bold;font-size:0.9rem;">${u.username} ${u.isOwner ? '👑' : ''}</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;">🆔 ${u.userId}</div>
+                        <div style="font-size:0.65rem;color:${u.muted ? '#ef4444' : '#10b981'};">${u.muted ? '🔇 مكتوم' : '🎤 نشط'}</div>
                     </div>
                     ${u.userId != currentUser?.numericId ? `
-                        <button class="btn-send-gift" onclick="event.stopPropagation();openGiftModal('${u.userId}','${u.username}')">
+                        <button onclick="event.stopPropagation();openGiftModal('${u.userId}','${u.username}')" style="padding:6px 14px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.7rem;font-weight:bold;transition:0.3s;">
                             <i class="fas fa-gift"></i> هدية
                         </button>
                     ` : ''}
@@ -2015,29 +1614,31 @@
         document.getElementById('giftReceiverId').textContent = userId;
         document.getElementById('giftSenderBalance').textContent = `${currentUser?.balanceEGP || 0} ج.م`;
         document.getElementById('giftOptions').innerHTML = GIFT_TYPES.map(g => `
-            <div class="gift-option" onclick="selectGift('${g.id}')" data-gift-id="${g.id}">
-                <span class="gift-emoji">${g.emoji}</span>
-                <div class="gift-name">${g.name}</div>
-                <div class="gift-price">💰 ${g.price} ج.م</div>
+            <div class="gift-option" onclick="selectGift('${g.id}')" data-gift-id="${g.id}" style="background:rgba(255,255,255,0.03);border:2px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:0.3s;">
+                <span style="font-size:2rem;display:block;">${g.emoji}</span>
+                <div style="font-size:0.75rem;font-weight:bold;">${g.name}</div>
+                <div style="font-size:0.65rem;color:#10b981;">💰 ${g.price} ج.م</div>
             </div>
         `).join('');
         selectedGift = null;
-        document.getElementById('giftSendModal').style.display = 'flex';
         document.getElementById('giftSendModal').classList.add('active');
+        document.getElementById('giftSendModal').style.display = 'flex';
         document.getElementById('screenOverlay').classList.add('active');
     }
 
     function selectGift(giftId) {
-        document.querySelectorAll('.gift-option').forEach(o => o.classList.remove('selected'));
+        document.querySelectorAll('.gift-option').forEach(o => o.style.borderColor = 'rgba(255,255,255,0.08)');
         const selected = document.querySelector(`.gift-option[data-gift-id="${giftId}"]`);
         if (!selected) return;
-        selected.classList.add('selected');
+        selected.style.borderColor = '#ffd700';
+        selected.style.background = 'rgba(255,215,0,0.1)';
         selectedGift = GIFT_TYPES.find(g => g.id === giftId);
         const user = getCurrentUserFromStorage();
         if (user && user.balanceEGP < selectedGift.price) {
             showToast(`⚠️ رصيد غير كافٍ (تحتاج ${selectedGift.price} ج.م)`, 'warning');
             selectedGift = null;
-            selected.classList.remove('selected');
+            selected.style.borderColor = 'rgba(255,255,255,0.08)';
+            selected.style.background = 'rgba(255,255,255,0.03)';
             return;
         }
         sendGift();
@@ -2049,10 +1650,7 @@
             return;
         }
         const user = await getCurrentUserFullData();
-        if (!user) {
-            showToast('⚠️ يرجى تسجيل الدخول', 'warning');
-            return;
-        }
+        if (!user) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         if (user.balanceEGP < selectedGift.price) {
             showToast(`⚠️ رصيد غير كافٍ`, 'warning');
             return;
@@ -2073,12 +1671,10 @@
                 giftsList.push({
                     senderId: user.numericId,
                     senderName: user.nickname || user.username,
-                    senderAvatar: user.avatar || '',
                     giftType: selectedGift.id,
                     giftName: selectedGift.name,
                     giftEmoji: selectedGift.emoji,
                     value: selectedGift.price,
-                    reason: `هدية من ${user.nickname || user.username}`,
                     date: new Date().toLocaleString('ar-EG'),
                     timestamp: new Date().toISOString()
                 });
@@ -2108,26 +1704,51 @@
     }
 
     function closeGiftModal() {
-        document.getElementById('giftSendModal').style.display = 'none';
         document.getElementById('giftSendModal').classList.remove('active');
+        document.getElementById('giftSendModal').style.display = 'none';
         document.getElementById('screenOverlay').classList.remove('active');
         selectedGift = null;
         selectedGiftReceiver = null;
     }
 
     // ============================================================
-    // 🎵 PEERJS FUNCTIONS
+    // 👑 OWNER FUNCTIONS
+    // ============================================================
+    async function kickUser(seatIndex) {
+        if (!isOwner || !confirm('طرد المستخدم؟')) return;
+        try {
+            const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
+            if (!seat) return;
+            await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
+            addChatMessage('system', `🚫 **${seat.username}** تم طرده`, null, null, 'leave');
+            showToast('✅ تم طرد المستخدم', 'success');
+        } catch(e) { showToast('❌ حدث خطأ', 'error'); }
+    }
+
+    async function muteUser(seatIndex) {
+        if (!isOwner) return;
+        try {
+            const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
+            if (!seat) return;
+            const newState = !seat.muted;
+            await database.ref('rooms/' + roomId + '/seats/' + seatIndex + '/muted').set(newState);
+            showToast(newState ? '🔇 تم كتم الميكروفون' : '🔊 تم فك الكتم', 'success');
+            addChatMessage('system', `${newState ? '🔇 تم كتم' : '🔊 تم فك كتم'} **${seat.username}**`, null, null, '');
+        } catch(e) { showToast('❌ حدث خطأ', 'error'); }
+    }
+
+    // ============================================================
+    // 🎵 PEERJS
     // ============================================================
     function initPeerJS() {
         if (!mediaStream) { setTimeout(initPeerJS, 1000); return; }
         if (mediaStream) mediaStream.getAudioTracks().forEach(track => track.enabled = false);
         const peerId = currentUser ? currentUser.numericId : 'user_' + Date.now();
-        try { peer = new Peer(peerId, PEER_CONFIG); }
-        catch(e) { peer = new Peer(peerId + '_' + Date.now(), PEER_CONFIG); }
+        try { peer = new Peer(peerId, { debug: 2, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }); }
+        catch(e) { peer = new Peer(peerId + '_' + Date.now(), { debug: 2, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }); }
         myPeerId = peer.id;
         peer.on('open', (id) => {
             myPeerId = id;
-            updateConnectionStatus('connected');
             if (mySeatIndex !== -1) {
                 database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(id);
             }
@@ -2145,21 +1766,6 @@
                 peerConnections[call.peer] = call;
             } catch(e) {}
         });
-        peer.on('error', (err) => {
-            updateConnectionStatus('disconnected');
-            if (err.type === 'unavailable-id' && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                reconnectAttempts++;
-                setTimeout(initPeerJS, 2000 * reconnectAttempts);
-            }
-        });
-        peer.on('disconnected', () => {
-            updateConnectionStatus('disconnected');
-            if (!isReconnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                isReconnecting = true;
-                reconnectAttempts++;
-                setTimeout(() => { isReconnecting = false; peer.reconnect(); }, 3000);
-            }
-        });
         listenForPeerConnections();
     }
 
@@ -2170,15 +1776,6 @@
             if (seat && seat.userId && seat.userId !== currentUser?.numericId && seat.peerId && seat.peerId !== myPeerId) {
                 setTimeout(() => connectToPeer(seat.peerId, seat.userId), 1000);
             }
-        });
-        database.ref('rooms/' + roomId + '/seats').on('child_changed', (snapshot) => {
-            const seat = snapshot.val();
-            if (seat && seat.userId && seat.userId !== currentUser?.numericId && seat.peerId && seat.peerId !== myPeerId) {
-                setTimeout(() => connectToPeer(seat.peerId, seat.userId), 500);
-            }
-        });
-        database.ref('rooms/' + roomId + '/seats').on('child_removed', (snapshot) => {
-            if (snapshot.val()?.peerId) disconnectFromPeer(snapshot.val().peerId);
         });
     }
 
@@ -2210,14 +1807,6 @@
         } catch(e) {}
     }
 
-    function disconnectFromPeer(peerId) {
-        try {
-            if (peerConnections[peerId]) { peerConnections[peerId].close(); delete peerConnections[peerId]; }
-            delete peerStreams[peerId];
-            removeRemoteAudio(peerId);
-        } catch(e) {}
-    }
-
     function playRemoteAudio(stream, peerId) {
         if (!isSpeakerActive) return;
         try {
@@ -2236,19 +1825,6 @@
         if (audio) { audio.pause(); audio.srcObject = null; audio.remove(); }
     }
 
-    function updateConnectionStatus(status) {
-        const el = document.getElementById('connectionStatus');
-        el.className = 'connection-status ' + status;
-        if (status === 'connected') {
-            el.innerHTML = '✅ متصل بالصوت';
-            setTimeout(() => el.className = 'connection-status', 3000);
-        } else if (status === 'disconnected') {
-            el.innerHTML = '❌ انقطاع الاتصال... جاري إعادة المحاولة';
-        } else if (status === 'connecting') {
-            el.innerHTML = '🔄 جاري الاتصال بالصوت...';
-        }
-    }
-
     // ============================================================
     // 📻 ROOM FUNCTIONS
     // ============================================================
@@ -2257,7 +1833,6 @@
         roomListener = database.ref('rooms/' + roomId).on('value', (snapshot) => {
             if (snapshot.exists()) {
                 roomData = snapshot.val();
-                document.getElementById('memberCount').textContent = roomData.members || 0;
             }
         });
     }
@@ -2266,8 +1841,6 @@
         try {
             if (mySeatIndex !== -1) {
                 await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
-                const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
-                await database.ref('rooms/' + roomId + '/members').set(Object.keys(seats).length);
             }
             if (roomListener) database.ref('rooms/' + roomId).off();
             if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
@@ -2280,7 +1853,321 @@
     }
 
     // ============================================================
-    // 🚀 INIT ON LOAD
+    // 👤 PROFILE FUNCTIONS
+    // ============================================================
+    function handleProfileClick() {
+        if (!isLoggedIn()) return;
+        toggleDropdown('profileDropdown');
+    }
+
+    function openNotifDropdown() {
+        if (!isLoggedIn()) return;
+        toggleDropdown('notifDropdown');
+        loadNotifications();
+    }
+
+    function toggleDropdown(id) {
+        const target = document.getElementById(id);
+        const isOpen = target.style.display === 'block';
+        closeAll();
+        if (!isOpen) {
+            target.style.display = 'block';
+            document.getElementById('screenOverlay').classList.add('active');
+        }
+    }
+
+    function closeAll() {
+        document.querySelectorAll('.dropdown-overlay').forEach(m => m.style.display = 'none');
+        document.querySelectorAll('.modal').forEach(m => {
+            m.style.display = 'none';
+            m.classList.remove('active');
+        });
+        document.getElementById('screenOverlay').classList.remove('active');
+        document.getElementById('giftSendModal').style.display = 'none';
+        document.getElementById('giftSendModal').classList.remove('active');
+        document.getElementById('usersListContainer').style.display = 'none';
+    }
+
+    function copyId() {
+        const text = document.getElementById('p_id').innerText;
+        navigator.clipboard.writeText(text).then(() => showToast('✅ تم نسخ المعرف: ' + text, 'success'))
+            .catch(() => showToast('❌ حدث خطأ في النسخ', 'error'));
+    }
+
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => showToast('✅ تم نسخ: ' + text, 'success'))
+            .catch(() => showToast('❌ حدث خطأ في النسخ', 'error'));
+    }
+
+    async function updateUI() {
+        const logged = isLoggedIn();
+        if (!logged) {
+            document.getElementById('p_nickname').innerText = "زائر";
+            document.getElementById('p_id').innerText = "000000";
+            document.getElementById('p_egp').innerText = "0";
+            document.getElementById('p_usd').innerText = "0";
+            document.getElementById('notifBadge').innerText = "0";
+            return;
+        }
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user) return;
+            document.getElementById('p_nickname').innerText = user.nickname || user.username;
+            document.getElementById('p_id').innerText = formatNumericId(user.numericId);
+            document.getElementById('p_egp').innerText = user.balanceEGP || "0";
+            document.getElementById('p_usd').innerText = user.balanceUSD || "0";
+            if (database && user.firebaseKey) {
+                database.ref('users/' + user.firebaseKey + '/notifications').on('value', (snapshot) => {
+                    let unreadCount = 0;
+                    if (snapshot.exists()) {
+                        const notifData = snapshot.val();
+                        for (const key in notifData) if (!notifData[key].read) unreadCount++;
+                    }
+                    document.getElementById('notifBadge').innerText = unreadCount;
+                    document.getElementById('unreadCount').innerText = unreadCount;
+                });
+            }
+        } catch(error) { console.error('UI update error:', error); }
+    }
+
+    // ============================================================
+    // 🔔 NOTIFICATIONS
+    // ============================================================
+    async function loadNotifications() {
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user || !database || !user.firebaseKey) {
+                document.getElementById('notifList').innerHTML = '<div style="padding:20px;text-align:center;color:#666;">لا توجد إشعارات</div>';
+                return;
+            }
+            const snapshot = await database.ref('users/' + user.firebaseKey + '/notifications').once('value');
+            let notifications = [];
+            if (snapshot.exists()) {
+                const notifData = snapshot.val();
+                for (const key in notifData) {
+                    const notif = notifData[key];
+                    notifications.push({
+                        id: notif.id || key,
+                        text: notif.text || '',
+                        read: notif.read || false,
+                        date: notif.date || new Date().toLocaleString('ar-EG'),
+                        key: key
+                    });
+                }
+                notifications.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+            }
+            const list = document.getElementById('notifList');
+            if (notifications.length === 0) {
+                list.innerHTML = '<div style="padding:20px;text-align:center;color:#666;">لا توجد إشعارات</div>';
+            } else {
+                list.innerHTML = '';
+                notifications.forEach(n => {
+                    const div = document.createElement('div');
+                    div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+                    div.style.cssText = `padding:10px 12px;border-bottom:1px solid #1e293b;font-size:0.8rem;${!n.read ? 'background:rgba(139,92,246,0.08);border-right:3px solid #8b5cf6;' : ''}`;
+                    div.innerHTML = `
+                        <div style="flex:1;">${n.text}<br><small style="opacity:0.6;">${n.date}</small></div>
+                        <button onclick="deleteSingleNotif('${user.firebaseKey}','${n.key}')" style="background:rgba(239,68,68,0.1);color:#ef4444;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:0.7rem;">✕</button>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        } catch(error) { console.error('Load notifications error:', error); }
+    }
+
+    async function deleteSingleNotif(userKey, notifKey) {
+        try {
+            await database.ref('users/' + userKey + '/notifications/' + notifKey).remove();
+            showToast('✅ تم حذف الإشعار', 'success');
+            loadNotifications();
+        } catch(error) { showToast('❌ خطأ في حذف الإشعار', 'error'); }
+    }
+
+    async function markAllRead() {
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user || !database || !user.firebaseKey) return;
+            const snapshot = await database.ref('users/' + user.firebaseKey + '/notifications').once('value');
+            if (snapshot.exists()) {
+                const updates = {};
+                const notifData = snapshot.val();
+                for (const key in notifData) updates[key + '/read'] = true;
+                await database.ref('users/' + user.firebaseKey + '/notifications').update(updates);
+                showToast('✅ تم تعيين جميع الإشعارات كمقروءة', 'success');
+                loadNotifications();
+            }
+        } catch(error) { console.error('Mark all read error:', error); }
+    }
+
+    async function deleteAllNotifs() {
+        if (!confirm("هل تريد حذف جميع الإشعارات؟")) return;
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user || !database || !user.firebaseKey) return;
+            await database.ref('users/' + user.firebaseKey + '/notifications').remove();
+            showToast('✅ تم حذف جميع الإشعارات', 'success');
+            loadNotifications();
+        } catch(error) { showToast('❌ خطأ في حذف الإشعارات', 'error'); }
+    }
+
+    // ============================================================
+    // 💰 TOP UP FUNCTIONS
+    // ============================================================
+    function openCurrencySelection() {
+        if (!isLoggedIn()) return;
+        closeAll();
+        document.getElementById('currencyModal').style.display = 'flex';
+        document.getElementById('currencyModal').classList.add('active');
+        document.getElementById('screenOverlay').classList.add('active');
+    }
+
+    function handleCurrencyChoice(currency) {
+        if (!isLoggedIn()) return;
+        selectedCurrency = currency;
+        closeAll();
+        const methodSelect = document.getElementById('paymentMethod');
+        methodSelect.innerHTML = '';
+        document.getElementById('topUpAmount').value = '';
+        document.getElementById('finalRequiredAmount').innerText = '0';
+        document.getElementById('calculationDisplay').style.display = 'none';
+        
+        if (currency === 'USD') {
+            document.getElementById('topUpTitle').innerText = "شحن رصيد (دولار)";
+            document.getElementById('amountLabel').innerText = "المبلغ (USD):";
+            ['binance','vodafone','instapay'].forEach(v => {
+                let el = document.createElement('option');
+                el.value = v;
+                el.innerText = v === 'binance' ? 'Binance Pay' : v === 'vodafone' ? 'فودافون كاش' : 'إنستا باي';
+                methodSelect.appendChild(el);
+            });
+        } else {
+            document.getElementById('topUpTitle').innerText = "شحن رصيد (جنيه)";
+            document.getElementById('amountLabel').innerText = "المبلغ (EGP):";
+            ['vodafone','instapay'].forEach(v => {
+                let el = document.createElement('option');
+                el.value = v;
+                el.innerText = v === 'vodafone' ? 'فودافون كاش' : 'إنستا باي';
+                methodSelect.appendChild(el);
+            });
+        }
+        updatePaymentDetails();
+        document.getElementById('topUpModal').style.display = 'flex';
+        document.getElementById('topUpModal').classList.add('active');
+        document.getElementById('screenOverlay').classList.add('active');
+    }
+
+    function calculateRequiredAmount() {
+        const amount = parseFloat(document.getElementById('topUpAmount').value) || 0;
+        const method = document.getElementById('paymentMethod').value;
+        const display = document.getElementById('calculationDisplay');
+        const finalLabel = document.getElementById('finalRequiredAmount');
+        if (amount <= 0) { display.style.display = 'none'; return; }
+        display.style.display = 'block';
+        if (selectedCurrency === 'USD') {
+            finalLabel.innerText = method === 'binance' ? amount + " USDT" : (amount * 50) + " جنيه";
+        } else {
+            finalLabel.innerText = amount + " جنيه";
+        }
+    }
+
+    function updatePaymentDetails() {
+        const method = document.getElementById('paymentMethod').value;
+        document.getElementById('walletBox').style.display = 'none';
+        document.getElementById('binanceDetails').style.display = 'none';
+        if (method === 'binance') {
+            document.getElementById('binanceDetails').style.display = 'block';
+            document.getElementById('methodHint').innerText = "بيانات الدفع عبر Binance Pay:";
+        } else {
+            document.getElementById('walletBox').style.display = 'flex';
+            document.getElementById('methodHint').innerText = "حول للرقم التالي:";
+            document.getElementById('walletNumber').innerText = "01022797043";
+        }
+        calculateRequiredAmount();
+    }
+
+    async function submitTopUp() {
+        if (!isLoggedIn() || isSubmittingTopUp) return;
+        const amount = document.getElementById('topUpAmount').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const fileInput = document.getElementById('topUpReceipt');
+        if (!amount || amount <= 0 || !paymentMethod || fileInput.files.length === 0) {
+            showToast('⚠️ يرجى ملء جميع الحقول', 'warning');
+            return;
+        }
+        isSubmittingTopUp = true;
+        const submitBtn = document.getElementById('submitTopUpBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الإرسال...';
+        submitBtn.disabled = true;
+        try {
+            const user = await getCurrentUserFullData();
+            if (!user) { showToast('❌ يرجى تسجيل الدخول أولاً', 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const generatedId = "DEP-" + Date.now();
+                    const methodNames = { vodafone: 'فودافون كاش', instapay: 'إنستا باي', binance: 'Binance Pay' };
+                    const methodName = methodNames[paymentMethod] || paymentMethod;
+                    await database.ref('orders').push({
+                        orderId: generatedId,
+                        userId: user.numericId,
+                        username: user.username,
+                        nickname: user.nickname || user.username,
+                        product: `إيداع ${selectedCurrency} عبر ${methodName}`,
+                        price: `${amount} ${selectedCurrency}`,
+                        paymentMethod: paymentMethod,
+                        method: methodName,
+                        currency: selectedCurrency,
+                        receipt: e.target.result,
+                        status: 'قيد المراجعة',
+                        type: 'deposit',
+                        createdAt: new Date().toISOString()
+                    });
+                    await database.ref('users/' + user.firebaseKey + '/notifications').push({
+                        id: Date.now(),
+                        text: `⏳ تم استلام إيصال الإيداع عبر ${methodName}. معرف الطلب: ${generatedId}.`,
+                        read: false,
+                        date: new Date().toLocaleString('ar-EG'),
+                        type: 'deposit',
+                        createdAt: new Date().toISOString()
+                    });
+                    showToast(`✅ تم إرسال طلب الشحن عبر ${methodName}`, 'success');
+                    closeAll();
+                    await updateUI();
+                } catch(error) {
+                    console.error('Top-up error:', error);
+                    showToast('❌ حدث خطأ', 'error');
+                } finally {
+                    isSubmittingTopUp = false;
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } catch(error) {
+            console.error('Top-up error:', error);
+            showToast('❌ حدث خطأ', 'error');
+            isSubmittingTopUp = false;
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    let isSubmittingTopUp = false;
+    let selectedCurrency = 'EGP';
+
+    // ============================================================
+    // 🚪 LOGOUT
+    // ============================================================
+    async function logout() {
+        try { if (auth) await auth.signOut(); } catch(e) {}
+        localStorage.removeItem('currentUser');
+        window.location.reload();
+    }
+
+    // ============================================================
+    // 🚀 INIT
     // ============================================================
     window.onload = async function() {
         try {
@@ -2290,7 +2177,18 @@
                 setTimeout(() => window.location.href = 'chat.html', 2000);
                 return;
             }
-            document.getElementById('micOverlay').style.display = 'flex';
+            // Request mic
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+                mediaStream = stream;
+                mediaStream.getAudioTracks().forEach(track => track.enabled = false);
+                isMicMuted = true;
+                document.getElementById('micBtn').className = 'audio-btn mic-inactive';
+                document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
+            } catch(e) {
+                showToast('⚠️ لا يمكن الوصول إلى الميكروفون', 'warning');
+            }
+            initRoom();
         } catch(e) { console.error('❌ خطأ في التحميل:', e); }
     };
 
@@ -2309,6 +2207,17 @@
         if (video) { video.pause(); video.currentTime = 0; }
         document.getElementById('vipEntrance').classList.remove('active');
     });
+
+    // ============================================================
+    // 📝 FUNCTIONS FOR HTML ONCLICK
+    // ============================================================
+    function openProfilePopup(seatIndex) {
+        database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value').then(s => {
+            const seat = s.val();
+            if (!seat) return;
+            showToast(`👤 ${seat.username}\n🆔 ${seat.userId}\n${seat.isOwner ? '👑 مالك' : '👤 عضو'}`, 'info');
+        });
+    }
 </script>
 </body>
 </html>
