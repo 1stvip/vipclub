@@ -110,6 +110,7 @@
             min-height: 500px;
         }
 
+        /* ===== SEATS AREA ===== */
         .seats-area {
             flex: 1;
             background: #000000 !important;
@@ -270,7 +271,7 @@
             text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
 
-        /* ===== FRAME - يدعم الفيديو و iframe ===== */
+        /* ===== FRAME - يدعم الفيديو ===== */
         .seat-frame {
             position: absolute;
             top: 50%;
@@ -304,15 +305,6 @@
             outline: none !important;
             box-shadow: none !important;
             opacity: 0.9;
-        }
-
-        .seat-frame iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 50%;
-            pointer-events: none;
-            background: transparent !important;
         }
 
         .seat-frame::before,
@@ -1272,7 +1264,7 @@
     };
 
     // ============================================================
-    // 📋 FRAMES DATA - يدعم الفيديو و iframe
+    // 📋 FRAMES DATA - محدث مع الأطارات الجديدة
     // ============================================================
     const FRAMES = [
         { 
@@ -1295,21 +1287,43 @@
         },
         { 
             id: 'frame3', 
-            name: 'إطار فاخر 3', 
+            name: 'إطار VIP', 
             price: 100, 
             duration: 30, 
-            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669', 
+            embedUrl: 'images/vipsystem/vip.mp4', 
             height: 445,
-            isVideo: false 
+            isVideo: true 
         },
         { 
             id: 'frame4', 
-            name: 'إطار فاخر 4', 
+            name: 'إطار Queen', 
             price: 150, 
             duration: 30, 
-            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964', 
+            embedUrl: 'images/vipsystem/queen.mp4', 
             height: 438,
-            isVideo: false 
+            isVideo: true 
+        }
+    ];
+
+    // ============================================================
+    // 📋 CHAT STYLES DATA - أشكال الكتابة
+    // ============================================================
+    const CHAT_STYLES = [
+        {
+            id: 'chatstyle1',
+            name: 'أسلوب كتابة 1',
+            price: 50,
+            duration: 30,
+            image: 'images/vipsystem/chatstyles/chat1style.png',
+            description: 'أسلوب كتابة مميز للدردشة'
+        },
+        {
+            id: 'chatstyle2',
+            name: 'أسلوب كتابة 2',
+            price: 20,
+            duration: 30,
+            image: 'images/vipsystem/chatstyles/chat2style.png',
+            description: 'أسلوب كتابة أنيق وجذاب'
         }
     ];
 
@@ -1604,7 +1618,7 @@
     }
 
     // ============================================================
-    // 💺 SEATS FUNCTIONS WITH FRAMES (يدعم الفيديو و iframe)
+    // 💺 SEATS FUNCTIONS WITH FRAMES (يدعم الفيديو)
     // ============================================================
     async function getUserFrame(userId) {
         try {
@@ -1626,6 +1640,31 @@
             const frameConfig = FRAMES.find(f => f.id === activeFrame);
             return frameConfig || null;
         } catch(e) { console.error('Error getting user frame:', e); return null; }
+    }
+
+    // ============================================================
+    // 👤 CHAT STYLE FUNCTIONS
+    // ============================================================
+    async function getUserChatStyle(userId) {
+        try {
+            const usersRef = database.ref('users');
+            const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
+            if (!snapshot.exists()) return null;
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            const activeChatStyle = user.activeChatStyle || null;
+            const chatStyles = user.chatStyles || {};
+            
+            if (!activeChatStyle) return null;
+            const styleData = chatStyles[activeChatStyle];
+            if (!styleData || !styleData.owned) return null;
+            const expiresAt = styleData.expiresAt ? new Date(styleData.expiresAt) : null;
+            if (expiresAt && expiresAt < new Date()) return null;
+            
+            const styleConfig = CHAT_STYLES.find(s => s.id === activeChatStyle);
+            return styleConfig || null;
+        } catch(e) { console.error('Error getting chat style:', e); return null; }
     }
 
     async function renderSeats(seats) {
@@ -1682,24 +1721,16 @@
                 
                 const wrapperClass = hasFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
                 
-                // توليد الإطار - يدعم الفيديو و iframe
+                // توليد الإطار - يدعم الفيديو
                 let frameHTML = '';
                 if (hasFrame && frameConfig) {
-                    if (frameConfig.isVideo) {
-                        frameHTML = `
-                            <div class="seat-frame active">
-                                <video autoplay loop muted playsinline>
-                                    <source src="${frameConfig.embedUrl}" type="video/mp4">
-                                </video>
-                            </div>
-                        `;
-                    } else {
-                        frameHTML = `
-                            <div class="seat-frame active">
-                                <iframe src="${frameConfig.embedUrl}" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
-                            </div>
-                        `;
-                    }
+                    frameHTML = `
+                        <div class="seat-frame active">
+                            <video autoplay loop muted playsinline>
+                                <source src="${frameConfig.embedUrl}" type="video/mp4">
+                            </video>
+                        </div>
+                    `;
                 } else {
                     frameHTML = `<div class="seat-frame"></div>`;
                 }
