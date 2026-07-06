@@ -16,7 +16,6 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
-        /* ===== جميع الأنماط السابقة مع إضافات للأطارات ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -158,7 +157,7 @@
         .seats-row.row-3 { max-width: 580px; }
         .seats-row.row-4 { max-width: 780px; }
 
-        /* ===== SEAT CIRCLE WITH FRAME ===== */
+        /* ===== SEAT WITH FRAME ===== */
         .seat-wrapper {
             position: relative;
             display: flex;
@@ -185,7 +184,6 @@
             z-index: 2;
         }
 
-        /* ===== FRAME AROUND SEAT ===== */
         .seat-frame {
             position: absolute;
             top: 50%;
@@ -199,9 +197,6 @@
             opacity: 0;
             transition: opacity 0.5s ease;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .seat-frame.active {
@@ -223,17 +218,16 @@
             background: transparent;
         }
 
-        /* ===== FRAME GLOW EFFECT ===== */
         .seat-frame::before {
             content: '';
             position: absolute;
             inset: -5px;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05));
+            background: radial-gradient(circle, rgba(255,215,0,0.15), transparent 70%);
             z-index: -1;
-            filter: blur(10px);
             opacity: 0;
             transition: opacity 0.5s ease;
+            filter: blur(10px);
         }
 
         .seat-frame.active::before {
@@ -242,11 +236,10 @@
         }
 
         @keyframes glowPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
         }
 
-        /* ===== باقي أنماط المقاعد ===== */
         .seat-circle::before {
             content: '';
             position: absolute;
@@ -448,7 +441,6 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
-        /* ===== باقي الأنماط (شات، أوديو، مودالات) ===== */
         .chat-area {
             width: 380px;
             min-width: 300px;
@@ -821,7 +813,6 @@
         }
         #vipEntrance .vip-skip-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); border-color: rgba(255,215,0,0.3); }
 
-        /* ===== MODALS ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -878,7 +869,6 @@
         .modal .btn-secondary { background: #1e293b; color: white; border: 1px solid #334155; }
         .modal .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
 
-        /* ===== GIFT MODAL ===== */
         .gift-options-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -921,7 +911,6 @@
         }
         .gift-receiver-select option { background: #1a1a2e; color: white; }
 
-        /* ===== DROPDOWNS ===== */
         .dropdown-overlay {
             position: fixed;
             top: 75px;
@@ -1017,7 +1006,6 @@
         }
         .notif-actions button:hover { background: #334155; }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
             .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 250px; }
@@ -1290,41 +1278,13 @@
     };
 
     // ============================================================
-    // 📋 FRAMES DATA (مطابق لصفحة VIP)
+    // 📋 FRAMES DATA
     // ============================================================
     const FRAMES = [
-        {
-            id: 'frame1',
-            name: 'إطار فاخر 1',
-            price: 50,
-            duration: 30,
-            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=875809458798946321',
-            height: 405
-        },
-        {
-            id: 'frame2',
-            name: 'إطار فاخر 2',
-            price: 50,
-            duration: 30,
-            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=601723200255670870',
-            height: 445
-        },
-        {
-            id: 'frame3',
-            name: 'إطار فاخر 3',
-            price: 100,
-            duration: 30,
-            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669',
-            height: 445
-        },
-        {
-            id: 'frame4',
-            name: 'إطار فاخر 4',
-            price: 150,
-            duration: 30,
-            embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964',
-            height: 438
-        }
+        { id: 'frame1', name: 'إطار فاخر 1', price: 50, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=875809458798946321', height: 405 },
+        { id: 'frame2', name: 'إطار فاخر 2', price: 50, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=601723200255670870', height: 445 },
+        { id: 'frame3', name: 'إطار فاخر 3', price: 100, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=723320390198898669', height: 445 },
+        { id: 'frame4', name: 'إطار فاخر 4', price: 150, duration: 30, embedUrl: 'https://assets.pinterest.com/ext/embed.html?id=1146025436439103964', height: 438 }
     ];
 
     // ============================================================
@@ -1350,7 +1310,6 @@
     let roomInitialized = false;
     let vipEntranceTimeout = null;
     let isVIPEntranceActive = false;
-    let selectedGiftReceiverId = null;
     let selectedGift = null;
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
@@ -1359,7 +1318,6 @@
     let vipQueue = [];
     let myVIPLevel = null;
     let hasShownMyVIP = false;
-    let userFramesCache = {};
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -1504,9 +1462,6 @@
             listenSeats();
             setupChatScroll();
             
-            // Load user frames data
-            await loadUserFrames();
-            
             // Listen for new users
             listenForNewUsers();
             
@@ -1521,41 +1476,6 @@
             setTimeout(initPeerJS, 1000);
             await updateUI();
         } catch(error) { console.error('Error loading room:', error); }
-    }
-
-    // ============================================================
-    // 🖼️ USER FRAMES LOADER
-    // ============================================================
-    async function loadUserFrames() {
-        try {
-            if (!currentUser?.numericId) return;
-            const user = await getCurrentUserFullData();
-            if (!user) return;
-            userFramesCache = user.frames || {};
-            console.log('🖼️ User frames loaded:', Object.keys(userFramesCache));
-        } catch(e) { console.error('Error loading frames:', e); }
-    }
-
-    async function getUserFrame(userId) {
-        try {
-            const usersRef = database.ref('users');
-            const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
-            if (!snapshot.exists()) return null;
-            const userData = snapshot.val();
-            const userKey = Object.keys(userData)[0];
-            const user = userData[userKey];
-            const activeFrame = user.activeFrame || null;
-            const frames = user.frames || {};
-            
-            if (!activeFrame) return null;
-            const frameData = frames[activeFrame];
-            if (!frameData || !frameData.owned) return null;
-            const expiresAt = frameData.expiresAt ? new Date(frameData.expiresAt) : null;
-            if (expiresAt && expiresAt < new Date()) return null;
-            
-            const frameConfig = FRAMES.find(f => f.id === activeFrame);
-            return frameConfig || null;
-        } catch(e) { console.error('Error getting user frame:', e); return null; }
     }
 
     // ============================================================
@@ -1659,10 +1579,43 @@
     // ============================================================
     // 💺 SEATS FUNCTIONS WITH FRAMES
     // ============================================================
-    function renderSeats(seats) {
+    async function getUserFrame(userId) {
+        try {
+            const usersRef = database.ref('users');
+            const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
+            if (!snapshot.exists()) return null;
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            const activeFrame = user.activeFrame || null;
+            const frames = user.frames || {};
+            
+            if (!activeFrame) return null;
+            const frameData = frames[activeFrame];
+            if (!frameData || !frameData.owned) return null;
+            const expiresAt = frameData.expiresAt ? new Date(frameData.expiresAt) : null;
+            if (expiresAt && expiresAt < new Date()) return null;
+            
+            const frameConfig = FRAMES.find(f => f.id === activeFrame);
+            return frameConfig || null;
+        } catch(e) { console.error('Error getting user frame:', e); return null; }
+    }
+
+    async function renderSeats(seats) {
         const container = document.getElementById('seatsContainer');
         let html = '', occupied = 0, globalIndex = 0;
         const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
+        
+        // Load frames for all occupied seats
+        for (const index in seats) {
+            const seat = seats[index];
+            if (seat && seat.userId) {
+                const frame = await getUserFrame(seat.userId);
+                if (frame) {
+                    seats[index].activeFrame = frame.id;
+                }
+            }
+        }
         
         SEATS_LAYOUT.forEach((rowData, rowIndex) => {
             html += `<div class="seats-row row-${rowIndex + 1}">`;
@@ -1685,12 +1638,8 @@
                 const userColor = seat?.color || colors[globalIndex % colors.length];
                 const displayName = seat ? seat.username : '';
                 const avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
-                const userId = seat?.userId || null;
-                
-                // Get frame for this user
-                const frameId = seat?.activeFrame || null;
-                const frameConfig = frameId ? FRAMES.find(f => f.id === frameId) : null;
-                const hasFrame = frameConfig && frameId;
+                const hasFrame = seat?.activeFrame ? true : false;
+                const frameConfig = hasFrame ? FRAMES.find(f => f.id === seat.activeFrame) : null;
                 
                 let seatClass = 'seat-circle';
                 if (!isOccupied) seatClass += ' empty';
@@ -1705,7 +1654,7 @@
                 
                 html += `
                     <div class="seat-wrapper">
-                        ${hasFrame ? `
+                        ${hasFrame && frameConfig ? `
                             <div class="seat-frame active">
                                 <iframe src="${frameConfig.embedUrl}" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
                             </div>
@@ -1765,22 +1714,6 @@
         document.getElementById('usersBadge').textContent = occupied;
         document.getElementById('chatMemberCount').textContent = occupied;
         document.getElementById('chatOnlineCount').innerHTML = `👥 <span id="chatMemberCount">${occupied}</span>`;
-        
-        // Load frames for occupied seats
-        loadFramesForSeats(seats);
-    }
-
-    async function loadFramesForSeats(seats) {
-        for (const index in seats) {
-            const seat = seats[index];
-            if (seat && seat.userId) {
-                const frame = await getUserFrame(seat.userId);
-                if (frame) {
-                    // Update seat data with frame
-                    database.ref('rooms/' + roomId + '/seats/' + index + '/activeFrame').set(frame.id);
-                }
-            }
-        }
     }
 
     function loadSeats() {
@@ -1879,7 +1812,7 @@
     }
 
     // ============================================================
-    // باقي الدوال (OWNER, MIC, SPEAKER, CHAT, GIFT, NOTIFICATIONS, TOPUP, LOGOUT)
+    // 👑 OWNER FUNCTIONS
     // ============================================================
     async function kickUser(seatIndex) {
         if (!isOwner || !confirm('طرد المستخدم؟')) return;
@@ -1902,6 +1835,9 @@
         } catch(e) { showToast('❌ حدث خطأ', 'error'); }
     }
 
+    // ============================================================
+    // 🎤 MIC & SPEAKER
+    // ============================================================
     function toggleMic() {
         if (mySeatIndex === -1) {
             showToast('⚠️ يجب الجلوس على مقعد أولاً', 'warning');
@@ -2065,7 +2001,6 @@
         document.getElementById('screenOverlay').classList.add('active');
         document.getElementById('giftStatusMessage').textContent = '';
         selectedGift = null;
-        selectedGiftReceiverId = null;
     }
 
     async function loadGiftReceivers() {
@@ -2228,7 +2163,6 @@
         document.getElementById('giftSendModal').style.display = 'none';
         document.getElementById('screenOverlay').classList.remove('active');
         selectedGift = null;
-        selectedGiftReceiverId = null;
         document.getElementById('giftStatusMessage').textContent = '';
         document.querySelectorAll('.gift-option-card').forEach(el => el.classList.remove('selected'));
     }
