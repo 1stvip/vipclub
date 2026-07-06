@@ -417,7 +417,7 @@
         }
         .chat-messages .message.system.join { background: rgba(16,185,129,0.06); color: #10b981; border-color: rgba(16,185,129,0.06); }
         .chat-messages .message.system.leave { background: rgba(239,68,68,0.04); color: #ef4444; border-color: rgba(239,68,68,0.05); }
-        .chat-messages .message.system.vip { background: rgba(255,215,0,0.1); color: #ffd700; border-color: rgba(255,215,0,0.15); }
+        .chat-messages .message.system.vip { background: rgba(255,215,0,0.12); color: #ffd700; border-color: rgba(255,215,0,0.2); font-weight: bold; }
         .chat-messages .message.own {
             background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.15));
             align-self: flex-end;
@@ -660,24 +660,32 @@
             width: 100%;
             height: 100%;
             z-index: 99999;
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             pointer-events: none;
         }
-        #vipEntrance.active { display: flex !important; animation: vipFadeIn 0.5s ease; pointer-events: all; }
-        @keyframes vipFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        #vipEntrance.active { 
+            display: flex !important; 
+            animation: vipFadeIn 0.6s ease; 
+            pointer-events: all;
+        }
+        @keyframes vipFadeIn { 
+            from { opacity: 0; transform: scale(0.9); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
 
         #vipEntrance .vip-video-container {
             width: 60%;
-            max-width: 500px;
+            max-width: 550px;
             border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 0 80px rgba(255,215,0,0.25);
+            box-shadow: 0 0 80px rgba(255,215,0,0.3), 0 0 150px rgba(255,215,0,0.1);
             position: relative;
             background: #000;
+            border: 2px solid rgba(255,215,0,0.2);
         }
         #vipEntrance .vip-video-container video { width: 100%; display: block; }
 
@@ -687,42 +695,44 @@
             left: 50%;
             transform: translateX(-50%);
             color: #ffd700;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 900;
-            text-shadow: 0 0 30px rgba(255,215,0,0.4);
+            text-shadow: 0 0 40px rgba(255,215,0,0.5), 0 0 80px rgba(255,215,0,0.2);
             z-index: 10;
             text-align: center;
-            background: rgba(0,0,0,0.5);
-            padding: 8px 25px;
-            border-radius: 14px;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 30px;
+            border-radius: 16px;
             backdrop-filter: blur(5px);
-            border: 2px solid rgba(255,215,0,0.15);
+            border: 2px solid rgba(255,215,0,0.2);
             letter-spacing: 2px;
+            white-space: nowrap;
         }
         #vipEntrance .vip-user {
-            margin-top: 15px;
+            margin-top: 20px;
             color: #fff;
-            font-size: 1rem;
-            background: rgba(0,0,0,0.5);
-            padding: 6px 25px;
-            border-radius: 10px;
+            font-size: 1.2rem;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 30px;
+            border-radius: 12px;
             backdrop-filter: blur(3px);
+            border: 1px solid rgba(255,255,255,0.05);
         }
         #vipEntrance .vip-skip-btn {
-            margin-top: 20px;
-            padding: 10px 35px;
+            margin-top: 25px;
+            padding: 12px 40px;
             background: rgba(255,255,255,0.1);
             color: white;
             border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1rem;
             transition: 0.3s;
             backdrop-filter: blur(5px);
             pointer-events: all;
         }
-        #vipEntrance .vip-skip-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+        #vipEntrance .vip-skip-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); border-color: rgba(255,215,0,0.3); }
 
         /* ===== MODALS ===== */
         .modal-overlay {
@@ -847,7 +857,7 @@
             .audio-btn { width: 42px; height: 42px; font-size: 1rem; }
             .btn-leave-seat { width: 42px; height: 42px; font-size: 1rem; }
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
-            #vipEntrance .vip-title { font-size: 1.2rem; padding: 6px 15px; }
+            #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 18px; }
         }
 
         @media (max-width: 480px) {
@@ -859,6 +869,7 @@
             .chat-area { height: 220px; }
             .main-layout { padding: 5px; }
             .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+            #vipEntrance .vip-title { font-size: 1rem; padding: 6px 12px; white-space: normal; }
         }
     </style>
 </head>
@@ -870,12 +881,10 @@
         <div class="logo" onclick="window.location.href='chat.html'">
             <i class="fas fa-crown"></i> VipChat
         </div>
-        <!-- أيقونة المستخدمين (مكان VIP سابقاً) -->
         <button class="icon-btn" onclick="toggleUsersList()" title="المستخدمين">
             <i class="fas fa-users"></i>
             <span class="badge" id="usersBadge">0</span>
         </button>
-        <!-- أيقونة الملف الشخصي (مكان الإشعارات سابقاً) -->
         <button class="icon-btn" onclick="handleProfileClick()" title="الملف الشخصي">
             <i class="fas fa-user-circle"></i>
         </button>
@@ -890,12 +899,10 @@
     </div>
 
     <div class="nav-icons">
-        <!-- أيقونة الإشعارات (مكان الملف الشخصي سابقاً) -->
         <button class="icon-btn" onclick="openNotifDropdown()" title="الإشعارات">
             <i class="fas fa-bell"></i>
             <span class="badge" id="notifBadge">0</span>
         </button>
-        <!-- زر الهدايا الجديد بجانب الإشعارات -->
         <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
             <i class="fas fa-gift"></i>
         </button>
@@ -1120,6 +1127,7 @@
     let selectedGift = null;
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
+    let vipShownForUsers = {};
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -1267,9 +1275,12 @@
             listenSeats();
             setupChatScroll();
             
-            // Show VIP entrance for ALL users in the room
+            // Listen for new users joining to show VIP entrance
+            listenForNewUsers();
+            
+            // Show VIP entrance for current user if they have VIP
             if (currentUser?.numericId) {
-                setTimeout(() => showVIPEntranceForAll(currentUser.numericId, currentUser.nickname || currentUser.username), 1500);
+                setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, currentUser.nickname || currentUser.username), 1500);
             }
             
             setTimeout(initPeerJS, 1000);
@@ -1280,7 +1291,27 @@
     // ============================================================
     // 👑 VIP ENTRANCE FOR ALL USERS
     // ============================================================
-    async function showVIPEntranceForAll(userId, username) {
+    function listenForNewUsers() {
+        if (!database || !roomId) return;
+        // Listen for new seats being added (users joining)
+        database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
+            const seat = snapshot.val();
+            if (seat && seat.userId) {
+                const userId = seat.userId;
+                const username = seat.username || 'مستخدم';
+                // Don't show for current user (already shown)
+                if (userId != currentUser?.numericId) {
+                    // Check if VIP entrance already shown for this user
+                    if (!vipShownForUsers[userId]) {
+                        vipShownForUsers[userId] = true;
+                        setTimeout(() => checkAndShowVIPEntrance(userId, username), 500);
+                    }
+                }
+            }
+        });
+    }
+
+    async function checkAndShowVIPEntrance(userId, username) {
         if (!database || isVIPEntranceActive) return;
         try {
             const usersRef = database.ref('users');
@@ -1297,25 +1328,35 @@
             const vipConfig = VIP_CONFIG[activeVIP];
             if (!vipConfig) return;
             
-            // Send VIP entrance to all users in the room via chat
+            // Send VIP entrance message to chat for all users
             addChatMessage('system', `👑 **${username}** دخل الغرفة بـ ${vipConfig.emoji} ${vipConfig.title}!`, null, null, 'vip');
             
-            // Show VIP video for all users
+            // Show VIP video for all users in the room
             isVIPEntranceActive = true;
             const entrance = document.getElementById('vipEntrance');
             const video = document.getElementById('vipVideoPlayer');
             const title = document.getElementById('vipTitle');
             const userDisplay = document.getElementById('vipEntranceUser');
+            
+            // Reset video
+            video.pause();
+            video.currentTime = 0;
             video.muted = false;
             video.src = vipConfig.video;
             video.load();
+            
             title.textContent = `${vipConfig.emoji} ${vipConfig.title}`;
             userDisplay.textContent = `👤 ${username}`;
             entrance.classList.add('active');
-            try { await video.play(); } catch(e) {}
+            
+            try { await video.play(); } catch(e) { console.log('Video play error:', e); }
+            
             if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
-            vipEntranceTimeout = setTimeout(skipVIPEntrance, 7000);
-        } catch(error) { console.error('VIP entrance error:', error); isVIPEntranceActive = false; }
+            vipEntranceTimeout = setTimeout(skipVIPEntrance, 8000);
+        } catch(error) { 
+            console.error('VIP entrance error:', error); 
+            isVIPEntranceActive = false;
+        }
     }
 
     function skipVIPEntrance() {
@@ -1486,6 +1527,9 @@
         }, 1000);
         showToast(seatIndex === 0 && isOwner ? '👑 جلست على مقعد المالك' : `✅ جلست على مقعد ${seatIndex + 1}`, 'success');
         addChatMessage('system', `👋 **${currentUser.nickname || currentUser.username}** انضم للغرفة`, null, null, 'join');
+        
+        // Check if this user has VIP and show entrance
+        setTimeout(() => checkAndShowVIPEntrance(currentUser.numericId, currentUser.nickname || currentUser.username), 500);
     }
 
     async function leaveSeat() {
@@ -1568,7 +1612,6 @@
         }
         if (roomId && mySeatIndex !== -1) {
             database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/muted').set(isMicMuted);
-            // Update speaking status
             database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/speaking').set(!isMicMuted);
         }
     }
@@ -1700,13 +1743,9 @@
     }
 
     function openGiftModal() {
-        // Load users list into select
         loadGiftReceivers();
-        // Load gift options
         loadGiftOptions();
-        // Update balance
         updateGiftBalance();
-        // Show modal
         document.getElementById('giftSendModal').classList.add('active');
         document.getElementById('giftSendModal').style.display = 'flex';
         document.getElementById('screenOverlay').classList.add('active');
@@ -1730,9 +1769,7 @@
                     select.appendChild(option);
                 }
             }
-            // Also include room creator if not in seats
             if (roomData && roomData.creatorId && roomData.creatorId != currentUser?.numericId) {
-                // Check if creator is not already in list
                 const existing = Array.from(select.options).some(o => o.value == roomData.creatorId);
                 if (!existing) {
                     const option = document.createElement('option');
@@ -1756,9 +1793,7 @@
     }
 
     function selectGiftOption(giftId) {
-        // Clear previous selection
         document.querySelectorAll('.gift-option-card').forEach(el => el.classList.remove('selected'));
-        // Select new
         const selected = document.querySelector(`.gift-option-card[data-gift-id="${giftId}"]`);
         if (selected) {
             selected.classList.add('selected');
@@ -1798,14 +1833,12 @@
             return;
         }
         
-        // Confirm with user
         if (!confirm(`تأكيد إرسال ${selectedGift.emoji} ${selectedGift.name} (${selectedGift.price} ج.م) إلى المستخدم؟`)) return;
         
         document.getElementById('confirmGiftBtn').disabled = true;
         document.getElementById('confirmGiftBtn').textContent = 'جاري الإرسال...';
         
         try {
-            // Get receiver info
             const receiverSnapshot = await database.ref('users').orderByChild('numericId').equalTo(parseInt(receiverId)).once('value');
             if (!receiverSnapshot.exists()) {
                 showToast('❌ المستخدم غير موجود', 'error');
@@ -1815,14 +1848,12 @@
             const rKey = Object.keys(rData)[0];
             const rUser = rData[rKey];
             
-            // Deduct from sender
             const newBalance = (user.balanceEGP || 0) - selectedGift.price;
             await database.ref('users/' + user.firebaseKey).update({
                 balanceEGP: newBalance,
                 updatedAt: new Date().toISOString()
             });
             
-            // Add to receiver's gifts
             const giftsList = rUser.giftsList || [];
             giftsList.push({
                 senderId: user.numericId,
@@ -1840,7 +1871,6 @@
                 updatedAt: new Date().toISOString()
             });
             
-            // Send notification to receiver
             await database.ref('users/' + rKey + '/notifications').push({
                 id: Date.now(),
                 text: `🎁 تلقيت ${selectedGift.emoji} ${selectedGift.name} من ${user.nickname || user.username}! 💰 ${selectedGift.price} ج.م`,
@@ -1850,12 +1880,10 @@
                 createdAt: new Date().toISOString()
             });
             
-            // Chat message
             addChatMessage('system', `🎁 **${user.nickname || user.username}** أرسل ${selectedGift.emoji} ${selectedGift.name} إلى **${rUser.nickname || rUser.username}**`, null, null, '');
             
             showToast(`✅ تم إرسال ${selectedGift.emoji} ${selectedGift.name} بنجاح!`, 'success');
             
-            // Update local storage
             if (currentUser) {
                 currentUser.balanceEGP = newBalance;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
@@ -1866,7 +1894,6 @@
             document.getElementById('giftStatusMessage').textContent = `✅ تم الإرسال بنجاح!`;
             document.getElementById('giftStatusMessage').style.color = '#10b981';
             
-            // Reset selection
             document.querySelectorAll('.gift-option-card').forEach(el => el.classList.remove('selected'));
             selectedGift = null;
             document.getElementById('giftReceiverSelect').value = '';
@@ -2101,6 +2128,13 @@
         document.getElementById('giftSendModal').classList.remove('active');
         document.getElementById('usersListContainer').style.display = 'none';
     }
+
+    // إغلاق النوافذ المنبثقة عند الضغط على الـ overlay
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('screenOverlay').addEventListener('click', function(e) {
+            closeAll();
+        });
+    });
 
     function copyId() {
         const text = document.getElementById('p_id').innerText;
