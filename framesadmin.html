@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 إدارة الأطارات - Admin</title>
+    <link rel="shortcut icon" href="images/videoslogo/vip.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .back-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ===== SEARCH ===== */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+        .search-box input::placeholder { color: #666; }
+        .search-box button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .search-box .btn-search { background: #8b5cf6; color: white; }
+        .search-box .btn-search:hover { background: #7c3aed; transform: translateY(-2px); }
+        .search-box .btn-reset { background: #334155; color: white; }
+        .search-box .btn-reset:hover { background: #475569; transform: translateY(-2px); }
+
+        /* ===== USERS LIST ===== */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .user-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .user-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,215,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .user-card .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-card .user-name { font-weight: bold; font-size: 1.1rem; color: #fff; }
+        .user-card .user-id { font-size: 0.7rem; color: #94a3b8; font-family: monospace; }
+        .user-card .user-frames { font-size: 0.8rem; color: #94a3b8; }
+        .user-card .user-frames span { color: #ffd700; }
+
+        .user-card .btn-gift {
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
+        .user-card .btn-gift:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(245, 158, 11, 0.3); }
+
+        /* ===== GIFT MODAL ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+            z-index: 9998; display: none;
+        }
+        .modal-overlay.active { display: block; }
+
+        .modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 450px; max-width: 95%; max-height: 90vh; overflow-y: auto;
+            z-index: 10001; padding: 25px;
+            display: none; flex-direction: column;
+            background: #1e293b; border-radius: 28px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+            border: 1px solid #334155; color: white;
+        }
+        .modal.active { display: flex !important; animation: popIn 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translate(-50%,-50%); } to { opacity: 1; transform: scale(1) translate(-50%,-50%); } }
+
+        .modal h3 { text-align: center; color: #ffd700; margin-bottom: 10px; }
+        .modal p { color: #94a3b8; text-align: center; }
+        .modal .form-group { margin: 12px 0; }
+        .modal .form-group label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; color: #94a3b8; }
+        .modal .form-group select, .modal .form-group input {
+            width: 100%; padding: 10px; border-radius: 10px;
+            border: 1px solid #334155; background: #0f172a; color: white;
+            font-size: 0.9rem;
+        }
+        .modal .form-group select option { background: #1a1a2e; }
+
+        .modal .action-btn {
+            width: 100%; padding: 12px; border-radius: 14px;
+            border: none; cursor: pointer; font-weight: bold;
+            transition: 0.3s; margin-top: 8px; font-size: 0.9rem;
+        }
+        .modal .btn-primary { background: #8b5cf6; color: white; }
+        .modal .btn-primary:hover { background: #7c3aed; transform: translateY(-2px); }
+        .modal .btn-success { background: #10b981; color: white; }
+        .modal .btn-success:hover { background: #059669; transform: translateY(-2px); }
+        .modal .btn-secondary { background: #1e293b; color: white; border: 1px solid #334155; }
+        .modal .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
+
+        /* ===== LOGS TABLE ===== */
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+        .logs-table th {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 2px solid #334155;
+            color: #ffd700;
+        }
+        .logs-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: #cbd5e1;
+        }
+        .logs-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .logs-table .status-active { color: #10b981; }
+        .logs-table .status-expired { color: #ef4444; }
+
+        .logs-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .logs-container::-webkit-scrollbar { width: 6px; }
+        .logs-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 3px; }
+        .logs-container::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 3px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .users-grid { grid-template-columns: 1fr 1fr; }
+            .modal { width: 95%; }
+            .logs-table { font-size: 0.7rem; }
+            .logs-table th, .logs-table td { padding: 6px 4px; }
+        }
+        @media (max-width: 480px) {
+            .users-grid { grid-template-columns: 1fr; }
+            .header .logo { font-size: 1.2rem; }
+            .tabs .tab-btn { padding: 8px 15px; font-size: 0.8rem; }
+            .search-box input { min-width: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                إدارة الأطارات
+            </div>
+            <div>
+                <a href="VipSystem.html" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> العودة لنظام VIP
+                </a>
+                <a href="index.html" class="back-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); margin-right: 10px;">
+                    <i class="fas fa-home"></i> الرئيسية
+                </a>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('users')" id="tabUsers">
+                <i class="fas fa-users"></i> المستخدمين
+            </button>
+            <button class="tab-btn" onclick="switchTab('logs')" id="tabLogs">
+                <i class="fas fa-history"></i> سجل المشتريات
+            </button>
+        </div>
+
+        <!-- Users Tab -->
+        <div class="tab-content active" id="tabContentUsers">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 ابحث باسم المستخدم أو المعرف..." oninput="searchUsers()">
+                <button class="btn-reset" onclick="resetSearch()">🗑️ مسح</button>
+                <button class="btn-search" onclick="searchUsers()">🔍 بحث</button>
+            </div>
+            <div class="users-grid" id="usersGrid">
+                <div style="grid-column:1/-1; text-align:center; padding:40px; color:#666;">جاري تحميل المستخدمين...</div>
+            </div>
+        </div>
+
+        <!-- Logs Tab -->
+        <div class="tab-content" id="tabContentLogs">
+            <div class="logs-container">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>👤 المستخدم</th>
+                            <th>🆔 المعرف</th>
+                            <th>🖼️ الإطار</th>
+                            <th>💰 القيمة</th>
+                            <th>📅 تاريخ البدأ</th>
+                            <th>📅 تاريخ الانتهاء</th>
+                            <th>📊 الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsBody">
+                        <tr><td colspan="8" style="text-align:center; color:#666; padding:30px;">لا توجد سجلات</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== GIFT MODAL ===== -->
+    <div id="screenOverlay" class="modal-overlay" onclick="closeModal()"></div>
+    <div id="giftModal" class="modal">
+        <h3>🎁 إهداء إطار</h3>
+        <p style="font-size:0.85rem;">إهداء إطار لـ <span id="giftUserName" style="color:#ffd700;">---</span></p>
+        
+        <div class="form-group">
+            <label>🖼️ اختر الإطار:</label>
+            <select id="giftFrameSelect"></select>
+        </div>
+        
+        <div class="form-group">
+            <label>⏱️ مدة التفعيل (أيام):</label>
+            <input type="number" id="giftDuration" value="30" min="1" max="365">
+        </div>
+        
+        <div class="form-group">
+            <label>📝 ملاحظة (اختياري):</label>
+            <input type="text" id="giftNote" placeholder="سبب الإهداء...">
+        </div>
+        
+        <button class="action-btn btn-success" onclick="confirmGift()">
+            <i class="fas fa-gift"></i> تأكيد الإهداء
+        </button>
+        <button class="action-btn btn-secondary" onclick="closeModal()">إلغاء</button>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+            authDomain: "vipclub-1d04a.firebaseapp.com",
+            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+            projectId: "vipclub-1d04a",
+            storageBucket: "vipclub-1d04a.firebasestorage.app",
+            messagingSenderId: "120667552740",
+            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        };
+
+        // ============================================================
+        // 📋 FRAMES DATA (مطابق لـ VipSystem)
+        // ============================================================
+        const FRAMES = [
+            { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true, isSpecial: true, specialLabel: '🎁 أطار أصدار خاص' },
+            { id: 'frame2', name: 'إطار فاخر 2', price: 50, embedUrl: 'images/vipsystem/warrior.mp4', isVideo: true, isSpecial: false },
+            { id: 'frame3', name: 'إطار فاخر 3', price: 100, embedUrl: 'images/vipsystem/vip.mp4', isVideo: true, isSpecial: false },
+            { id: 'frame4', name: 'إطار فاخر 4', price: 150, embedUrl: 'images/vipsystem/queen.mp4', isVideo: true, isSpecial: false }
+        ];
+
+        // ============================================================
+        // 📋 VARIABLES
+        // ============================================================
+        let database;
+        let allUsers = [];
+        let giftTargetUser = null;
+        let isAdmin = false;
+
+        // ============================================================
+        // 🚀 INIT
+        // ============================================================
+        async function init() {
+            try {
+                if (firebase.apps.length > 0) await firebase.app().delete();
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                console.log('✅ Firebase connected');
+
+                // تحقق من الصلاحية (Admin)
+                await checkAdminStatus();
+
+                // تحميل المستخدمين
+                await loadUsers();
+
+                // تحميل السجلات
+                await loadLogs();
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                document.getElementById('usersGrid').innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:40px; color:#ef4444;">
+                        ❌ حدث خطأ في التحميل: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================
+        // 🔐 ADMIN CHECK
+        // ============================================================
+        async function checkAdminStatus() {
+            try {
+                const adminRef = database.ref('admins');
+                const snapshot = await adminRef.once('value');
+                const admins = snapshot.val() || {};
+                
+                // تحقق من المستخدم الحالي في localStorage
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const userId = currentUser.numericId || currentUser.id;
+                
+                if (userId && admins[userId]) {
+                    isAdmin = true;
+                    console.log('✅ Admin verified');
+                } else {
+                    // إذا لم يكن Admin، أظهر رسالة
+                    isAdmin = false;
+                    document.getElementById('usersGrid').innerHTML = `
+                        <div style="grid-column:1/-1; text-align:center; padding:50px; color:#ef4444;">
+                            <i class="fas fa-lock" style="font-size:3rem; display:block; margin-bottom:15px;"></i>
+                            <h2 style="color:#ffd700;">⛔ غير مصرح</h2>
+                            <p style="color:#94a3b8;">هذه الصفحة مخصصة للإدارة فقط</p>
+                            <a href="VipSystem.html" style="display:inline-block; margin-top:15px; padding:10px 30px; background:#8b5cf6; color:white; border-radius:10px; text-decoration:none;">العودة لنظام VIP</a>
+                        </div>
+                    `;
+                }
+            } catch(e) {
+                console.error('Admin check error:', e);
+                isAdmin = false;
+            }
+        }
+
+        // ============================================================
+        // 👥 LOAD USERS
+        // ============================================================
+        async function loadUsers() {
+            if (!isAdmin) return;
+            
+            try {
+                const snapshot = await database.ref('users').once('value');
+                const users = snapshot.val() || {};
+                allUsers = [];
+                
+                for (const key in users) {
+                    const user = users[key];
+                    user.firebaseKey = key;
+                    allUsers.push(user);
+                }
+                
+                renderUsers(allUsers);
+            } catch(e) {
+                console.error('Error loading users:', e);
+            }
+        }
+
+        // ============================================================
+        // 🖼️ RENDER USERS
+        // ============================================================
+        function renderUsers(users) {
+            const grid = document.getElementById('usersGrid');
+            
+            if (!users || users.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#666;">لا يوجد مستخدمين</div>';
+                return;
+            }
+            
+            grid.innerHTML = users.map(user => {
+                const frames = user.frames || {};
+                const frameCount = Object.keys(frames).length;
+                const activeFrame = user.activeFrame || 'لا يوجد';
+                const frameName = FRAMES.find(f => f.id === activeFrame)?.name || activeFrame;
+                
+                return `
+                    <div class="user-card" data-userid="${user.numericId}">
+                        <div class="user-header">
+                            <span class="user-name">${user.nickname || user.username || 'مستخدم'}</span>
+                            <span class="user-id">🆔 ${user.numericId || '---'}</span>
+                        </div>
+                        <div class="user-frames">
+                            📦 الأطارات: <span>${frameCount}</span>
+                            ${activeFrame ? `| 🔥 مفعل: <span>${frameName}</span>` : ''}
+                        </div>
+                        <div style="display:flex; gap:8px; margin-top:5px; flex-wrap:wrap;">
+                            <button class="btn-gift" onclick="openGiftModal('${user.numericId}', '${user.nickname || user.username}')">
+                                <i class="fas fa-gift"></i> إهداء إطار
+                            </button>
+                            <button class="btn-gift" style="background: linear-gradient(135deg, #3b82f6, #2563eb);" onclick="viewUserFrames('${user.numericId}')">
+                                <i class="fas fa-eye"></i> عرض
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // 🔍 SEARCH USERS
+        // ============================================================
+        function searchUsers() {
+            const input = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!input) {
+                renderUsers(allUsers);
+                return;
+            }
+            
+            const filtered = allUsers.filter(user => {
+                const name = (user.nickname || user.username || '').toLowerCase();
+                const id = (user.numericId || '').toString();
+                return name.includes(input) || id.includes(input);
+            });
+            
+            renderUsers(filtered);
+        }
+
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            renderUsers(allUsers);
+        }
+
+        // ============================================================
+        // 🎁 GIFT MODAL
+        // ============================================================
+        function openGiftModal(userId, userName) {
+            if (!isAdmin) return;
+            
+            giftTargetUser = { id: userId, name: userName };
+            document.getElementById('giftUserName').textContent = userName;
+            
+            // ملء قائمة الأطارات
+            const select = document.getElementById('giftFrameSelect');
+            select.innerHTML = '';
+            FRAMES.forEach(frame => {
+                const option = document.createElement('option');
+                option.value = frame.id;
+                let label = `${frame.name}`;
+                if (frame.isSpecial) label += ` (${frame.specialLabel})`;
+                option.textContent = label;
+                select.appendChild(option);
+            });
+            
+            document.getElementById('giftDuration').value = 30;
+            document.getElementById('giftNote').value = '';
+            
+            document.getElementById('giftModal').classList.add('active');
+            document.getElementById('giftModal').style.display = 'flex';
+            document.getElementById('screenOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('giftModal').classList.remove('active');
+            document.getElementById('giftModal').style.display = 'none';
+            document.getElementById('screenOverlay').classList.remove('active');
+            giftTargetUser = null;
+        }
+
+        // ============================================================
+        // ✅ CONFIRM GIFT
+        // ============================================================
+        async function confirmGift() {
+            if (!giftTargetUser || !isAdmin) {
+                showToast('❌ خطأ في البيانات', 'error');
+                return;
+            }
+            
+            const frameId = document.getElementById('giftFrameSelect').value;
+            const duration = parseInt(document.getElementById('giftDuration').value) || 30;
+            const note = document.getElementById('giftNote').value.trim() || 'هدية من الإدارة';
+            
+            if (!frameId) {
+                showToast('⚠️ يرجى اختيار إطار', 'warning');
+                return;
+            }
+            
+            if (duration < 1 || duration > 365) {
+                showToast('⚠️ المدة بين 1 و 365 يوم', 'warning');
+                return;
+            }
+            
+            try {
+                // جلب بيانات المستخدم
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(giftTargetUser.id)).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+                
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+                const user = userData[userKey];
+                
+                // حساب تاريخ الانتهاء
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + duration);
+                
+                // تحديث أطارات المستخدم
+                const frames = user.frames || {};
+                frames[frameId] = {
+                    owned: true,
+                    purchasedAt: now.toISOString(),
+                    expiresAt: expiresAt.toISOString(),
+                    giftedBy: 'admin',
+                    note: note,
+                    duration: duration
+                };
+                
+                await database.ref('users/' + userKey + '/frames').set(frames);
+                
+                // تفعيل الإطار تلقائياً
+                await database.ref('users/' + userKey + '/activeFrame').set(frameId);
+                
+                // تسجيل في السجل
+                const logEntry = {
+                    userId: giftTargetUser.id,
+                    username: giftTargetUser.name,
+                    frameId: frameId,
+                    frameName: FRAMES.find(f => f.id === frameId)?.name || frameId,
+                    price: 0,
+                    type: 'gift',
+                    note: note,
+                    duration: duration,
+                    startDate: now.toISOString(),
+                    expiryDate: expiresAt.toISOString(),
+                    giftedBy: 'admin',
+                    timestamp: now.toISOString()
+                };
+                await database.ref('frameLogs').push(logEntry);
+                
+                // إشعار للمستخدم
+                const notification = {
+                    id: Date.now(),
+                    text: `🎁 تم إهداؤك إطار "${FRAMES.find(f => f.id === frameId)?.name || frameId}" من الإدارة! مدة ${duration} يوم.${note ? ` (${note})` : ''}`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'frame_gifted',
+                    createdAt: now.toISOString()
+                };
+                await database.ref('users/' + userKey + '/notifications').push(notification);
+                
+                showToast(`✅ تم إهداء الإطار بنجاح لـ ${giftTargetUser.name}`, 'success');
+                closeModal();
+                
+                // إعادة تحميل البيانات
+                await loadUsers();
+                await loadLogs();
+                
+            } catch(e) {
+                console.error('Gift error:', e);
+                showToast('❌ حدث خطأ في الإهداء', 'error');
+            }
+        }
+
+        // ============================================================
+        // 📊 LOAD LOGS
+        // ============================================================
+        async function loadLogs() {
+            try {
+                const snapshot = await database.ref('frameLogs').orderByChild('timestamp').limitToLast(100).once('value');
+                const logs = snapshot.val() || {};
+                const logsArray = [];
+                
+                for (const key in logs) {
+                    const log = logs[key];
+                    log.key = key;
+                    logsArray.push(log);
+                }
+                
+                // ترتيب من الأحدث للأقدم
+                logsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                renderLogs(logsArray);
+            } catch(e) {
+                console.error('Error loading logs:', e);
+            }
+        }
+
+        function renderLogs(logs) {
+            const tbody = document.getElementById('logsBody');
+            
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#666; padding:30px;">لا توجد سجلات</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = logs.map((log, index) => {
+                const now = new Date();
+                const expiry = new Date(log.expiryDate);
+                const isExpired = expiry < now;
+                
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${log.username || 'مستخدم'}</td>
+                        <td style="font-family:monospace;">${log.userId || '---'}</td>
+                        <td>${log.frameName || log.frameId}</td>
+                        <td>${log.price === 0 ? '🎁 هدية' : log.price + ' ج.م'}</td>
+                        <td>${new Date(log.startDate).toLocaleDateString('ar-EG')}</td>
+                        <td>${new Date(log.expiryDate).toLocaleDateString('ar-EG')}</td>
+                        <td class="${isExpired ? 'status-expired' : 'status-active'}">
+                            ${isExpired ? '⏳ منتهي' : '✅ مفعل'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // 👁️ VIEW USER FRAMES
+        // ============================================================
+        async function viewUserFrames(userId) {
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+                
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+                const user = userData[userKey];
+                const frames = user.frames || {};
+                const activeFrame = user.activeFrame || null;
+                
+                let message = `📦 أطارات المستخدم ${user.nickname || user.username}:\n\n`;
+                if (Object.keys(frames).length === 0) {
+                    message += '❌ لا يوجد أطارات';
+                } else {
+                    for (const id in frames) {
+                        const frame = frames[id];
+                        const frameName = FRAMES.find(f => f.id === id)?.name || id;
+                        const isActive = id === activeFrame;
+                        const expiresAt = frame.expiresAt ? new Date(frame.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد';
+                        message += `${isActive ? '✅' : '📦'} ${frameName}\n`;
+                        message += `   📅 ينتهي: ${expiresAt}\n`;
+                        message += `   ${frame.giftedBy === 'admin' ? '🎁 هدية من الإدارة' : '🛒 مشترى'}\n\n`;
+                    }
+                }
+                
+                alert(message);
+                
+            } catch(e) {
+                console.error('Error viewing user frames:', e);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🍞 TOAST
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
+            const old = document.querySelector('.toast-message');
+            if (old) old.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.style.cssText = `position:fixed;top:70px;right:20px;padding:12px 20px;border-radius:12px;color:white;font-weight:600;z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,0.4);animation:slideDown 0.3s ease-out;max-width:320px;direction:rtl;font-size:0.85rem;background:${colors[type] || colors.info};`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================================
+        // 📑 TABS
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tabContent${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+            document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+        }
+
+        // ============================================================
+        // 🚀 START
+        // ============================================================
+        window.onload = function() {
+            init();
+        };
+    </script>
+</body>
+</html>
