@@ -1230,6 +1230,8 @@
     let vipShownForUsers = {};
     let isProcessingJoin = false;
     let vipQueue = [];
+    let myVIPLevel = null;
+    let hasShownMyVIP = false;
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -1374,16 +1376,19 @@
             listenSeats();
             setupChatScroll();
             
-            // Listen for new users joining the room
+            // FIRST: Get current user's VIP level
+            await loadMyVIPLevel();
+            
+            // SECOND: Listen for new users
             listenForNewUsers();
             
-            // Check VIP for current user - show entrance to all
-            if (currentUser?.numericId) {
-                const username = currentUser.nickname || currentUser.username || 'مستخدم';
-                // Mark current user as VIP shown
-                vipShownForUsers[currentUser.numericId] = true;
-                // Show VIP entrance for current user to all
-                setTimeout(() => showVIPEntranceForUser(currentUser.numericId, username), 1500);
+            // THIRD: Show MY VIP entrance to all users (including myself)
+            if (myVIPLevel && !hasShownMyVIP) {
+                hasShownMyVIP = true;
+                const username = currentUser?.nickname || currentUser?.username || 'مستخدم';
+                setTimeout(() => {
+                    showVIPEntranceForUser(currentUser.numericId, username);
+                }, 1500);
             }
             
             setTimeout(initPeerJS, 1000);
@@ -1392,25 +1397,43 @@
     }
 
     // ============================================================
-    // 👑 VIP SYSTEM - FIXED FOR ALL USERS
+    // 👑 VIP SYSTEM - FIXED
     // ============================================================
+    async function loadMyVIPLevel() {
+        try {
+            if (!currentUser?.numericId) return;
+            const user = await getCurrentUserFullData();
+            if (!user) return;
+            const vipData = user.vip || { active: null, expiresAt: null };
+            const activeVIP = vipData.active;
+            if (!activeVIP) return;
+            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
+            if (expiresAt && expiresAt < new Date()) return;
+            myVIPLevel = activeVIP;
+            console.log('👑 My VIP Level:', myVIPLevel);
+        } catch(e) { console.error('Error loading VIP level:', e); }
+    }
+
     function listenForNewUsers() {
         if (!database || !roomId) return;
         
-        // Listen for new seats being added (users joining)
+        // Listen for new seats being added
         database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
             const seat = snapshot.val();
             if (seat && seat.userId) {
                 const userId = seat.userId;
                 const username = seat.username || 'مستخدم';
                 
-                // Don't process if already shown for this user
+                // Don't process if already shown
                 if (vipShownForUsers[userId]) return;
+                
+                // Don't show for myself (already shown)
+                if (userId == currentUser?.numericId) return;
                 
                 // Mark as shown
                 vipShownForUsers[userId] = true;
                 
-                // Add to queue and process
+                // Add to queue
                 vipQueue.push({ userId, username });
                 processVIPQueue();
             }
