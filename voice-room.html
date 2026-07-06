@@ -21,10 +21,11 @@
         body {
             background: linear-gradient(145deg, #0a0a1a, #1a1040, #0f0c29);
             min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             color: white;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         .navbar {
@@ -42,6 +43,7 @@
             gap: 8px;
             min-height: 65px;
             box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
 
         .logo-section { display: flex; align-items: center; gap: 15px; }
@@ -109,7 +111,8 @@
             margin: 0 auto;
             width: 100%;
             height: calc(100vh - 85px);
-            min-height: 500px;
+            min-height: 0;
+            overflow: hidden;
         }
 
         /* ===== SEATS AREA ===== */
@@ -125,6 +128,7 @@
             justify-content: center;
             position: relative;
             min-width: 0;
+            overflow: hidden;
         }
 
         .seats-area .seats-title {
@@ -136,6 +140,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            z-index: 5;
         }
         .seats-area .seats-title i { color: #ffd700; }
 
@@ -146,6 +151,7 @@
             gap: 40px;
             width: 100%;
             padding: 10px 0;
+            justify-content: center;
         }
 
         .seats-row {
@@ -153,6 +159,7 @@
             justify-content: center;
             gap: 90px !important;
             width: 100%;
+            flex-wrap: wrap;
         }
         .seats-row.row-1 { max-width: 180px; }
         .seats-row.row-2 { max-width: 420px; }
@@ -438,6 +445,7 @@
             height: 100%;
             overflow: hidden;
             position: relative;
+            flex-shrink: 0;
         }
 
         .chat-header {
@@ -458,21 +466,45 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             min-height: 0;
             scroll-behavior: smooth;
         }
+        
+        /* تخصيص شريط التمرير - شفاف ونحيف */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+            background: transparent;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        /* إخفاء شريط التمرير في فايرفوكس */
+        .chat-messages {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.15) transparent;
+        }
+
         .chat-messages .message {
-            padding: 6px 12px;
-            border-radius: 12px;
-            max-width: 85%;
+            border-radius: 16px;
+            max-width: 88%;
             word-wrap: break-word;
             animation: fadeInMsg 0.2s ease;
             position: relative;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            min-height: 40px;
+            min-height: 45px;
+            overflow: hidden;
+            flex-shrink: 0;
+            padding: 0 !important;
         }
         @keyframes fadeInMsg { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -484,11 +516,15 @@
             font-size: 0.7rem;
             border: 1px solid rgba(255,215,0,0.05);
             border-radius: 12px;
-            padding: 4px 12px;
+            padding: 4px 12px !important;
             margin: 2px auto;
             max-width: 80%;
             opacity: 0.8;
         }
+        .chat-messages .message.system .msg-content {
+            padding: 4px 0 !important;
+        }
+
         .chat-messages .message.own {
             align-self: flex-end;
             border: 1px solid rgba(102,126,234,0.1);
@@ -504,27 +540,56 @@
             text-align: left;
         }
 
+        /* طبقة خلفية شفافة للرسالة */
+        .chat-messages .message .msg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            background: rgba(0,0,0,0.55);
+            z-index: 0;
+        }
+
+        .chat-messages .message .msg-content {
+            position: relative;
+            z-index: 1;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-height: 45px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
         .chat-messages .message .msg-sender { 
             font-size: 0.55rem; 
             color: #fff; 
-            margin-bottom: 2px; 
             font-weight: bold;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+            opacity: 0.95;
         }
         .chat-messages .message .msg-sender.owner { color: #ffd700; }
         .chat-messages .message .msg-text { 
             font-size: 0.85rem; 
-            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.9);
             position: relative;
             z-index: 1;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+            color: #fff;
         }
         .chat-messages .message .msg-time { 
             font-size: 0.45rem; 
             color: rgba(255,255,255,0.6); 
             margin-top: 2px;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.9);
             position: relative;
             z-index: 1;
+            opacity: 0.8;
         }
         .chat-messages .message .msg-badge { 
             font-size: 0.45rem; 
@@ -534,30 +599,14 @@
             border-radius: 8px; 
             margin-left: 4px; 
         }
-        
-        /* طبقة خلفية شفافة للرسالة */
-        .chat-messages .message .msg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: inherit;
-            background: rgba(0,0,0,0.45);
-            z-index: 0;
-        }
-        .chat-messages .message .msg-content {
-            position: relative;
-            z-index: 1;
-        }
 
         .scroll-down-btn {
             position: absolute;
-            bottom: 65px;
+            bottom: 70px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: rgba(102,126,234,0.3);
             border: 2px solid rgba(102,126,234,0.2);
@@ -572,6 +621,10 @@
             backdrop-filter: blur(10px);
         }
         .scroll-down-btn.visible { display: flex; }
+        .scroll-down-btn:hover {
+            background: rgba(102,126,234,0.5);
+            transform: translateX(-50%) scale(1.1);
+        }
 
         .chat-input-area {
             padding: 8px 12px;
@@ -581,6 +634,7 @@
             align-items: center;
             flex-shrink: 0;
             background: rgba(0,0,0,0.2);
+            min-height: 55px;
         }
         .chat-input-area .input-wrapper {
             flex: 1;
@@ -591,6 +645,7 @@
             border: 1px solid rgba(255,255,255,0.05);
             padding: 0 8px;
             position: relative;
+            min-height: 40px;
         }
         .chat-input-area .input-wrapper input {
             flex: 1;
@@ -600,6 +655,7 @@
             color: white;
             outline: none;
             font-size: 0.8rem;
+            min-height: 38px;
         }
         .chat-input-area .input-wrapper input::placeholder { color: #666; font-size: 0.7rem; }
 
@@ -612,6 +668,7 @@
             padding: 4px 6px;
             transition: 0.3s;
             border-radius: 6px;
+            flex-shrink: 0;
         }
         .chat-input-area .emoji-btn:hover { color: #ffd700; background: rgba(255,215,0,0.1); }
         .chat-input-area .send-btn {
@@ -624,13 +681,15 @@
             transition: 0.3s;
             font-weight: 600;
             font-size: 0.8rem;
+            flex-shrink: 0;
+            min-height: 40px;
         }
         .chat-input-area .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(102,126,234,0.3); }
 
         .emoji-picker {
             display: none;
             position: absolute;
-            bottom: 45px;
+            bottom: 50px;
             left: 0;
             background: #1a1a2e;
             border: 1px solid rgba(255,255,255,0.08);
@@ -1034,50 +1093,125 @@
         }
         .notif-actions button:hover { background: #334155; }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .main-layout { flex-direction: column; height: auto; padding: 10px; }
-            .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 250px; }
-            .seats-area { min-height: 400px; }
-            .seats-row { gap: 20px !important; }
-            .seats-row.row-1 { max-width: 160px; }
-            .seats-row.row-2 { max-width: 340px; }
-            .seats-row.row-3 { max-width: 520px; }
-            .seats-row.row-4 { max-width: 700px; }
-            .seat-circle { width: 80px !important; height: 80px !important; }
-            .seat-circle .seat-avatar { width: 44px !important; height: 44px !important; font-size: 1.2rem !important; }
-            .seat-frame { width: 140px !important; height: 140px !important; }
+            .main-layout { flex-direction: column; height: auto; padding: 10px; max-height: calc(100vh - 85px); }
+            .chat-area { width: 100%; max-width: 100%; height: 300px; min-height: 200px; flex-shrink: 0; }
+            .seats-area { min-height: 300px; max-height: 400px; }
+            .seats-row { gap: 25px !important; }
+            .seats-row.row-1 { max-width: 120px; }
+            .seats-row.row-2 { max-width: 280px; }
+            .seats-row.row-3 { max-width: 420px; }
+            .seats-row.row-4 { max-width: 560px; }
+            .seat-circle { width: 70px !important; height: 70px !important; }
+            .seat-circle .seat-avatar { width: 40px !important; height: 40px !important; font-size: 1.1rem !important; }
+            .seat-frame { width: 120px !important; height: 120px !important; }
+            .seat-circle .seat-username { font-size: 0.5rem; max-width: 60px; }
         }
 
         @media (max-width: 768px) {
             .navbar { padding: 0.4rem 3%; min-height: 55px; }
-            .room-info-box { padding: 4px 12px; gap: 8px; }
-            .room-info-box .room-name { font-size: 0.75rem; }
-            .room-info-box .room-id { font-size: 0.6rem; }
-            .seat-circle { width: 70px !important; height: 70px !important; }
-            .seat-circle .seat-avatar { width: 38px !important; height: 38px !important; font-size: 1rem !important; }
+            .room-info-box { padding: 4px 12px; gap: 6px; }
+            .room-info-box .room-name { font-size: 0.7rem; }
+            .room-info-box .room-id { font-size: 0.55rem; }
+            .room-info-box .room-owner { font-size: 0.65rem; }
+            .room-info-box .member-count { font-size: 0.65rem; }
+            .room-info-box .btn-leave-icon { width: 28px; height: 28px; font-size: 0.7rem; }
+            .icon-btn { width: 32px; height: 32px; font-size: 0.9rem; }
+            
             .seats-row { gap: 15px !important; }
-            .chat-area { height: 280px; }
-            .audio-controls { bottom: 20px; right: 15px; gap: 8px; }
-            .audio-btn { width: 42px; height: 42px; font-size: 1rem; }
-            .btn-leave-seat { width: 42px; height: 42px; font-size: 1rem; }
+            .seat-circle { width: 60px !important; height: 60px !important; }
+            .seat-circle .seat-avatar { width: 34px !important; height: 34px !important; font-size: 0.9rem !important; }
+            .seat-circle .seat-username { font-size: 0.45rem; max-width: 50px; }
+            .seat-circle .seat-number { font-size: 0.45rem; }
+            .seat-frame { width: 100px !important; height: 100px !important; }
+            .seat-circle .crown-icon { font-size: 1.2rem; top: -10px; right: -6px; }
+            .seat-circle .mic-indicator { font-size: 0.55rem; padding: 3px; }
+            .seat-circle .owner-actions button { font-size: 0.4rem; padding: 1px 6px; }
+            
+            .chat-area { height: 250px; min-height: 180px; }
+            .chat-messages { padding: 8px 10px; }
+            .chat-messages .message .msg-content { padding: 8px 10px; }
+            .chat-messages .message .msg-text { font-size: 0.75rem; }
+            .chat-messages .message { max-width: 92%; }
+            
+            .audio-controls { bottom: 15px; right: 10px; gap: 6px; }
+            .audio-btn { width: 38px; height: 38px; font-size: 0.9rem; }
+            .btn-leave-seat { width: 38px; height: 38px; font-size: 0.9rem; }
+            
+            .seats-area .seats-title { font-size: 0.7rem; top: 10px; right: 12px; }
+            
+            .chat-input-area { padding: 6px 10px; min-height: 48px; }
+            .chat-input-area .input-wrapper input { font-size: 0.7rem; min-height: 34px; padding: 6px 6px; }
+            .chat-input-area .send-btn { padding: 6px 12px; font-size: 0.7rem; min-height: 34px; }
+            .chat-input-area .emoji-btn { font-size: 0.8rem; padding: 3px 4px; }
+            
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
-            #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 18px; }
-            #notifDropdown { right: 10px; width: 320px; }
-            .seat-frame { width: 120px !important; height: 120px !important; }
+            #vipEntrance .vip-title { font-size: 1.2rem; padding: 6px 16px; white-space: normal; }
+            #notifDropdown { right: 10px; width: 300px; }
+            #profileDropdown { right: 10px; width: 300px; }
+            #usersListContainer { width: 92vw; }
+            
+            .modal { width: 92%; padding: 18px; }
+            .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
         }
 
         @media (max-width: 480px) {
-            .seat-circle { width: 60px !important; height: 60px !important; }
-            .seat-circle .seat-avatar { width: 32px !important; height: 32px !important; font-size: 0.8rem !important; }
-            .seats-row { gap: 10px !important; }
-            .seat-circle .seat-username { font-size: 0.45rem; max-width: 50px; }
-            .seat-circle .crown-icon { font-size: 1.1rem; top: -8px; right: -4px; }
-            .chat-area { height: 220px; }
             .main-layout { padding: 5px; }
-            .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
-            #vipEntrance .vip-title { font-size: 1rem; padding: 6px 12px; white-space: normal; }
-            #notifDropdown { right: 5px; width: 290px; }
-            .seat-frame { width: 100px !important; height: 100px !important; }
+            .seats-area { padding: 15px 10px; min-height: 250px; max-height: 320px; }
+            .seats-container { gap: 20px; }
+            .seats-row { gap: 10px !important; }
+            .seat-circle { width: 50px !important; height: 50px !important; }
+            .seat-circle .seat-avatar { width: 28px !important; height: 28px !important; font-size: 0.7rem !important; }
+            .seat-circle .seat-username { font-size: 0.4rem; max-width: 40px; margin-top: 3px; }
+            .seat-circle .seat-number { font-size: 0.4rem; }
+            .seat-frame { width: 85px !important; height: 85px !important; }
+            .seat-circle .crown-icon { font-size: 1rem; top: -8px; right: -4px; }
+            .seat-circle .mic-indicator { font-size: 0.45rem; padding: 2px; bottom: -1px; right: -1px; }
+            
+            .chat-area { height: 200px; min-height: 150px; }
+            .chat-messages { padding: 6px 8px; gap: 4px; }
+            .chat-messages .message .msg-content { padding: 6px 8px; min-height: 35px; }
+            .chat-messages .message .msg-text { font-size: 0.7rem; }
+            .chat-messages .message .msg-sender { font-size: 0.5rem; }
+            .chat-messages .message .msg-time { font-size: 0.4rem; }
+            .chat-messages .message { max-width: 95%; border-radius: 12px; }
+            
+            .chat-header { padding: 8px 12px; }
+            .chat-header h3 { font-size: 0.7rem; }
+            .chat-header .online-count { font-size: 0.6rem; }
+            
+            .chat-input-area { padding: 4px 8px; min-height: 42px; }
+            .chat-input-area .input-wrapper { min-height: 34px; padding: 0 6px; }
+            .chat-input-area .input-wrapper input { font-size: 0.65rem; min-height: 30px; padding: 4px 6px; }
+            .chat-input-area .send-btn { padding: 4px 10px; font-size: 0.65rem; min-height: 30px; }
+            .chat-input-area .emoji-btn { font-size: 0.7rem; padding: 2px 3px; }
+            .emoji-picker { bottom: 42px; max-width: 150px; max-height: 80px; }
+            .emoji-picker .emoji-item { font-size: 0.7rem; width: 20px; height: 20px; }
+            
+            .scroll-down-btn { width: 26px; height: 26px; font-size: 0.6rem; bottom: 58px; }
+            
+            .audio-btn { width: 34px; height: 34px; font-size: 0.8rem; }
+            .btn-leave-seat { width: 34px; height: 34px; font-size: 0.8rem; }
+            
+            #vipEntrance .vip-title { font-size: 0.9rem; padding: 4px 12px; }
+            #vipEntrance .vip-video-container { width: 95%; max-width: 350px; }
+            #vipEntrance .vip-user { font-size: 0.9rem; padding: 4px 16px; }
+            #vipEntrance .vip-skip-btn { padding: 8px 24px; font-size: 0.8rem; }
+            
+            .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+            .gift-option-card { padding: 10px 6px; }
+            .gift-option-card .gift-emoji { font-size: 1.8rem; }
+            .gift-option-card .gift-name { font-size: 0.65rem; }
+            .gift-option-card .gift-price { font-size: 0.6rem; }
+            
+            #notifDropdown { right: 5px; width: 280px; }
+            #profileDropdown { right: 5px; width: 280px; }
+            .notif-item { font-size: 0.75rem; padding: 8px 10px; }
+            
+            .modal { padding: 14px; }
+            .modal h3 { font-size: 1rem; }
+            .modal .action-btn { padding: 10px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -1382,8 +1516,6 @@
     let vipShownForUsers = {};
     let isProcessingJoin = false;
     let vipQueue = [];
-    let myVIPLevel = null;
-    let hasShownMyVIP = false;
 
     // ============================================================
     // 🎁 GIFTS & VIP CONFIG
@@ -2005,7 +2137,7 @@
             className += ' system';
             div.className = className;
             div.setAttribute('data-msg-id', msg.id || Date.now());
-            div.innerHTML = `<div class="msg-text">${msg.text}</div>`;
+            div.innerHTML = `<div class="msg-content"><div class="msg-text">${msg.text}</div></div>`;
             container.appendChild(div);
             return;
         }
@@ -2042,6 +2174,17 @@
             </div>
         `;
         container.appendChild(div);
+        
+        // تحديث التمرير الذكي
+        requestAnimationFrame(() => {
+            const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+            if (isNearBottom) {
+                container.scrollTop = container.scrollHeight;
+                document.getElementById('scrollDownBtn').classList.remove('visible');
+            } else {
+                document.getElementById('scrollDownBtn').classList.add('visible');
+            }
+        });
     }
 
     async function addChatMessage(type, text, username = null, userId = null, subType = '') {
@@ -2091,14 +2234,39 @@
 
     function setupChatScroll() {
         const container = document.getElementById('chatMessages');
+        let isUserScrolling = false;
+        let scrollTimeout = null;
+        
         container.addEventListener('scroll', () => {
             const btn = document.getElementById('scrollDownBtn');
-            if (container.scrollHeight - container.scrollTop - container.clientHeight < 30) {
+            const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+            
+            if (isNearBottom) {
                 btn.classList.remove('visible');
+                isUserScrolling = false;
             } else {
                 btn.classList.add('visible');
+                isUserScrolling = true;
+            }
+            
+            // إعادة تعيين حالة التمرير بعد توقف المستخدم
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                isUserScrolling = false;
+            }, 2000);
+        });
+        
+        // تحديث عند إضافة رسائل جديدة
+        const observer = new MutationObserver(() => {
+            if (!isUserScrolling) {
+                const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+                if (isNearBottom) {
+                    container.scrollTop = container.scrollHeight;
+                    document.getElementById('scrollDownBtn').classList.remove('visible');
+                }
             }
         });
+        observer.observe(container, { childList: true, subtree: true });
     }
 
     function toggleEmojiPicker() {
