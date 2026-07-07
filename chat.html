@@ -396,7 +396,7 @@
             padding: 16px 16px 14px;
             text-align: center;
             position: relative;
-            min-height: 80px;
+            min-height: 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -405,6 +405,8 @@
             background-size: cover;
             background-position: center;
             background-color: #1a1a2e;
+            width: 100%;
+            aspect-ratio: 16/9;
         }
 
         .room-card .room-banner .vip-wave-small {
@@ -539,14 +541,14 @@
         .room-card .room-body .room-host {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
             padding-top: 8px;
             border-top: 1px solid #1e1e3a;
         }
 
         .room-card .room-body .room-host .host-avatar {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, #4f46e5, #8b5cf6);
             display: flex;
@@ -571,13 +573,14 @@
         }
 
         .room-card .room-body .room-host .host-name {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #eee;
+            margin-bottom: 1px;
         }
 
         .room-card .room-body .room-host .host-id {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: #666;
             font-family: monospace;
         }
@@ -1971,17 +1974,18 @@
         .card-preview {
             background: #0f0f1f;
             border-radius: 12px;
-            padding: 15px;
             margin: 10px 0;
             border: 1px solid #2a2a4a;
             position: relative;
-            min-height: 120px;
+            min-height: 150px;
             background-size: cover;
             background-position: center;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16/9;
         }
 
         .card-preview .preview-overlay-image {
@@ -2131,6 +2135,8 @@
             .notif-dropdown { width: 340px; max-width: 92vw; right: 5px; }
             .room-card .room-banner .room-id-badge { font-size: 0.5rem; padding: 2px 8px; }
             .room-card .room-footer .join-btn { padding: 4px 14px; font-size: 0.65rem; }
+            .room-card .room-banner { min-height: 80px; }
+            .card-preview { min-height: 120px; }
         }
 
         @media (max-width: 400px) {
@@ -2146,6 +2152,8 @@
             .modal-content { padding: 15px; max-width: 98%; }
             .room-card .room-banner .vip-text { font-size: 1rem; }
             .room-card .room-banner .room-id-badge { font-size: 0.45rem; padding: 1px 6px; }
+            .room-card .room-banner { min-height: 70px; }
+            .card-preview { min-height: 100px; }
         }
     </style>
 </head>
@@ -2628,7 +2636,7 @@
         ];
 
         // ============================================================
-        // 📁 قائمة الصور المتاحة للخلفيات
+        // 📁 قائمة الصور المتاحة
         // ============================================================
         const bgImages = [];
         const overlayImages = [];
@@ -2746,7 +2754,7 @@
                 preview.appendChild(overlayImg);
             }
             
-            // إضافة النص الذهبي فقط (تم إزالة النص الأسود)
+            // إضافة النص الذهبي
             const textDiv = document.createElement('div');
             textDiv.className = 'preview-text';
             textDiv.textContent = '🎙️ VIP CHAT';
