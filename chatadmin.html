@@ -183,6 +183,13 @@
             border-radius: 8px;
             font-size: 0.8rem;
             color: #aaa;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .request-card .room-id:hover {
+            background: rgba(255,215,0,0.15);
+            color: #ffd700;
         }
 
         .request-card .status-badge {
@@ -217,7 +224,6 @@
             margin-bottom: 12px;
         }
 
-        /* ===== خصائص الغرفة ===== */
         .request-card .room-features {
             display: flex;
             flex-wrap: wrap;
@@ -303,14 +309,14 @@
 
         .request-card .card-actions button {
             flex: 1;
-            min-width: 80px;
+            min-width: 70px;
             padding: 8px 12px;
             border: none;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .request-card .card-actions button:hover {
@@ -325,6 +331,8 @@
         .btn-view:hover { background: #2563eb; }
         .btn-delete { background: #dc2626; color: white; }
         .btn-delete:hover { background: #b91c1c; }
+        .btn-edit { background: #8b5cf6; color: white; }
+        .btn-edit:hover { background: #7c3aed; }
 
         .request-card .card-date {
             font-size: 0.75rem;
@@ -381,7 +389,7 @@
             border-radius: 20px;
             padding: 35px;
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             max-height: 90vh;
             overflow-y: auto;
             border: 1px solid rgba(255,255,255,0.1);
@@ -444,6 +452,15 @@
 
         .modal-actions .btn-close:hover {
             background: rgba(255,255,255,0.2);
+        }
+
+        .modal-actions .btn-save {
+            background: #10b981;
+            color: white;
+        }
+
+        .modal-actions .btn-save:hover {
+            background: #059669;
         }
 
         /* ===== TOAST ===== */
@@ -528,6 +545,43 @@
         .form-group select option {
             background: #1a1a2e;
             color: white;
+        }
+
+        .form-group .password-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 0 12px;
+        }
+
+        .form-group .password-wrapper input {
+            border: none;
+            padding: 10px 0;
+            flex: 1;
+            background: transparent;
+            color: white;
+            outline: none;
+        }
+
+        .form-group .password-wrapper button {
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 8px;
+            transition: 0.3s;
+        }
+
+        .form-group .password-wrapper button:hover {
+            color: #ffd700;
+        }
+
+        .form-group .password-wrapper input:focus {
+            box-shadow: none;
         }
 
         @media (max-width: 768px) {
@@ -638,6 +692,72 @@
         </div>
     </div>
 
+    <!-- ===== MODAL: تعديل الغرفة ===== -->
+    <div id="editRoomModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-edit"></i> تعديل الغرفة</h2>
+            <input type="hidden" id="editRoomId">
+            <input type="hidden" id="editOriginalRoomId">
+            
+            <div class="form-group">
+                <label>🔑 معرف الغرفة</label>
+                <input type="text" id="editRoomIdInput" placeholder="أدخل معرف الغرفة الجديد">
+                <small style="color: #666; font-size: 0.75rem;">تغيير المعرف سيؤثر على رابط الغرفة</small>
+            </div>
+
+            <div class="form-group">
+                <label>📛 اسم الغرفة</label>
+                <input type="text" id="editRoomName" placeholder="اسم الغرفة">
+            </div>
+
+            <div class="form-group">
+                <label>📝 وصف الغرفة</label>
+                <textarea id="editRoomDesc" placeholder="وصف الغرفة" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>🪑 عدد المقاعد</label>
+                <select id="editRoomMaxSlots">
+                    <option value="2">2 مقاعد</option>
+                    <option value="3">3 مقاعد</option>
+                    <option value="4">4 مقاعد</option>
+                    <option value="5">5 مقاعد</option>
+                    <option value="6">6 مقاعد</option>
+                    <option value="7">7 مقاعد</option>
+                    <option value="8">8 مقاعد</option>
+                    <option value="9">9 مقاعد</option>
+                    <option value="10">10 مقاعد</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>🔒 حالة الغرفة</label>
+                <select id="editRoomPrivacy">
+                    <option value="public">🌐 عامة (بدون كلمة مرور)</option>
+                    <option value="private">🔒 خاصة (بكلمة مرور)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="editPasswordGroup">
+                <label>🔑 كلمة المرور</label>
+                <div class="password-wrapper">
+                    <input type="password" id="editRoomPassword" placeholder="أدخل كلمة المرور الجديدة">
+                    <button type="button" onclick="toggleEditPassword()">
+                        <i class="fas fa-eye" id="editPasswordIcon"></i>
+                    </button>
+                </div>
+                <small style="color: #666; font-size: 0.75rem;">اترك فارغاً للحفاظ على كلمة المرور الحالية</small>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveRoomChanges()">
+                    <i class="fas fa-save"></i> حفظ التغييرات
+                </button>
+                <button class="btn-close" onclick="closeModal('editRoomModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== MODAL: إضافة غرفة ===== -->
     <div id="addRoomModal" class="modal">
         <div class="modal-content">
@@ -671,7 +791,12 @@
             </div>
             <div class="form-group">
                 <label>🔑 كلمة المرور (اختياري)</label>
-                <input type="text" id="newRoomPassword" placeholder="أدخل كلمة مرور للغرفة (اختياري)">
+                <div class="password-wrapper">
+                    <input type="password" id="newRoomPassword" placeholder="أدخل كلمة مرور للغرفة (اختياري)">
+                    <button type="button" onclick="toggleNewPassword()">
+                        <i class="fas fa-eye" id="newPasswordIcon"></i>
+                    </button>
+                </div>
             </div>
             <div class="form-group">
                 <label>👤 منشيء الغرفة</label>
@@ -681,7 +806,7 @@
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-success" onclick="addRoomDirectly()" style="flex:2; background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                <button class="btn-save" onclick="addRoomDirectly()" style="flex:2;">
                     <i class="fas fa-check"></i> إنشاء الغرفة
                 </button>
                 <button class="btn-close" onclick="closeModal('addRoomModal')" style="flex:1;">إلغاء</button>
@@ -706,6 +831,7 @@
 
         let database;
         let currentTab = 'pending';
+        let currentEditingRoom = null;
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
@@ -744,7 +870,6 @@
             }
 
             try {
-                // جلب طلبات الغرف
                 const snapshot = await database.ref('room_requests').once('value');
                 let allRequests = [];
                 let pendingCount = 0;
@@ -759,7 +884,6 @@
                     }
                 }
 
-                // جلب الغرف المفعلة من مسار rooms
                 const roomsSnapshot = await database.ref('rooms').once('value');
                 const roomsMap = {};
                 if (roomsSnapshot.exists()) {
@@ -776,10 +900,8 @@
                 if (status === 'pending') {
                     filtered = allRequests.filter(req => req.status === 'pending');
                 } else if (status === 'approved') {
-                    // الغرف المفعلة هي التي موجودة في rooms وموافقة في room_requests
                     const approvedRequests = allRequests.filter(req => req.status === 'approved');
                     filtered = approvedRequests.filter(req => roomsMap[req._roomId]);
-                    // إذا لم توجد غرف في room_requests ولكن توجد في rooms
                     for (const roomId in roomsMap) {
                         const room = roomsMap[roomId];
                         const existsInRequests = allRequests.some(req => req._roomId === roomId);
@@ -834,17 +956,14 @@
                                       req.status === 'pending' ? '🟡 قيد الانتظار' : 
                                       '🔴 مرفوضة';
 
-                    // عرض كلمة المرور إذا كانت موجودة (مخفية)
                     const hasPassword = req.hasPassword || (req.password && req.password.length > 0);
                     const passwordDisplay = hasPassword ? '🔒 محمية' : '🔓 عامة';
-                    
-                    // عرض عدد المقاعد
                     const maxSlots = req.maxSlots || 10;
 
                     html += `
                         <div class="request-card">
                             <div class="card-header">
-                                <div class="room-id">🔑 ${req._roomId}</div>
+                                <div class="room-id" onclick="copyRoomId('${req._roomId}')" title="انقر لنسخ المعرف">🔑 ${req._roomId}</div>
                                 <div class="status-badge ${statusBadgeClass}">${statusText}</div>
                             </div>
                             <div class="room-name">
@@ -854,7 +973,6 @@
                             </div>
                             <div class="room-desc">${req.description || 'لا يوجد وصف'}</div>
                             
-                            <!-- خصائص الغرفة -->
                             <div class="room-features">
                                 <span class="feature"><i class="fas fa-chair"></i> ${maxSlots} مقاعد</span>
                                 <span class="feature ${hasPassword ? 'has-password' : 'no-password'}">
@@ -887,8 +1005,11 @@
                                     </button>
                                 ` : ''}
                                 ${req.status === 'approved' ? `
+                                    <button class="btn-edit" onclick="openEditModal('${req._roomId}')">
+                                        <i class="fas fa-edit"></i> تعديل
+                                    </button>
                                     <button class="btn-view" onclick="viewCreator('${req._roomId}')">
-                                        <i class="fas fa-user"></i> بيانات المنشيء
+                                        <i class="fas fa-user"></i> بيانات
                                     </button>
                                     <button class="btn-delete" onclick="deleteRoom('${req._roomId}')">
                                         <i class="fas fa-trash"></i> حذف
@@ -896,7 +1017,7 @@
                                 ` : ''}
                                 ${req.status === 'rejected' ? `
                                     <button class="btn-view" onclick="viewCreator('${req._roomId}')">
-                                        <i class="fas fa-user"></i> بيانات المنشيء
+                                        <i class="fas fa-user"></i> بيانات
                                     </button>
                                 ` : ''}
                             </div>
@@ -910,33 +1031,16 @@
 
             } catch (error) {
                 console.error('Error loading requests:', error);
-                
-                if (error.message && error.message.includes('permission_denied')) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-lock" style="color: #ef4444; font-size: 4rem;"></i>
-                            <h3 style="color: #ef4444;">🔒 خطأ في الصلاحيات</h3>
-                            <p style="color: #aaa; max-width: 500px; margin: 10px auto;">
-                                لا تملك صلاحية الوصول إلى قاعدة البيانات. 
-                                يرجى تعديل <strong style="color: #ffd700;">قواعد أمان Firebase</strong>.
-                            </p>
-                            <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
-                                <i class="fas fa-sync-alt"></i> إعادة المحاولة
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                            <h3 style="color: #ef4444;">خطأ في تحميل الطلبات</h3>
-                            <p style="color: #666;">${error.message}</p>
-                            <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
-                                <i class="fas fa-sync-alt"></i> إعادة المحاولة
-                            </button>
-                        </div>
-                    `;
-                }
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                        <h3 style="color: #ef4444;">خطأ في تحميل الطلبات</h3>
+                        <p style="color: #666;">${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
+                            <i class="fas fa-sync-alt"></i> إعادة المحاولة
+                        </button>
+                    </div>
+                `;
             }
         }
 
@@ -969,7 +1073,6 @@
                     return;
                 }
 
-                // إنشاء الغرفة مع جميع البيانات الجديدة
                 const roomData = {
                     roomId: roomId,
                     name: request.name,
@@ -1032,84 +1135,212 @@
         }
 
         // ============================================================
-        // ➕ إضافة غرفة مباشرة
+        // ✏️ EDIT ROOM FUNCTIONS
         // ============================================================
-        function showAddRoomModal() {
-            document.getElementById('addRoomModal').classList.add('active');
-            document.getElementById('newRoomId').value = '';
-            document.getElementById('newRoomName').value = '';
-            document.getElementById('newRoomDesc').value = '';
-            document.getElementById('newRoomPassword').value = '';
-            document.getElementById('newRoomMaxSlots').value = '10';
+        async function openEditModal(roomId) {
+            try {
+                // جلب بيانات الغرفة من rooms
+                const roomSnapshot = await database.ref('rooms/' + roomId).once('value');
+                const room = roomSnapshot.val();
+
+                if (!room) {
+                    showToast('❌ لم يتم العثور على الغرفة', 'error');
+                    return;
+                }
+
+                currentEditingRoom = roomId;
+                document.getElementById('editOriginalRoomId').value = roomId;
+                document.getElementById('editRoomId').value = roomId;
+                document.getElementById('editRoomIdInput').value = roomId;
+                document.getElementById('editRoomName').value = room.name || '';
+                document.getElementById('editRoomDesc').value = room.description || '';
+                document.getElementById('editRoomMaxSlots').value = room.maxSlots || 10;
+                
+                // تحديد حالة الخصوصية
+                const privacySelect = document.getElementById('editRoomPrivacy');
+                if (room.hasPassword && room.password) {
+                    privacySelect.value = 'private';
+                    document.getElementById('editPasswordGroup').style.display = 'block';
+                } else {
+                    privacySelect.value = 'public';
+                    document.getElementById('editPasswordGroup').style.display = 'none';
+                }
+
+                document.getElementById('editRoomPassword').value = '';
+                document.getElementById('editRoomModal').classList.add('active');
+
+            } catch (error) {
+                console.error('Error loading room for edit:', error);
+                showToast('❌ حدث خطأ في تحميل بيانات الغرفة', 'error');
+            }
         }
 
-        async function addRoomDirectly() {
-            const roomId = document.getElementById('newRoomId').value.trim();
-            const name = document.getElementById('newRoomName').value.trim();
-            const desc = document.getElementById('newRoomDesc').value.trim();
-            const creator = document.getElementById('newRoomCreator').value;
-            const maxSlots = parseInt(document.getElementById('newRoomMaxSlots').value);
-            const password = document.getElementById('newRoomPassword').value.trim();
+        function toggleEditPassword() {
+            const input = document.getElementById('editRoomPassword');
+            const icon = document.getElementById('editPasswordIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
 
-            if (!roomId || !name) {
+        function toggleNewPassword() {
+            const input = document.getElementById('newRoomPassword');
+            const icon = document.getElementById('newPasswordIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        // تغيير حالة الخصوصية
+        document.addEventListener('DOMContentLoaded', function() {
+            const privacySelect = document.getElementById('editRoomPrivacy');
+            if (privacySelect) {
+                privacySelect.addEventListener('change', function() {
+                    const passwordGroup = document.getElementById('editPasswordGroup');
+                    if (this.value === 'private') {
+                        passwordGroup.style.display = 'block';
+                    } else {
+                        passwordGroup.style.display = 'none';
+                        document.getElementById('editRoomPassword').value = '';
+                    }
+                });
+            }
+        });
+
+        async function saveRoomChanges() {
+            const originalRoomId = document.getElementById('editOriginalRoomId').value;
+            const newRoomId = document.getElementById('editRoomIdInput').value.trim();
+            const name = document.getElementById('editRoomName').value.trim();
+            const description = document.getElementById('editRoomDesc').value.trim();
+            const maxSlots = parseInt(document.getElementById('editRoomMaxSlots').value);
+            const privacy = document.getElementById('editRoomPrivacy').value;
+            const newPassword = document.getElementById('editRoomPassword').value.trim();
+
+            if (!newRoomId || !name) {
                 showToast('⚠️ يرجى إدخال معرف الغرفة والاسم', 'warning');
                 return;
             }
 
             try {
-                // التحقق من عدم وجود الغرفة
-                const checkSnapshot = await database.ref('rooms/' + roomId).once('value');
-                if (checkSnapshot.exists()) {
-                    showToast('⚠️ الغرفة موجودة بالفعل', 'warning');
+                // جلب البيانات الحالية
+                const roomSnapshot = await database.ref('rooms/' + originalRoomId).once('value');
+                const room = roomSnapshot.val();
+
+                if (!room) {
+                    showToast('❌ لم يتم العثور على الغرفة', 'error');
                     return;
                 }
 
-                const roomData = {
-                    roomId: roomId,
+                // التحقق من تغيير المعرف
+                if (originalRoomId !== newRoomId) {
+                    // التحقق من عدم وجود غرفة بنفس المعرف الجديد
+                    const checkSnapshot = await database.ref('rooms/' + newRoomId).once('value');
+                    if (checkSnapshot.exists()) {
+                        showToast('⚠️ الغرفة بالمعرف الجديد موجودة بالفعل', 'warning');
+                        return;
+                    }
+
+                    // نسخ البيانات إلى المعرف الجديد
+                    const newRoomData = { ...room, roomId: newRoomId };
+                    await database.ref('rooms/' + newRoomId).set(newRoomData);
+                    
+                    // حذف الغرفة القديمة
+                    await database.ref('rooms/' + originalRoomId).remove();
+                    
+                    // تحديث room_requests
+                    const reqSnapshot = await database.ref('room_requests/' + originalRoomId).once('value');
+                    if (reqSnapshot.exists()) {
+                        const reqData = reqSnapshot.val();
+                        await database.ref('room_requests/' + newRoomId).set({ ...reqData, _roomId: newRoomId });
+                        await database.ref('room_requests/' + originalRoomId).remove();
+                    }
+                }
+
+                // تحديث البيانات
+                const updateData = {
                     name: name,
-                    description: desc || '',
-                    creatorId: creator,
-                    creatorName: creator === 'admin' ? '👑 الأدمن' : '🤖 النظام',
-                    createdAt: new Date().toISOString(),
-                    status: 'approved',
-                    members: 0,
-                    isActive: true,
-                    maxSlots: maxSlots || 10,
-                    hasPassword: !!password,
-                    password: password ? btoa(password) : '',
-                    background: 'default',
-                    overlayImage: 'none',
-                    vip: false,
-                    tag: 'all'
+                    description: description,
+                    maxSlots: maxSlots
                 };
 
-                // إنشاء الغرفة
-                await database.ref('rooms/' + roomId).set(roomData);
+                // معالجة كلمة المرور
+                if (privacy === 'public') {
+                    updateData.hasPassword = false;
+                    updateData.password = '';
+                } else {
+                    if (newPassword) {
+                        updateData.hasPassword = true;
+                        updateData.password = btoa(newPassword);
+                    } else {
+                        // الحفاظ على كلمة المرور الحالية إذا لم يتم إدخال جديدة
+                        const currentRoom = await database.ref('rooms/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).once('value');
+                        const currentData = currentRoom.val();
+                        updateData.hasPassword = currentData.hasPassword || false;
+                        updateData.password = currentData.password || '';
+                    }
+                }
 
-                // إضافة سجل في room_requests
-                await database.ref('room_requests/' + roomId).set({
-                    name: name,
-                    description: desc || '',
-                    creatorId: creator,
-                    creatorName: creator === 'admin' ? '👑 الأدمن' : '🤖 النظام',
-                    createdAt: new Date().toISOString(),
-                    status: 'approved',
-                    isDirect: true,
-                    maxSlots: maxSlots || 10,
-                    hasPassword: !!password,
-                    password: password ? btoa(password) : '',
-                    background: 'default',
-                    overlayImage: 'none'
-                });
+                await database.ref('rooms/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).update(updateData);
 
-                showToast(`✅ تم إنشاء الغرفة "${name}" بنجاح!`, 'success');
-                closeModal('addRoomModal');
+                // تحديث room_requests
+                const reqSnapshot = await database.ref('room_requests/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).once('value');
+                if (reqSnapshot.exists()) {
+                    await database.ref('room_requests/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).update({
+                        name: name,
+                        description: description,
+                        maxSlots: maxSlots,
+                        hasPassword: updateData.hasPassword,
+                        password: updateData.password
+                    });
+                }
+
+                showToast('✅ تم تحديث الغرفة بنجاح!', 'success');
+                closeModal('editRoomModal');
                 loadRequests(currentTab);
 
             } catch (error) {
-                console.error('Error adding room:', error);
-                showToast('❌ حدث خطأ في إنشاء الغرفة', 'error');
+                console.error('Error saving room changes:', error);
+                showToast('❌ حدث خطأ في حفظ التغييرات', 'error');
             }
+        }
+
+        // ============================================================
+        // 📋 COPY ROOM ID
+        // ============================================================
+        function copyRoomId(roomId) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(roomId).then(() => {
+                    showToast(`✅ تم نسخ المعرف: ${roomId}`, 'success');
+                }).catch(() => {
+                    copyTextFallback(roomId);
+                });
+            } else {
+                copyTextFallback(roomId);
+            }
+        }
+
+        function copyTextFallback(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(`✅ تم نسخ المعرف: ${text}`, 'success');
+            } catch (err) {
+                showToast('❌ فشل نسخ المعرف', 'error');
+            }
+            document.body.removeChild(textArea);
         }
 
         // ============================================================
@@ -1124,7 +1355,6 @@
                     request._roomId = roomId;
                 }
 
-                // إذا لم يوجد في room_requests، جلب من rooms
                 if (!request) {
                     const roomSnapshot = await database.ref('rooms/' + roomId).once('value');
                     if (roomSnapshot.exists()) {
@@ -1152,7 +1382,6 @@
                     return;
                 }
 
-                // فك تشفير كلمة المرور
                 let passwordDisplay = 'لا توجد';
                 if (request.hasPassword && request.password) {
                     try {
@@ -1221,6 +1450,84 @@
             } catch (error) {
                 console.error('Error loading creator info:', error);
                 showToast('❌ حدث خطأ في تحميل بيانات المنشيء', 'error');
+            }
+        }
+
+        // ============================================================
+        // ➕ إضافة غرفة مباشرة
+        // ============================================================
+        function showAddRoomModal() {
+            document.getElementById('addRoomModal').classList.add('active');
+            document.getElementById('newRoomId').value = '';
+            document.getElementById('newRoomName').value = '';
+            document.getElementById('newRoomDesc').value = '';
+            document.getElementById('newRoomPassword').value = '';
+            document.getElementById('newRoomMaxSlots').value = '10';
+        }
+
+        async function addRoomDirectly() {
+            const roomId = document.getElementById('newRoomId').value.trim();
+            const name = document.getElementById('newRoomName').value.trim();
+            const desc = document.getElementById('newRoomDesc').value.trim();
+            const creator = document.getElementById('newRoomCreator').value;
+            const maxSlots = parseInt(document.getElementById('newRoomMaxSlots').value);
+            const password = document.getElementById('newRoomPassword').value.trim();
+
+            if (!roomId || !name) {
+                showToast('⚠️ يرجى إدخال معرف الغرفة والاسم', 'warning');
+                return;
+            }
+
+            try {
+                const checkSnapshot = await database.ref('rooms/' + roomId).once('value');
+                if (checkSnapshot.exists()) {
+                    showToast('⚠️ الغرفة موجودة بالفعل', 'warning');
+                    return;
+                }
+
+                const roomData = {
+                    roomId: roomId,
+                    name: name,
+                    description: desc || '',
+                    creatorId: creator,
+                    creatorName: creator === 'admin' ? '👑 الأدمن' : '🤖 النظام',
+                    createdAt: new Date().toISOString(),
+                    status: 'approved',
+                    members: 0,
+                    isActive: true,
+                    maxSlots: maxSlots || 10,
+                    hasPassword: !!password,
+                    password: password ? btoa(password) : '',
+                    background: 'default',
+                    overlayImage: 'none',
+                    vip: false,
+                    tag: 'all'
+                };
+
+                await database.ref('rooms/' + roomId).set(roomData);
+
+                await database.ref('room_requests/' + roomId).set({
+                    name: name,
+                    description: desc || '',
+                    creatorId: creator,
+                    creatorName: creator === 'admin' ? '👑 الأدمن' : '🤖 النظام',
+                    createdAt: new Date().toISOString(),
+                    status: 'approved',
+                    isDirect: true,
+                    maxSlots: maxSlots || 10,
+                    hasPassword: !!password,
+                    password: password ? btoa(password) : '',
+                    background: 'default',
+                    overlayImage: 'none'
+                });
+
+                showToast(`✅ تم إنشاء الغرفة "${name}" بنجاح!`, 'success');
+                closeModal('addRoomModal');
+                loadRequests(currentTab);
+
+            } catch (error) {
+                console.error('Error adding room:', error);
+                showToast('❌ حدث خطأ في إنشاء الغرفة', 'error');
             }
         }
 
