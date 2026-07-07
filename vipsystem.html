@@ -847,16 +847,17 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات الغرف الصوتية (vipclub-1d04a)
+        // 🔥 FIREBASE CONFIG - مشروع stvipclub
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-            authDomain: "vipclub-1d04a.firebaseapp.com",
-            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-            projectId: "vipclub-1d04a",
-            storageBucket: "vipclub-1d04a.firebasestorage.app",
-            messagingSenderId: "120667552740",
-            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
         };
 
         let database;
@@ -864,7 +865,7 @@
         let currentFirebaseUserId = null;
 
         // ============================================================
-        // 📋 FRAMES & VIP DATA - مطابقة مع كود الغرفة
+        // 📋 FRAMES & VIP DATA
         // ============================================================
         const FRAMES = [
             {
@@ -958,6 +959,7 @@
         // ============================================================
         function initializeFirebase() {
             try {
+                // حذف أي Firebase قديم إذا وجد
                 if (firebase.apps.length > 0) {
                     firebase.app().delete();
                 }
@@ -972,7 +974,7 @@
         }
 
         // ============================================================
-        // 👤 USER MANAGEMENT - مدمج مع قاعدة بيانات الغرف
+        // 👤 USER MANAGEMENT - مدمج مع Firebase
         // ============================================================
         function getStoredUser() {
             try {
@@ -1011,6 +1013,7 @@
             document.getElementById('vipLevel').textContent = 'VIP 0';
             document.getElementById('vipStatus').textContent = 'غير مفعل';
             document.getElementById('userAvatar').innerHTML = '<i class="fas fa-user"></i>';
+            // إعادة تحميل الصفحة لعرض الوضع كزائر
             location.reload();
         }
 
@@ -1025,6 +1028,7 @@
             }
 
             try {
+                // البحث عن المستخدم في Firebase باستخدام numericId
                 const snapshot = await database.ref('users')
                     .orderByChild('numericId')
                     .equalTo(stored.numericId)
@@ -1035,6 +1039,7 @@
                     const firebaseKey = Object.keys(userData)[0];
                     const fullUser = userData[firebaseKey];
                     
+                    // تحديث localStorage بأحدث البيانات
                     saveUserToStorage(fullUser, firebaseKey);
                     currentFirebaseUserId = firebaseKey;
                     
@@ -1042,6 +1047,7 @@
                     updateLoginButtons(true);
                     return fullUser;
                 } else {
+                    // المستخدم غير موجود في Firebase
                     console.warn('⚠️ المستخدم غير موجود في Firebase');
                     clearUserFromStorage();
                     return false;
@@ -1074,6 +1080,7 @@
         }
 
         async function ensureUserData() {
+            // التأكد من اتصال Firebase
             if (!database) {
                 if (!initializeFirebase()) {
                     showToast('❌ فشل الاتصال بقاعدة البيانات', 'error');
@@ -1083,11 +1090,13 @@
 
             const user = await loadUserFromFirebase();
             if (!user) {
+                // عرض رسالة للمستخدم غير المسجل
                 document.getElementById('userName').textContent = 'زائر';
                 document.getElementById('userId').textContent = '🆔 ---';
                 document.getElementById('vipLevel').textContent = 'VIP 0';
                 document.getElementById('vipStatus').textContent = 'غير مفعل';
                 
+                // عرض رسالة ترحيب
                 const vipGrid = document.getElementById('vipGrid');
                 if (vipGrid) {
                     vipGrid.innerHTML = `
@@ -1105,6 +1114,7 @@
                     `;
                 }
                 
+                // إخفاء أزرار الإجراءات في بطاقات VIP
                 for (let level = 1; level <= 2; level++) {
                     const actionsEl = document.getElementById(`vip${level}Actions`);
                     if (actionsEl) {
@@ -1119,6 +1129,7 @@
                 return null;
             }
 
+            // تحديث واجهة المستخدم
             updateUI(user);
             renderVIPActions(user);
             renderFrames(user);
@@ -1140,6 +1151,7 @@
                 document.getElementById('userAvatar').innerHTML = `<img src="${user.avatar}" alt="">`;
             }
 
+            // تحديث حالة VIP
             const vipData = user.vip || { active: null, expiresAt: null };
             const activeVIP = vipData.active;
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
@@ -1166,7 +1178,7 @@
         }
 
         // ============================================================
-        // 📊 VIP SYSTEM
+        // 📊 VIP SYSTEM (محدث للعمل مع Firebase)
         // ============================================================
         function renderVIPActions(user) {
             if (!user) return;
@@ -1284,7 +1296,7 @@
         }
 
         // ============================================================
-        // 🎯 VIP ACTIONS
+        // 🎯 VIP ACTIONS (محدثة للعمل مع Firebase)
         // ============================================================
         async function buyVIP(level) {
             if (!currentUser || !currentFirebaseUserId) {
@@ -1299,6 +1311,7 @@
             }
 
             try {
+                // جلب أحدث بيانات المستخدم من Firebase
                 const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
                 const user = snapshot.val();
 
@@ -1359,9 +1372,11 @@
 
                 await database.ref('users/' + currentFirebaseUserId).update(updateData);
 
+                // تحديث localStorage
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
+                // إشعار
                 const notification = {
                     id: Date.now(),
                     text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
@@ -1414,6 +1429,7 @@
                     activatedAt: now.toISOString()
                 });
 
+                // تحديث localStorage
                 const updatedUser = { ...user };
                 updatedUser.vip = { active: level, expiresAt: expiresAt.toISOString(), activatedAt: now.toISOString() };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
@@ -1441,6 +1457,7 @@
                     deactivatedAt: new Date().toISOString()
                 });
 
+                // تحديث localStorage
                 const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
                 const user = snapshot.val();
                 if (user) {
@@ -1457,7 +1474,7 @@
         }
 
         // ============================================================
-        // 🖼️ FRAMES SYSTEM
+        // 🖼️ FRAMES SYSTEM (محدثة)
         // ============================================================
         function renderFrames(user) {
             const grid = document.getElementById('framesGrid');
@@ -1635,6 +1652,7 @@
 
                 await database.ref('users/' + currentFirebaseUserId).update(updateData);
 
+                // تحديث localStorage
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
@@ -1677,6 +1695,7 @@
 
                 await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(frameId);
 
+                // تحديث localStorage
                 const updatedUser = { ...user, activeFrame: frameId };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
@@ -1700,6 +1719,7 @@
             try {
                 await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(null);
 
+                // تحديث localStorage
                 const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
                 const user = snapshot.val();
                 if (user) {
@@ -1716,7 +1736,7 @@
         }
 
         // ============================================================
-        // 💬 CHAT STYLES SYSTEM
+        // 💬 CHAT STYLES SYSTEM (محدثة)
         // ============================================================
         function renderChatStyles(user) {
             const grid = document.getElementById('chatStylesGrid');
@@ -1845,6 +1865,7 @@
 
                 await database.ref('users/' + currentFirebaseUserId).update(updateData);
 
+                // تحديث localStorage
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
@@ -1887,6 +1908,7 @@
 
                 await database.ref('users/' + currentFirebaseUserId + '/activeChatStyle').set(styleId);
 
+                // تحديث localStorage
                 const updatedUser = { ...user, activeChatStyle: styleId };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
@@ -1910,6 +1932,7 @@
             try {
                 await database.ref('users/' + currentFirebaseUserId + '/activeChatStyle').set(null);
 
+                // تحديث localStorage
                 const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
                 const user = snapshot.val();
                 if (user) {
@@ -1944,6 +1967,7 @@
             if (contentEl) contentEl.classList.add('active');
             if (btnEl) btnEl.classList.add('active');
             
+            // إعادة تحميل البيانات عند التبديل
             if (tab === 'frames') {
                 renderFrames(currentUser);
             } else if (tab === 'chatstyles') {
@@ -1975,13 +1999,16 @@
         // 🚀 INIT
         // ============================================================
         window.onload = function() {
+            // تهيئة Firebase أولاً
             initializeFirebase();
             
+            // تحميل بيانات المستخدم
             ensureUserData().then(() => {
                 console.log('👑 VIP System loaded successfully');
                 console.log('📊 Current user:', currentUser);
             });
             
+            // التحقق من وجود مستخدم في localStorage عند تحميل الصفحة
             const stored = getStoredUser();
             if (stored) {
                 updateLoginButtons(true);
