@@ -393,11 +393,10 @@
         }
 
         .room-card .room-banner {
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
             padding: 16px 16px 14px;
             text-align: center;
             position: relative;
-            min-height: 70px;
+            min-height: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -405,6 +404,7 @@
             flex-shrink: 0;
             background-size: cover;
             background-position: center;
+            background-color: #1a1a2e;
         }
 
         .room-card .room-banner .vip-wave-small {
@@ -457,7 +457,7 @@
             border-radius: 12px;
             font-size: 0.6rem;
             color: #ffd700;
-            z-index: 3;
+            z-index: 10;
             font-family: monospace;
             border: 1px solid rgba(255, 215, 0, 0.15);
             font-weight: bold;
@@ -474,7 +474,7 @@
             border-radius: 12px;
             font-size: 0.55rem;
             font-weight: 600;
-            z-index: 3;
+            z-index: 10;
             display: flex;
             align-items: center;
             gap: 4px;
@@ -495,7 +495,7 @@
             border-radius: 12px;
             font-size: 0.55rem;
             color: #ffd700;
-            z-index: 3;
+            z-index: 10;
             border: 1px solid rgba(255, 215, 0, 0.15);
             display: flex;
             align-items: center;
@@ -504,7 +504,7 @@
 
         .room-card .room-banner .room-overlay-image {
             position: absolute;
-            z-index: 2;
+            z-index: 5;
             width: 100%;
             height: 100%;
             top: 0;
@@ -1981,6 +1981,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .card-preview .preview-overlay-image {
@@ -1991,11 +1992,12 @@
             height: 100%;
             object-fit: contain;
             pointer-events: none;
+            z-index: 2;
         }
 
         .card-preview .preview-text {
             position: relative;
-            z-index: 2;
+            z-index: 3;
             color: #ffd700;
             font-weight: bold;
             font-size: 1.2rem;
@@ -2626,7 +2628,7 @@
         ];
 
         // ============================================================
-        // 📁 قائمة الصور المتاحة
+        // 📁 قائمة الصور المتاحة للخلفيات
         // ============================================================
         const bgImages = [];
         const overlayImages = [];
@@ -2744,7 +2746,7 @@
                 preview.appendChild(overlayImg);
             }
             
-            // إضافة النص
+            // إضافة النص الذهبي فقط (تم إزالة النص الأسود)
             const textDiv = document.createElement('div');
             textDiv.className = 'preview-text';
             textDiv.textContent = '🎙️ VIP CHAT';
@@ -2762,7 +2764,6 @@
             bgImages.forEach(img => {
                 const option = document.createElement('option');
                 option.value = img;
-                // استخراج الرقم من اسم الملف
                 const match = img.match(/\((\d+)\)/);
                 const num = match ? match[1] : '0';
                 option.textContent = `خلفية ${num}`;
@@ -2843,10 +2844,8 @@
             };
 
             try {
-                // إرسال الطلب إلى room_requests في stvipclub
                 await database.ref('room_requests/' + roomId).set(requestData);
 
-                // إشعار للأدمن في admin_notifications
                 await database.ref('admin_notifications').push({
                     type: 'new_room_request',
                     roomId: roomId,
@@ -2859,7 +2858,6 @@
                     createdAt: new Date().toISOString()
                 });
 
-                // إشعار للمستخدم
                 if (user && user.numericId) {
                     await sendNotification(
                         user.numericId,
@@ -2874,7 +2872,6 @@
                 document.getElementById('roomDescInput').value = '';
                 document.getElementById('roomPasswordInput').value = '';
                 
-                // إعادة تعيين زر إظهار/إخفاء كلمة المرور
                 const toggleIcon = document.getElementById('passwordToggleIcon');
                 toggleIcon.className = 'fas fa-eye';
                 toggleIcon.style.color = '#888';
@@ -2913,7 +2910,6 @@
             if (!database) return;
 
             try {
-                // جلب الغرف من مسار rooms في stvipclub
                 const snapshot = await database.ref('rooms').once('value');
                 const roomsGrid = document.getElementById('roomsGrid');
 
@@ -3000,9 +2996,9 @@
 
             grid.innerHTML = filtered.map(room => {
                 // تحديد خلفية البطاقة
-                let bgStyle = '';
+                let bgStyle = 'background-color: #1a1a2e;';
                 if (room.background && room.background !== 'default') {
-                    bgStyle = `background-image: url('images/chathtml/${room.background}'); background-size: cover; background-position: center;`;
+                    bgStyle = `background-image: url('images/chathtml/${room.background}'); background-size: cover; background-position: center; background-color: #1a1a2e;`;
                 }
                 
                 // تحديد الصورة العلوية
@@ -3081,13 +3077,11 @@
                     return;
                 }
                 
-                // التحقق من وجود كلمة مرور
                 if (room.hasPassword && room.password) {
                     showPasswordPrompt(roomId, room);
                     return;
                 }
                 
-                // إذا لم تكن هناك كلمة مرور، التوجه مباشرة
                 window.location.href = `voice-room.html?room=${roomId}`;
                 
             } catch (error) {
@@ -3100,7 +3094,6 @@
         // 🔐 نافذة إدخال كلمة المرور
         // ============================================================
         function showPasswordPrompt(roomId, room) {
-            // إزالة أي نافذة سابقة
             const existingPrompt = document.getElementById('passwordPrompt');
             if (existingPrompt) existingPrompt.remove();
             
@@ -3139,20 +3132,17 @@
             
             document.body.insertAdjacentHTML('beforeend', promptHTML);
             
-            // التركيز على حقل كلمة المرور
             setTimeout(() => {
                 const input = document.getElementById('passwordInput');
                 if (input) input.focus();
             }, 300);
             
-            // الضغط على Enter لتأكيد كلمة المرور
             const enterHandler = function(e) {
                 if (e.key === 'Enter' && document.getElementById('passwordPrompt')) {
                     verifyPassword(roomId);
                 }
             };
             document.addEventListener('keydown', enterHandler);
-            // تخزين الـ handler للإزالة لاحقاً
             window._passwordEnterHandler = enterHandler;
         }
 
@@ -3196,21 +3186,16 @@
                     return;
                 }
                 
-                // فك تشفير كلمة المرور
                 const storedPassword = room.password ? atob(room.password) : '';
                 
                 if (input.value.trim() === storedPassword) {
-                    // كلمة المرور صحيحة
                     closePasswordPrompt();
                     window.location.href = `voice-room.html?room=${roomId}`;
                 } else {
-                    // كلمة المرور خاطئة
                     errorDiv.style.display = 'block';
                     errorDiv.textContent = '❌ كلمة المرور غير صحيحة';
                     input.value = '';
                     input.focus();
-                    
-                    // إظهار رسالة الخطأ المخصصة
                     showPasswordErrorModal();
                 }
                 
@@ -3227,7 +3212,6 @@
             const prompt = document.getElementById('passwordPrompt');
             if (prompt) prompt.remove();
             
-            // إزالة مستمع الأحداث
             if (window._passwordEnterHandler) {
                 document.removeEventListener('keydown', window._passwordEnterHandler);
                 window._passwordEnterHandler = null;
@@ -4105,7 +4089,6 @@
         function openCreateRoomModal() {
             if (!requireLogin('openCreateRoomModal')) return;
             document.getElementById('createRoomModal').classList.add('active');
-            // تحميل الصور في القوائم المنسدلة
             loadImageSelects();
         }
 
