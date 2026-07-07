@@ -16,6 +16,7 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
+        /* جميع الأنماط كما هي ... */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -503,6 +504,22 @@
         .chat-messages .message .msg-text { font-size: 0.8rem; }
         .chat-messages .message .msg-time { font-size: 0.45rem; color: #666; margin-top: 1px; }
         .chat-messages .message .msg-badge { font-size: 0.45rem; background: #ffd700; color: #1a1a2e; padding: 1px 8px; border-radius: 8px; margin-left: 4px; }
+
+        .message .style-image-container {
+            display: flex;
+            margin-top: 4px;
+            justify-content: flex-start;
+        }
+        .message.own .style-image-container {
+            justify-content: flex-end;
+        }
+        .message .style-image-container img {
+            max-width: 80px;
+            max-height: 30px;
+            object-fit: contain;
+            opacity: 0.7;
+            border-radius: 4px;
+        }
 
         .scroll-down-btn {
             position: absolute;
@@ -1258,20 +1275,21 @@
 
 <script>
     // ============================================================
-    // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات لوحة الإدارة
+    // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات إدارة المستخدمين (stvipclub)
     // ============================================================
     const firebaseConfig = {
-        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-        authDomain: "vipclub-1d04a.firebaseapp.com",
-        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-        projectId: "vipclub-1d04a",
-        storageBucket: "vipclub-1d04a.firebasestorage.app",
-        messagingSenderId: "120667552740",
-        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+        apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+        authDomain: "stvipclub.firebaseapp.com",
+        databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "stvipclub",
+        storageBucket: "stvipclub.firebasestorage.app",
+        messagingSenderId: "526607326044",
+        appId: "1:526607326044:web:6af53db123ae02c7193f99",
+        measurementId: "G-QZQMQCH9N9"
     };
 
     // ============================================================
-    // 📋 FRAMES DATA
+    // 📋 FRAMES DATA - مطابقة مع vipsystem.html
     // ============================================================
     const FRAMES = [
         { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true, isSpecial: true },
@@ -1402,12 +1420,12 @@
             if (firebase.apps.length > 0) await firebase.app().delete();
             firebase.initializeApp(firebaseConfig);
             database = firebase.database();
-            console.log('✅ Firebase initialized');
+            console.log('✅ Firebase initialized:', firebaseConfig.projectId);
         } catch(error) { console.error('❌ Firebase error:', error); }
     }
 
     // ============================================================
-    // 🖼️ GET USER FRAME
+    // 🖼️ GET USER FRAME - من قاعدة بيانات stvipclub
     // ============================================================
     async function getUserFrameFromFirebase(userId) {
         try {
@@ -1434,7 +1452,7 @@
     }
 
     // ============================================================
-    // 👤 GET USER CHAT STYLE
+    // 👤 GET USER CHAT STYLE - من قاعدة بيانات stvipclub
     // ============================================================
     async function getUserChatStyleFromFirebase(userId) {
         try {
@@ -1461,7 +1479,7 @@
     }
 
     // ============================================================
-    // 👑 CHECK VIP
+    // 👑 CHECK VIP - من قاعدة بيانات stvipclub
     // ============================================================
     async function getUserVIPFromFirebase(userId) {
         try {
@@ -1485,7 +1503,7 @@
     }
 
     // ============================================================
-    // 🏠 ROOM INIT - مع دعم الغرف من لوحة الإدارة
+    // 🏠 ROOM INIT
     // ============================================================
     function getRoomIdFromURL() {
         const params = new URLSearchParams(window.location.search);
@@ -1511,17 +1529,14 @@
         try {
             console.log('🔍 جاري البحث عن الغرفة:', roomId);
             
-            // محاولة جلب الغرفة من مسار rooms
             let roomSnapshot = await database.ref('rooms/' + roomId).once('value');
             
-            // إذا لم توجد الغرفة في rooms، حاول البحث في room_requests
             if (!roomSnapshot.exists()) {
                 console.log('⚠️ الغرفة غير موجودة في rooms، جاري البحث في room_requests...');
                 const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
                 
                 if (requestSnapshot.exists()) {
                     const requestData = requestSnapshot.val();
-                    // إذا كانت حالة الطلب موافق عليها، أنشئ الغرفة
                     if (requestData.status === 'approved') {
                         console.log('✅ تم العثور على طلب موافق عليه، جاري إنشاء الغرفة...');
                         await database.ref('rooms/' + roomId).set({
@@ -1535,7 +1550,6 @@
                             members: 0,
                             isActive: true
                         });
-                        // إعادة المحاولة
                         roomSnapshot = await database.ref('rooms/' + roomId).once('value');
                     } else {
                         showToast(`❌ الغرفة غير مفعلة (الحالة: ${requestData.status})`, 'error');
@@ -2040,9 +2054,8 @@
             if (style) {
                 styleNameHTML = ` <span style="font-size:0.5rem; color:#ffd700;">✍️ ${style.name}</span>`;
                 styleImageHTML = `
-                    <div style="display:flex; justify-content:${isOwn ? 'flex-end' : 'flex-start'}; margin-top:4px;">
-                        <img src="${style.image}" alt="${style.name}" 
-                             style="max-width:80px; max-height:30px; object-fit:contain; opacity:0.7; border-radius:4px;">
+                    <div class="style-image-container">
+                        <img src="${style.image}" alt="${style.name}">
                     </div>
                 `;
             }
@@ -2130,7 +2143,7 @@
     }
 
     // ============================================================
-    // 🎨 CHAT STYLES MODAL
+    // 🎨 CHAT STYLES MODAL - (يتم استدعاؤها من زر الناف بار)
     // ============================================================
     async function openChatStylesModal() {
         if (!isLoggedIn()) {
