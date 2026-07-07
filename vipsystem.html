@@ -120,6 +120,22 @@
             box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
         }
 
+        .header .login-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .header .login-btn:hover {
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .header .logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .header .logout-btn:hover {
+            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
+        }
+
         /* ===== USER INFO ===== */
         .user-info {
             background: rgba(255,255,255,0.05);
@@ -662,6 +678,7 @@
             .vip-card .vip-video-container { min-height: 280px; }
             .tabs .tab-btn { padding: 10px 15px; font-size: 0.8rem; }
             .chatstyle-card { min-height: 350px; }
+            .header .back-btn { padding: 8px 15px; font-size: 0.8rem; }
         }
 
         @media (max-width: 480px) {
@@ -691,9 +708,13 @@
                 <a href="index.html" class="back-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); margin-right: 10px;">
                     <i class="fas fa-home"></i> الرئيسية
                 </a>
-                <a href="admin.html" class="back-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-right: 10px;">
-                    <i class="fas fa-cog"></i> لوحة الإدارة
+                <!-- زر تسجيل الدخول / تسجيل الخروج -->
+                <a href="login4.html" class="back-btn login-btn" id="loginBtn" style="margin-right: 10px;">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
                 </a>
+                <button class="back-btn logout-btn" id="logoutBtn" style="display: none; margin-right: 10px;" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
             </div>
         </div>
 
@@ -826,7 +847,7 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG - مشروع stvipclub (نفس مشروع لوحة الإدارة)
+        // 🔥 FIREBASE CONFIG - مشروع stvipclub
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -938,6 +959,7 @@
         // ============================================================
         function initializeFirebase() {
             try {
+                // حذف أي Firebase قديم إذا وجد
                 if (firebase.apps.length > 0) {
                     firebase.app().delete();
                 }
@@ -981,13 +1003,27 @@
             currentUser = userToStore;
         }
 
+        function clearUserFromStorage() {
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            currentFirebaseUserId = null;
+            updateLoginButtons(false);
+            document.getElementById('userName').textContent = 'زائر';
+            document.getElementById('userId').textContent = '🆔 ---';
+            document.getElementById('vipLevel').textContent = 'VIP 0';
+            document.getElementById('vipStatus').textContent = 'غير مفعل';
+            document.getElementById('userAvatar').innerHTML = '<i class="fas fa-user"></i>';
+            // إعادة تحميل الصفحة لعرض الوضع كزائر
+            location.reload();
+        }
+
         async function loadUserFromFirebase() {
             const stored = getStoredUser();
             if (!stored) {
                 console.log('⚠️ لا يوجد مستخدم مسجل');
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 document.getElementById('userName').textContent = 'زائر';
                 document.getElementById('userId').textContent = '🆔 ---';
+                updateLoginButtons(false);
                 return false;
             }
 
@@ -1008,19 +1044,38 @@
                     currentFirebaseUserId = firebaseKey;
                     
                     console.log('✅ تم تحميل المستخدم:', fullUser.username);
+                    updateLoginButtons(true);
                     return fullUser;
                 } else {
                     // المستخدم غير موجود في Firebase
                     console.warn('⚠️ المستخدم غير موجود في Firebase');
-                    localStorage.removeItem('currentUser');
-                    currentUser = null;
-                    showToast('⚠️ المستخدم غير موجود، يرجى تسجيل الدخول مجدداً', 'warning');
+                    clearUserFromStorage();
                     return false;
                 }
             } catch (error) {
                 console.error('❌ Error loading user:', error);
                 showToast('❌ حدث خطأ في تحميل البيانات', 'error');
                 return false;
+            }
+        }
+
+        function updateLoginButtons(isLoggedIn) {
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (isLoggedIn) {
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-flex';
+            } else {
+                loginBtn.style.display = 'inline-flex';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        function logoutUser() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                clearUserFromStorage();
+                showToast('✅ تم تسجيل الخروج بنجاح', 'success');
             }
         }
 
@@ -1035,6 +1090,42 @@
 
             const user = await loadUserFromFirebase();
             if (!user) {
+                // عرض رسالة للمستخدم غير المسجل
+                document.getElementById('userName').textContent = 'زائر';
+                document.getElementById('userId').textContent = '🆔 ---';
+                document.getElementById('vipLevel').textContent = 'VIP 0';
+                document.getElementById('vipStatus').textContent = 'غير مفعل';
+                
+                // عرض رسالة ترحيب
+                const vipGrid = document.getElementById('vipGrid');
+                if (vipGrid) {
+                    vipGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                            <div style="font-size: 80px; margin-bottom: 20px;">👋</div>
+                            <h2 style="color: #ffd700; margin-bottom: 15px;">مرحباً بك في نظام VIP</h2>
+                            <p style="color: #94a3b8; font-size: 1.1rem; max-width: 500px; margin: 0 auto 30px;">
+                                يرجى <a href="login4.html" style="color: #8b5cf6; text-decoration: none; font-weight: bold;">تسجيل الدخول</a> 
+                                لعرض محتوى VIP الخاص بك وشراء الدخلات المميزة والأطارات.
+                            </p>
+                            <a href="login4.html" class="back-btn login-btn" style="font-size: 1.2rem; padding: 15px 40px; text-decoration: none;">
+                                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول الآن
+                            </a>
+                        </div>
+                    `;
+                }
+                
+                // إخفاء أزرار الإجراءات في بطاقات VIP
+                for (let level = 1; level <= 2; level++) {
+                    const actionsEl = document.getElementById(`vip${level}Actions`);
+                    if (actionsEl) {
+                        actionsEl.innerHTML = `
+                            <button class="btn-buy disabled" disabled style="width: 100%;">
+                                🔒 يرجى تسجيل الدخول
+                            </button>
+                        `;
+                    }
+                }
+                
                 return null;
             }
 
@@ -1051,6 +1142,8 @@
         // 🖥️ UPDATE UI
         // ============================================================
         function updateUI(user) {
+            if (!user) return;
+            
             document.getElementById('userName').textContent = user.nickname || user.username || 'مستخدم';
             document.getElementById('userId').textContent = '🆔 ' + (user.numericId || '---');
             
@@ -1088,6 +1181,8 @@
         // 📊 VIP SYSTEM (محدث للعمل مع Firebase)
         // ============================================================
         function renderVIPActions(user) {
+            if (!user) return;
+            
             for (let level = 1; level <= 2; level++) {
                 const vipConfig = VIP_CONFIG[level];
                 const vipData = user.vip || { active: null, expiresAt: null };
@@ -1102,6 +1197,8 @@
                 const badgeEl = document.getElementById(`vip${level}Badge`);
                 const statusEl = document.getElementById(`vip${level}Status`);
                 const statusTextEl = document.getElementById(`vip${level}StatusText`);
+
+                if (!actionsEl) continue;
 
                 if (isCurrentlyActive) {
                     badgeEl.textContent = '✅ مفعل';
@@ -1186,12 +1283,14 @@
                 actionsEl.innerHTML = actionsHTML;
 
                 const reqEl = document.getElementById(`vip${level}Requirement`);
-                if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
-                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
-                } else if (vipConfig.requirements.EGP) {
-                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م`;
-                } else if (vipConfig.requirements.USD) {
-                    reqEl.textContent = `${vipConfig.requirements.USD} دولار`;
+                if (reqEl) {
+                    if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
+                        reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
+                    } else if (vipConfig.requirements.EGP) {
+                        reqEl.textContent = `${vipConfig.requirements.EGP} ج.م`;
+                    } else if (vipConfig.requirements.USD) {
+                        reqEl.textContent = `${vipConfig.requirements.USD} دولار`;
+                    }
                 }
             }
         }
@@ -1379,8 +1478,10 @@
         // ============================================================
         function renderFrames(user) {
             const grid = document.getElementById('framesGrid');
-            const userFrames = user.frames || {};
-            const activeFrame = user.activeFrame || null;
+            if (!grid) return;
+            
+            const userFrames = user ? (user.frames || {}) : {};
+            const activeFrame = user ? (user.activeFrame || null) : null;
 
             grid.innerHTML = FRAMES.map(frame => {
                 const frameData = userFrames[frame.id] || null;
@@ -1407,11 +1508,17 @@
                     statusClass = 'special';
                 }
 
-                const canAfford = user.balanceEGP >= frame.price;
+                const canAfford = user ? (user.balanceEGP >= frame.price) : false;
 
                 let actionsHTML = '';
 
-                if (frame.isSpecial) {
+                if (!user) {
+                    actionsHTML = `
+                        <button class="btn-buy disabled" disabled style="width: 100%;">
+                            🔒 يرجى تسجيل الدخول
+                        </button>
+                    `;
+                } else if (frame.isSpecial) {
                     actionsHTML = `
                         <button class="btn-buy disabled" disabled style="background: #ffd700; color: #1a1a2e; cursor: default;">
                             🎁 لا يمكن الشراء
@@ -1549,29 +1656,6 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
-                // تسجيل في السجل
-                await database.ref('frameLogs').push({
-                    userId: user.numericId,
-                    username: user.nickname || user.username,
-                    frameId: frameId,
-                    frameName: name,
-                    price: price,
-                    type: 'purchase',
-                    startDate: now.toISOString(),
-                    expiryDate: expiresAt.toISOString(),
-                    timestamp: now.toISOString()
-                });
-
-                const notification = {
-                    id: Date.now(),
-                    text: `🖼️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
-                    read: false,
-                    date: new Date().toLocaleString('ar-EG'),
-                    type: 'frame_purchased',
-                    createdAt: now.toISOString()
-                };
-                await database.ref('users/' + currentFirebaseUserId + '/notifications').push(notification);
-
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
                 await ensureUserData();
 
@@ -1656,8 +1740,10 @@
         // ============================================================
         function renderChatStyles(user) {
             const grid = document.getElementById('chatStylesGrid');
-            const userChatStyles = user.chatStyles || {};
-            const activeChatStyle = user.activeChatStyle || null;
+            if (!grid) return;
+            
+            const userChatStyles = user ? (user.chatStyles || {}) : {};
+            const activeChatStyle = user ? (user.activeChatStyle || null) : null;
 
             grid.innerHTML = CHAT_STYLES.map(style => {
                 const styleData = userChatStyles[style.id] || null;
@@ -1681,11 +1767,17 @@
                     statusClass = 'expired';
                 }
 
-                const canAfford = user.balanceEGP >= style.price;
+                const canAfford = user ? (user.balanceEGP >= style.price) : false;
 
                 let actionsHTML = '';
 
-                if (isActive) {
+                if (!user) {
+                    actionsHTML = `
+                        <button class="btn-buy disabled" disabled style="width: 100%;">
+                            🔒 يرجى تسجيل الدخول
+                        </button>
+                    `;
+                } else if (isActive) {
                     actionsHTML = `
                         <button class="btn-deactivate active" onclick="deactivateChatStyle('${style.id}')">
                             <i class="fas fa-times"></i> إلغاء التفعيل
@@ -1716,7 +1808,7 @@
                 return `
                     <div class="chatstyle-card">
                         <div class="style-preview">
-                            <img src="${style.image}" alt="${style.name}" loading="lazy">
+                            <img src="${style.image}" alt="${style.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23333%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2216%22%3E${style.name}%3C/text%3E%3C/svg%3E'">
                         </div>
                         <div class="style-name">✍️ ${style.name}</div>
                         <div class="style-price">💰 ${style.price} ج.م</div>
@@ -1776,29 +1868,6 @@
                 // تحديث localStorage
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
-
-                // تسجيل في السجل
-                await database.ref('chatStyleLogs').push({
-                    userId: user.numericId,
-                    username: user.nickname || user.username,
-                    styleId: styleId,
-                    styleName: name,
-                    price: price,
-                    type: 'purchase',
-                    startDate: now.toISOString(),
-                    expiryDate: expiresAt.toISOString(),
-                    timestamp: now.toISOString()
-                });
-
-                const notification = {
-                    id: Date.now(),
-                    text: `✍️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
-                    read: false,
-                    date: new Date().toLocaleString('ar-EG'),
-                    type: 'chatstyle_purchased',
-                    createdAt: now.toISOString()
-                };
-                await database.ref('users/' + currentFirebaseUserId + '/notifications').push(notification);
 
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
                 await ensureUserData();
@@ -1892,21 +1961,24 @@
                 'chatstyles': 'ChatStyles'
             };
             
-            document.getElementById(`tabContent${tabMap[tab]}`).classList.add('active');
-            document.getElementById(`tab${tabMap[tab]}`).classList.add('active');
+            const contentEl = document.getElementById(`tabContent${tabMap[tab]}`);
+            const btnEl = document.getElementById(`tab${tabMap[tab]}`);
+            
+            if (contentEl) contentEl.classList.add('active');
+            if (btnEl) btnEl.classList.add('active');
+            
+            // إعادة تحميل البيانات عند التبديل
+            if (tab === 'frames') {
+                renderFrames(currentUser);
+            } else if (tab === 'chatstyles') {
+                renderChatStyles(currentUser);
+            }
         }
 
         // ============================================================
         // 🍞 TOAST
         // ============================================================
         function showToast(message, type = 'info') {
-            const colors = {
-                success: '#10b981',
-                error: '#ef4444',
-                warning: '#f59e0b',
-                info: '#3b82f6'
-            };
-            
             const oldToast = document.querySelector('.toast');
             if (oldToast) oldToast.remove();
             
@@ -1935,6 +2007,14 @@
                 console.log('👑 VIP System loaded successfully');
                 console.log('📊 Current user:', currentUser);
             });
+            
+            // التحقق من وجود مستخدم في localStorage عند تحميل الصفحة
+            const stored = getStoredUser();
+            if (stored) {
+                updateLoginButtons(true);
+            } else {
+                updateLoginButtons(false);
+            }
         };
     </script>
 </body>
