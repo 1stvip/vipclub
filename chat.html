@@ -374,7 +374,6 @@
             flex: 1;
         }
 
-        /* ===== بطاقة الغرفة - التصميم الجديد ===== */
         .room-card {
             background: #14142a;
             border-radius: 16px;
@@ -2345,7 +2344,6 @@
             <div class="logo" onclick="showHome()">
                 <i class="fas fa-crown"></i>
                 VipChat
-                <i class="fas fa-crown"></i>
             </div>
         </div>
 
@@ -2805,12 +2803,14 @@
         const bgImages = [];
         const overlayImages = [];
 
+        // خلفيات البطاقات (1-10) - من مجلد roomsbg
         for (let i = 1; i <= 10; i++) {
             bgImages.push(`roomsbg/roommk (${i}).png`);
         }
 
+        // الصور العلوية (1-28) - من مجلد roomsmk
         for (let i = 1; i <= 28; i++) {
-            overlayImages.push(`roomsmk/roommk (${i}).png`);
+            overlayImages.push(`roomsmk/roomsmk (${i}).png`);
         }
 
         // ============================================================
@@ -2888,12 +2888,14 @@
             const bgValue = bgSelect.value;
             const overlayValue = overlaySelect.value;
 
+            // إزالة الصور السابقة
             const existingOverlay = preview.querySelector('.preview-overlay-image');
             if (existingOverlay) existingOverlay.remove();
 
             const existingText = preview.querySelector('.preview-text');
             if (existingText) existingText.remove();
 
+            // تعيين الخلفية
             if (bgValue && bgValue !== 'default') {
                 preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
                 preview.style.backgroundSize = 'cover';
@@ -2902,14 +2904,23 @@
                 preview.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e, #0f3460)';
             }
 
+            // إضافة الصورة العلوية
             if (overlayValue && overlayValue !== 'none') {
                 const overlayImg = document.createElement('img');
                 overlayImg.className = 'preview-overlay-image';
                 overlayImg.src = `images/chathtml/${overlayValue}`;
                 overlayImg.alt = 'صورة علوية';
+                overlayImg.onerror = function() {
+                    console.log('❌ فشل تحميل الصورة العلوية:', overlayValue);
+                    this.style.display = 'none';
+                };
+                overlayImg.onload = function() {
+                    console.log('✅ تم تحميل الصورة العلوية:', overlayValue);
+                };
                 preview.appendChild(overlayImg);
             }
 
+            // إضافة النص الذهبي
             const textDiv = document.createElement('div');
             textDiv.className = 'preview-text';
             textDiv.textContent = '🎙️ VIP CHAT';
@@ -2923,6 +2934,7 @@
             const bgSelect = document.getElementById('roomBackground');
             const overlaySelect = document.getElementById('roomOverlay');
 
+            // تحميل الخلفيات
             bgImages.forEach(img => {
                 const option = document.createElement('option');
                 option.value = img;
@@ -2932,6 +2944,7 @@
                 bgSelect.appendChild(option);
             });
 
+            // تحميل الصور العلوية
             overlayImages.forEach(img => {
                 const option = document.createElement('option');
                 option.value = img;
@@ -3130,19 +3143,14 @@
             let filtered = rooms;
 
             if (currentFilter === 'all') {
-                // عرض جميع الغرف
                 filtered = rooms;
             } else if (currentFilter === 'vip') {
-                // الغرف VIP فقط
                 filtered = rooms.filter(room => room.vip === true);
             } else if (currentFilter === 'password') {
-                // الغرف المحمية فقط
                 filtered = rooms.filter(room => room.hasPassword === true);
             } else if (currentFilter === 'public') {
-                // الغرف العامة فقط
                 filtered = rooms.filter(room => room.hasPassword === false);
             } else {
-                // أي فلتر آخر (للتوافق مع القديم)
                 filtered = rooms.filter(room => getRoomTag(room) === currentFilter);
             }
 
@@ -3168,18 +3176,22 @@
             }
 
             grid.innerHTML = filtered.map(room => {
-                // خلفية البطاقة
+                // خلفية البطاقة - إذا كانت default استخدم التدرج الافتراضي
                 let bgStyle = 'background-color: #1a1a2e;';
                 if (room.background && room.background !== 'default') {
                     bgStyle =
                         `background-image: url('images/chathtml/${room.background}'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
+                } else {
+                    // الخلفية الافتراضية - تدرج لوني
+                    bgStyle =
+                        'background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); background-size: cover; background-position: center;';
                 }
 
                 // الصورة العلوية
                 let overlayImg = '';
                 if (room.overlayImage && room.overlayImage !== 'none') {
                     overlayImg =
-                        `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة">`;
+                        `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة" onerror="this.style.display='none'">`;
                 }
 
                 // حالة الخصوصية
