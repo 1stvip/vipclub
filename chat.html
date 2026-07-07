@@ -403,6 +403,8 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
         }
 
         .room-card .room-banner .vip-wave-small {
@@ -480,6 +482,35 @@
 
         .room-card .room-banner .room-status i {
             font-size: 0.4rem;
+        }
+
+        .room-card .room-banner .room-password-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.15);
+            backdrop-filter: blur(4px);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.55rem;
+            color: #ffd700;
+            z-index: 3;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .room-card .room-banner .room-overlay-image {
+            position: absolute;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            object-fit: contain;
+            pointer-events: none;
         }
 
         .room-card .room-body {
@@ -566,6 +597,7 @@
             gap: 12px;
             font-size: 0.7rem;
             color: #777;
+            flex-wrap: wrap;
         }
 
         .room-card .room-footer .stats span {
@@ -1935,6 +1967,52 @@
             background: #3a3a5a;
         }
 
+        /* ستايلات معاينة البطاقة */
+        .card-preview {
+            background: #0f0f1f;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #2a2a4a;
+            position: relative;
+            min-height: 120px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-preview .preview-overlay-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .card-preview .preview-text {
+            position: relative;
+            z-index: 2;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .card-preview .preview-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            font-size: 0.8rem;
+            z-index: 1;
+        }
+
         .bottom-nav {
             background: #14142a;
             border-top: 1px solid #1e1e3a;
@@ -2345,26 +2423,99 @@
     <div id="createRoomModal" class="modal">
         <div class="modal-content">
             <h2><i class="fas fa-home" style="color: #ffd700;"></i> إنشاء غرفة جديدة</h2>
+            
             <div class="form-group">
                 <label>اسم الغرفة *</label>
                 <input type="text" id="roomNameInput" placeholder="أدخل اسم الغرفة" maxlength="50">
             </div>
+            
             <div class="form-group">
                 <label>وصف الغرفة</label>
                 <textarea id="roomDescInput" placeholder="أدخل وصفاً للغرفة..." rows="3"></textarea>
             </div>
+
+            <!-- ===== خلفية البطاقة ===== -->
+            <div class="form-group">
+                <label>🎨 خلفية البطاقة</label>
+                <select id="roomBackground" onchange="updateCardPreview()">
+                    <option value="default">الخلفية الافتراضية</option>
+                </select>
+            </div>
+
+            <!-- ===== الصورة العلوية ===== -->
+            <div class="form-group">
+                <label>🖼️ الصورة العلوية (اختياري)</label>
+                <select id="roomOverlay" onchange="updateCardPreview()">
+                    <option value="none">بدون صورة علوية</option>
+                </select>
+            </div>
+
+            <!-- ===== عدد المقاعد ===== -->
+            <div class="form-group">
+                <label>🪑 عدد المقاعد</label>
+                <select id="roomMaxSlots">
+                    <option value="2">2 مقاعد</option>
+                    <option value="3">3 مقاعد</option>
+                    <option value="4">4 مقاعد</option>
+                    <option value="5">5 مقاعد</option>
+                    <option value="6">6 مقاعد</option>
+                    <option value="7">7 مقاعد</option>
+                    <option value="8">8 مقاعد</option>
+                    <option value="9">9 مقاعد</option>
+                    <option value="10" selected>10 مقاعد</option>
+                </select>
+            </div>
+
+            <!-- ===== كلمة المرور مع زر الإظهار/الإخفاء ===== -->
+            <div class="form-group">
+                <label>🔑 كلمة مرور الغرفة (اختياري)</label>
+                <div style="display: flex; align-items: center; gap: 8px; background: #0f0f1f; border: 2px solid #2a2a4a; border-radius: 10px; padding: 0 12px;">
+                    <input type="password" id="roomPasswordInput" placeholder="أدخل كلمة مرور للغرفة (اختياري)" maxlength="20" style="flex: 1; background: transparent; border: none; padding: 10px 0; color: #fff; outline: none; font-size: 0.95rem;">
+                    <button type="button" onclick="togglePasswordVisibility()" style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 1.1rem; padding: 8px;">
+                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== معاينة البطاقة ===== -->
+            <div class="form-group">
+                <label>📋 معاينة البطاقة</label>
+                <div class="card-preview" id="cardPreview">
+                    <div class="preview-placeholder">🎙️ VipChat</div>
+                </div>
+            </div>
+
             <div class="form-group" style="background: rgba(255,215,0,0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,215,0,0.1);">
                 <p style="font-size: 0.85rem; color: #aaa;">
                     <i class="fas fa-info-circle" style="color: #ffd700;"></i>
                     سيتم إرسال طلبك إلى الإدارة للموافقة عليه.
                 </p>
             </div>
+
             <div class="modal-actions">
                 <button class="btn-submit" onclick="submitRoomRequest()">
                     <i class="fas fa-paper-plane"></i> إرسال
                 </button>
                 <button class="btn-cancel" onclick="closeModal('createRoomModal')">إلغاء</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== نافذة خطأ كلمة المرور ===== -->
+    <div id="passwordErrorModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h2 style="color: #ff4757; border-bottom: none;">
+                <i class="fas fa-lock"></i> كلمة المرور غير صحيحة
+            </h2>
+            <p style="color: #ff6b81; font-size: 1.1rem; margin: 20px 0;">
+                ❌ كلمة المرور غير صحيحة
+            </p>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">
+                يرجى التأكد من كلمة المرور والمحاولة مرة أخرى
+            </p>
+            <button onclick="closePasswordError()" style="background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                <i class="fas fa-redo"></i> حاول مرة أخرى
+            </button>
         </div>
     </div>
 
@@ -2475,6 +2626,22 @@
         ];
 
         // ============================================================
+        // 📁 قائمة الصور المتاحة
+        // ============================================================
+        const bgImages = [];
+        const overlayImages = [];
+
+        // توليد أسماء الصور للخلفيات (1-10)
+        for (let i = 1; i <= 10; i++) {
+            bgImages.push(`roomsbg/roommk (${i}).png`);
+        }
+
+        // توليد أسماء الصور للطبقة العلوية (1-28)
+        for (let i = 1; i <= 28; i++) {
+            overlayImages.push(`roomsmk/roommk (${i}).png`);
+        }
+
+        // ============================================================
         // 🚀 INITIALIZE FIREBASE
         // ============================================================
         try {
@@ -2542,6 +2709,99 @@
         }
 
         // ============================================================
+        // 🎨 UPDATE CARD PREVIEW
+        // ============================================================
+        function updateCardPreview() {
+            const preview = document.getElementById('cardPreview');
+            const bgSelect = document.getElementById('roomBackground');
+            const overlaySelect = document.getElementById('roomOverlay');
+            
+            const bgValue = bgSelect.value;
+            const overlayValue = overlaySelect.value;
+            
+            // إزالة الصور السابقة
+            const existingOverlay = preview.querySelector('.preview-overlay-image');
+            if (existingOverlay) existingOverlay.remove();
+            
+            const existingText = preview.querySelector('.preview-text');
+            if (existingText) existingText.remove();
+            
+            // تعيين الخلفية
+            if (bgValue && bgValue !== 'default') {
+                preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
+            } else {
+                preview.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e, #0f3460)';
+            }
+            
+            // إضافة الصورة العلوية
+            if (overlayValue && overlayValue !== 'none') {
+                const overlayImg = document.createElement('img');
+                overlayImg.className = 'preview-overlay-image';
+                overlayImg.src = `images/chathtml/${overlayValue}`;
+                overlayImg.alt = 'صورة علوية';
+                preview.appendChild(overlayImg);
+            }
+            
+            // إضافة النص
+            const textDiv = document.createElement('div');
+            textDiv.className = 'preview-text';
+            textDiv.textContent = '🎙️ VIP CHAT';
+            preview.appendChild(textDiv);
+        }
+
+        // ============================================================
+        // 📋 LOAD IMAGES INTO SELECTS
+        // ============================================================
+        function loadImageSelects() {
+            const bgSelect = document.getElementById('roomBackground');
+            const overlaySelect = document.getElementById('roomOverlay');
+            
+            // تحميل الخلفيات
+            bgImages.forEach(img => {
+                const option = document.createElement('option');
+                option.value = img;
+                // استخراج الرقم من اسم الملف
+                const match = img.match(/\((\d+)\)/);
+                const num = match ? match[1] : '0';
+                option.textContent = `خلفية ${num}`;
+                bgSelect.appendChild(option);
+            });
+            
+            // تحميل الصور العلوية
+            overlayImages.forEach(img => {
+                const option = document.createElement('option');
+                option.value = img;
+                const match = img.match(/\((\d+)\)/);
+                const num = match ? match[1] : '0';
+                option.textContent = `صورة ${num}`;
+                overlaySelect.appendChild(option);
+            });
+            
+            // تحديث المعاينة
+            updateCardPreview();
+        }
+
+        // ============================================================
+        // 👁️ إظهار/إخفاء كلمة المرور
+        // ============================================================
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('roomPasswordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+                toggleIcon.style.color = '#ffd700';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+                toggleIcon.style.color = '#888';
+            }
+        }
+
+        // ============================================================
         // 📝 SUBMIT ROOM REQUEST - يرسل إلى stvipclub
         // ============================================================
         async function submitRoomRequest() {
@@ -2549,6 +2809,10 @@
 
             const name = document.getElementById('roomNameInput').value.trim();
             const description = document.getElementById('roomDescInput').value.trim();
+            const background = document.getElementById('roomBackground').value;
+            const overlay = document.getElementById('roomOverlay').value;
+            const maxSlots = parseInt(document.getElementById('roomMaxSlots').value);
+            const password = document.getElementById('roomPasswordInput').value.trim();
 
             if (!name) {
                 showToast('⚠️ يرجى إدخال اسم الغرفة', 'warning');
@@ -2565,6 +2829,11 @@
                 creatorId: user.numericId || 'GUEST',
                 creatorName: user.nickname || user.username || 'زائر',
                 creatorAvatar: user.avatar || '',
+                background: background || 'default',
+                overlayImage: overlay || 'none',
+                maxSlots: maxSlots || 10,
+                password: password ? btoa(password) : '',
+                hasPassword: !!password,
                 status: 'pending',
                 vip: false,
                 tag: 'all',
@@ -2584,6 +2853,8 @@
                     roomName: name,
                     creatorName: requestData.creatorName,
                     creatorId: requestData.creatorId,
+                    hasPassword: requestData.hasPassword,
+                    maxSlots: requestData.maxSlots,
                     read: false,
                     createdAt: new Date().toISOString()
                 });
@@ -2601,6 +2872,13 @@
                 closeModal('createRoomModal');
                 document.getElementById('roomNameInput').value = '';
                 document.getElementById('roomDescInput').value = '';
+                document.getElementById('roomPasswordInput').value = '';
+                
+                // إعادة تعيين زر إظهار/إخفاء كلمة المرور
+                const toggleIcon = document.getElementById('passwordToggleIcon');
+                toggleIcon.className = 'fas fa-eye';
+                toggleIcon.style.color = '#888';
+                document.getElementById('roomPasswordInput').type = 'password';
 
                 setTimeout(() => loadRooms(), 500);
 
@@ -2665,9 +2943,13 @@
                         hostId: room.creatorId || '---',
                         creatorAvatar: room.creatorAvatar || '',
                         members: room.members || 0,
+                        maxSlots: room.maxSlots || 10,
                         status: room.isActive ? 'live' : 'pending',
                         vip: room.vip || false,
                         tag: room.tag || 'all',
+                        background: room.background || 'default',
+                        overlayImage: room.overlayImage || 'none',
+                        hasPassword: room.hasPassword || false,
                         createdAt: room.createdAt || new Date().toISOString()
                     });
                 }
@@ -2716,12 +2998,32 @@
                 return;
             }
 
-            grid.innerHTML = filtered.map(room => `
+            grid.innerHTML = filtered.map(room => {
+                // تحديد خلفية البطاقة
+                let bgStyle = '';
+                if (room.background && room.background !== 'default') {
+                    bgStyle = `background-image: url('images/chathtml/${room.background}'); background-size: cover; background-position: center;`;
+                }
+                
+                // تحديد الصورة العلوية
+                let overlayImg = '';
+                if (room.overlayImage && room.overlayImage !== 'none') {
+                    overlayImg = `<img src="images/chathtml/${room.overlayImage}" class="room-overlay-image" alt="صورة الغرفة">`;
+                }
+
+                const passwordBadge = room.hasPassword ? 
+                    `<div class="room-password-badge"><i class="fas fa-lock"></i> محمية</div>` : '';
+
+                const slotsText = `${room.members}/${room.maxSlots}`;
+
+                return `
                 <div class="room-card" onclick="joinRoom('${room.id}')" data-room-id="${room.id}">
-                    <div class="room-banner">
+                    <div class="room-banner" style="${bgStyle}">
                         <div class="vip-wave-small"></div>
+                        ${overlayImg}
                         <div class="room-id-badge">🔑 ${room.id}</div>
                         <div class="room-status"><i class="fas fa-circle"></i> مباشر</div>
+                        ${passwordBadge}
                         <div class="vip-text">${room.vip ? 'V I P' : '🎙️'}</div>
                     </div>
                     <div class="room-body">
@@ -2739,15 +3041,16 @@
                     </div>
                     <div class="room-footer">
                         <div class="stats">
-                            <span><i class="fas fa-users"></i> ${room.members}</span>
+                            <span><i class="fas fa-users"></i> ${slotsText}</span>
                             <span><i class="fas fa-bolt"></i> ${room.vip ? 'VIP' : 'عام'}</span>
+                            ${room.hasPassword ? '<span><i class="fas fa-lock"></i> محمية</span>' : ''}
                         </div>
                         <button class="join-btn" onclick="event.stopPropagation(); joinRoom('${room.id}')">
                             <i class="fas fa-sign-in-alt"></i> دخول
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function filterRooms() {
@@ -2764,11 +3067,182 @@
         }
 
         // ============================================================
-        // 🎯 JOIN ROOM
+        // 🎯 JOIN ROOM مع التحقق من كلمة المرور
         // ============================================================
-        function joinRoom(roomId) {
+        async function joinRoom(roomId) {
             if (!requireLogin('joinRoom')) return;
-            window.location.href = `voice-room.html?room=${roomId}`;
+            
+            try {
+                const snapshot = await database.ref('rooms/' + roomId).once('value');
+                const room = snapshot.val();
+                
+                if (!room) {
+                    showToast('❌ الغرفة غير موجودة', 'error');
+                    return;
+                }
+                
+                // التحقق من وجود كلمة مرور
+                if (room.hasPassword && room.password) {
+                    showPasswordPrompt(roomId, room);
+                    return;
+                }
+                
+                // إذا لم تكن هناك كلمة مرور، التوجه مباشرة
+                window.location.href = `voice-room.html?room=${roomId}`;
+                
+            } catch (error) {
+                console.error('Error joining room:', error);
+                showToast('❌ حدث خطأ في الدخول إلى الغرفة', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🔐 نافذة إدخال كلمة المرور
+        // ============================================================
+        function showPasswordPrompt(roomId, room) {
+            // إزالة أي نافذة سابقة
+            const existingPrompt = document.getElementById('passwordPrompt');
+            if (existingPrompt) existingPrompt.remove();
+            
+            const promptHTML = `
+                <div id="passwordPrompt" class="modal active" style="z-index: 5000;">
+                    <div class="modal-content" style="max-width: 400px; text-align: center;">
+                        <h2 style="color: #ffd700; border-bottom: none;">
+                            <i class="fas fa-lock"></i> غرفة محمية بكلمة مرور
+                        </h2>
+                        <p style="color: #aaa; margin: 15px 0; font-size: 0.9rem;">
+                            الغرفة <strong style="color: #ffd700;">${room.name}</strong> محمية بكلمة مرور
+                        </p>
+                        <div class="form-group" style="text-align: right;">
+                            <label style="color: #ddd; text-align: right; display: block;">🔑 أدخل كلمة المرور</label>
+                            <div style="display: flex; align-items: center; gap: 8px; background: #0f0f1f; border-radius: 10px; border: 2px solid #2a2a4a; padding: 0 12px;">
+                                <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور..." style="flex: 1; background: transparent; border: none; padding: 12px 0; color: #fff; outline: none; font-size: 1rem;">
+                                <button type="button" onclick="togglePromptPassword()" style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 1.1rem; padding: 8px;">
+                                    <i class="fas fa-eye" id="promptToggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="passwordError" style="color: #ff4757; font-size: 0.9rem; margin-top: 10px; display: none;">
+                            ❌ كلمة المرور غير صحيحة
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button onclick="verifyPassword('${roomId}')" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #ffd700, #f0c000); color: #1a1a2e; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                                <i class="fas fa-unlock"></i> دخول
+                            </button>
+                            <button onclick="closePasswordPrompt()" style="flex: 1; padding: 12px; background: #2a2a4a; color: #aaa; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                                إلغاء
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', promptHTML);
+            
+            // التركيز على حقل كلمة المرور
+            setTimeout(() => {
+                const input = document.getElementById('passwordInput');
+                if (input) input.focus();
+            }, 300);
+            
+            // الضغط على Enter لتأكيد كلمة المرور
+            const enterHandler = function(e) {
+                if (e.key === 'Enter' && document.getElementById('passwordPrompt')) {
+                    verifyPassword(roomId);
+                }
+            };
+            document.addEventListener('keydown', enterHandler);
+            // تخزين الـ handler للإزالة لاحقاً
+            window._passwordEnterHandler = enterHandler;
+        }
+
+        // ============================================================
+        // 👁️ إظهار/إخفاء كلمة المرور في نافذة الدخول
+        // ============================================================
+        function togglePromptPassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('promptToggleIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+                icon.style.color = '#ffd700';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+                icon.style.color = '#888';
+            }
+        }
+
+        // ============================================================
+        // ✅ التحقق من كلمة المرور
+        // ============================================================
+        async function verifyPassword(roomId) {
+            const input = document.getElementById('passwordInput');
+            const errorDiv = document.getElementById('passwordError');
+            
+            if (!input || !input.value.trim()) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = '⚠️ يرجى إدخال كلمة المرور';
+                return;
+            }
+            
+            try {
+                const snapshot = await database.ref('rooms/' + roomId).once('value');
+                const room = snapshot.val();
+                
+                if (!room) {
+                    showToast('❌ الغرفة غير موجودة', 'error');
+                    return;
+                }
+                
+                // فك تشفير كلمة المرور
+                const storedPassword = room.password ? atob(room.password) : '';
+                
+                if (input.value.trim() === storedPassword) {
+                    // كلمة المرور صحيحة
+                    closePasswordPrompt();
+                    window.location.href = `voice-room.html?room=${roomId}`;
+                } else {
+                    // كلمة المرور خاطئة
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = '❌ كلمة المرور غير صحيحة';
+                    input.value = '';
+                    input.focus();
+                    
+                    // إظهار رسالة الخطأ المخصصة
+                    showPasswordErrorModal();
+                }
+                
+            } catch (error) {
+                console.error('Error verifying password:', error);
+                showToast('❌ حدث خطأ في التحقق من كلمة المرور', 'error');
+            }
+        }
+
+        // ============================================================
+        // ❌ إغلاق نافذة إدخال كلمة المرور
+        // ============================================================
+        function closePasswordPrompt() {
+            const prompt = document.getElementById('passwordPrompt');
+            if (prompt) prompt.remove();
+            
+            // إزالة مستمع الأحداث
+            if (window._passwordEnterHandler) {
+                document.removeEventListener('keydown', window._passwordEnterHandler);
+                window._passwordEnterHandler = null;
+            }
+        }
+
+        // ============================================================
+        // 🔴 عرض رسالة خطأ كلمة المرور
+        // ============================================================
+        function showPasswordErrorModal() {
+            document.getElementById('passwordErrorModal').classList.add('active');
+        }
+
+        function closePasswordError() {
+            document.getElementById('passwordErrorModal').classList.remove('active');
         }
 
         // ============================================================
@@ -3631,6 +4105,8 @@
         function openCreateRoomModal() {
             if (!requireLogin('openCreateRoomModal')) return;
             document.getElementById('createRoomModal').classList.add('active');
+            // تحميل الصور في القوائم المنسدلة
+            loadImageSelects();
         }
 
         function closeModal(modalId) {
@@ -3847,6 +4323,10 @@
             console.log('🎙️ VipChat جاهز!');
             console.log('✅ قاعدة البيانات: stvipclub');
             console.log('✅ تم إضافة نظام تسجيل الدخول الإجباري');
+            console.log('✅ تم إضافة خلفيات وصور علوية للبطاقات');
+            console.log('✅ تم إضافة عدد المقاعد (2-10)');
+            console.log('✅ تم إضافة كلمة المرور مع إظهار/إخفاء');
+            console.log('✅ تم إضافة رسالة خطأ مخصصة');
         };
 
         async function updateNotifBadge() {
@@ -3913,6 +4393,5 @@
             }
         });
     </script>
-
 </body>
 </html>
