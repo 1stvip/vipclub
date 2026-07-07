@@ -431,6 +431,70 @@
             box-shadow: 0 5px 20px rgba(255,215,0,0.3);
         }
 
+        /* ===== زر إضافة غرفة ===== */
+        .btn-add-room {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add-room:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        /* ===== مودال إضافة غرفة ===== */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #0f172a;
+            color: white;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #8b5cf6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .requests-grid {
                 grid-template-columns: 1fr;
@@ -496,6 +560,9 @@
         <div class="admin-header">
             <h1><i class="fas fa-user-shield"></i> لوحة إدارة الغرف</h1>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button class="btn-add-room" onclick="showAddRoomModal()">
+                    <i class="fas fa-plus"></i> إضافة غرفة جديدة
+                </button>
                 <button onclick="loadRequests(currentTab)" style="padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; cursor: pointer;">
                     <i class="fas fa-sync-alt"></i> تحديث
                 </button>
@@ -536,18 +603,52 @@
         </div>
     </div>
 
+    <!-- ===== MODAL: إضافة غرفة ===== -->
+    <div id="addRoomModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-plus-circle"></i> إضافة غرفة جديدة</h2>
+            <div class="form-group">
+                <label>🔑 معرف الغرفة *</label>
+                <input type="text" id="newRoomId" placeholder="مثال: room123" required>
+                <small style="color: #666; font-size: 0.75rem;">يجب أن يكون معرف فريد</small>
+            </div>
+            <div class="form-group">
+                <label>📛 اسم الغرفة *</label>
+                <input type="text" id="newRoomName" placeholder="اسم الغرفة" required>
+            </div>
+            <div class="form-group">
+                <label>📝 وصف الغرفة</label>
+                <textarea id="newRoomDesc" placeholder="وصف الغرفة"></textarea>
+            </div>
+            <div class="form-group">
+                <label>👤 منشيء الغرفة</label>
+                <select id="newRoomCreator">
+                    <option value="admin">👑 الأدمن</option>
+                    <option value="system">🤖 النظام</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="addRoomDirectly()" style="flex:2; background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                    <i class="fas fa-check"></i> إنشاء الغرفة
+                </button>
+                <button class="btn-close" onclick="closeModal('addRoomModal')" style="flex:1;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG
+        // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات الغرف الصوتية (stvipclub)
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-            authDomain: "vipclub-1d04a.firebaseapp.com",
-            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-            projectId: "vipclub-1d04a",
-            storageBucket: "vipclub-1d04a.firebasestorage.app",
-            messagingSenderId: "120667552740",
-            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
         };
 
         let database;
@@ -557,18 +658,20 @@
         // 🚀 INITIALIZE FIREBASE
         // ============================================================
         try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
+            if (firebase.apps.length > 0) {
+                firebase.app().delete();
             }
+            firebase.initializeApp(firebaseConfig);
             database = firebase.database();
-            console.log('✅ Firebase connected');
+            console.log('✅ Firebase connected to:', firebaseConfig.projectId);
+            console.log('📁 قاعدة البيانات:', firebaseConfig.databaseURL);
         } catch (error) {
             console.error('❌ Firebase error:', error);
             showToast('❌ فشل الاتصال بقاعدة البيانات', 'error');
         }
 
         // ============================================================
-        // 📋 LOAD REQUESTS - مع معالجة أخطاء الصلاحيات
+        // 📋 LOAD REQUESTS
         // ============================================================
         async function loadRequests(status) {
             const container = document.getElementById('requestsContainer');
@@ -588,33 +691,62 @@
             }
 
             try {
+                // جلب طلبات الغرف
                 const snapshot = await database.ref('room_requests').once('value');
-
-                if (!snapshot.exists()) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h3>لا توجد طلبات</h3>
-                            <p style="color: #666;">سوف تظهر هنا طلبات إنشاء الغرف</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const requests = snapshot.val();
                 let allRequests = [];
                 let pendingCount = 0;
 
-                for (const roomId in requests) {
-                    const req = requests[roomId];
-                    req._roomId = roomId;
-                    allRequests.push(req);
-                    if (req.status === 'pending') pendingCount++;
+                if (snapshot.exists()) {
+                    const requests = snapshot.val();
+                    for (const roomId in requests) {
+                        const req = requests[roomId];
+                        req._roomId = roomId;
+                        allRequests.push(req);
+                        if (req.status === 'pending') pendingCount++;
+                    }
+                }
+
+                // جلب الغرف المفعلة من مسار rooms
+                const roomsSnapshot = await database.ref('rooms').once('value');
+                const roomsMap = {};
+                if (roomsSnapshot.exists()) {
+                    const roomsData = roomsSnapshot.val();
+                    for (const roomId in roomsData) {
+                        roomsMap[roomId] = roomsData[roomId];
+                    }
                 }
 
                 document.getElementById('pendingCount').textContent = pendingCount;
 
-                const filtered = allRequests.filter(req => req.status === status);
+                let filtered = [];
+                
+                if (status === 'pending') {
+                    filtered = allRequests.filter(req => req.status === 'pending');
+                } else if (status === 'approved') {
+                    // الغرف المفعلة هي التي موجودة في rooms وموافقة في room_requests
+                    const approvedRequests = allRequests.filter(req => req.status === 'approved');
+                    filtered = approvedRequests.filter(req => roomsMap[req._roomId]);
+                    // إذا لم توجد غرف في room_requests ولكن توجد في rooms
+                    for (const roomId in roomsMap) {
+                        const room = roomsMap[roomId];
+                        const existsInRequests = allRequests.some(req => req._roomId === roomId);
+                        if (!existsInRequests && room.status !== 'rejected') {
+                            filtered.push({
+                                _roomId: roomId,
+                                name: room.name || 'غرفة صوتية',
+                                description: room.description || '',
+                                creatorId: room.creatorId || 'admin',
+                                creatorName: room.creatorName || 'الأدمن',
+                                status: 'approved',
+                                createdAt: room.createdAt || new Date().toISOString(),
+                                isDirect: true
+                            });
+                        }
+                    }
+                } else if (status === 'rejected') {
+                    filtered = allRequests.filter(req => req.status === 'rejected');
+                }
+
                 filtered.sort((a, b) => {
                     return new Date(b.createdAt) - new Date(a.createdAt);
                 });
@@ -638,32 +770,26 @@
                 let html = '<div class="requests-grid">';
                 filtered.forEach(req => {
                     const date = req.createdAt ? new Date(req.createdAt).toLocaleString('ar-EG') : '---';
-                    const statusBadge = {
-                        'pending': 'pending',
-                        'approved': 'approved',
-                        'rejected': 'rejected'
-                    };
+                    const isDirect = req.isDirect === true;
+                    const statusBadgeClass = req.status === 'approved' ? 'approved' : req.status === 'pending' ? 'pending' : 'rejected';
+                    const statusText = req.status === 'approved' ? '🟢 تمت الموافقة' : 
+                                      req.status === 'pending' ? '🟡 قيد الانتظار' : 
+                                      '🔴 مرفوضة';
 
                     html += `
                         <div class="request-card">
                             <div class="card-header">
                                 <div class="room-id">🔑 ${req._roomId}</div>
-                                <div class="status-badge ${statusBadge[req.status] || 'pending'}">
-                                    ${req.status === 'pending' ? '🟡 قيد الانتظار' : 
-                                      req.status === 'approved' ? '🟢 تمت الموافقة' : 
-                                      '🔴 مرفوضة'}
-                                </div>
+                                <div class="status-badge ${statusBadgeClass}">${statusText}</div>
                             </div>
-                            <div class="room-name">${req.name || 'غرفة بدون اسم'}</div>
+                            <div class="room-name">${req.name || 'غرفة بدون اسم'} ${isDirect ? '✨' : ''}</div>
                             <div class="room-desc">${req.description || 'لا يوجد وصف'}</div>
                             <div class="creator-info">
                                 <div class="avatar">${(req.creatorName || 'U').charAt(0).toUpperCase()}</div>
                                 <div class="details">
-                                    <div class="name">${req.creatorName || 'مستخدم'}</div>
+                                    <div class="name">${req.creatorName || 'مستخدم'} ${isDirect ? '👑' : ''}</div>
                                     <div class="id">🆔 ${req.creatorId || '---'}</div>
-                                    ${req.creatorEmail ? `<div class="contact">📧 ${req.creatorEmail}</div>` : ''}
-                                    ${req.creatorPhone ? `<div class="contact">📱 ${req.creatorPhone}</div>` : ''}
-                                    ${req.isGuest ? '<div class="contact" style="color: #f59e0b;">👤 مستخدم زائر</div>' : ''}
+                                    ${req.isDirect ? '<div class="contact" style="color: #ffd700;">✨ تم إنشاؤها مباشرة</div>' : ''}
                                 </div>
                             </div>
                             <div class="card-actions">
@@ -675,12 +801,17 @@
                                         <i class="fas fa-times"></i> رفض
                                     </button>
                                 ` : ''}
-                                <button class="btn-view" onclick="viewCreator('${req._roomId}')">
-                                    <i class="fas fa-user"></i> بيانات المنشيء
-                                </button>
                                 ${req.status === 'approved' ? `
+                                    <button class="btn-view" onclick="viewCreator('${req._roomId}')">
+                                        <i class="fas fa-user"></i> بيانات المنشيء
+                                    </button>
                                     <button class="btn-delete" onclick="deleteRoom('${req._roomId}')">
                                         <i class="fas fa-trash"></i> حذف
+                                    </button>
+                                ` : ''}
+                                ${req.status === 'rejected' ? `
+                                    <button class="btn-view" onclick="viewCreator('${req._roomId}')">
+                                        <i class="fas fa-user"></i> بيانات المنشيء
                                     </button>
                                 ` : ''}
                             </div>
@@ -695,7 +826,6 @@
             } catch (error) {
                 console.error('Error loading requests:', error);
                 
-                // معالجة خطأ الصلاحيات
                 if (error.message && error.message.includes('permission_denied')) {
                     container.innerHTML = `
                         <div class="empty-state">
@@ -705,20 +835,7 @@
                                 لا تملك صلاحية الوصول إلى قاعدة البيانات. 
                                 يرجى تعديل <strong style="color: #ffd700;">قواعد أمان Firebase</strong>.
                             </p>
-                            <div style="background: #1a1a2e; padding: 15px; border-radius: 10px; margin: 15px auto; max-width: 500px; text-align: right; direction: ltr; font-family: monospace; font-size: 0.8rem; color: #888; border: 1px solid #333;">
-                                {
-                                  "rules": {
-                                    ".read": true,
-                                    ".write": true
-                                  }
-                                }
-                            </div>
-                            <button onclick="window.open('https://console.firebase.google.com/project/vipclub-1d04a/database/vipclub-1d04a-default-rtdb/rules', '_blank')" 
-                                    class="btn-fix-permissions">
-                                <i class="fas fa-external-link-alt"></i> فتح قواعد Firebase
-                            </button>
-                            <br>
-                            <button onclick="location.reload()" style="margin-top:10px; padding:8px 20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:white; cursor:pointer;">
+                            <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
                                 <i class="fas fa-sync-alt"></i> إعادة المحاولة
                             </button>
                         </div>
@@ -781,14 +898,6 @@
 
                 await database.ref('room_requests/' + roomId + '/status').set('approved');
 
-                if (request.creatorId && request.creatorId !== 'GUEST') {
-                    await sendNotification(
-                        request.creatorId,
-                        `✅ تمت الموافقة على غرفتك "${request.name}"!`,
-                        `معرف الغرفة: ${roomId}\nيمكنك الآن الدخول إلى الغرفة والبدء في الدردشة الصوتية.`
-                    );
-                }
-
                 showToast(`✅ تمت الموافقة على الغرفة ${request.name}`, 'success');
                 loadRequests(currentTab);
 
@@ -802,19 +911,7 @@
             if (!confirm(`❌ هل تريد رفض إنشاء الغرفة ${roomId}؟`)) return;
 
             try {
-                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
-                const request = requestSnapshot.val();
-
-                if (request && request.creatorId && request.creatorId !== 'GUEST') {
-                    await sendNotification(
-                        request.creatorId,
-                        `❌ تم رفض طلب إنشاء غرفتك "${request.name}"`,
-                        `معرف الغرفة: ${roomId}\nيرجى التواصل مع الإدارة لمعرفة السبب.`
-                    );
-                }
-
                 await database.ref('room_requests/' + roomId + '/status').set('rejected');
-
                 showToast(`❌ تم رفض الغرفة`, 'error');
                 loadRequests(currentTab);
 
@@ -841,31 +938,101 @@
         }
 
         // ============================================================
+        // ➕ إضافة غرفة مباشرة
+        // ============================================================
+        function showAddRoomModal() {
+            document.getElementById('addRoomModal').classList.add('active');
+            document.getElementById('newRoomId').value = '';
+            document.getElementById('newRoomName').value = '';
+            document.getElementById('newRoomDesc').value = '';
+        }
+
+        async function addRoomDirectly() {
+            const roomId = document.getElementById('newRoomId').value.trim();
+            const name = document.getElementById('newRoomName').value.trim();
+            const desc = document.getElementById('newRoomDesc').value.trim();
+            const creator = document.getElementById('newRoomCreator').value;
+
+            if (!roomId || !name) {
+                showToast('⚠️ يرجى إدخال معرف الغرفة والاسم', 'warning');
+                return;
+            }
+
+            try {
+                // التحقق من عدم وجود الغرفة
+                const checkSnapshot = await database.ref('rooms/' + roomId).once('value');
+                if (checkSnapshot.exists()) {
+                    showToast('⚠️ الغرفة موجودة بالفعل', 'warning');
+                    return;
+                }
+
+                // إنشاء الغرفة
+                await database.ref('rooms/' + roomId).set({
+                    roomId: roomId,
+                    name: name,
+                    description: desc || '',
+                    creatorId: creator,
+                    creatorName: creator === 'admin' ? '👑 الأدمن' : '🤖 النظام',
+                    createdAt: new Date().toISOString(),
+                    status: 'approved',
+                    members: 0,
+                    isActive: true
+                });
+
+                // إضافة سجل في room_requests
+                await database.ref('room_requests/' + roomId).set({
+                    name: name,
+                    description: desc || '',
+                    creatorId: creator,
+                    creatorName: creator === 'admin' ? '👑 الأدمن' : '🤖 النظام',
+                    createdAt: new Date().toISOString(),
+                    status: 'approved',
+                    isDirect: true
+                });
+
+                showToast(`✅ تم إنشاء الغرفة "${name}" بنجاح!`, 'success');
+                closeModal('addRoomModal');
+                loadRequests(currentTab);
+
+            } catch (error) {
+                console.error('Error adding room:', error);
+                showToast('❌ حدث خطأ في إنشاء الغرفة', 'error');
+            }
+        }
+
+        // ============================================================
         // 👤 VIEW CREATOR
         // ============================================================
         async function viewCreator(roomId) {
             try {
-                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
-                const request = requestSnapshot.val();
+                let request = null;
+                let requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
+                if (requestSnapshot.exists()) {
+                    request = requestSnapshot.val();
+                    request._roomId = roomId;
+                }
+
+                // إذا لم يوجد في room_requests، جلب من rooms
+                if (!request) {
+                    const roomSnapshot = await database.ref('rooms/' + roomId).once('value');
+                    if (roomSnapshot.exists()) {
+                        const room = roomSnapshot.val();
+                        request = {
+                            _roomId: roomId,
+                            name: room.name,
+                            description: room.description,
+                            creatorId: room.creatorId,
+                            creatorName: room.creatorName,
+                            createdAt: room.createdAt,
+                            status: room.status || 'approved',
+                            isDirect: true
+                        };
+                    }
+                }
 
                 if (!request) {
                     showToast('❌ لم يتم العثور على بيانات الطلب', 'error');
                     return;
-                }
-
-                let userData = {};
-                if (request.creatorId && request.creatorId !== 'GUEST') {
-                    try {
-                        const usersRef = database.ref('users');
-                        const snapshot = await usersRef.orderByChild('numericId').equalTo(request.creatorId).once('value');
-                        if (snapshot.exists()) {
-                            const data = snapshot.val();
-                            const userKey = Object.keys(data)[0];
-                            userData = data[userKey];
-                        }
-                    } catch (e) {
-                        console.warn('Could not fetch user data:', e);
-                    }
                 }
 
                 const infoDiv = document.getElementById('creatorInfo');
@@ -876,25 +1043,9 @@
                         </div>
                         <h3 style="color: #ffd700;">${request.creatorName || 'مستخدم'}</h3>
                         <div style="color: #888; font-family: monospace;">🆔 ${request.creatorId || '---'}</div>
-                        ${request.isGuest ? '<div style="color: #f59e0b; font-size: 0.8rem;">👤 مستخدم زائر (غير مسجل)</div>' : ''}
+                        ${request.isDirect ? '<div style="color: #ffd700; font-size: 0.8rem;">✨ تم إنشاؤها مباشرة من لوحة الإدارة</div>' : ''}
                     </div>
                     <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px;">
-                        <div class="info-row">
-                            <span class="label">📧 البريد الإلكتروني</span>
-                            <span class="value">${userData.email || request.creatorEmail || 'غير متوفر'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">📱 رقم الهاتف</span>
-                            <span class="value">${userData.phone || request.creatorPhone || 'غير متوفر'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">👤 اسم المستخدم</span>
-                            <span class="value">${userData.username || 'غير متوفر'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">💰 الرصيد (EGP)</span>
-                            <span class="value">${userData.balanceEGP ? userData.balanceEGP.toFixed(2) : 'غير متوفر'}</span>
-                        </div>
                         <div class="info-row">
                             <span class="label">📛 اسم الغرفة</span>
                             <span class="value">${request.name}</span>
@@ -904,15 +1055,15 @@
                             <span class="value">${request.description || 'لا يوجد'}</span>
                         </div>
                         <div class="info-row">
-                            <span class="label">📅 تاريخ الطلب</span>
+                            <span class="label">📅 تاريخ الإنشاء</span>
                             <span class="value">${request.createdAt ? new Date(request.createdAt).toLocaleString('ar-EG') : '---'}</span>
                         </div>
                         <div class="info-row">
-                            <span class="label">📊 حالة الطلب</span>
+                            <span class="label">📊 حالة الغرفة</span>
                             <span class="value" style="color: ${request.status === 'approved' ? '#10b981' : request.status === 'pending' ? '#f59e0b' : '#ef4444'};">
-                                ${request.status === 'approved' ? '✅ تمت الموافقة' : 
+                                ${request.status === 'approved' ? '✅ نشطة' : 
                                   request.status === 'pending' ? '🟡 قيد الانتظار' : 
-                                  '❌ مرفوض'}
+                                  '❌ مرفوضة'}
                             </span>
                         </div>
                     </div>
@@ -923,36 +1074,6 @@
             } catch (error) {
                 console.error('Error loading creator info:', error);
                 showToast('❌ حدث خطأ في تحميل بيانات المنشيء', 'error');
-            }
-        }
-
-        // ============================================================
-        // 🔔 SEND NOTIFICATION
-        // ============================================================
-        async function sendNotification(userId, title, message) {
-            if (!database) return;
-
-            try {
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
-
-                if (!snapshot.exists()) {
-                    console.warn('User not found:', userId);
-                    return;
-                }
-
-                const userData = snapshot.val();
-                const userKey = Object.keys(userData)[0];
-
-                await database.ref('users/' + userKey + '/notifications').push({
-                    text: `${title}\n${message}`,
-                    date: new Date().toLocaleString('ar-EG'),
-                    read: false,
-                    type: 'room_request'
-                });
-
-            } catch (error) {
-                console.error('Error sending notification:', error);
             }
         }
 
@@ -992,21 +1113,22 @@
         // 🚀 INIT ON PAGE LOAD
         // ============================================================
         window.onload = function() {
-            // تحميل الطلبات
             loadRequests('pending');
 
-            // الاستماع للتحديثات
             if (database) {
                 try {
                     database.ref('room_requests').on('value', () => {
                         loadRequests(currentTab);
                     });
+                    database.ref('rooms').on('value', () => {
+                        loadRequests(currentTab);
+                    });
                 } catch (e) {
-                    console.warn('Could not listen to room_requests:', e);
+                    console.warn('Could not listen to changes:', e);
                 }
             }
 
-            console.log('👑 لوحة إدارة الغرف جاهزة');
+            console.log('👑 لوحة إدارة الغرف جاهزة (stvipclub)');
         };
     </script>
 </body>
