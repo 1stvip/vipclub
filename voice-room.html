@@ -1434,7 +1434,7 @@
 
 <script>
 // ============================================================
-// 🔥 FIREBASE CONFIG - مشروع vipclub-1d04a (نفس المشروع)
+// 🔥 FIREBASE CONFIG - مشروع vipclub-1d04a
 // ============================================================
 const firebaseConfig = {
     apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
@@ -1447,7 +1447,7 @@ const firebaseConfig = {
 };
 
 // ============================================================
-// 📋 DATA CONFIG (نفس البيانات الموجودة في vipsystem.html)
+// 📋 DATA CONFIG
 // ============================================================
 const FRAMES = [
     { id: 'frame1', name: 'إطار فاخر 1', price: 50, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true },
@@ -1512,7 +1512,7 @@ let isProcessingJoin = false;
 let vipQueue = [];
 
 // ============================================================
-// 👤 USER FUNCTIONS (محسّنة للربط مع Firebase Auth)
+// 👤 USER FUNCTIONS
 // ============================================================
 function getCurrentUserFromStorage() {
     try { return JSON.parse(localStorage.getItem('currentUser')); } catch(e) { return null; }
@@ -1531,7 +1531,6 @@ function isLoggedIn() {
 
 async function getCurrentUserFullData() {
     try {
-        // أولاً: التحقق من Firebase Auth
         if (currentFirebaseUser) {
             const uid = currentFirebaseUser.uid;
             const userRef = database.ref('users').orderByChild('uid').equalTo(uid);
@@ -1551,8 +1550,6 @@ async function getCurrentUserFullData() {
                 return merged;
             }
         }
-        
-        // ثانياً: الرجوع إلى localStorage
         const localUser = getCurrentUserFromStorage();
         if (localUser && localUser.numericId) {
             return localUser;
@@ -1610,11 +1607,7 @@ auth.onAuthStateChanged(async (user) => {
         isAuthenticated = true;
         currentFirebaseUser = user;
         currentUser = await getCurrentUserFullData();
-        
-        // تحديث واجهة المستخدم
         updateUI();
-        
-        // بدء تهيئة الغرفة إذا لم تبدأ بعد
         if (!roomInitialized && roomId) {
             initRoom();
         }
@@ -1623,8 +1616,6 @@ auth.onAuthStateChanged(async (user) => {
         isAuthenticated = false;
         currentUser = null;
         currentFirebaseUser = null;
-        
-        // عرض رسالة للمستخدم غير المسجل
         showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
         setTimeout(() => {
             window.location.href = 'loginchat.html';
@@ -1682,10 +1673,8 @@ async function loadRoomData() {
         listenSeats();
         setupChatScroll();
         
-        // VIP Entrance for new users
         listenForNewUsers();
         
-        // Show VIP entrance for current user
         if (currentUser?.numericId) {
             const username = currentUser.nickname || currentUser.username || 'مستخدم';
             setTimeout(() => {
@@ -1797,7 +1786,7 @@ function skipVIPEntrance() {
 }
 
 // ============================================================
-// 💺 SEATS FUNCTIONS (محسّنة لجلب البيانات من Firebase بنفس هيكل vipsystem)
+// 💺 SEATS FUNCTIONS
 // ============================================================
 async function getUserFrame(userId) {
     try {
@@ -3093,14 +3082,12 @@ window.onload = async function() {
     try {
         await initializeFirebase();
         
-        // التحقق من وجود معرف الغرفة
         if (!getRoomIdFromURL()) {
             showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
             setTimeout(() => window.location.href = 'chat.html', 2000);
             return;
         }
         
-        // طلب الميكروفون
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: { echoCancellation: true, noiseSuppression: true } 
@@ -3117,7 +3104,6 @@ window.onload = async function() {
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون غير متاح</span>';
         }
         
-        // بدء تهيئة الغرفة (سيتم إكمالها بعد تسجيل الدخول)
         initRoom();
         
     } catch(e) { 
