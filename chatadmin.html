@@ -172,6 +172,8 @@
             justify-content: space-between;
             align-items: start;
             margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .request-card .room-id {
@@ -198,6 +200,14 @@
             font-size: 1.2rem;
             font-weight: bold;
             margin: 10px 0 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .request-card .room-name .lock-icon {
+            color: #ffd700;
+            font-size: 0.9rem;
         }
 
         .request-card .room-desc {
@@ -205,6 +215,41 @@
             font-size: 0.9rem;
             line-height: 1.5;
             margin-bottom: 12px;
+        }
+
+        /* ===== خصائص الغرفة ===== */
+        .request-card .room-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .request-card .room-features .feature {
+            background: rgba(255,255,255,0.06);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .request-card .room-features .feature i {
+            font-size: 0.7rem;
+        }
+
+        .request-card .room-features .feature.has-password {
+            color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .request-card .room-features .feature.no-password {
+            color: #10b981;
         }
 
         .request-card .creator-info {
@@ -368,6 +413,14 @@
             font-weight: 500;
         }
 
+        .modal-content .info-row .value .password-display {
+            font-family: monospace;
+            background: rgba(255,215,0,0.1);
+            padding: 2px 10px;
+            border-radius: 6px;
+            color: #ffd700;
+        }
+
         .modal-actions {
             display: flex;
             gap: 10px;
@@ -412,24 +465,6 @@
         .toast.error { background: #ef4444; }
         .toast.info { background: #3b82f6; }
         .toast.warning { background: #f59e0b; }
-
-        .btn-fix-permissions {
-            background: #ffd700;
-            color: #1a1a2e;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 15px;
-            font-size: 1rem;
-        }
-
-        .btn-fix-permissions:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(255,215,0,0.3);
-        }
 
         /* ===== زر إضافة غرفة ===== */
         .btn-add-room {
@@ -621,6 +656,24 @@
                 <textarea id="newRoomDesc" placeholder="وصف الغرفة"></textarea>
             </div>
             <div class="form-group">
+                <label>🪑 عدد المقاعد</label>
+                <select id="newRoomMaxSlots">
+                    <option value="2">2 مقاعد</option>
+                    <option value="3">3 مقاعد</option>
+                    <option value="4">4 مقاعد</option>
+                    <option value="5">5 مقاعد</option>
+                    <option value="6">6 مقاعد</option>
+                    <option value="7">7 مقاعد</option>
+                    <option value="8">8 مقاعد</option>
+                    <option value="9">9 مقاعد</option>
+                    <option value="10" selected>10 مقاعد</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🔑 كلمة المرور (اختياري)</label>
+                <input type="text" id="newRoomPassword" placeholder="أدخل كلمة مرور للغرفة (اختياري)">
+            </div>
+            <div class="form-group">
                 <label>👤 منشيء الغرفة</label>
                 <select id="newRoomCreator">
                     <option value="admin">👑 الأدمن</option>
@@ -638,7 +691,7 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات الغرف الصوتية (stvipclub)
+        // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات stvipclub
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -739,7 +792,12 @@
                                 creatorName: room.creatorName || 'الأدمن',
                                 status: 'approved',
                                 createdAt: room.createdAt || new Date().toISOString(),
-                                isDirect: true
+                                isDirect: true,
+                                maxSlots: room.maxSlots || 10,
+                                hasPassword: room.hasPassword || false,
+                                password: room.password || '',
+                                background: room.background || 'default',
+                                overlayImage: room.overlayImage || 'none'
                             });
                         }
                     }
@@ -776,20 +834,47 @@
                                       req.status === 'pending' ? '🟡 قيد الانتظار' : 
                                       '🔴 مرفوضة';
 
+                    // عرض كلمة المرور إذا كانت موجودة (مخفية)
+                    const hasPassword = req.hasPassword || (req.password && req.password.length > 0);
+                    const passwordDisplay = hasPassword ? '🔒 محمية' : '🔓 عامة';
+                    
+                    // عرض عدد المقاعد
+                    const maxSlots = req.maxSlots || 10;
+
                     html += `
                         <div class="request-card">
                             <div class="card-header">
                                 <div class="room-id">🔑 ${req._roomId}</div>
                                 <div class="status-badge ${statusBadgeClass}">${statusText}</div>
                             </div>
-                            <div class="room-name">${req.name || 'غرفة بدون اسم'} ${isDirect ? '✨' : ''}</div>
+                            <div class="room-name">
+                                ${req.name || 'غرفة بدون اسم'} 
+                                ${isDirect ? '✨' : ''}
+                                ${hasPassword ? '<span class="lock-icon"><i class="fas fa-lock"></i></span>' : ''}
+                            </div>
                             <div class="room-desc">${req.description || 'لا يوجد وصف'}</div>
+                            
+                            <!-- خصائص الغرفة -->
+                            <div class="room-features">
+                                <span class="feature"><i class="fas fa-chair"></i> ${maxSlots} مقاعد</span>
+                                <span class="feature ${hasPassword ? 'has-password' : 'no-password'}">
+                                    <i class="fas ${hasPassword ? 'fa-lock' : 'fa-unlock'}"></i> ${passwordDisplay}
+                                </span>
+                                ${req.background && req.background !== 'default' ? `
+                                    <span class="feature"><i class="fas fa-image"></i> خلفية مخصصة</span>
+                                ` : ''}
+                                ${req.overlayImage && req.overlayImage !== 'none' ? `
+                                    <span class="feature"><i class="fas fa-layer-group"></i> صورة علوية</span>
+                                ` : ''}
+                                ${req.vip ? `<span class="feature" style="color:#ffd700;"><i class="fas fa-crown"></i> VIP</span>` : ''}
+                            </div>
+                            
                             <div class="creator-info">
                                 <div class="avatar">${(req.creatorName || 'U').charAt(0).toUpperCase()}</div>
                                 <div class="details">
                                     <div class="name">${req.creatorName || 'مستخدم'} ${isDirect ? '👑' : ''}</div>
                                     <div class="id">🆔 ${req.creatorId || '---'}</div>
-                                    ${req.isDirect ? '<div class="contact" style="color: #ffd700;">✨ تم إنشاؤها مباشرة</div>' : ''}
+                                    ${req.isDirect ? '<div class="contact" style="color: #ffd700;">✨ تم إنشاؤها مباشرة من لوحة الإدارة</div>' : ''}
                                 </div>
                             </div>
                             <div class="card-actions">
@@ -884,7 +969,8 @@
                     return;
                 }
 
-                await database.ref('rooms/' + roomId).set({
+                // إنشاء الغرفة مع جميع البيانات الجديدة
+                const roomData = {
                     roomId: roomId,
                     name: request.name,
                     description: request.description,
@@ -893,9 +979,17 @@
                     createdAt: request.createdAt,
                     status: 'approved',
                     members: 0,
-                    isActive: true
-                });
+                    isActive: true,
+                    maxSlots: request.maxSlots || 10,
+                    hasPassword: request.hasPassword || false,
+                    password: request.password || '',
+                    background: request.background || 'default',
+                    overlayImage: request.overlayImage || 'none',
+                    vip: request.vip || false,
+                    tag: request.tag || 'all'
+                };
 
+                await database.ref('rooms/' + roomId).set(roomData);
                 await database.ref('room_requests/' + roomId + '/status').set('approved');
 
                 showToast(`✅ تمت الموافقة على الغرفة ${request.name}`, 'success');
@@ -945,6 +1039,8 @@
             document.getElementById('newRoomId').value = '';
             document.getElementById('newRoomName').value = '';
             document.getElementById('newRoomDesc').value = '';
+            document.getElementById('newRoomPassword').value = '';
+            document.getElementById('newRoomMaxSlots').value = '10';
         }
 
         async function addRoomDirectly() {
@@ -952,6 +1048,8 @@
             const name = document.getElementById('newRoomName').value.trim();
             const desc = document.getElementById('newRoomDesc').value.trim();
             const creator = document.getElementById('newRoomCreator').value;
+            const maxSlots = parseInt(document.getElementById('newRoomMaxSlots').value);
+            const password = document.getElementById('newRoomPassword').value.trim();
 
             if (!roomId || !name) {
                 showToast('⚠️ يرجى إدخال معرف الغرفة والاسم', 'warning');
@@ -966,8 +1064,7 @@
                     return;
                 }
 
-                // إنشاء الغرفة
-                await database.ref('rooms/' + roomId).set({
+                const roomData = {
                     roomId: roomId,
                     name: name,
                     description: desc || '',
@@ -976,8 +1073,18 @@
                     createdAt: new Date().toISOString(),
                     status: 'approved',
                     members: 0,
-                    isActive: true
-                });
+                    isActive: true,
+                    maxSlots: maxSlots || 10,
+                    hasPassword: !!password,
+                    password: password ? btoa(password) : '',
+                    background: 'default',
+                    overlayImage: 'none',
+                    vip: false,
+                    tag: 'all'
+                };
+
+                // إنشاء الغرفة
+                await database.ref('rooms/' + roomId).set(roomData);
 
                 // إضافة سجل في room_requests
                 await database.ref('room_requests/' + roomId).set({
@@ -987,7 +1094,12 @@
                     creatorName: creator === 'admin' ? '👑 الأدمن' : '🤖 النظام',
                     createdAt: new Date().toISOString(),
                     status: 'approved',
-                    isDirect: true
+                    isDirect: true,
+                    maxSlots: maxSlots || 10,
+                    hasPassword: !!password,
+                    password: password ? btoa(password) : '',
+                    background: 'default',
+                    overlayImage: 'none'
                 });
 
                 showToast(`✅ تم إنشاء الغرفة "${name}" بنجاح!`, 'success');
@@ -1025,7 +1137,12 @@
                             creatorName: room.creatorName,
                             createdAt: room.createdAt,
                             status: room.status || 'approved',
-                            isDirect: true
+                            isDirect: true,
+                            maxSlots: room.maxSlots || 10,
+                            hasPassword: room.hasPassword || false,
+                            password: room.password || '',
+                            background: room.background || 'default',
+                            overlayImage: room.overlayImage || 'none'
                         };
                     }
                 }
@@ -1033,6 +1150,16 @@
                 if (!request) {
                     showToast('❌ لم يتم العثور على بيانات الطلب', 'error');
                     return;
+                }
+
+                // فك تشفير كلمة المرور
+                let passwordDisplay = 'لا توجد';
+                if (request.hasPassword && request.password) {
+                    try {
+                        passwordDisplay = atob(request.password);
+                    } catch (e) {
+                        passwordDisplay = request.password;
+                    }
                 }
 
                 const infoDiv = document.getElementById('creatorInfo');
@@ -1053,6 +1180,26 @@
                         <div class="info-row">
                             <span class="label">📝 وصف الغرفة</span>
                             <span class="value">${request.description || 'لا يوجد'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">🪑 عدد المقاعد</span>
+                            <span class="value">${request.maxSlots || 10}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">🔑 كلمة المرور</span>
+                            <span class="value">
+                                ${request.hasPassword ? 
+                                    `<span class="password-display">${passwordDisplay}</span>` : 
+                                    'لا توجد كلمة مرور'}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">🎨 الخلفية</span>
+                            <span class="value">${request.background && request.background !== 'default' ? request.background : 'افتراضية'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">🖼️ الصورة العلوية</span>
+                            <span class="value">${request.overlayImage && request.overlayImage !== 'none' ? request.overlayImage : 'لا توجد'}</span>
                         </div>
                         <div class="info-row">
                             <span class="label">📅 تاريخ الإنشاء</span>
