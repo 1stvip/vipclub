@@ -11,11 +11,14 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     
     <style>
-        /* ===== RESET & BASE ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
         body {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
@@ -93,7 +96,9 @@
             gap: 10px;
         }
 
-        .header .logo i { color: #ffd700; }
+        .header .logo i {
+            color: #ffd700;
+        }
 
         .header .back-btn {
             padding: 10px 25px;
@@ -113,31 +118,6 @@
         .header .back-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
-        }
-
-        .header .auth-btn {
-            padding: 10px 25px;
-            background: linear-gradient(135deg, #ffd700, #f0c000);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-        }
-
-        .header .auth-btn.logout-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
         }
 
         /* ===== USER INFO ===== */
@@ -182,11 +162,6 @@
         .user-info .user-name {
             font-size: 1.2rem;
             font-weight: bold;
-        }
-
-        .user-info .user-email {
-            color: #94a3b8;
-            font-size: 0.85rem;
         }
 
         .user-info .user-id {
@@ -255,12 +230,35 @@
             z-index: 2;
         }
 
-        .vip-card .vip-badge.vip1 { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .vip-card .vip-badge.vip2 { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .vip-card .vip-badge.owned { background: #10b981; color: white; }
-        .vip-card .vip-badge.expired { background: #6b7280; color: white; }
-        .vip-card .vip-badge.active { background: #3b82f6; color: white; }
-        .vip-card .vip-badge.special { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; }
+        .vip-card .vip-badge.vip1 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .vip-card .vip-badge.vip2 {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .vip-card .vip-badge.owned {
+            background: #10b981;
+            color: white;
+        }
+
+        .vip-card .vip-badge.expired {
+            background: #6b7280;
+            color: white;
+        }
+
+        .vip-card .vip-badge.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .vip-card .vip-badge.special {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a1a2e;
+        }
 
         .vip-card .vip-video-container {
             width: 100%;
@@ -279,6 +277,27 @@
             height: 100%;
             object-fit: cover;
             background: #0a0a1a;
+        }
+
+        .vip-card .vip-video-container .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+        .vip-card .vip-video-container:hover .video-overlay {
+            opacity: 1;
         }
 
         .vip-card .vip-title {
@@ -312,9 +331,18 @@
             font-size: 0.85rem;
         }
 
-        .vip-card .vip-requirements .req-item:last-child { border-bottom: none; }
-        .vip-card .vip-requirements .req-item .req-label { color: #94a3b8; }
-        .vip-card .vip-requirements .req-item .req-value { color: #fff; font-weight: bold; }
+        .vip-card .vip-requirements .req-item:last-child {
+            border-bottom: none;
+        }
+
+        .vip-card .vip-requirements .req-item .req-label {
+            color: #94a3b8;
+        }
+
+        .vip-card .vip-requirements .req-item .req-value {
+            color: #fff;
+            font-weight: bold;
+        }
 
         .vip-card .vip-status-text {
             text-align: center;
@@ -326,11 +354,36 @@
             flex-shrink: 0;
         }
 
-        .vip-card .vip-status-text.active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
-        .vip-card .vip-status-text.owned { background: rgba(255, 215, 0, 0.1); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.2); }
-        .vip-card .vip-status-text.special { background: rgba(255, 215, 0, 0.15); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.3); font-size: 1rem; }
-        .vip-card .vip-status-text.inactive { background: rgba(107, 114, 128, 0.1); color: #94a3b8; border: 1px solid rgba(107, 114, 128, 0.2); }
-        .vip-card .vip-status-text.locked { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .vip-card .vip-status-text.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .vip-card .vip-status-text.owned {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .vip-card .vip-status-text.special {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            font-size: 1rem;
+        }
+
+        .vip-card .vip-status-text.inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .vip-card .vip-status-text.locked {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
 
         .vip-card .vip-actions {
             display: flex;
@@ -480,10 +533,29 @@
             margin-bottom: 12px;
         }
 
-        .chatstyle-card .style-status.active { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
-        .chatstyle-card .style-status.owned { background: rgba(255, 215, 0, 0.15); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.2); }
-        .chatstyle-card .style-status.inactive { background: rgba(107, 114, 128, 0.15); color: #94a3b8; border: 1px solid rgba(107, 114, 128, 0.2); }
-        .chatstyle-card .style-status.expired { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .chatstyle-card .style-status.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .chatstyle-card .style-status.owned {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .chatstyle-card .style-status.inactive {
+            background: rgba(107, 114, 128, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .chatstyle-card .style-status.expired {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
 
         .chatstyle-card .style-actions {
             display: flex;
@@ -517,6 +589,11 @@
         .chatstyle-card .style-actions .btn-buy.disabled {
             background: #6b7280;
             cursor: not-allowed;
+        }
+
+        .chatstyle-card .style-actions .btn-buy.disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .chatstyle-card .style-actions .btn-activate {
@@ -575,136 +652,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* ===== LOADING ===== */
-        .loading-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 60px 20px;
-            color: #666;
-            gap: 15px;
-        }
-
-        .loading-spinner i {
-            font-size: 2rem;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ===== LOGIN REQUIRED ===== */
-        .login-required {
-            grid-column: 1/-1;
-            text-align: center;
-            padding: 60px 20px;
-            color: #666;
-        }
-
-        .login-required i {
-            font-size: 3.5rem;
-            color: #333;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .login-required h3 {
-            color: #888;
-            margin-bottom: 8px;
-        }
-
-        .login-required p {
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-
-        .login-required .login-btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #ffd700, #f0c000);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .login-required .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-        }
-
-        /* ===== LOGIN OVERLAY ===== */
-        .login-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 5000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .login-overlay.active {
-            display: flex;
-        }
-
-        .login-overlay .login-box {
-            background: #1a1a2e;
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            border: 2px solid rgba(255, 215, 0, 0.2);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-        }
-
-        .login-overlay .login-box .login-icon {
-            font-size: 4rem;
-            color: #ffd700;
-            margin-bottom: 15px;
-        }
-
-        .login-overlay .login-box h2 {
-            color: #fff;
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-        }
-
-        .login-overlay .login-box p {
-            color: #94a3b8;
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .login-overlay .login-box .login-btn-main {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #ffd700, #f0c000);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .login-overlay .login-box .login-btn-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
-        }
-
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .vip-grid { grid-template-columns: 1fr; }
@@ -715,9 +662,6 @@
             .vip-card .vip-video-container { min-height: 280px; }
             .tabs .tab-btn { padding: 10px 15px; font-size: 0.8rem; }
             .chatstyle-card { min-height: 350px; }
-            .login-overlay .login-box { padding: 30px 20px; }
-            .login-overlay .login-box .login-icon { font-size: 3rem; }
-            .login-overlay .login-box h2 { font-size: 1.2rem; }
         }
 
         @media (max-width: 480px) {
@@ -733,18 +677,6 @@
 </head>
 <body>
 
-    <!-- ===== LOGIN OVERLAY ===== -->
-    <div id="loginOverlay" class="login-overlay active">
-        <div class="login-box">
-            <div class="login-icon"><i class="fas fa-crown"></i></div>
-            <h2>نظام VIP</h2>
-            <p>يرجى تسجيل الدخول للاستمتاع بجميع مميزات نظام VIP وشراء الدخلات المميزة والأطارات.</p>
-            <button class="login-btn-main" onclick="redirectToLogin()">
-                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-            </button>
-        </div>
-    </div>
-
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -756,9 +688,12 @@
                 <a href="chat.html" class="back-btn">
                     <i class="fas fa-arrow-right"></i> العودة للغرف
                 </a>
-                <button id="authBtn" class="auth-btn" onclick="handleAuth()">
-                    <i class="fas fa-spinner fa-spin"></i> جاري التحقق...
-                </button>
+                <a href="index.html" class="back-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); margin-right: 10px;">
+                    <i class="fas fa-home"></i> الرئيسية
+                </a>
+                <a href="admin.html" class="back-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-right: 10px;">
+                    <i class="fas fa-cog"></i> لوحة الإدارة
+                </a>
             </div>
         </div>
 
@@ -770,7 +705,6 @@
                 </div>
                 <div>
                     <div class="user-name" id="userName">تحميل...</div>
-                    <div class="user-email" id="userEmail">---</div>
                     <div class="user-id" id="userId">🆔 ---</div>
                 </div>
             </div>
@@ -801,9 +735,76 @@
         <!-- VIP Tab -->
         <div class="tab-content active" id="tabContentVip">
             <div class="vip-grid" id="vipGrid">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
-                    <span>جاري التحميل...</span>
+                <!-- VIP 1 Card -->
+                <div class="vip-card" id="vip1Card">
+                    <span class="vip-badge vip1" id="vip1Badge">VIP 1</span>
+                    <div class="vip-video-container">
+                        <video id="vip1Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/car.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="vip-title">🚗 VIP 1 - السيارة الرياضية</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض سيارة رياضية فاخرة عند دخولك الغرفة.
+                        تميز نفسك بأناقة وسرعة!
+                    </div>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip1Requirement">1000 ج.م أو 20 دولار</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">30 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip1Status">غير مفعل</span>
+                        </div>
+                    </div>
+                    <div class="vip-status-text" id="vip1StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions" id="vip1Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
+                    </div>
+                </div>
+
+                <!-- VIP 2 Card -->
+                <div class="vip-card" id="vip2Card">
+                    <span class="vip-badge vip2" id="vip2Badge">VIP 2</span>
+                    <div class="vip-video-container">
+                        <video id="vip2Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/lion.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="vip-title">🦁 VIP 2 - هيبة الأسد</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض هيبة وقوة الأسد عند دخولك الغرفة.
+                        أظهر قوتك وهيبتك!
+                    </div>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip2Requirement">2500 ج.م</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">60 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip2Status">غير مفعل</span>
+                        </div>
+                    </div>
+                    <div class="vip-status-text" id="vip2StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions" id="vip2Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -811,239 +812,253 @@
         <!-- Frames Tab -->
         <div class="tab-content" id="tabContentFrames">
             <div class="vip-grid" id="framesGrid">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
-                    <span>جاري التحميل...</span>
-                </div>
+                <!-- سيتم إنشاء البطاقات بواسطة JavaScript -->
             </div>
         </div>
 
         <!-- Chat Styles Tab -->
         <div class="tab-content" id="tabContentChatStyles">
             <div class="chatstyles-grid" id="chatStylesGrid">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner"></i>
-                    <span>جاري التحميل...</span>
-                </div>
+                <!-- سيتم إنشاء البطاقات بواسطة JavaScript -->
             </div>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG - مشروع vipclub-1d04a (نفس المشروع)
+        // 🔥 FIREBASE CONFIG - مشروع stvipclub (نفس مشروع لوحة الإدارة)
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-            authDomain: "vipclub-1d04a.firebaseapp.com",
-            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-            projectId: "vipclub-1d04a",
-            storageBucket: "vipclub-1d04a.firebasestorage.app",
-            messagingSenderId: "120667552740",
-            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
         };
 
-        let database, auth;
+        let database;
         let currentUser = null;
-        let isAuthenticated = false;
+        let currentFirebaseUserId = null;
 
         // ============================================================
         // 📋 FRAMES & VIP DATA
         // ============================================================
         const FRAMES = [
-            { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true, isSpecial: true },
-            { id: 'frame2', name: 'إطار فاخر 2', price: 50, duration: 30, embedUrl: 'images/vipsystem/warrior.mp4', isVideo: true, isSpecial: false },
-            { id: 'frame3', name: 'إطار فاخر 3', price: 100, duration: 30, embedUrl: 'images/vipsystem/vip.mp4', isVideo: true, isSpecial: false },
-            { id: 'frame4', name: 'إطار فاخر 4', price: 150, duration: 30, embedUrl: 'images/vipsystem/queen.mp4', isVideo: true, isSpecial: false }
+            {
+                id: 'frame1',
+                name: 'إطار خاص (هدية)',
+                price: 0,
+                duration: 30,
+                embedUrl: 'images/vipsystem/manager.mp4',
+                height: 405,
+                isVideo: true,
+                isSpecial: true,
+                specialLabel: '🎁 أطار أصدار خاص'
+            },
+            {
+                id: 'frame2',
+                name: 'إطار فاخر 2',
+                price: 50,
+                duration: 30,
+                embedUrl: 'images/vipsystem/warrior.mp4',
+                height: 445,
+                isVideo: true,
+                isSpecial: false
+            },
+            {
+                id: 'frame3',
+                name: 'إطار فاخر 3',
+                price: 100,
+                duration: 30,
+                embedUrl: 'images/vipsystem/vip.mp4',
+                height: 445,
+                isVideo: true,
+                isSpecial: false
+            },
+            {
+                id: 'frame4',
+                name: 'إطار فاخر 4',
+                price: 150,
+                duration: 30,
+                embedUrl: 'images/vipsystem/queen.mp4',
+                height: 438,
+                isVideo: true,
+                isSpecial: false
+            }
         ];
 
+        // ============================================================
+        // 📋 CHAT STYLES DATA
+        // ============================================================
         const CHAT_STYLES = [
-            { id: 'chatstyle1', name: 'أسلوب كتابة 1', price: 50, duration: 30, image: 'images/vipsystem/chatstyles/chat1style.png', description: 'أسلوب كتابة مميز للدردشة' },
-            { id: 'chatstyle2', name: 'أسلوب كتابة 2', price: 20, duration: 30, image: 'images/vipsystem/chatstyles/chat2style.png', description: 'أسلوب كتابة أنيق وجذاب' }
+            {
+                id: 'chatstyle1',
+                name: 'أسلوب كتابة 1',
+                price: 50,
+                duration: 30,
+                image: 'images/vipsystem/chatstyles/chat1style.png',
+                description: 'أسلوب كتابة مميز للدردشة'
+            },
+            {
+                id: 'chatstyle2',
+                name: 'أسلوب كتابة 2',
+                price: 20,
+                duration: 30,
+                image: 'images/vipsystem/chatstyles/chat2style.png',
+                description: 'أسلوب كتابة أنيق وجذاب'
+            }
         ];
 
         const VIP_CONFIG = {
-            1: { level: 1, name: 'VIP 1', emoji: '🚗', title: 'السيارة الرياضية', video: 'images/vipsystem/car.mp4', duration: 30, requirements: { EGP: 1000, USD: 20 } },
-            2: { level: 2, name: 'VIP 2', emoji: '🦁', title: 'هيبة الأسد', video: 'images/vipsystem/lion.mp4', duration: 60, requirements: { EGP: 2500, USD: null } }
+            1: {
+                level: 1,
+                name: 'VIP 1',
+                emoji: '🚗',
+                title: 'السيارة الرياضية',
+                video: 'images/vipsystem/car.mp4',
+                duration: 30,
+                requirements: { EGP: 1000, USD: 20 }
+            },
+            2: {
+                level: 2,
+                name: 'VIP 2',
+                emoji: '🦁',
+                title: 'هيبة الأسد',
+                video: 'images/vipsystem/lion.mp4',
+                duration: 60,
+                requirements: { EGP: 2500, USD: null }
+            }
         };
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
         // ============================================================
-        try {
-            if (!firebase.apps.length) {
+        function initializeFirebase() {
+            try {
+                if (firebase.apps.length > 0) {
+                    firebase.app().delete();
+                }
                 firebase.initializeApp(firebaseConfig);
-            }
-            database = firebase.database();
-            auth = firebase.auth();
-            console.log('✅ Firebase connected with Auth - مشروع vipclub-1d04a');
-        } catch (error) {
-            console.error('❌ Firebase error:', error);
-        }
-
-        // ============================================================
-        // 🔐 AUTHENTICATION
-        // ============================================================
-        function redirectToLogin() {
-            window.location.href = 'loginchat.html';
-        }
-
-        function handleAuth() {
-            if (isAuthenticated) {
-                logout();
-            } else {
-                redirectToLogin();
-            }
-        }
-
-        async function logout() {
-            try {
-                await auth.signOut();
-                showToast('👋 تم تسجيل الخروج بنجاح', 'success');
-                isAuthenticated = false;
-                currentUser = null;
-                document.getElementById('loginOverlay').classList.add('active');
-                document.getElementById('authBtn').className = 'auth-btn';
-                document.getElementById('authBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                localStorage.removeItem('currentUser');
-                updateUIForGuest();
+                database = firebase.database();
+                console.log('✅ Firebase connected to:', firebaseConfig.projectId);
+                return true;
             } catch (error) {
-                console.error('Logout error:', error);
-                showToast('❌ حدث خطأ', 'error');
+                console.error('❌ Firebase error:', error);
+                return false;
             }
         }
 
-        function updateUIForGuest() {
-            document.getElementById('userName').textContent = 'زائر';
-            document.getElementById('userEmail').textContent = '---';
-            document.getElementById('userId').textContent = '🆔 ---';
-            document.getElementById('vipLevel').textContent = 'VIP 0';
-            document.getElementById('vipStatus').textContent = 'غير مفعل';
-            document.getElementById('userAvatar').innerHTML = '<i class="fas fa-user"></i>';
-            
-            const loginHtml = `
-                <div class="login-required">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <h3>يرجى تسجيل الدخول</h3>
-                    <p>سجل الدخول للاستمتاع بجميع مميزات نظام VIP</p>
-                    <button class="login-btn" onclick="window.location.href='loginchat.html'">
-                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-                    </button>
-                </div>
-            `;
-            
-            document.getElementById('vipGrid').innerHTML = loginHtml;
-            document.getElementById('framesGrid').innerHTML = loginHtml;
-            document.getElementById('chatStylesGrid').innerHTML = loginHtml;
+        // ============================================================
+        // 👤 USER MANAGEMENT - مدمج مع Firebase
+        // ============================================================
+        function getStoredUser() {
+            try {
+                return JSON.parse(localStorage.getItem('currentUser'));
+            } catch (e) {
+                return null;
+            }
         }
 
-        // ============================================================
-        // 👤 USER DATA FROM FIREBASE
-        // ============================================================
-        async function loadUserData(uid) {
+        function saveUserToStorage(userData, firebaseKey) {
+            const userToStore = {
+                numericId: userData.numericId,
+                username: userData.username,
+                nickname: userData.nickname || userData.username,
+                firebaseKey: firebaseKey,
+                balanceEGP: userData.balanceEGP || 0,
+                balanceUSD: userData.balanceUSD || 0,
+                vip: userData.vip || null,
+                vipPurchased: userData.vipPurchased || {},
+                frames: userData.frames || {},
+                activeFrame: userData.activeFrame || null,
+                chatStyles: userData.chatStyles || {},
+                activeChatStyle: userData.activeChatStyle || null
+            };
+            localStorage.setItem('currentUser', JSON.stringify(userToStore));
+            currentUser = userToStore;
+        }
+
+        async function loadUserFromFirebase() {
+            const stored = getStoredUser();
+            if (!stored) {
+                console.log('⚠️ لا يوجد مستخدم مسجل');
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                document.getElementById('userName').textContent = 'زائر';
+                document.getElementById('userId').textContent = '🆔 ---';
+                return false;
+            }
+
             try {
-                const userRef = database.ref('users').orderByChild('uid').equalTo(uid);
-                const snapshot = await userRef.once('value');
+                // البحث عن المستخدم في Firebase باستخدام numericId
+                const snapshot = await database.ref('users')
+                    .orderByChild('numericId')
+                    .equalTo(stored.numericId)
+                    .once('value');
 
                 if (snapshot.exists()) {
-                    const users = snapshot.val();
-                    const userId = Object.keys(users)[0];
-                    const userData = users[userId];
-
-                    currentUser = {
-                        ...userData,
-                        firebaseKey: userId,
-                        uid: uid
-                    };
-
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    updateUI(currentUser);
-                    renderVIPCards(currentUser);
-                    renderFrames(currentUser);
-                    renderChatStyles(currentUser);
-                    document.getElementById('loginOverlay').classList.remove('active');
+                    const userData = snapshot.val();
+                    const firebaseKey = Object.keys(userData)[0];
+                    const fullUser = userData[firebaseKey];
                     
-                    return currentUser;
+                    // تحديث localStorage بأحدث البيانات
+                    saveUserToStorage(fullUser, firebaseKey);
+                    currentFirebaseUserId = firebaseKey;
+                    
+                    console.log('✅ تم تحميل المستخدم:', fullUser.username);
+                    return fullUser;
                 } else {
-                    await createUser(uid);
+                    // المستخدم غير موجود في Firebase
+                    console.warn('⚠️ المستخدم غير موجود في Firebase');
+                    localStorage.removeItem('currentUser');
+                    currentUser = null;
+                    showToast('⚠️ المستخدم غير موجود، يرجى تسجيل الدخول مجدداً', 'warning');
+                    return false;
                 }
             } catch (error) {
-                console.error('Error loading user data:', error);
+                console.error('❌ Error loading user:', error);
                 showToast('❌ حدث خطأ في تحميل البيانات', 'error');
-                return null;
+                return false;
             }
         }
 
-        async function createUser(uid) {
-            try {
-                const authUser = auth.currentUser;
-                if (!authUser) return null;
+        async function ensureUserData() {
+            // التأكد من اتصال Firebase
+            if (!database) {
+                if (!initializeFirebase()) {
+                    showToast('❌ فشل الاتصال بقاعدة البيانات', 'error');
+                    return null;
+                }
+            }
 
-                const numericId = Math.floor(100000 + Math.random() * 900000);
-                const newUserRef = database.ref('users').push();
-                const firebaseKey = newUserRef.key;
-
-                const userData = {
-                    uid: uid,
-                    numericId: numericId,
-                    username: authUser.displayName || `user_${numericId}`,
-                    nickname: authUser.displayName || `user_${numericId}`,
-                    email: authUser.email || '',
-                    avatar: authUser.photoURL || '',
-                    balanceEGP: 0,
-                    balanceUSD: 0,
-                    likes: 0,
-                    gifts: 0,
-                    visits: 0,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    vip: { active: null, expiresAt: null },
-                    frames: {},
-                    chatStyles: {},
-                    vipPurchased: {},
-                    notifications: {},
-                    messages: []
-                };
-
-                await newUserRef.set(userData);
-
-                currentUser = {
-                    ...userData,
-                    firebaseKey: firebaseKey
-                };
-
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                showToast('✅ تم إنشاء حسابك بنجاح!', 'success');
-
-                updateUI(currentUser);
-                renderVIPCards(currentUser);
-                renderFrames(currentUser);
-                renderChatStyles(currentUser);
-                document.getElementById('loginOverlay').classList.remove('active');
-
-                return currentUser;
-
-            } catch (error) {
-                console.error('Error creating user:', error);
-                showToast('❌ حدث خطأ في إنشاء الحساب', 'error');
+            const user = await loadUserFromFirebase();
+            if (!user) {
                 return null;
             }
+
+            // تحديث واجهة المستخدم
+            updateUI(user);
+            renderVIPActions(user);
+            renderFrames(user);
+            renderChatStyles(user);
+            
+            return user;
         }
 
         // ============================================================
         // 🖥️ UPDATE UI
         // ============================================================
         function updateUI(user) {
-            if (!user) return;
-            
             document.getElementById('userName').textContent = user.nickname || user.username || 'مستخدم';
-            document.getElementById('userEmail').textContent = user.email || '---';
             document.getElementById('userId').textContent = '🆔 ' + (user.numericId || '---');
             
             if (user.avatar) {
                 document.getElementById('userAvatar').innerHTML = `<img src="${user.avatar}" alt="">`;
             }
-            
+
+            // تحديث حالة VIP
             const vipData = user.vip || { active: null, expiresAt: null };
             const activeVIP = vipData.active;
             const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
@@ -1067,89 +1082,79 @@
                 vipStatusEl.textContent = 'غير مفعل';
                 vipStatusEl.style.color = '#94a3b8';
             }
-
-            document.getElementById('authBtn').className = 'auth-btn logout-btn';
-            document.getElementById('authBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل الخروج';
         }
 
         // ============================================================
-        // 📊 RENDER VIP CARDS
+        // 📊 VIP SYSTEM (محدث للعمل مع Firebase)
         // ============================================================
-        function renderVIPCards(user) {
-            const grid = document.getElementById('vipGrid');
-            
-            if (!user) {
-                grid.innerHTML = `
-                    <div class="login-required">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <h3>يرجى تسجيل الدخول</h3>
-                        <p>سجل الدخول لعرض محتوى VIP</p>
-                        <button class="login-btn" onclick="window.location.href='loginchat.html'">
-                            <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            grid.innerHTML = Object.keys(VIP_CONFIG).map(level => {
+        function renderVIPActions(user) {
+            for (let level = 1; level <= 2; level++) {
                 const vipConfig = VIP_CONFIG[level];
                 const vipData = user.vip || { active: null, expiresAt: null };
-                const isActive = vipData.active === parseInt(level);
+                const isActive = vipData.active === level;
                 const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
                 const now = new Date();
                 const isExpired = expiresAt && expiresAt < now;
                 const isCurrentlyActive = isActive && !isExpired;
                 const isOwned = user.vipPurchased && user.vipPurchased[level] === true;
 
-                let badgeText, badgeClass;
+                const actionsEl = document.getElementById(`vip${level}Actions`);
+                const badgeEl = document.getElementById(`vip${level}Badge`);
+                const statusEl = document.getElementById(`vip${level}Status`);
+                const statusTextEl = document.getElementById(`vip${level}StatusText`);
+
                 if (isCurrentlyActive) {
-                    badgeText = '✅ مفعل';
-                    badgeClass = 'active';
+                    badgeEl.textContent = '✅ مفعل';
+                    badgeEl.className = 'vip-badge active';
                 } else if (isOwned && isExpired) {
-                    badgeText = '⏳ منتهي';
-                    badgeClass = 'expired';
+                    badgeEl.textContent = '⏳ منتهي';
+                    badgeEl.className = 'vip-badge expired';
                 } else if (isOwned) {
-                    badgeText = '📦 مملوك';
-                    badgeClass = 'owned';
+                    badgeEl.textContent = '📦 مملوك';
+                    badgeEl.className = 'vip-badge owned';
                 } else {
-                    badgeText = `VIP ${level}`;
-                    badgeClass = `vip${level}`;
+                    badgeEl.textContent = `VIP ${level}`;
+                    badgeEl.className = `vip-badge vip${level}`;
                 }
 
                 let canAfford = false;
                 let affordMessage = '';
                 
-                const egpReq = vipConfig.requirements.EGP || 0;
-                const usdReq = vipConfig.requirements.USD || 0;
-                
-                if (egpReq > 0 && (user.balanceEGP || 0) >= egpReq) {
+                if (vipConfig.requirements.EGP && user.balanceEGP >= vipConfig.requirements.EGP) {
                     canAfford = true;
                     affordMessage = `✅ رصيدك كافي (${user.balanceEGP} ج.م)`;
-                } else if (usdReq > 0 && (user.balanceUSD || 0) >= usdReq) {
+                } else if (vipConfig.requirements.USD && user.balanceUSD >= vipConfig.requirements.USD) {
                     canAfford = true;
                     affordMessage = `✅ رصيدك كافي (${user.balanceUSD} دولار)`;
                 } else {
-                    affordMessage = `❌ رصيد غير كافٍ (مطلوب ${egpReq || usdReq} ${egpReq ? 'ج.م' : 'دولار'})`;
+                    const neededEGP = vipConfig.requirements.EGP || 0;
+                    const neededUSD = vipConfig.requirements.USD || 0;
+                    affordMessage = `❌ رصيد غير كافٍ (مطلوب ${neededEGP} ج.م أو ${neededUSD} دولار)`;
                 }
 
-                let statusText, statusClass;
                 if (isCurrentlyActive) {
-                    statusText = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
-                    statusClass = 'active';
+                    statusEl.textContent = '✅ مفعل';
+                    statusEl.style.color = '#3b82f6';
+                    statusTextEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
+                    statusTextEl.className = 'vip-status-text active';
                 } else if (isOwned && isExpired) {
-                    statusText = '⏳ صلاحية منتهية - قم بالشراء مجدداً';
-                    statusClass = 'locked';
+                    statusEl.textContent = '⏳ منتهي';
+                    statusEl.style.color = '#ef4444';
+                    statusTextEl.textContent = '⏳ صلاحية منتهية - قم بالشراء مجدداً';
+                    statusTextEl.className = 'vip-status-text locked';
                 } else if (isOwned) {
-                    statusText = '📦 تم شراؤه - قم بالتفعيل';
-                    statusClass = 'owned';
+                    statusEl.textContent = '📦 مملوك';
+                    statusEl.style.color = '#ffd700';
+                    statusTextEl.textContent = '📦 تم شراؤه - قم بالتفعيل';
+                    statusTextEl.className = 'vip-status-text owned';
                 } else {
-                    statusText = canAfford ? '🔓 متاح للشراء' : affordMessage;
-                    statusClass = canAfford ? 'active' : 'locked';
+                    statusEl.textContent = canAfford ? '🔓 متاح' : '🔒 غير متاح';
+                    statusEl.style.color = canAfford ? '#10b981' : '#ef4444';
+                    statusTextEl.textContent = canAfford ? '🔓 متاح للشراء' : affordMessage;
+                    statusTextEl.className = canAfford ? 'vip-status-text active' : 'vip-status-text locked';
                 }
 
                 let actionsHTML = '';
-                const reqText = egpReq && usdReq ? `${egpReq} ج.م أو ${usdReq} دولار` : (egpReq ? `${egpReq} ج.م` : `${usdReq} دولار`);
 
                 if (isCurrentlyActive) {
                     actionsHTML = `
@@ -1166,7 +1171,7 @@
                 } else if (isOwned && isExpired) {
                     actionsHTML = `
                         <button class="btn-buy" onclick="buyVIP(${level})">
-                            <i class="fas fa-sync"></i> شراء مجدد (${reqText})
+                            <i class="fas fa-sync"></i> شراء مجدد (${vipConfig.requirements.EGP || vipConfig.requirements.USD} ${vipConfig.requirements.EGP ? 'ج.م' : 'دولار'})
                         </button>
                     `;
                 } else {
@@ -1178,63 +1183,202 @@
                     `;
                 }
 
-                return `
-                    <div class="vip-card">
-                        <span class="vip-badge ${badgeClass}">${badgeText}</span>
-                        <div class="vip-video-container">
-                            <video autoplay loop muted playsinline>
-                                <source src="${vipConfig.video}" type="video/mp4">
-                            </video>
-                        </div>
-                        <div class="vip-title">${vipConfig.emoji} ${vipConfig.name} - ${vipConfig.title}</div>
-                        <div class="vip-description">
-                            دخلة مميزة للغرف الصوتية تعرض ${vipConfig.title} عند دخولك الغرفة.
-                        </div>
-                        <div class="vip-requirements">
-                            <div class="req-item">
-                                <span class="req-label">💰 المطلوب للتفعيل</span>
-                                <span class="req-value">${reqText}</span>
-                            </div>
-                            <div class="req-item">
-                                <span class="req-label">⏱️ مدة التفعيل</span>
-                                <span class="req-value">${vipConfig.duration} يوم</span>
-                            </div>
-                            <div class="req-item">
-                                <span class="req-label">📊 حالتك الحالية</span>
-                                <span class="req-value" style="color: ${isCurrentlyActive ? '#3b82f6' : isOwned && !isExpired ? '#ffd700' : isOwned && isExpired ? '#ef4444' : '#94a3b8'}">
-                                    ${isCurrentlyActive ? '✅ مفعل' : isOwned && !isExpired ? '📦 مملوك' : isOwned && isExpired ? '⏳ منتهي' : 'غير مملوك'}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="vip-status-text ${statusClass}">${statusText}</div>
-                        <div class="vip-actions">
-                            ${actionsHTML}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                actionsEl.innerHTML = actionsHTML;
+
+                const reqEl = document.getElementById(`vip${level}Requirement`);
+                if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
+                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
+                } else if (vipConfig.requirements.EGP) {
+                    reqEl.textContent = `${vipConfig.requirements.EGP} ج.م`;
+                } else if (vipConfig.requirements.USD) {
+                    reqEl.textContent = `${vipConfig.requirements.USD} دولار`;
+                }
+            }
         }
 
         // ============================================================
-        // 🖼️ RENDER FRAMES
+        // 🎯 VIP ACTIONS (محدثة للعمل مع Firebase)
+        // ============================================================
+        async function buyVIP(level) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            const vipConfig = VIP_CONFIG[level];
+            if (!vipConfig) {
+                showToast('❌ مستوى VIP غير صحيح', 'error');
+                return;
+            }
+
+            try {
+                // جلب أحدث بيانات المستخدم من Firebase
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const currentVIP = user.vip || { active: null, expiresAt: null };
+                if (currentVIP.active === level) {
+                    const expiresAt = currentVIP.expiresAt ? new Date(currentVIP.expiresAt) : null;
+                    if (expiresAt && expiresAt > new Date()) {
+                        showToast(`⚠️ VIP ${level} مفعل بالفعل`, 'warning');
+                        return;
+                    }
+                }
+
+                let costEGP = vipConfig.requirements.EGP || 0;
+                let costUSD = vipConfig.requirements.USD || 0;
+                let useUSD = false;
+
+                if (costUSD > 0 && user.balanceUSD >= costUSD) {
+                    useUSD = true;
+                } else if (costEGP > 0 && user.balanceEGP >= costEGP) {
+                    useUSD = false;
+                } else {
+                    showToast(`❌ رصيد غير كافٍ (مطلوب ${costEGP} ج.م أو ${costUSD} دولار)`, 'error');
+                    return;
+                }
+
+                if (!confirm(`تأكيد شراء VIP ${level} (${vipConfig.title}) مقابل ${useUSD ? costUSD + ' دولار' : costEGP + ' ج.م'}؟`)) return;
+
+                const newBalance = useUSD ? 
+                    (user.balanceUSD || 0) - costUSD : 
+                    (user.balanceEGP || 0) - costEGP;
+
+                const updateData = {};
+                if (useUSD) {
+                    updateData.balanceUSD = newBalance;
+                } else {
+                    updateData.balanceEGP = newBalance;
+                }
+
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
+
+                const vipPurchased = user.vipPurchased || {};
+                vipPurchased[level] = true;
+
+                updateData['vip/active'] = level;
+                updateData['vip/expiresAt'] = expiresAt.toISOString();
+                updateData['vip/activatedAt'] = now.toISOString();
+                updateData['vip/activatedWith'] = useUSD ? 'USD' : 'EGP';
+                updateData['vip/amount'] = useUSD ? costUSD : costEGP;
+                updateData.vipPurchased = vipPurchased;
+                updateData.updatedAt = now.toISOString();
+
+                await database.ref('users/' + currentFirebaseUserId).update(updateData);
+
+                // تحديث localStorage
+                const updatedUser = { ...user, ...updateData };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                // إشعار
+                const notification = {
+                    id: Date.now(),
+                    text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'vip_purchased',
+                    createdAt: now.toISOString()
+                };
+                await database.ref('users/' + currentFirebaseUserId + '/notifications').push(notification);
+
+                showToast(`✅ تم شراء VIP ${level} بنجاح!`, 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error buying VIP:', error);
+                showToast('❌ حدث خطأ في الشراء', 'error');
+            }
+        }
+
+        async function activateOwnedVIP(level) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const vipPurchased = user.vipPurchased || {};
+
+                if (!vipPurchased[level]) {
+                    showToast('⚠️ هذا الـ VIP غير مملوك', 'warning');
+                    return;
+                }
+
+                const vipConfig = VIP_CONFIG[level];
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
+
+                await database.ref('users/' + currentFirebaseUserId + '/vip').update({
+                    active: level,
+                    expiresAt: expiresAt.toISOString(),
+                    activatedAt: now.toISOString()
+                });
+
+                // تحديث localStorage
+                const updatedUser = { ...user };
+                updatedUser.vip = { active: level, expiresAt: expiresAt.toISOString(), activatedAt: now.toISOString() };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error activating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function deactivateVIP(level) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل VIP ${level}؟`)) return;
+
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/vip').update({
+                    active: null,
+                    deactivatedAt: new Date().toISOString()
+                });
+
+                // تحديث localStorage
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+                if (user) {
+                    saveUserToStorage(user, currentFirebaseUserId);
+                }
+
+                showToast('✅ تم إلغاء تفعيل VIP', 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error deactivating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ FRAMES SYSTEM (محدثة)
         // ============================================================
         function renderFrames(user) {
             const grid = document.getElementById('framesGrid');
-            
-            if (!user) {
-                grid.innerHTML = `
-                    <div class="login-required">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <h3>يرجى تسجيل الدخول</h3>
-                        <p>سجل الدخول لعرض الأطارات</p>
-                        <button class="login-btn" onclick="window.location.href='loginchat.html'">
-                            <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
             const userFrames = user.frames || {};
             const activeFrame = user.activeFrame || null;
 
@@ -1263,7 +1407,7 @@
                     statusClass = 'special';
                 }
 
-                const canAfford = (user.balanceEGP || 0) >= frame.price;
+                const canAfford = user.balanceEGP >= frame.price;
 
                 let actionsHTML = '';
 
@@ -1301,13 +1445,27 @@
                     `;
                 }
 
+                let previewHTML = '';
+                if (frame.isVideo) {
+                    previewHTML = `
+                        <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+                            <source src="${frame.embedUrl}" type="video/mp4">
+                        </video>
+                    `;
+                } else {
+                    previewHTML = `
+                        <iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>
+                    `;
+                }
+
                 return `
                     <div class="vip-card">
                         <span class="vip-badge ${frame.isSpecial ? 'special' : ''}">${frame.isSpecial ? '🎁 خاص' : '🖼️ إطار'}</span>
                         <div class="vip-video-container">
-                            <video autoplay loop muted playsinline>
-                                <source src="${frame.embedUrl}" type="video/mp4">
-                            </video>
+                            ${previewHTML}
+                            <div class="video-overlay">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
                         </div>
                         <div class="vip-title">${frame.name}</div>
                         <div class="vip-description">
@@ -1338,26 +1496,166 @@
             }).join('');
         }
 
+        async function buyFrame(frameId, price, name) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            const frame = FRAMES.find(f => f.id === frameId);
+            if (frame?.isSpecial) {
+                showToast('⚠️ هذا الإطار خاص ولا يمكن شراؤه', 'warning');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                if (user.balanceEGP < price) {
+                    showToast(`⚠️ رصيد غير كافٍ (تحتاج ${price} ج.م)`, 'warning');
+                    return;
+                }
+
+                if (!confirm(`تأكيد شراء "${name}" مقابل ${price} ج.م؟`)) return;
+
+                const newBalance = (user.balanceEGP || 0) - price;
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + 30);
+
+                const updateData = {
+                    balanceEGP: newBalance,
+                    updatedAt: now.toISOString()
+                };
+
+                const frames = user.frames || {};
+                frames[frameId] = {
+                    owned: true,
+                    purchasedAt: now.toISOString(),
+                    expiresAt: expiresAt.toISOString(),
+                    type: 'frame'
+                };
+                updateData.frames = frames;
+
+                await database.ref('users/' + currentFirebaseUserId).update(updateData);
+
+                // تحديث localStorage
+                const updatedUser = { ...user, ...updateData };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                // تسجيل في السجل
+                await database.ref('frameLogs').push({
+                    userId: user.numericId,
+                    username: user.nickname || user.username,
+                    frameId: frameId,
+                    frameName: name,
+                    price: price,
+                    type: 'purchase',
+                    startDate: now.toISOString(),
+                    expiryDate: expiresAt.toISOString(),
+                    timestamp: now.toISOString()
+                });
+
+                const notification = {
+                    id: Date.now(),
+                    text: `🖼️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'frame_purchased',
+                    createdAt: now.toISOString()
+                };
+                await database.ref('users/' + currentFirebaseUserId + '/notifications').push(notification);
+
+                showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error buying frame:', error);
+                showToast('❌ حدث خطأ في الشراء', 'error');
+            }
+        }
+
+        async function activateFrame(frameId) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const frames = user.frames || {};
+                const frame = frames[frameId];
+                if (!frame || !frame.owned) {
+                    showToast('⚠️ هذا الإطار غير مملوك', 'warning');
+                    return;
+                }
+
+                const expiresAt = frame.expiresAt ? new Date(frame.expiresAt) : null;
+                if (expiresAt && expiresAt < new Date()) {
+                    showToast('⏳ صلاحية هذا الإطار منتهية', 'warning');
+                    return;
+                }
+
+                await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(frameId);
+
+                // تحديث localStorage
+                const updatedUser = { ...user, activeFrame: frameId };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                showToast(`✅ تم تفعيل الإطار بنجاح`, 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error activating frame:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function deactivateFrame(frameId) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل هذا الإطار؟`)) return;
+
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(null);
+
+                // تحديث localStorage
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+                if (user) {
+                    saveUserToStorage(user, currentFirebaseUserId);
+                }
+
+                showToast('✅ تم إلغاء تفعيل الإطار', 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error deactivating frame:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
         // ============================================================
-        // 💬 RENDER CHAT STYLES
+        // 💬 CHAT STYLES SYSTEM (محدثة)
         // ============================================================
         function renderChatStyles(user) {
             const grid = document.getElementById('chatStylesGrid');
-            
-            if (!user) {
-                grid.innerHTML = `
-                    <div class="login-required">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <h3>يرجى تسجيل الدخول</h3>
-                        <p>سجل الدخول لعرض أشكال الكتابة</p>
-                        <button class="login-btn" onclick="window.location.href='loginchat.html'">
-                            <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
             const userChatStyles = user.chatStyles || {};
             const activeChatStyle = user.activeChatStyle || null;
 
@@ -1383,7 +1681,7 @@
                     statusClass = 'expired';
                 }
 
-                const canAfford = (user.balanceEGP || 0) >= style.price;
+                const canAfford = user.balanceEGP >= style.price;
 
                 let actionsHTML = '';
 
@@ -1432,350 +1730,78 @@
             }).join('');
         }
 
-        // ============================================================
-        // 🎯 VIP ACTIONS
-        // ============================================================
-        async function buyVIP(level) {
-            if (!isAuthenticated || !currentUser) {
+        async function buyChatStyle(styleId, price, name) {
+            if (!currentUser || !currentFirebaseUserId) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 return;
             }
 
-            const vipConfig = VIP_CONFIG[level];
-            if (!vipConfig) {
-                showToast('❌ مستوى VIP غير صحيح', 'error');
-                return;
-            }
-
             try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                const snapshot = await userRef.once('value');
-                const dbUser = snapshot.val();
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
 
-                const currentVIP = dbUser.vip || { active: null, expiresAt: null };
-                if (currentVIP.active === level) {
-                    const expiresAt = currentVIP.expiresAt ? new Date(currentVIP.expiresAt) : null;
-                    if (expiresAt && expiresAt > new Date()) {
-                        showToast(`⚠️ VIP ${level} مفعل بالفعل`, 'warning');
-                        return;
-                    }
-                }
-
-                let costEGP = vipConfig.requirements.EGP || 0;
-                let costUSD = vipConfig.requirements.USD || 0;
-                let useUSD = false;
-
-                if (costUSD > 0 && (dbUser.balanceUSD || 0) >= costUSD) {
-                    useUSD = true;
-                } else if (costEGP > 0 && (dbUser.balanceEGP || 0) >= costEGP) {
-                    useUSD = false;
-                } else {
-                    showToast(`❌ رصيد غير كافٍ (مطلوب ${costEGP} ج.م أو ${costUSD} دولار)`, 'error');
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
                     return;
                 }
 
-                if (!confirm(`تأكيد شراء VIP ${level} (${vipConfig.title}) مقابل ${useUSD ? costUSD + ' دولار' : costEGP + ' ج.م'}؟`)) return;
-
-                const newBalance = useUSD ? 
-                    (dbUser.balanceUSD || 0) - costUSD : 
-                    (dbUser.balanceEGP || 0) - costEGP;
-
-                const updateData = {};
-                if (useUSD) {
-                    updateData.balanceUSD = newBalance;
-                } else {
-                    updateData.balanceEGP = newBalance;
-                }
-
-                const now = new Date();
-                const expiresAt = new Date(now);
-                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
-
-                const vipPurchased = dbUser.vipPurchased || {};
-                vipPurchased[level] = true;
-
-                updateData['vip/active'] = level;
-                updateData['vip/expiresAt'] = expiresAt.toISOString();
-                updateData['vip/activatedAt'] = now.toISOString();
-                updateData['vip/activatedWith'] = useUSD ? 'USD' : 'EGP';
-                updateData['vip/amount'] = useUSD ? costUSD : costEGP;
-                updateData.vipPurchased = vipPurchased;
-                updateData.updatedAt = now.toISOString();
-
-                await userRef.update(updateData);
-
-                currentUser = { ...currentUser, ...updateData };
-                currentUser.balanceEGP = newBalance;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push({
-                    id: Date.now(),
-                    text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
-                    read: false,
-                    date: new Date().toLocaleString('ar-EG'),
-                    type: 'vip_purchased',
-                    createdAt: now.toISOString()
-                });
-
-                showToast(`✅ تم شراء VIP ${level} بنجاح!`, 'success');
-                renderVIPCards(currentUser);
-                updateUI(currentUser);
-
-            } catch (error) {
-                console.error('Error buying VIP:', error);
-                showToast('❌ حدث خطأ في الشراء', 'error');
-            }
-        }
-
-        async function activateOwnedVIP(level) {
-            if (!isAuthenticated || !currentUser) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                const snapshot = await userRef.once('value');
-                const dbUser = snapshot.val();
-
-                const vipPurchased = dbUser.vipPurchased || {};
-
-                if (!vipPurchased[level]) {
-                    showToast('⚠️ هذا الـ VIP غير مملوك', 'warning');
-                    return;
-                }
-
-                const vipConfig = VIP_CONFIG[level];
-                const now = new Date();
-                const expiresAt = new Date(now);
-                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
-
-                await userRef.update({
-                    'vip/active': level,
-                    'vip/expiresAt': expiresAt.toISOString(),
-                    'vip/activatedAt': now.toISOString()
-                });
-
-                showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
-                currentUser.vip = { active: level, expiresAt: expiresAt.toISOString() };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderVIPCards(currentUser);
-                updateUI(currentUser);
-
-            } catch (error) {
-                console.error('Error activating VIP:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        async function deactivateVIP(level) {
-            if (!isAuthenticated || !currentUser) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل VIP ${level}؟`)) return;
-
-            try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                await userRef.update({
-                    'vip/active': null,
-                    'vip/deactivatedAt': new Date().toISOString()
-                });
-
-                showToast('✅ تم إلغاء تفعيل VIP', 'success');
-                currentUser.vip.active = null;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderVIPCards(currentUser);
-                updateUI(currentUser);
-
-            } catch (error) {
-                console.error('Error deactivating VIP:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        // ============================================================
-        // 🖼️ FRAME ACTIONS
-        // ============================================================
-        async function buyFrame(frameId, price, name) {
-            if (!isAuthenticated || !currentUser) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            const frame = FRAMES.find(f => f.id === frameId);
-            if (frame?.isSpecial) {
-                showToast('⚠️ هذا الإطار خاص ولا يمكن شراؤه', 'warning');
-                return;
-            }
-
-            try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                const snapshot = await userRef.once('value');
-                const dbUser = snapshot.val();
-
-                if ((dbUser.balanceEGP || 0) < price) {
+                if (user.balanceEGP < price) {
                     showToast(`⚠️ رصيد غير كافٍ (تحتاج ${price} ج.م)`, 'warning');
                     return;
                 }
 
                 if (!confirm(`تأكيد شراء "${name}" مقابل ${price} ج.م؟`)) return;
 
-                const newBalance = (dbUser.balanceEGP || 0) - price;
+                const newBalance = (user.balanceEGP || 0) - price;
                 const now = new Date();
                 const expiresAt = new Date(now);
                 expiresAt.setDate(expiresAt.getDate() + 30);
 
-                const frames = dbUser.frames || {};
-                frames[frameId] = {
-                    owned: true,
-                    purchasedAt: now.toISOString(),
-                    expiresAt: expiresAt.toISOString(),
-                    type: 'frame'
+                const updateData = {
+                    balanceEGP: newBalance,
+                    updatedAt: now.toISOString()
                 };
 
-                await userRef.update({
-                    balanceEGP: newBalance,
-                    frames: frames,
-                    updatedAt: now.toISOString()
-                });
-
-                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push({
-                    id: Date.now(),
-                    text: `🖼️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
-                    read: false,
-                    date: new Date().toLocaleString('ar-EG'),
-                    type: 'frame_purchased',
-                    createdAt: now.toISOString()
-                });
-
-                showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
-                currentUser.frames = frames;
-                currentUser.balanceEGP = newBalance;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderFrames(currentUser);
-
-            } catch (error) {
-                console.error('Error buying frame:', error);
-                showToast('❌ حدث خطأ في الشراء', 'error');
-            }
-        }
-
-        async function activateFrame(frameId) {
-            if (!isAuthenticated || !currentUser) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                const snapshot = await userRef.once('value');
-                const dbUser = snapshot.val();
-
-                const frames = dbUser.frames || {};
-                const frame = frames[frameId];
-                if (!frame || !frame.owned) {
-                    showToast('⚠️ هذا الإطار غير مملوك', 'warning');
-                    return;
-                }
-
-                const expiresAt = frame.expiresAt ? new Date(frame.expiresAt) : null;
-                if (expiresAt && expiresAt < new Date()) {
-                    showToast('⏳ صلاحية هذا الإطار منتهية', 'warning');
-                    return;
-                }
-
-                await userRef.update({ activeFrame: frameId });
-
-                showToast(`✅ تم تفعيل الإطار بنجاح`, 'success');
-                currentUser.activeFrame = frameId;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderFrames(currentUser);
-
-            } catch (error) {
-                console.error('Error activating frame:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        async function deactivateFrame(frameId) {
-            if (!isAuthenticated || !currentUser) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل هذا الإطار؟`)) return;
-
-            try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                await userRef.update({ activeFrame: null });
-
-                showToast('✅ تم إلغاء تفعيل الإطار', 'success');
-                currentUser.activeFrame = null;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderFrames(currentUser);
-
-            } catch (error) {
-                console.error('Error deactivating frame:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        // ============================================================
-        // 💬 CHAT STYLE ACTIONS
-        // ============================================================
-        async function buyChatStyle(styleId, price, name) {
-            if (!isAuthenticated || !currentUser) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                const snapshot = await userRef.once('value');
-                const dbUser = snapshot.val();
-
-                if ((dbUser.balanceEGP || 0) < price) {
-                    showToast(`⚠️ رصيد غير كافٍ (تحتاج ${price} ج.م)`, 'warning');
-                    return;
-                }
-
-                if (!confirm(`تأكيد شراء "${name}" مقابل ${price} ج.م؟`)) return;
-
-                const newBalance = (dbUser.balanceEGP || 0) - price;
-                const now = new Date();
-                const expiresAt = new Date(now);
-                expiresAt.setDate(expiresAt.getDate() + 30);
-
-                const chatStyles = dbUser.chatStyles || {};
+                const chatStyles = user.chatStyles || {};
                 chatStyles[styleId] = {
                     owned: true,
                     purchasedAt: now.toISOString(),
                     expiresAt: expiresAt.toISOString(),
                     type: 'chatstyle'
                 };
+                updateData.chatStyles = chatStyles;
 
-                await userRef.update({
-                    balanceEGP: newBalance,
-                    chatStyles: chatStyles,
-                    updatedAt: now.toISOString()
+                await database.ref('users/' + currentFirebaseUserId).update(updateData);
+
+                // تحديث localStorage
+                const updatedUser = { ...user, ...updateData };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                // تسجيل في السجل
+                await database.ref('chatStyleLogs').push({
+                    userId: user.numericId,
+                    username: user.nickname || user.username,
+                    styleId: styleId,
+                    styleName: name,
+                    price: price,
+                    type: 'purchase',
+                    startDate: now.toISOString(),
+                    expiryDate: expiresAt.toISOString(),
+                    timestamp: now.toISOString()
                 });
 
-                await database.ref('users/' + currentUser.firebaseKey + '/notifications').push({
+                const notification = {
                     id: Date.now(),
                     text: `✍️ تم شراء "${name}" بنجاح! صلاحية 30 يوم.`,
                     read: false,
                     date: new Date().toLocaleString('ar-EG'),
                     type: 'chatstyle_purchased',
                     createdAt: now.toISOString()
-                });
+                };
+                await database.ref('users/' + currentFirebaseUserId + '/notifications').push(notification);
 
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
-                currentUser.chatStyles = chatStyles;
-                currentUser.balanceEGP = newBalance;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderChatStyles(currentUser);
+                await ensureUserData();
 
             } catch (error) {
                 console.error('Error buying chat style:', error);
@@ -1784,17 +1810,21 @@
         }
 
         async function activateChatStyle(styleId) {
-            if (!isAuthenticated || !currentUser) {
+            if (!currentUser || !currentFirebaseUserId) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 return;
             }
 
             try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                const snapshot = await userRef.once('value');
-                const dbUser = snapshot.val();
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
 
-                const chatStyles = dbUser.chatStyles || {};
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const chatStyles = user.chatStyles || {};
                 const style = chatStyles[styleId];
                 if (!style || !style.owned) {
                     showToast('⚠️ هذا الأسلوب غير مملوك', 'warning');
@@ -1807,12 +1837,14 @@
                     return;
                 }
 
-                await userRef.update({ activeChatStyle: styleId });
+                await database.ref('users/' + currentFirebaseUserId + '/activeChatStyle').set(styleId);
+
+                // تحديث localStorage
+                const updatedUser = { ...user, activeChatStyle: styleId };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
 
                 showToast(`✅ تم تفعيل أسلوب الكتابة بنجاح`, 'success');
-                currentUser.activeChatStyle = styleId;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderChatStyles(currentUser);
+                await ensureUserData();
 
             } catch (error) {
                 console.error('Error activating chat style:', error);
@@ -1821,7 +1853,7 @@
         }
 
         async function deactivateChatStyle(styleId) {
-            if (!isAuthenticated || !currentUser) {
+            if (!currentUser || !currentFirebaseUserId) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
                 return;
             }
@@ -1829,13 +1861,17 @@
             if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل هذا الأسلوب؟`)) return;
 
             try {
-                const userRef = database.ref('users/' + currentUser.firebaseKey);
-                await userRef.update({ activeChatStyle: null });
+                await database.ref('users/' + currentFirebaseUserId + '/activeChatStyle').set(null);
+
+                // تحديث localStorage
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+                if (user) {
+                    saveUserToStorage(user, currentFirebaseUserId);
+                }
 
                 showToast('✅ تم إلغاء تفعيل أسلوب الكتابة', 'success');
-                currentUser.activeChatStyle = null;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                renderChatStyles(currentUser);
+                await ensureUserData();
 
             } catch (error) {
                 console.error('Error deactivating chat style:', error);
@@ -1888,34 +1924,18 @@
         }
 
         // ============================================================
-        // 🚀 AUTH STATE LISTENER
-        // ============================================================
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                console.log('✅ مستخدم مسجل:', user.uid);
-                isAuthenticated = true;
-                document.getElementById('authBtn').className = 'auth-btn logout-btn';
-                document.getElementById('authBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
-                await loadUserData(user.uid);
-            } else {
-                console.log('👤 لا يوجد مستخدم مسجل');
-                isAuthenticated = false;
-                currentUser = null;
-                document.getElementById('authBtn').className = 'auth-btn';
-                document.getElementById('authBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                document.getElementById('loginOverlay').classList.add('active');
-                localStorage.removeItem('currentUser');
-                updateUIForGuest();
-            }
-        });
-
-        // ============================================================
         // 🚀 INIT
         // ============================================================
-        console.log('👑 VIP System loaded');
-        console.log('✅ يستخدم Firebase Authentication - مشروع vipclub-1d04a');
-        console.log('✅ نفس جلسة المستخدم مع chat.html');
+        window.onload = function() {
+            // تهيئة Firebase أولاً
+            initializeFirebase();
+            
+            // تحميل بيانات المستخدم
+            ensureUserData().then(() => {
+                console.log('👑 VIP System loaded successfully');
+                console.log('📊 Current user:', currentUser);
+            });
+        };
     </script>
-
 </body>
 </html>
