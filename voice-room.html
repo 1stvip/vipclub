@@ -16,7 +16,6 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
-        /* جميع الأنماط كما هي ... */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -113,7 +112,6 @@
             min-height: 500px;
         }
 
-        /* ===== SEATS AREA ===== */
         .seats-area {
             flex: 1;
             background: #000000 !important;
@@ -274,7 +272,6 @@
             text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
 
-        /* ===== FRAME ===== */
         .seat-frame {
             position: absolute;
             top: 50%;
@@ -425,7 +422,6 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
-        /* ===== CHAT ===== */
         .chat-area {
             width: 380px;
             min-width: 300px;
@@ -507,23 +503,6 @@
         .chat-messages .message .msg-text { font-size: 0.8rem; }
         .chat-messages .message .msg-time { font-size: 0.45rem; color: #666; margin-top: 1px; }
         .chat-messages .message .msg-badge { font-size: 0.45rem; background: #ffd700; color: #1a1a2e; padding: 1px 8px; border-radius: 8px; margin-left: 4px; }
-
-        /* ===== STYLE IMAGE IN CHAT ===== */
-        .message .style-image-container {
-            display: flex;
-            margin-top: 4px;
-            justify-content: flex-start;
-        }
-        .message.own .style-image-container {
-            justify-content: flex-end;
-        }
-        .message .style-image-container img {
-            max-width: 80px;
-            max-height: 30px;
-            object-fit: contain;
-            opacity: 0.7;
-            border-radius: 4px;
-        }
 
         .scroll-down-btn {
             position: absolute;
@@ -733,7 +712,6 @@
         .toast-message.info { background: rgba(59,130,246,0.9); }
         @keyframes slideDown { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* ===== VIP ENTRANCE ===== */
         #vipEntrance {
             display: none;
             position: fixed;
@@ -1280,21 +1258,20 @@
 
 <script>
     // ============================================================
-    // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات نظام VIP (stvipclub)
+    // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات لوحة الإدارة
     // ============================================================
     const firebaseConfig = {
-        apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
-        authDomain: "stvipclub.firebaseapp.com",
-        databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
-        projectId: "stvipclub",
-        storageBucket: "stvipclub.firebasestorage.app",
-        messagingSenderId: "526607326044",
-        appId: "1:526607326044:web:6af53db123ae02c7193f99",
-        measurementId: "G-QZQMQCH9N9"
+        apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
+        authDomain: "vipclub-1d04a.firebaseapp.com",
+        databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
+        projectId: "vipclub-1d04a",
+        storageBucket: "vipclub-1d04a.firebasestorage.app",
+        messagingSenderId: "120667552740",
+        appId: "1:120667552740:web:02085765fd43eb0080e5f1"
     };
 
     // ============================================================
-    // 📋 FRAMES & VIP DATA - مطابقة مع نظام VIP
+    // 📋 FRAMES DATA
     // ============================================================
     const FRAMES = [
         { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true, isSpecial: true },
@@ -1349,7 +1326,6 @@
     let roomInitialized = false;
     let vipEntranceTimeout = null;
     let isVIPEntranceActive = false;
-    let selectedGiftReceiverId = null;
     let selectedGift = null;
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
@@ -1364,26 +1340,9 @@
         try { return JSON.parse(localStorage.getItem('currentUser')); } catch(e) { return null; }
     }
 
-    function saveUserToStorage(userData, firebaseKey) {
-        const userToStore = {
-            numericId: userData.numericId,
-            username: userData.username,
-            nickname: userData.nickname || userData.username,
-            firebaseKey: firebaseKey,
-            balanceEGP: userData.balanceEGP || 0,
-            balanceUSD: userData.balanceUSD || 0,
-            vip: userData.vip || null,
-            vipPurchased: userData.vipPurchased || {},
-            frames: userData.frames || {},
-            activeFrame: userData.activeFrame || null,
-            chatStyles: userData.chatStyles || {},
-            activeChatStyle: userData.activeChatStyle || null
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userToStore));
-        currentUser = userToStore;
-    }
-
     function isLoggedIn() { return getStoredUser() !== null; }
+
+    function generateNumericId() { return Math.floor(100000 + Math.random() * 900000); }
 
     async function getCurrentUserFullData() {
         try {
@@ -1391,18 +1350,25 @@
             if (!stored) return null;
             if (!database) return stored;
             
+            const numericId = stored.numericId || generateNumericId();
+            if (!stored.numericId) {
+                stored.numericId = numericId;
+                localStorage.setItem('currentUser', JSON.stringify(stored));
+            }
+            
             const snapshot = await database.ref('users')
                 .orderByChild('numericId')
-                .equalTo(stored.numericId)
+                .equalTo(numericId)
                 .once('value');
 
             if (snapshot.exists()) {
                 const userData = snapshot.val();
                 const firebaseKey = Object.keys(userData)[0];
                 const fullUser = userData[firebaseKey];
-                saveUserToStorage(fullUser, firebaseKey);
+                const merged = { ...stored, ...fullUser, numericId: numericId, firebaseKey: firebaseKey };
+                localStorage.setItem('currentUser', JSON.stringify(merged));
                 currentFirebaseUserId = firebaseKey;
-                return fullUser;
+                return merged;
             }
             return stored;
         } catch(e) { return getStoredUser(); }
@@ -1436,12 +1402,12 @@
             if (firebase.apps.length > 0) await firebase.app().delete();
             firebase.initializeApp(firebaseConfig);
             database = firebase.database();
-            console.log('✅ Firebase initialized:', firebaseConfig.projectId);
+            console.log('✅ Firebase initialized');
         } catch(error) { console.error('❌ Firebase error:', error); }
     }
 
     // ============================================================
-    // 🖼️ GET USER FRAME - من نظام VIP
+    // 🖼️ GET USER FRAME
     // ============================================================
     async function getUserFrameFromFirebase(userId) {
         try {
@@ -1468,7 +1434,7 @@
     }
 
     // ============================================================
-    // 👤 GET USER CHAT STYLE - من نظام VIP
+    // 👤 GET USER CHAT STYLE
     // ============================================================
     async function getUserChatStyleFromFirebase(userId) {
         try {
@@ -1495,7 +1461,7 @@
     }
 
     // ============================================================
-    // 👑 CHECK VIP - من نظام VIP
+    // 👑 CHECK VIP
     // ============================================================
     async function getUserVIPFromFirebase(userId) {
         try {
@@ -1519,7 +1485,7 @@
     }
 
     // ============================================================
-    // 🏠 ROOM INIT
+    // 🏠 ROOM INIT - مع دعم الغرف من لوحة الإدارة
     // ============================================================
     function getRoomIdFromURL() {
         const params = new URLSearchParams(window.location.search);
@@ -1543,13 +1509,55 @@
     async function loadRoomData() {
         if (!database) return;
         try {
-            const snapshot = await database.ref('rooms/' + roomId).once('value');
-            if (!snapshot.exists()) {
+            console.log('🔍 جاري البحث عن الغرفة:', roomId);
+            
+            // محاولة جلب الغرفة من مسار rooms
+            let roomSnapshot = await database.ref('rooms/' + roomId).once('value');
+            
+            // إذا لم توجد الغرفة في rooms، حاول البحث في room_requests
+            if (!roomSnapshot.exists()) {
+                console.log('⚠️ الغرفة غير موجودة في rooms، جاري البحث في room_requests...');
+                const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
+                
+                if (requestSnapshot.exists()) {
+                    const requestData = requestSnapshot.val();
+                    // إذا كانت حالة الطلب موافق عليها، أنشئ الغرفة
+                    if (requestData.status === 'approved') {
+                        console.log('✅ تم العثور على طلب موافق عليه، جاري إنشاء الغرفة...');
+                        await database.ref('rooms/' + roomId).set({
+                            roomId: roomId,
+                            name: requestData.name || 'غرفة صوتية',
+                            description: requestData.description || '',
+                            creatorId: requestData.creatorId || 'admin',
+                            creatorName: requestData.creatorName || 'المالك',
+                            createdAt: requestData.createdAt || new Date().toISOString(),
+                            status: 'approved',
+                            members: 0,
+                            isActive: true
+                        });
+                        // إعادة المحاولة
+                        roomSnapshot = await database.ref('rooms/' + roomId).once('value');
+                    } else {
+                        showToast(`❌ الغرفة غير مفعلة (الحالة: ${requestData.status})`, 'error');
+                        setTimeout(() => window.location.href = 'chat.html', 3000);
+                        return;
+                    }
+                } else {
+                    showToast('❌ الغرفة غير موجودة', 'error');
+                    setTimeout(() => window.location.href = 'chat.html', 3000);
+                    return;
+                }
+            }
+            
+            if (!roomSnapshot.exists()) {
                 showToast('❌ الغرفة غير موجودة', 'error');
-                setTimeout(() => window.location.href = 'chat.html', 2000);
+                setTimeout(() => window.location.href = 'chat.html', 3000);
                 return;
             }
-            roomData = snapshot.val();
+            
+            roomData = roomSnapshot.val();
+            console.log('✅ تم تحميل بيانات الغرفة:', roomData);
+            
             document.getElementById('roomNameDisplay').textContent = roomData.name || 'غرفة صوتية';
             
             const creatorId = roomData.creatorId;
@@ -1557,7 +1565,7 @@
             
             const userData = await getCurrentUserFullData();
             if (userData) {
-                isOwner = roomData.creatorId == userData.numericId;
+                isOwner = roomData.creatorId == userData.numericId || roomData.creatorId == userData.numericId?.toString();
                 currentUser = userData;
             }
             
@@ -1572,10 +1580,8 @@
             listenSeats();
             setupChatScroll();
             
-            // استماع للمستخدمين الجدد لعرض دخلات VIP
             listenForNewUsers();
             
-            // عرض دخلة VIP للمستخدم الحالي
             if (userData?.numericId) {
                 const username = userData.nickname || userData.username || 'مستخدم';
                 setTimeout(() => {
@@ -1585,11 +1591,15 @@
             
             setTimeout(initPeerJS, 1000);
             await updateUI();
-        } catch(error) { console.error('Error loading room:', error); }
+            
+        } catch(error) {
+            console.error('❌ Error loading room:', error);
+            showToast('❌ حدث خطأ في تحميل الغرفة: ' + error.message, 'error');
+        }
     }
 
     // ============================================================
-    // 👑 VIP ENTRANCE - دخلات مميزة من نظام VIP
+    // 👑 VIP ENTRANCE
     // ============================================================
     function listenForNewUsers() {
         if (!database || !roomId) return;
@@ -1676,14 +1686,13 @@
     }
 
     // ============================================================
-    // 💺 SEATS FUNCTIONS - مع دعم الأطارات
+    // 💺 SEATS FUNCTIONS
     // ============================================================
     async function renderSeats(seats) {
         const container = document.getElementById('seatsContainer');
         let html = '', occupied = 0, globalIndex = 0;
         const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
         
-        // جلب الأطر لكل مستخدم
         const seatsWithFrames = {};
         for (const index in seats) {
             const seat = seats[index];
@@ -1981,7 +1990,7 @@
     }
 
     // ============================================================
-    // 💬 CHAT - مع دعم أشكال الكتابة من نظام VIP
+    // 💬 CHAT
     // ============================================================
     function listenChat() {
         if (!database) return;
@@ -2031,8 +2040,9 @@
             if (style) {
                 styleNameHTML = ` <span style="font-size:0.5rem; color:#ffd700;">✍️ ${style.name}</span>`;
                 styleImageHTML = `
-                    <div class="style-image-container">
-                        <img src="${style.image}" alt="${style.name}">
+                    <div style="display:flex; justify-content:${isOwn ? 'flex-end' : 'flex-start'}; margin-top:4px;">
+                        <img src="${style.image}" alt="${style.name}" 
+                             style="max-width:80px; max-height:30px; object-fit:contain; opacity:0.7; border-radius:4px;">
                     </div>
                 `;
             }
@@ -2120,7 +2130,7 @@
     }
 
     // ============================================================
-    // 🎨 CHAT STYLES MODAL - من نظام VIP
+    // 🎨 CHAT STYLES MODAL
     // ============================================================
     async function openChatStylesModal() {
         if (!isLoggedIn()) {
@@ -2227,7 +2237,8 @@
             await database.ref('users/' + currentFirebaseUserId + '/activeChatStyle').set(styleId);
             
             const updatedUser = { ...user, activeChatStyle: styleId };
-            saveUserToStorage(updatedUser, currentFirebaseUserId);
+            localStorage.setItem('currentUser', JSON.stringify({ ...currentUser, activeChatStyle: styleId }));
+            currentUser = { ...currentUser, activeChatStyle: styleId };
 
             showToast(`✅ تم تفعيل أسلوب الكتابة بنجاح`, 'success');
             closeChatStylesModal();
@@ -2250,7 +2261,8 @@
             const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
             const user = snapshot.val();
             if (user) {
-                saveUserToStorage(user, currentFirebaseUserId);
+                localStorage.setItem('currentUser', JSON.stringify({ ...currentUser, activeChatStyle: null }));
+                currentUser = { ...currentUser, activeChatStyle: null };
             }
 
             showToast('✅ تم إلغاء تفعيل أسلوب الكتابة', 'success');
@@ -2263,7 +2275,7 @@
     }
 
     // ============================================================
-    // 🎁 GIFT SYSTEM - إرسال هدايا
+    // 🎁 GIFT SYSTEM
     // ============================================================
     function openGiftModalFromNav() {
         if (!isLoggedIn()) {
