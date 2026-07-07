@@ -1434,7 +1434,7 @@
 
 <script>
 // ============================================================
-// 🔥 FIREBASE CONFIG
+// 🔥 FIREBASE CONFIG - مشروع vipclub-1d04a (نفس المشروع)
 // ============================================================
 const firebaseConfig = {
     apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
@@ -1447,7 +1447,7 @@ const firebaseConfig = {
 };
 
 // ============================================================
-// 📋 DATA CONFIG
+// 📋 DATA CONFIG (نفس البيانات الموجودة في vipsystem.html)
 // ============================================================
 const FRAMES = [
     { id: 'frame1', name: 'إطار فاخر 1', price: 50, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true },
@@ -1484,6 +1484,8 @@ const COLORS = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a1
 // ============================================================
 let database, auth;
 let currentUser = null;
+let currentFirebaseUser = null;
+let isAuthenticated = false;
 let roomId = null;
 let roomData = null;
 let isOwner = false;
@@ -1510,7 +1512,7 @@ let isProcessingJoin = false;
 let vipQueue = [];
 
 // ============================================================
-// 👤 USER FUNCTIONS
+// 👤 USER FUNCTIONS (محسّنة للربط مع Firebase Auth)
 // ============================================================
 function getCurrentUserFromStorage() {
     try { return JSON.parse(localStorage.getItem('currentUser')); } catch(e) { return null; }
@@ -1524,31 +1526,42 @@ function formatNumericId(id) {
 }
 
 function isLoggedIn() {
-    return getCurrentUserFromStorage() !== null;
+    return isAuthenticated;
 }
 
 async function getCurrentUserFullData() {
     try {
+        // أولاً: التحقق من Firebase Auth
+        if (currentFirebaseUser) {
+            const uid = currentFirebaseUser.uid;
+            const userRef = database.ref('users').orderByChild('uid').equalTo(uid);
+            const snapshot = await userRef.once('value');
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                const userId = Object.keys(users)[0];
+                const userData = users[userId];
+                const merged = { 
+                    ...userData, 
+                    firebaseKey: userId, 
+                    uid: uid,
+                    numericId: userData.numericId || generateNumericId()
+                };
+                localStorage.setItem('currentUser', JSON.stringify(merged));
+                return merged;
+            }
+        }
+        
+        // ثانياً: الرجوع إلى localStorage
         const localUser = getCurrentUserFromStorage();
-        if (!localUser) return null;
-        if (!database) return localUser;
-        const numericId = localUser.numericId || generateNumericId();
-        if (!localUser.numericId) {
-            localUser.numericId = numericId;
-            localStorage.setItem('currentUser', JSON.stringify(localUser));
+        if (localUser && localUser.numericId) {
+            return localUser;
         }
-        const userRef = database.ref('users').orderByChild('numericId').equalTo(numericId);
-        const snapshot = await userRef.once('value');
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            const userId = Object.keys(users)[0];
-            const userData = users[userId];
-            const merged = { ...localUser, ...userData, numericId: numericId, firebaseKey: userId };
-            localStorage.setItem('currentUser', JSON.stringify(merged));
-            return merged;
-        }
-        return localUser;
-    } catch(e) { return getCurrentUserFromStorage(); }
+        return null;
+    } catch(e) { 
+        console.error('Error getting user:', e);
+        return getCurrentUserFromStorage(); 
+    }
 }
 
 // ============================================================
@@ -1580,13 +1593,44 @@ async function initializeFirebase() {
         firebase.initializeApp(firebaseConfig);
         database = firebase.database();
         auth = firebase.auth();
-        console.log('✅ Firebase initialized');
+        console.log('✅ Firebase initialized - vipclub-1d04a');
         await database.ref('connection_test').set({
             timestamp: new Date().toISOString(),
             message: 'اتصال ناجح من الغرفة الصوتية'
         });
     } catch(error) { console.error('❌ Firebase error:', error); }
 }
+
+// ============================================================
+// 🔐 AUTH STATE LISTENER
+// ============================================================
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        console.log('✅ مستخدم مسجل في الغرفة الصوتية:', user.uid);
+        isAuthenticated = true;
+        currentFirebaseUser = user;
+        currentUser = await getCurrentUserFullData();
+        
+        // تحديث واجهة المستخدم
+        updateUI();
+        
+        // بدء تهيئة الغرفة إذا لم تبدأ بعد
+        if (!roomInitialized && roomId) {
+            initRoom();
+        }
+    } else {
+        console.log('👤 لا يوجد مستخدم مسجل في الغرفة الصوتية');
+        isAuthenticated = false;
+        currentUser = null;
+        currentFirebaseUser = null;
+        
+        // عرض رسالة للمستخدم غير المسجل
+        showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+        setTimeout(() => {
+            window.location.href = 'loginchat.html';
+        }, 2000);
+    }
+});
 
 // ============================================================
 // 🚀 ROOM INIT
@@ -1598,6 +1642,11 @@ function getRoomIdFromURL() {
 
 function initRoom() {
     if (roomInitialized) return;
+    if (!isAuthenticated) {
+        showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+        return;
+    }
+    
     roomInitialized = true;
     roomId = getRoomIdFromURL();
     if (!roomId) {
@@ -1605,7 +1654,7 @@ function initRoom() {
         setTimeout(() => window.location.href = 'chat.html', 2000);
         return;
     }
-    currentUser = getCurrentUserFromStorage();
+    
     document.getElementById('roomIdDisplay').textContent = '🔑 ' + roomId;
     renderSeats({});
     loadRoomData();
@@ -1748,7 +1797,7 @@ function skipVIPEntrance() {
 }
 
 // ============================================================
-// 💺 SEATS FUNCTIONS
+// 💺 SEATS FUNCTIONS (محسّنة لجلب البيانات من Firebase بنفس هيكل vipsystem)
 // ============================================================
 async function getUserFrame(userId) {
     try {
@@ -1937,7 +1986,10 @@ function listenSeats() {
 }
 
 async function joinSeat(seatIndex) {
-    if (!database || !roomId || !currentUser?.numericId) return;
+    if (!database || !roomId || !currentUser?.numericId) {
+        showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+        return;
+    }
     const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
     for (const key in seats) if (seats[key].userId == currentUser.numericId) {
         showToast('⚠️ أنت بالفعل في مقعد', 'warning');
@@ -2737,8 +2789,8 @@ function copyText(id) {
 }
 
 async function updateUI() {
-    const logged = isLoggedIn();
-    if (!logged) {
+    const user = await getCurrentUserFullData();
+    if (!user) {
         document.getElementById('p_nickname').innerText = "زائر";
         document.getElementById('p_id').innerText = "000000";
         document.getElementById('p_egp').innerText = "0";
@@ -2747,8 +2799,6 @@ async function updateUI() {
         return;
     }
     try {
-        const user = await getCurrentUserFullData();
-        if (!user) return;
         document.getElementById('p_nickname').innerText = user.nickname || user.username;
         document.getElementById('p_id').innerText = formatNumericId(user.numericId);
         document.getElementById('p_egp').innerText = user.balanceEGP || "0";
@@ -3026,9 +3076,14 @@ async function submitTopUp() {
 // 🚪 LOGOUT
 // ============================================================
 async function logout() {
-    try { if (auth) await auth.signOut(); } catch(e) {}
-    localStorage.removeItem('currentUser');
-    window.location.reload();
+    try { 
+        if (auth) await auth.signOut(); 
+        localStorage.removeItem('currentUser');
+        window.location.href = 'loginchat.html';
+    } catch(e) { 
+        localStorage.removeItem('currentUser');
+        window.location.href = 'loginchat.html';
+    }
 }
 
 // ============================================================
@@ -3037,13 +3092,19 @@ async function logout() {
 window.onload = async function() {
     try {
         await initializeFirebase();
+        
+        // التحقق من وجود معرف الغرفة
         if (!getRoomIdFromURL()) {
             showToast('❌ لم يتم العثور على معرف الغرفة', 'error');
             setTimeout(() => window.location.href = 'chat.html', 2000);
             return;
         }
+        
+        // طلب الميكروفون
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: { echoCancellation: true, noiseSuppression: true } 
+            });
             mediaStream = stream;
             mediaStream.getAudioTracks().forEach(track => track.enabled = true);
             isMicMuted = false;
@@ -3055,8 +3116,13 @@ window.onload = async function() {
             document.getElementById('micBtn').className = 'audio-btn mic-inactive';
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون غير متاح</span>';
         }
+        
+        // بدء تهيئة الغرفة (سيتم إكمالها بعد تسجيل الدخول)
         initRoom();
-    } catch(e) { console.error('❌ خطأ في التحميل:', e); }
+        
+    } catch(e) { 
+        console.error('❌ خطأ في التحميل:', e);
+    }
 };
 
 // ============================================================
