@@ -67,6 +67,13 @@
             box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
         }
 
+        .header .btn-admin {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        .header .btn-admin:hover {
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.4);
+        }
+
         /* ===== TABS ===== */
         .tabs {
             display: flex;
@@ -283,6 +290,30 @@
         .modal .btn-secondary { background: #1e293b; color: white; border: 1px solid #334155; }
         .modal .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
 
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideDown 0.3s ease;
+            max-width: 90vw;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.warning { background: #f59e0b; }
+        .toast.info { background: #3b82f6; }
+
+        @keyframes slideDown {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .users-grid { grid-template-columns: 1fr 1fr; }
@@ -311,7 +342,7 @@
                 لوحة التحكم - إدارة الأطارات
             </div>
             <div>
-                <a href="VipSystem.html" class="back-btn">
+                <a href="VipSystem.html" class="back-btn btn-admin" style="margin-right: 10px;">
                     <i class="fas fa-arrow-right"></i> العودة لنظام VIP
                 </a>
                 <a href="index.html" class="back-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); margin-right: 10px;">
@@ -438,20 +469,21 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG
+        // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات stvipclub
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
-            authDomain: "vipclub-1d04a.firebaseapp.com",
-            databaseURL: "https://vipclub-1d04a-default-rtdb.firebaseio.com",
-            projectId: "vipclub-1d04a",
-            storageBucket: "vipclub-1d04a.firebasestorage.app",
-            messagingSenderId: "120667552740",
-            appId: "1:120667552740:web:02085765fd43eb0080e5f1"
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
         };
 
         // ============================================================
-        // 📋 DATA DEFINITIONS
+        // 📋 DATA DEFINITIONS - مطابقة مع vipsystem.html
         // ============================================================
         const FRAMES = [
             { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, isSpecial: true },
@@ -486,7 +518,7 @@
                 if (firebase.apps.length > 0) await firebase.app().delete();
                 firebase.initializeApp(firebaseConfig);
                 database = firebase.database();
-                console.log('✅ Firebase connected');
+                console.log('✅ Firebase connected to stvipclub');
 
                 await loadAllData();
             } catch (error) {
@@ -970,12 +1002,11 @@
         // ============================================================
         function showToast(message, type = 'info') {
             const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
-            const old = document.querySelector('.toast-message');
-            if (old) old.remove();
+            const oldToast = document.querySelector('.toast');
+            if (oldToast) oldToast.remove();
             
             const toast = document.createElement('div');
-            toast.className = 'toast-message';
-            toast.style.cssText = `position:fixed;top:70px;right:20px;padding:12px 20px;border-radius:12px;color:white;font-weight:600;z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,0.4);animation:slideDown 0.3s ease-out;max-width:320px;direction:rtl;font-size:0.85rem;background:${colors[type] || colors.info};`;
+            toast.className = `toast ${type}`;
             toast.textContent = message;
             document.body.appendChild(toast);
             
@@ -984,7 +1015,7 @@
                 toast.style.transform = 'translateX(30px)';
                 toast.style.transition = 'all 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
-            }, 3500);
+            }, 4000);
         }
 
         // ============================================================
