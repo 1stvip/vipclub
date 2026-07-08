@@ -444,6 +444,17 @@
             font-size: 0.4rem;
         }
 
+        /* ===== النص الافتراضي للخلفية ===== */
+        .room-card .room-banner .default-bg-text {
+            position: relative;
+            z-index: 2;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            letter-spacing: 3px;
+        }
+
         .room-card .room-body {
             padding: 4px 14px 10px;
             flex: 1;
@@ -1974,6 +1985,7 @@
             background: #3a3a5a;
         }
 
+        /* ===== معاينة البطاقة ===== */
         .card-preview {
             background: #0f0f1f;
             border-radius: 12px;
@@ -1993,13 +2005,16 @@
 
         .card-preview .preview-overlay-image {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 6px;
+            right: 6px;
+            width: 30%;
+            height: 30%;
             object-fit: contain;
             pointer-events: none;
-            z-index: 2;
+            z-index: 4;
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+            border-radius: 6px;
         }
 
         .card-preview .preview-text {
@@ -2007,8 +2022,9 @@
             z-index: 3;
             color: #ffd700;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            letter-spacing: 3px;
         }
 
         .card-preview .preview-placeholder {
@@ -2244,6 +2260,9 @@
             .card-preview {
                 min-height: 120px;
             }
+            .card-preview .preview-text {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 400px) {
@@ -2322,6 +2341,9 @@
             }
             .card-preview {
                 min-height: 100px;
+            }
+            .card-preview .preview-text {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -2888,28 +2910,47 @@
             const bgValue = bgSelect.value;
             const overlayValue = overlaySelect.value;
 
-            // إزالة الصور السابقة
-            const existingOverlay = preview.querySelector('.preview-overlay-image');
-            if (existingOverlay) existingOverlay.remove();
+            // إزالة جميع العناصر السابقة
+            preview.innerHTML = '';
 
-            const existingText = preview.querySelector('.preview-text');
-            if (existingText) existingText.remove();
-
-            // تعيين الخلفية
+            // ===== تعيين الخلفية =====
             if (bgValue && bgValue !== 'default') {
+                // خلفية مخصصة من الصور
                 preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
                 preview.style.backgroundSize = 'cover';
                 preview.style.backgroundPosition = 'center';
+                preview.style.backgroundColor = 'transparent';
             } else {
-                preview.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e, #0f3460)';
+                // الخلفية الافتراضية - تدرج لوني مع نص
+                preview.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
+                preview.style.backgroundColor = '#1a1a2e';
             }
 
-            // إضافة الصورة العلوية
+            // ===== إضافة النص الافتراضي في المنتصف =====
+            const textDiv = document.createElement('div');
+            textDiv.className = 'preview-text';
+            textDiv.textContent = '🎙️ VIP CHAT';
+            preview.appendChild(textDiv);
+
+            // ===== إضافة الصورة العلوية في أعلى اليمين (مصغرة) =====
             if (overlayValue && overlayValue !== 'none') {
                 const overlayImg = document.createElement('img');
                 overlayImg.className = 'preview-overlay-image';
                 overlayImg.src = `images/chathtml/${overlayValue}`;
                 overlayImg.alt = 'صورة علوية';
+                overlayImg.style.position = 'absolute';
+                overlayImg.style.top = '6px';
+                overlayImg.style.right = '6px';
+                overlayImg.style.width = '30%';
+                overlayImg.style.height = '30%';
+                overlayImg.style.objectFit = 'contain';
+                overlayImg.style.pointerEvents = 'none';
+                overlayImg.style.zIndex = '4';
+                overlayImg.style.opacity = '0.9';
+                overlayImg.style.filter = 'drop-shadow(0 2px 10px rgba(0,0,0,0.5))';
+                overlayImg.style.borderRadius = '6px';
                 overlayImg.onerror = function() {
                     console.log('❌ فشل تحميل الصورة العلوية:', overlayValue);
                     this.style.display = 'none';
@@ -2919,12 +2960,6 @@
                 };
                 preview.appendChild(overlayImg);
             }
-
-            // إضافة النص الذهبي
-            const textDiv = document.createElement('div');
-            textDiv.className = 'preview-text';
-            textDiv.textContent = '🎙️ VIP CHAT';
-            preview.appendChild(textDiv);
         }
 
         // ============================================================
@@ -3176,15 +3211,15 @@
             }
 
             grid.innerHTML = filtered.map(room => {
-                // خلفية البطاقة - إذا كانت default استخدم التدرج الافتراضي
-                let bgStyle = 'background-color: #1a1a2e;';
+                // خلفية البطاقة
+                let bgStyle = '';
                 if (room.background && room.background !== 'default') {
                     bgStyle =
                         `background-image: url('images/chathtml/${room.background}'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 } else {
-                    // الخلفية الافتراضية - تدرج لوني
+                    // الخلفية الافتراضية - تدرج لوني مع نص
                     bgStyle =
-                        'background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); background-size: cover; background-position: center;';
+                        'background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); background-size: cover; background-position: center; background-color: #1a1a2e;';
                 }
 
                 // الصورة العلوية
@@ -3192,6 +3227,12 @@
                 if (room.overlayImage && room.overlayImage !== 'none') {
                     overlayImg =
                         `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة" onerror="this.style.display='none'">`;
+                }
+
+                // النص الافتراضي للخلفية (يظهر فقط إذا كانت الخلفية default)
+                let defaultText = '';
+                if (!room.background || room.background === 'default') {
+                    defaultText = `<div class="default-bg-text">🎙️ VIP CHAT</div>`;
                 }
 
                 // حالة الخصوصية
@@ -3206,6 +3247,7 @@
                                 <div class="room-banner" style="${bgStyle}">
                                     <div class="banner-overlay"></div>
                                     ${overlayImg}
+                                    ${defaultText}
                                     <div class="room-status"><i class="fas fa-circle"></i> مباشر</div>
                                 </div>
                                 <div class="room-body">
