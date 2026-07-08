@@ -136,72 +136,55 @@
             font-weight: bold;
         }
 
+        /* ===== هيرو بانر جديد ===== */
         .hero-banner-wrapper {
             position: relative;
             margin: 16px 16px 20px;
             border-radius: 16px;
             overflow: hidden;
-            height: 160px;
+            height: 180px;
+            touch-action: pan-y;
+            user-select: none;
         }
 
-        .hero-banner {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
-            padding: 30px 20px;
-            text-align: center;
+        .hero-banner-slider {
             display: flex;
-            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+        }
+
+        .hero-banner-slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            flex-shrink: 0;
+            display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            position: relative;
         }
 
-        .hero-banner .vip-wave {
+        .hero-banner-slide .slide-overlay {
             position: absolute;
             inset: 0;
-            background: #0a0a1a;
-            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
         }
 
-        .hero-banner .vip-wave::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 50%, transparent 40%, rgba(0, 0, 0, 0.8) 60%, #0a0a1a 100%);
-            animation: waveMove 6s ease-in-out infinite;
-        }
-
-        .hero-banner .vip-wave::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 70% 50%, transparent 40%, rgba(0, 0, 0, 0.6) 60%, #0a0a1a 100%);
-            animation: waveMove 8s ease-in-out infinite reverse;
-        }
-
-        @keyframes waveMove {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(5%, 5%) rotate(5deg); }
-            50% { transform: translate(10%, 0) rotate(0deg); }
-            75% { transform: translate(5%, -5%) rotate(-5deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-
-        .hero-banner .hero-content {
+        .hero-banner-slide .slide-content {
             position: relative;
             z-index: 2;
+            text-align: center;
+            padding: 20px;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
         }
 
-        .hero-banner .hero-title {
+        .hero-banner-slide .slide-content .hero-title {
             font-size: 2rem;
             font-weight: 900;
             color: #ffd700;
@@ -209,36 +192,25 @@
             letter-spacing: 2px;
         }
 
-        .hero-banner .hero-subtitle {
-            color: #c8d6e5;
+        .hero-banner-slide .slide-content .hero-subtitle {
+            color: #e2e8f0;
             font-size: 1rem;
             margin-top: 6px;
             font-weight: 300;
             letter-spacing: 1px;
         }
 
-        .hero-banner .hero-tag {
+        .hero-banner-slide .slide-content .hero-tag {
             display: inline-block;
             margin-top: 10px;
-            background: rgba(255, 215, 0, 0.12);
+            background: rgba(255, 215, 0, 0.15);
             padding: 6px 20px;
             border-radius: 30px;
             color: #ffd700;
             font-size: 0.75rem;
             border: 1px solid rgba(255, 215, 0, 0.2);
             letter-spacing: 1px;
-        }
-
-        .hero-banner.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-        }
-
-        .hero-banner.visible {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
+            backdrop-filter: blur(4px);
         }
 
         .hero-dots {
@@ -396,7 +368,7 @@
             width: 100%;
             aspect-ratio: 16/9;
             overflow: hidden;
-            background-size: contain;
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #1a1a2e;
@@ -413,8 +385,8 @@
         .room-card .room-banner .overlay-image {
             position: absolute;
             z-index: 4;
-            width: 30%;
-            height: 30%;
+            width: 60%;
+            height: 60%;
             top: 6px;
             right: 6px;
             object-fit: contain;
@@ -442,17 +414,6 @@
 
         .room-card .room-banner .room-status i {
             font-size: 0.4rem;
-        }
-
-        /* ===== النص الافتراضي للخلفية ===== */
-        .room-card .room-banner .default-bg-text {
-            position: relative;
-            z-index: 2;
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-            letter-spacing: 3px;
         }
 
         .room-card .room-body {
@@ -1985,7 +1946,6 @@
             background: #3a3a5a;
         }
 
-        /* ===== معاينة البطاقة ===== */
         .card-preview {
             background: #0f0f1f;
             border-radius: 12px;
@@ -2007,8 +1967,8 @@
             position: absolute;
             top: 6px;
             right: 6px;
-            width: 30%;
-            height: 30%;
+            width: 60%;
+            height: 60%;
             object-fit: contain;
             pointer-events: none;
             z-index: 4;
@@ -2152,13 +2112,13 @@
                 font-size: 0.9rem;
             }
             .hero-banner-wrapper {
-                height: 140px;
+                height: 150px;
                 margin: 12px 12px 16px;
             }
-            .hero-banner .hero-title {
+            .hero-banner-slide .slide-content .hero-title {
                 font-size: 1.5rem;
             }
-            .hero-banner .hero-subtitle {
+            .hero-banner-slide .slide-content .hero-subtitle {
                 font-size: 0.85rem;
             }
             .rooms-grid {
@@ -2223,8 +2183,8 @@
                 right: 5px;
             }
             .room-card .room-banner .overlay-image {
-                width: 25%;
-                height: 25%;
+                width: 60%;
+                height: 60%;
                 top: 4px;
                 right: 4px;
             }
@@ -2282,7 +2242,7 @@
                 height: 120px;
                 margin: 8px 8px 12px;
             }
-            .hero-banner .hero-title {
+            .hero-banner-slide .slide-content .hero-title {
                 font-size: 1.2rem;
             }
             .profile-dropdown {
@@ -2310,8 +2270,8 @@
                 max-width: 98%;
             }
             .room-card .room-banner .overlay-image {
-                width: 20%;
-                height: 20%;
+                width: 60%;
+                height: 60%;
             }
             .room-card .room-body .room-host {
                 gap: 8px;
@@ -2485,27 +2445,41 @@
         <!-- ===== HOME PAGE ===== -->
         <div id="homePage" class="page active">
 
-            <!-- ===== HERO BANNER ===== -->
-            <div class="hero-banner-wrapper">
-                <div class="hero-banner visible" id="banner1">
-                    <div class="vip-wave"></div>
-                    <div class="hero-content">
-                        <div class="hero-title">🌟 VIP CLUB</div>
-                        <div class="hero-subtitle">نادي كبار الشخصيات</div>
-                        <div class="hero-tag">✨ اللحظات المميزة للأشخاص المميزون فقط ✨</div>
+            <!-- ===== HERO BANNER SLIDER ===== -->
+            <div class="hero-banner-wrapper" id="heroBannerWrapper">
+                <div class="hero-banner-slider" id="heroSlider">
+                    <!-- بانر 1 -->
+                    <div class="hero-banner-slide" style="background-image: url('images/chathtml/banners/banner1.png');">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="hero-title">🌟 VIP CLUB</div>
+                            <div class="hero-subtitle">نادي كبار الشخصيات</div>
+                            <div class="hero-tag">✨ اللحظات المميزة للأشخاص المميزون فقط ✨</div>
+                        </div>
+                    </div>
+                    <!-- بانر 2 -->
+                    <div class="hero-banner-slide" style="background-image: url('images/chathtml/banners/banner2.png');">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="hero-title">🎙️ مرحباً بك</div>
+                            <div class="hero-subtitle">انضم إلى أفضل الغرف الصوتية</div>
+                            <div class="hero-tag">💬 تواصل مع كبار الشخصيات</div>
+                        </div>
+                    </div>
+                    <!-- بانر 3 -->
+                    <div class="hero-banner-slide" style="background-image: url('images/chathtml/banners/banner3.png');">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="hero-title">🚀 انطلق الآن</div>
+                            <div class="hero-subtitle">غرف صوتية فاخرة بتقنية عالية</div>
+                            <div class="hero-tag">🌟 تجربة مميزة لكبار الشخصيات</div>
+                        </div>
                     </div>
                 </div>
-                <div class="hero-banner hidden" id="banner2">
-                    <div class="vip-wave"></div>
-                    <div class="hero-content">
-                        <div class="hero-title">🎙️ مرحباً بك</div>
-                        <div class="hero-subtitle">انضم إلى أفضل الغرف الصوتية</div>
-                        <div class="hero-tag">💬 تواصل مع كبار الشخصيات</div>
-                    </div>
-                </div>
-                <div class="hero-dots">
+                <div class="hero-dots" id="heroDots">
                     <span class="dot active" onclick="goToBanner(0)"></span>
                     <span class="dot" onclick="goToBanner(1)"></span>
+                    <span class="dot" onclick="goToBanner(2)"></span>
                 </div>
             </div>
 
@@ -2915,16 +2889,17 @@
 
             // ===== تعيين الخلفية =====
             if (bgValue && bgValue !== 'default') {
-                // خلفية مخصصة من الصور
                 preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
-                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundSize = 'contain';
                 preview.style.backgroundPosition = 'center';
-                preview.style.backgroundColor = 'transparent';
+                preview.style.backgroundRepeat = 'no-repeat';
+                preview.style.backgroundColor = '#1a1a2e';
             } else {
-                // الخلفية الافتراضية - تدرج لوني مع نص
-                preview.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
+                // الخلفية الافتراضية - صورة ثابتة
+                preview.style.backgroundImage = `url('images/chathtml/roomsbg/roommk (0).png')`;
                 preview.style.backgroundSize = 'cover';
                 preview.style.backgroundPosition = 'center';
+                preview.style.backgroundRepeat = 'no-repeat';
                 preview.style.backgroundColor = '#1a1a2e';
             }
 
@@ -2943,8 +2918,8 @@
                 overlayImg.style.position = 'absolute';
                 overlayImg.style.top = '6px';
                 overlayImg.style.right = '6px';
-                overlayImg.style.width = '30%';
-                overlayImg.style.height = '30%';
+                overlayImg.style.width = '60%';
+                overlayImg.style.height = '60%';
                 overlayImg.style.objectFit = 'contain';
                 overlayImg.style.pointerEvents = 'none';
                 overlayImg.style.zIndex = '4';
@@ -3199,6 +3174,13 @@
                 );
             }
 
+            // ترتيب الغرف بحيث تظهر الغرفة رقم 1 في المقدمة دائماً
+            filtered.sort((a, b) => {
+                if (a.id === "1") return -1;
+                if (b.id === "1") return 1;
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+
             if (filtered.length === 0) {
                 grid.innerHTML = `
                             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
@@ -3217,9 +3199,9 @@
                     bgStyle =
                         `background-image: url('images/chathtml/${room.background}'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 } else {
-                    // الخلفية الافتراضية - تدرج لوني مع نص
+                    // الخلفية الافتراضية - صورة ثابتة
                     bgStyle =
-                        'background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); background-size: cover; background-position: center; background-color: #1a1a2e;';
+                        `background-image: url('images/chathtml/roomsbg/roommk (0).png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 }
 
                 // الصورة العلوية
@@ -3227,12 +3209,6 @@
                 if (room.overlayImage && room.overlayImage !== 'none') {
                     overlayImg =
                         `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة" onerror="this.style.display='none'">`;
-                }
-
-                // النص الافتراضي للخلفية (يظهر فقط إذا كانت الخلفية default)
-                let defaultText = '';
-                if (!room.background || room.background === 'default') {
-                    defaultText = `<div class="default-bg-text">🎙️ VIP CHAT</div>`;
                 }
 
                 // حالة الخصوصية
@@ -3247,7 +3223,6 @@
                                 <div class="room-banner" style="${bgStyle}">
                                     <div class="banner-overlay"></div>
                                     ${overlayImg}
-                                    ${defaultText}
                                     <div class="room-status"><i class="fas fa-circle"></i> مباشر</div>
                                 </div>
                                 <div class="room-body">
@@ -4256,14 +4231,21 @@
         // ============================================================
         // 🖥️ HERO BANNER SLIDER
         // ============================================================
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isDragging = false;
+        let sliderWrapper = document.getElementById('heroBannerWrapper');
+        let slider = document.getElementById('heroSlider');
+        let totalSlides = 3;
+
         function startBannerSlider() {
             stopBannerSlider();
             currentBanner = 0;
-            showBanner(currentBanner);
+            updateSlider();
             bannerInterval = setInterval(() => {
-                currentBanner = (currentBanner + 1) % 2;
-                showBanner(currentBanner);
-            }, 4000);
+                currentBanner = (currentBanner + 1) % totalSlides;
+                updateSlider();
+            }, 5000);
         }
 
         function stopBannerSlider() {
@@ -4273,36 +4255,88 @@
             }
         }
 
-        function showBanner(index) {
-            const banner1 = document.getElementById('banner1');
-            const banner2 = document.getElementById('banner2');
-            const dots = document.querySelectorAll('.hero-dots .dot');
-
-            if (index === 0) {
-                banner1.classList.remove('hidden');
-                banner1.classList.add('visible');
-                banner2.classList.remove('visible');
-                banner2.classList.add('hidden');
-            } else {
-                banner2.classList.remove('hidden');
-                banner2.classList.add('visible');
-                banner1.classList.remove('visible');
-                banner1.classList.add('hidden');
+        function updateSlider() {
+            if (slider) {
+                slider.style.transform = `translateX(-${currentBanner * 100}%)`;
             }
-
+            const dots = document.querySelectorAll('.hero-dots .dot');
             dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
+                dot.classList.toggle('active', i === currentBanner);
             });
         }
 
         function goToBanner(index) {
-            currentBanner = index;
-            showBanner(index);
-            stopBannerSlider();
-            bannerInterval = setInterval(() => {
-                currentBanner = (currentBanner + 1) % 2;
-                showBanner(currentBanner);
-            }, 4000);
+            if (index >= 0 && index < totalSlides) {
+                currentBanner = index;
+                updateSlider();
+                stopBannerSlider();
+                bannerInterval = setInterval(() => {
+                    currentBanner = (currentBanner + 1) % totalSlides;
+                    updateSlider();
+                }, 5000);
+            }
+        }
+
+        // ===== Touch Events for Swipe =====
+        if (sliderWrapper) {
+            sliderWrapper.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                isDragging = true;
+            });
+
+            sliderWrapper.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                touchEndX = e.changedTouches[0].screenX;
+            });
+
+            sliderWrapper.addEventListener('touchend', function(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0 && currentBanner < totalSlides - 1) {
+                        goToBanner(currentBanner + 1);
+                    } else if (diff < 0 && currentBanner > 0) {
+                        goToBanner(currentBanner - 1);
+                    }
+                }
+                touchStartX = 0;
+                touchEndX = 0;
+            });
+
+            // Mouse drag support for desktop
+            let mouseStartX = 0;
+            let mouseEndX = 0;
+            let isMouseDragging = false;
+
+            sliderWrapper.addEventListener('mousedown', function(e) {
+                mouseStartX = e.screenX;
+                isMouseDragging = true;
+            });
+
+            sliderWrapper.addEventListener('mousemove', function(e) {
+                if (!isMouseDragging) return;
+                mouseEndX = e.screenX;
+            });
+
+            sliderWrapper.addEventListener('mouseup', function(e) {
+                if (!isMouseDragging) return;
+                isMouseDragging = false;
+                const diff = mouseStartX - mouseEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0 && currentBanner < totalSlides - 1) {
+                        goToBanner(currentBanner + 1);
+                    } else if (diff < 0 && currentBanner > 0) {
+                        goToBanner(currentBanner - 1);
+                    }
+                }
+                mouseStartX = 0;
+                mouseEndX = 0;
+            });
+
+            sliderWrapper.addEventListener('mouseleave', function() {
+                isMouseDragging = false;
+            });
         }
 
         // ============================================================
@@ -4532,6 +4566,7 @@
             console.log('✅ تم إضافة عدد المقاعد (2-10)');
             console.log('✅ تم إضافة كلمة المرور مع إظهار/إخفاء');
             console.log('✅ تم إضافة رسالة خطأ مخصصة');
+            console.log('✅ تم إضافة 3 بانرات مع إمكانية التقليب باللمس');
         };
 
         async function updateNotifBadge() {
