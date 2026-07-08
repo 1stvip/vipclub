@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎙️ VipClub - غرف الدردشة الصوتية</title>
+    <title>🎙️ VipChat - غرف الدردشة الصوتية</title>
     <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -27,7 +27,6 @@
             display: flex;
             flex-direction: column;
             color: #fff;
-            overflow-x: hidden;
         }
 
         ::-webkit-scrollbar {
@@ -46,13 +45,12 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             padding: 10px 16px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
             border-bottom: 2px solid #ffd700;
-            gap: 15px;
         }
 
         .header-left {
@@ -82,53 +80,18 @@
             color: #ffd700;
         }
 
-        .header-center {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         .header-center .logo {
-            font-size: 1.6rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700, #ffb800, #ffd700);
-            background-size: 300% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: goldShine 3s ease-in-out infinite;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffd700;
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            text-shadow: none;
-            letter-spacing: 1px;
-        }
-
-        @keyframes goldShine {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         .header-center .logo i {
-            font-size: 1.8rem;
-            -webkit-text-fill-color: initial;
-            color: #ffd700;
-            animation: goldShine 3s ease-in-out infinite;
-        }
-
-        .header-center .logo-tag {
-            font-size: 0.7rem;
-            color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
-            padding: 2px 10px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            -webkit-text-fill-color: initial;
-            color: #ffd700;
+            font-size: 1.6rem;
         }
 
         .header-right {
@@ -173,56 +136,72 @@
             font-weight: bold;
         }
 
-        /* ===== هيرو بانر جديد ===== */
         .hero-banner-wrapper {
             position: relative;
             margin: 16px 16px 20px;
             border-radius: 16px;
             overflow: hidden;
-            height: 180px;
-            touch-action: pan-y;
-            user-select: none;
+            height: 160px;
         }
 
-        .hero-banner-slider {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            will-change: transform;
-            direction: ltr;
-        }
-
-        .hero-banner-slide {
-            min-width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .hero-banner-slide .slide-overlay {
+        .hero-banner {
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 1;
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            padding: 30px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
-        .hero-banner-slide .slide-content {
+        .hero-banner .vip-wave {
+            position: absolute;
+            inset: 0;
+            background: #0a0a1a;
+            overflow: hidden;
+        }
+
+        .hero-banner .vip-wave::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, transparent 40%, rgba(0, 0, 0, 0.8) 60%, #0a0a1a 100%);
+            animation: waveMove 6s ease-in-out infinite;
+        }
+
+        .hero-banner .vip-wave::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 70% 50%, transparent 40%, rgba(0, 0, 0, 0.6) 60%, #0a0a1a 100%);
+            animation: waveMove 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes waveMove {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(5%, 5%) rotate(5deg); }
+            50% { transform: translate(10%, 0) rotate(0deg); }
+            75% { transform: translate(5%, -5%) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .hero-banner .hero-content {
             position: relative;
             z-index: 2;
-            text-align: center;
-            padding: 20px;
-            color: #fff;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
         }
 
-        .hero-banner-slide .slide-content .hero-title {
+        .hero-banner .hero-title {
             font-size: 2rem;
             font-weight: 900;
             color: #ffd700;
@@ -230,25 +209,36 @@
             letter-spacing: 2px;
         }
 
-        .hero-banner-slide .slide-content .hero-subtitle {
-            color: #e2e8f0;
+        .hero-banner .hero-subtitle {
+            color: #c8d6e5;
             font-size: 1rem;
             margin-top: 6px;
             font-weight: 300;
             letter-spacing: 1px;
         }
 
-        .hero-banner-slide .slide-content .hero-tag {
+        .hero-banner .hero-tag {
             display: inline-block;
             margin-top: 10px;
-            background: rgba(255, 215, 0, 0.15);
+            background: rgba(255, 215, 0, 0.12);
             padding: 6px 20px;
             border-radius: 30px;
             color: #ffd700;
             font-size: 0.75rem;
             border: 1px solid rgba(255, 215, 0, 0.2);
             letter-spacing: 1px;
-            backdrop-filter: blur(4px);
+        }
+
+        .hero-banner.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .hero-banner.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
         }
 
         .hero-dots {
@@ -406,7 +396,7 @@
             width: 100%;
             aspect-ratio: 16/9;
             overflow: hidden;
-            background-size: cover;
+            background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #1a1a2e;
@@ -423,10 +413,10 @@
         .room-card .room-banner .overlay-image {
             position: absolute;
             z-index: 4;
-            width: 60%;
-            height: 60%;
-            top: 4px;
-            left: 4px;
+            width: 30%;
+            height: 30%;
+            top: 6px;
+            right: 6px;
             object-fit: contain;
             pointer-events: none;
             opacity: 0.9;
@@ -437,7 +427,7 @@
         .room-card .room-banner .room-status {
             position: absolute;
             top: 8px;
-            right: 10px;
+            left: 10px;
             background: #10b981;
             color: #fff;
             padding: 2px 10px;
@@ -452,6 +442,17 @@
 
         .room-card .room-banner .room-status i {
             font-size: 0.4rem;
+        }
+
+        /* ===== النص الافتراضي للخلفية ===== */
+        .room-card .room-banner .default-bg-text {
+            position: relative;
+            z-index: 2;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            letter-spacing: 3px;
         }
 
         .room-card .room-body {
@@ -1984,6 +1985,7 @@
             background: #3a3a5a;
         }
 
+        /* ===== معاينة البطاقة ===== */
         .card-preview {
             background: #0f0f1f;
             border-radius: 12px;
@@ -2003,10 +2005,10 @@
 
         .card-preview .preview-overlay-image {
             position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 60%;
-            height: 60%;
+            top: 6px;
+            right: 6px;
+            width: 30%;
+            height: 30%;
             object-fit: contain;
             pointer-events: none;
             z-index: 4;
@@ -2138,14 +2140,10 @@
 
         @media (max-width: 600px) {
             .header-center .logo {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
             .header-center .logo i {
-                font-size: 1.3rem;
-            }
-            .header-center .logo-tag {
-                font-size: 0.55rem;
-                padding: 1px 6px;
+                font-size: 1.2rem;
             }
             .header-left .icon-btn,
             .header-right .icon-btn {
@@ -2154,13 +2152,13 @@
                 font-size: 0.9rem;
             }
             .hero-banner-wrapper {
-                height: 150px;
+                height: 140px;
                 margin: 12px 12px 16px;
             }
-            .hero-banner-slide .slide-content .hero-title {
+            .hero-banner .hero-title {
                 font-size: 1.5rem;
             }
-            .hero-banner-slide .slide-content .hero-subtitle {
+            .hero-banner .hero-subtitle {
                 font-size: 0.85rem;
             }
             .rooms-grid {
@@ -2225,10 +2223,10 @@
                 right: 5px;
             }
             .room-card .room-banner .overlay-image {
-                width: 60%;
-                height: 60%;
+                width: 25%;
+                height: 25%;
                 top: 4px;
-                left: 4px;
+                right: 4px;
             }
             .room-card .room-body .room-host {
                 gap: 10px;
@@ -2272,11 +2270,7 @@
                 padding: 6px 10px;
             }
             .header-center .logo {
-                font-size: 1rem;
-            }
-            .header-center .logo-tag {
-                font-size: 0.5rem;
-                padding: 1px 4px;
+                font-size: 0.95rem;
             }
             .header-left .icon-btn,
             .header-right .icon-btn {
@@ -2288,7 +2282,7 @@
                 height: 120px;
                 margin: 8px 8px 12px;
             }
-            .hero-banner-slide .slide-content .hero-title {
+            .hero-banner .hero-title {
                 font-size: 1.2rem;
             }
             .profile-dropdown {
@@ -2316,8 +2310,8 @@
                 max-width: 98%;
             }
             .room-card .room-banner .overlay-image {
-                width: 60%;
-                height: 60%;
+                width: 20%;
+                height: 20%;
             }
             .room-card .room-body .room-host {
                 gap: 8px;
@@ -2369,12 +2363,10 @@
         </div>
 
         <div class="header-center">
-            <span class="logo-tag">VIP</span>
             <div class="logo" onclick="showHome()">
                 <i class="fas fa-crown"></i>
-                VipClub
+                VipChat
             </div>
-            <span class="logo-tag">CLUB</span>
         </div>
 
         <div class="header-right">
@@ -2493,41 +2485,27 @@
         <!-- ===== HOME PAGE ===== -->
         <div id="homePage" class="page active">
 
-            <!-- ===== HERO BANNER SLIDER ===== -->
-            <div class="hero-banner-wrapper" id="heroBannerWrapper">
-                <div class="hero-banner-slider" id="heroSlider">
-                    <!-- بانر 1 -->
-                    <div class="hero-banner-slide" style="background-image: url('images/chathtml/banners/banner1.png');">
-                        <div class="slide-overlay"></div>
-                        <div class="slide-content">
-                            <div class="hero-title">🌟 VIP CLUB</div>
-                            <div class="hero-subtitle">نادي كبار الشخصيات</div>
-                            <div class="hero-tag">✨ اللحظات المميزة للأشخاص المميزون فقط ✨</div>
-                        </div>
-                    </div>
-                    <!-- بانر 2 -->
-                    <div class="hero-banner-slide" style="background-image: url('images/chathtml/banners/banner2.png');">
-                        <div class="slide-overlay"></div>
-                        <div class="slide-content">
-                            <div class="hero-title">🎙️ مرحباً بك</div>
-                            <div class="hero-subtitle">انضم إلى أفضل الغرف الصوتية</div>
-                            <div class="hero-tag">💬 تواصل مع كبار الشخصيات</div>
-                        </div>
-                    </div>
-                    <!-- بانر 3 -->
-                    <div class="hero-banner-slide" style="background-image: url('images/chathtml/banners/banner3.png');">
-                        <div class="slide-overlay"></div>
-                        <div class="slide-content">
-                            <div class="hero-title">🚀 انطلق الآن</div>
-                            <div class="hero-subtitle">غرف صوتية فاخرة بتقنية عالية</div>
-                            <div class="hero-tag">🌟 تجربة مميزة لكبار الشخصيات</div>
-                        </div>
+            <!-- ===== HERO BANNER ===== -->
+            <div class="hero-banner-wrapper">
+                <div class="hero-banner visible" id="banner1">
+                    <div class="vip-wave"></div>
+                    <div class="hero-content">
+                        <div class="hero-title">🌟 VIP CLUB</div>
+                        <div class="hero-subtitle">نادي كبار الشخصيات</div>
+                        <div class="hero-tag">✨ اللحظات المميزة للأشخاص المميزون فقط ✨</div>
                     </div>
                 </div>
-                <div class="hero-dots" id="heroDots">
+                <div class="hero-banner hidden" id="banner2">
+                    <div class="vip-wave"></div>
+                    <div class="hero-content">
+                        <div class="hero-title">🎙️ مرحباً بك</div>
+                        <div class="hero-subtitle">انضم إلى أفضل الغرف الصوتية</div>
+                        <div class="hero-tag">💬 تواصل مع كبار الشخصيات</div>
+                    </div>
+                </div>
+                <div class="hero-dots">
                     <span class="dot active" onclick="goToBanner(0)"></span>
                     <span class="dot" onclick="goToBanner(1)"></span>
-                    <span class="dot" onclick="goToBanner(2)"></span>
                 </div>
             </div>
 
@@ -2697,7 +2675,7 @@
             <div class="form-group">
                 <label>📋 معاينة البطاقة</label>
                 <div class="card-preview" id="cardPreview">
-                    <div class="preview-placeholder">🎙️ VipClub</div>
+                    <div class="preview-placeholder">🎙️ VipChat</div>
                 </div>
             </div>
 
@@ -2937,37 +2915,36 @@
 
             // ===== تعيين الخلفية =====
             if (bgValue && bgValue !== 'default') {
+                // خلفية مخصصة من الصور
                 preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
-                preview.style.backgroundSize = 'contain';
-                preview.style.backgroundPosition = 'center';
-                preview.style.backgroundRepeat = 'no-repeat';
-                preview.style.backgroundColor = '#1a1a2e';
-            } else {
-                // الخلفية الافتراضية - صورة ثابتة
-                preview.style.backgroundImage = `url('images/chathtml/roomsbg/roommk (0).png')`;
                 preview.style.backgroundSize = 'cover';
                 preview.style.backgroundPosition = 'center';
-                preview.style.backgroundRepeat = 'no-repeat';
+                preview.style.backgroundColor = 'transparent';
+            } else {
+                // الخلفية الافتراضية - تدرج لوني مع نص
+                preview.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
                 preview.style.backgroundColor = '#1a1a2e';
             }
 
             // ===== إضافة النص الافتراضي في المنتصف =====
             const textDiv = document.createElement('div');
             textDiv.className = 'preview-text';
-            textDiv.textContent = '🎙️ VIP CLUB';
+            textDiv.textContent = '🎙️ VIP CHAT';
             preview.appendChild(textDiv);
 
-            // ===== إضافة الصورة العلوية في أعلى اليسار =====
+            // ===== إضافة الصورة العلوية في أعلى اليمين (مصغرة) =====
             if (overlayValue && overlayValue !== 'none') {
                 const overlayImg = document.createElement('img');
                 overlayImg.className = 'preview-overlay-image';
                 overlayImg.src = `images/chathtml/${overlayValue}`;
                 overlayImg.alt = 'صورة علوية';
                 overlayImg.style.position = 'absolute';
-                overlayImg.style.top = '4px';
-                overlayImg.style.left = '4px';
-                overlayImg.style.width = '60%';
-                overlayImg.style.height = '60%';
+                overlayImg.style.top = '6px';
+                overlayImg.style.right = '6px';
+                overlayImg.style.width = '30%';
+                overlayImg.style.height = '30%';
                 overlayImg.style.objectFit = 'contain';
                 overlayImg.style.pointerEvents = 'none';
                 overlayImg.style.zIndex = '4';
@@ -3222,13 +3199,6 @@
                 );
             }
 
-            // ترتيب الغرف بحيث تظهر الغرفة رقم 1 في المقدمة دائماً
-            filtered.sort((a, b) => {
-                if (a.id === "1") return -1;
-                if (b.id === "1") return 1;
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            });
-
             if (filtered.length === 0) {
                 grid.innerHTML = `
                             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
@@ -3247,16 +3217,22 @@
                     bgStyle =
                         `background-image: url('images/chathtml/${room.background}'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 } else {
-                    // الخلفية الافتراضية - صورة ثابتة
+                    // الخلفية الافتراضية - تدرج لوني مع نص
                     bgStyle =
-                        `background-image: url('images/chathtml/roomsbg/roommk (0).png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
+                        'background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); background-size: cover; background-position: center; background-color: #1a1a2e;';
                 }
 
-                // الصورة العلوية في أعلى اليسار
+                // الصورة العلوية
                 let overlayImg = '';
                 if (room.overlayImage && room.overlayImage !== 'none') {
                     overlayImg =
-                        `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة" style="position:absolute; z-index:4; width:60%; height:60%; top:4px; left:4px; object-fit:contain; pointer-events:none; opacity:0.9; filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5)); border-radius:6px;" onerror="this.style.display='none'">`;
+                        `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة" onerror="this.style.display='none'">`;
+                }
+
+                // النص الافتراضي للخلفية (يظهر فقط إذا كانت الخلفية default)
+                let defaultText = '';
+                if (!room.background || room.background === 'default') {
+                    defaultText = `<div class="default-bg-text">🎙️ VIP CHAT</div>`;
                 }
 
                 // حالة الخصوصية
@@ -3271,6 +3247,7 @@
                                 <div class="room-banner" style="${bgStyle}">
                                     <div class="banner-overlay"></div>
                                     ${overlayImg}
+                                    ${defaultText}
                                     <div class="room-status"><i class="fas fa-circle"></i> مباشر</div>
                                 </div>
                                 <div class="room-body">
@@ -4279,21 +4256,14 @@
         // ============================================================
         // 🖥️ HERO BANNER SLIDER
         // ============================================================
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let isDragging = false;
-        let sliderWrapper = document.getElementById('heroBannerWrapper');
-        let slider = document.getElementById('heroSlider');
-        let totalSlides = 3;
-
         function startBannerSlider() {
             stopBannerSlider();
             currentBanner = 0;
-            updateSlider();
+            showBanner(currentBanner);
             bannerInterval = setInterval(() => {
-                currentBanner = (currentBanner + 1) % totalSlides;
-                updateSlider();
-            }, 5000);
+                currentBanner = (currentBanner + 1) % 2;
+                showBanner(currentBanner);
+            }, 4000);
         }
 
         function stopBannerSlider() {
@@ -4303,88 +4273,36 @@
             }
         }
 
-        function updateSlider() {
-            if (slider) {
-                slider.style.transform = `translateX(-${currentBanner * 100}%)`;
-            }
+        function showBanner(index) {
+            const banner1 = document.getElementById('banner1');
+            const banner2 = document.getElementById('banner2');
             const dots = document.querySelectorAll('.hero-dots .dot');
+
+            if (index === 0) {
+                banner1.classList.remove('hidden');
+                banner1.classList.add('visible');
+                banner2.classList.remove('visible');
+                banner2.classList.add('hidden');
+            } else {
+                banner2.classList.remove('hidden');
+                banner2.classList.add('visible');
+                banner1.classList.remove('visible');
+                banner1.classList.add('hidden');
+            }
+
             dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentBanner);
+                dot.classList.toggle('active', i === index);
             });
         }
 
         function goToBanner(index) {
-            if (index >= 0 && index < totalSlides) {
-                currentBanner = index;
-                updateSlider();
-                stopBannerSlider();
-                bannerInterval = setInterval(() => {
-                    currentBanner = (currentBanner + 1) % totalSlides;
-                    updateSlider();
-                }, 5000);
-            }
-        }
-
-        // ===== Touch Events for Swipe =====
-        if (sliderWrapper) {
-            sliderWrapper.addEventListener('touchstart', function(e) {
-                touchStartX = e.changedTouches[0].screenX;
-                isDragging = true;
-            });
-
-            sliderWrapper.addEventListener('touchmove', function(e) {
-                if (!isDragging) return;
-                touchEndX = e.changedTouches[0].screenX;
-            });
-
-            sliderWrapper.addEventListener('touchend', function(e) {
-                if (!isDragging) return;
-                isDragging = false;
-                const diff = touchStartX - touchEndX;
-                if (Math.abs(diff) > 50) {
-                    if (diff < 0 && currentBanner < totalSlides - 1) {
-                        goToBanner(currentBanner + 1);
-                    } else if (diff > 0 && currentBanner > 0) {
-                        goToBanner(currentBanner - 1);
-                    }
-                }
-                touchStartX = 0;
-                touchEndX = 0;
-            });
-
-            // Mouse drag support for desktop
-            let mouseStartX = 0;
-            let mouseEndX = 0;
-            let isMouseDragging = false;
-
-            sliderWrapper.addEventListener('mousedown', function(e) {
-                mouseStartX = e.screenX;
-                isMouseDragging = true;
-            });
-
-            sliderWrapper.addEventListener('mousemove', function(e) {
-                if (!isMouseDragging) return;
-                mouseEndX = e.screenX;
-            });
-
-            sliderWrapper.addEventListener('mouseup', function(e) {
-                if (!isMouseDragging) return;
-                isMouseDragging = false;
-                const diff = mouseStartX - mouseEndX;
-                if (Math.abs(diff) > 50) {
-                    if (diff < 0 && currentBanner < totalSlides - 1) {
-                        goToBanner(currentBanner + 1);
-                    } else if (diff > 0 && currentBanner > 0) {
-                        goToBanner(currentBanner - 1);
-                    }
-                }
-                mouseStartX = 0;
-                mouseEndX = 0;
-            });
-
-            sliderWrapper.addEventListener('mouseleave', function() {
-                isMouseDragging = false;
-            });
+            currentBanner = index;
+            showBanner(index);
+            stopBannerSlider();
+            bannerInterval = setInterval(() => {
+                currentBanner = (currentBanner + 1) % 2;
+                showBanner(currentBanner);
+            }, 4000);
         }
 
         // ============================================================
@@ -4597,7 +4515,7 @@
                             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
                                 <i class="fas fa-sign-in-alt" style="font-size:3.5rem; color:#333; margin-bottom:15px;"></i>
                                 <h3 style="color:#888;">يرجى تسجيل الدخول</h3>
-                                <p style="font-size:0.9rem;">سجل الدخول للاستمتاع بجميع مميزات VipClub</p>
+                                <p style="font-size:0.9rem;">سجل الدخول للاستمتاع بجميع مميزات VipChat</p>
                                 <button onclick="redirectToLogin()" style="margin-top:15px; padding:12px 30px; background:linear-gradient(135deg,#ffd700,#f0c000); color:#1a1a2e; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer;">
                                     <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
                                 </button>
@@ -4607,14 +4525,13 @@
 
             startBannerSlider();
 
-            console.log('🎙️ VipClub جاهز!');
+            console.log('🎙️ VipChat جاهز!');
             console.log('✅ قاعدة البيانات: stvipclub');
-            console.log('✅ تم تغيير الاسم من VipChat إلى VipClub');
-            console.log('✅ تم إضافة تاج VIP قبل الاسم وتاج CLUB بعده');
-            console.log('✅ اللوجو يلمع بألوان ذهبية متحركة');
-            console.log('✅ تم إصلاح اتجاه السحب للبانرات');
-            console.log('✅ الصورة العلوية في أعلى يسار البطاقة');
-            console.log('✅ تم إصلاح خاصية البحث');
+            console.log('✅ تم إضافة نظام تسجيل الدخول الإجباري');
+            console.log('✅ تم إضافة خلفيات وصور علوية للبطاقات');
+            console.log('✅ تم إضافة عدد المقاعد (2-10)');
+            console.log('✅ تم إضافة كلمة المرور مع إظهار/إخفاء');
+            console.log('✅ تم إضافة رسالة خطأ مخصصة');
         };
 
         async function updateNotifBadge() {
