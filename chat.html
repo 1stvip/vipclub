@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎙️ VipChat - غرف الدردشة الصوتية</title>
+    <title>🎙️ VipClub - غرف الدردشة الصوتية</title>
     <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -46,12 +46,13 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             padding: 10px 16px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
             border-bottom: 2px solid #ffd700;
+            gap: 15px;
         }
 
         .header-left {
@@ -81,18 +82,53 @@
             color: #ffd700;
         }
 
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header-center .logo {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #ffd700;
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700, #ffb800, #ffd700);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: goldShine 3s ease-in-out infinite;
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            text-shadow: none;
+            letter-spacing: 1px;
+        }
+
+        @keyframes goldShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .header-center .logo i {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
+            -webkit-text-fill-color: initial;
+            color: #ffd700;
+            animation: goldShine 3s ease-in-out infinite;
+        }
+
+        .header-center .logo-tag {
+            font-size: 0.7rem;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            -webkit-text-fill-color: initial;
+            color: #ffd700;
         }
 
         .header-right {
@@ -154,6 +190,7 @@
             height: 100%;
             transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             will-change: transform;
+            direction: ltr;
         }
 
         .hero-banner-slide {
@@ -2101,10 +2138,14 @@
 
         @media (max-width: 600px) {
             .header-center .logo {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
             }
             .header-center .logo i {
-                font-size: 1.2rem;
+                font-size: 1.3rem;
+            }
+            .header-center .logo-tag {
+                font-size: 0.55rem;
+                padding: 1px 6px;
             }
             .header-left .icon-btn,
             .header-right .icon-btn {
@@ -2231,7 +2272,11 @@
                 padding: 6px 10px;
             }
             .header-center .logo {
-                font-size: 0.95rem;
+                font-size: 1rem;
+            }
+            .header-center .logo-tag {
+                font-size: 0.5rem;
+                padding: 1px 4px;
             }
             .header-left .icon-btn,
             .header-right .icon-btn {
@@ -2324,10 +2369,12 @@
         </div>
 
         <div class="header-center">
+            <span class="logo-tag">VIP</span>
             <div class="logo" onclick="showHome()">
                 <i class="fas fa-crown"></i>
-                VipChat
+                VipClub
             </div>
+            <span class="logo-tag">CLUB</span>
         </div>
 
         <div class="header-right">
@@ -2650,7 +2697,7 @@
             <div class="form-group">
                 <label>📋 معاينة البطاقة</label>
                 <div class="card-preview" id="cardPreview">
-                    <div class="preview-placeholder">🎙️ VipChat</div>
+                    <div class="preview-placeholder">🎙️ VipClub</div>
                 </div>
             </div>
 
@@ -2907,10 +2954,10 @@
             // ===== إضافة النص الافتراضي في المنتصف =====
             const textDiv = document.createElement('div');
             textDiv.className = 'preview-text';
-            textDiv.textContent = '🎙️ VIP CHAT';
+            textDiv.textContent = '🎙️ VIP CLUB';
             preview.appendChild(textDiv);
 
-            // ===== إضافة الصورة العلوية في أعلى اليسار (مصغرة) =====
+            // ===== إضافة الصورة العلوية في أعلى اليسار =====
             if (overlayValue && overlayValue !== 'none') {
                 const overlayImg = document.createElement('img');
                 overlayImg.className = 'preview-overlay-image';
@@ -4295,9 +4342,9 @@
                 isDragging = false;
                 const diff = touchStartX - touchEndX;
                 if (Math.abs(diff) > 50) {
-                    if (diff > 0 && currentBanner < totalSlides - 1) {
+                    if (diff < 0 && currentBanner < totalSlides - 1) {
                         goToBanner(currentBanner + 1);
-                    } else if (diff < 0 && currentBanner > 0) {
+                    } else if (diff > 0 && currentBanner > 0) {
                         goToBanner(currentBanner - 1);
                     }
                 }
@@ -4325,9 +4372,9 @@
                 isMouseDragging = false;
                 const diff = mouseStartX - mouseEndX;
                 if (Math.abs(diff) > 50) {
-                    if (diff > 0 && currentBanner < totalSlides - 1) {
+                    if (diff < 0 && currentBanner < totalSlides - 1) {
                         goToBanner(currentBanner + 1);
-                    } else if (diff < 0 && currentBanner > 0) {
+                    } else if (diff > 0 && currentBanner > 0) {
                         goToBanner(currentBanner - 1);
                     }
                 }
@@ -4550,7 +4597,7 @@
                             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
                                 <i class="fas fa-sign-in-alt" style="font-size:3.5rem; color:#333; margin-bottom:15px;"></i>
                                 <h3 style="color:#888;">يرجى تسجيل الدخول</h3>
-                                <p style="font-size:0.9rem;">سجل الدخول للاستمتاع بجميع مميزات VipChat</p>
+                                <p style="font-size:0.9rem;">سجل الدخول للاستمتاع بجميع مميزات VipClub</p>
                                 <button onclick="redirectToLogin()" style="margin-top:15px; padding:12px 30px; background:linear-gradient(135deg,#ffd700,#f0c000); color:#1a1a2e; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer;">
                                     <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
                                 </button>
@@ -4560,16 +4607,14 @@
 
             startBannerSlider();
 
-            console.log('🎙️ VipChat جاهز!');
+            console.log('🎙️ VipClub جاهز!');
             console.log('✅ قاعدة البيانات: stvipclub');
-            console.log('✅ تم إضافة نظام تسجيل الدخول الإجباري');
-            console.log('✅ تم إضافة خلفيات وصور علوية للبطاقات');
-            console.log('✅ تم إضافة عدد المقاعد (2-10)');
-            console.log('✅ تم إضافة كلمة المرور مع إظهار/إخفاء');
-            console.log('✅ تم إضافة رسالة خطأ مخصصة');
-            console.log('✅ تم إضافة 3 بانرات مع إمكانية التقليب باللمس');
-            console.log('✅ تم إصلاح الإسكرول (الاتجاه من اليمين لليسار)');
-            console.log('✅ تم نقل الصور العلوية إلى أعلى اليسار');
+            console.log('✅ تم تغيير الاسم من VipChat إلى VipClub');
+            console.log('✅ تم إضافة تاج VIP قبل الاسم وتاج CLUB بعده');
+            console.log('✅ اللوجو يلمع بألوان ذهبية متحركة');
+            console.log('✅ تم إصلاح اتجاه السحب للبانرات');
+            console.log('✅ الصورة العلوية في أعلى يسار البطاقة');
+            console.log('✅ تم إصلاح خاصية البحث');
         };
 
         async function updateNotifBadge() {
