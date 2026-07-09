@@ -136,97 +136,25 @@
             font-weight: bold;
         }
 
+        /* ===== هيرو بنرات محسّنة ===== */
         .hero-banner-wrapper {
             position: relative;
-            margin: 16px 16px 20px;
+            margin: 12px 12px 16px;
             border-radius: 16px;
             overflow: hidden;
-            height: 160px;
+            height: 180px;
+            background: #0a0a1a;
         }
 
         .hero-banner {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
-            padding: 30px 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: 100%;
             transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .hero-banner .vip-wave {
-            position: absolute;
-            inset: 0;
-            background: #0a0a1a;
-            overflow: hidden;
-        }
-
-        .hero-banner .vip-wave::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 50%, transparent 40%, rgba(0, 0, 0, 0.8) 60%, #0a0a1a 100%);
-            animation: waveMove 6s ease-in-out infinite;
-        }
-
-        .hero-banner .vip-wave::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 70% 50%, transparent 40%, rgba(0, 0, 0, 0.6) 60%, #0a0a1a 100%);
-            animation: waveMove 8s ease-in-out infinite reverse;
-        }
-
-        @keyframes waveMove {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(5%, 5%) rotate(5deg); }
-            50% { transform: translate(10%, 0) rotate(0deg); }
-            75% { transform: translate(5%, -5%) rotate(-5deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-
-        .hero-banner .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-banner .hero-title {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-            letter-spacing: 2px;
-        }
-
-        .hero-banner .hero-subtitle {
-            color: #c8d6e5;
-            font-size: 1rem;
-            margin-top: 6px;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        .hero-banner .hero-tag {
-            display: inline-block;
-            margin-top: 10px;
-            background: rgba(255, 215, 0, 0.12);
-            padding: 6px 20px;
-            border-radius: 30px;
-            color: #ffd700;
-            font-size: 0.75rem;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            letter-spacing: 1px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .hero-banner.hidden {
@@ -239,6 +167,14 @@
             opacity: 1;
             transform: scale(1);
             pointer-events: auto;
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
         }
 
         .hero-dots {
@@ -410,18 +346,24 @@
             z-index: 1;
         }
 
+        /* ===== الصورة العلوية المحسّنة ===== */
         .room-card .room-banner .overlay-image {
             position: absolute;
             z-index: 4;
-            width: 30%;
-            height: 30%;
-            top: 6px;
-            right: 6px;
+            width: 35%;
+            height: auto;
+            max-height: 45%;
+            min-width: 60px;
+            max-width: 140px;
+            top: 8px;
+            right: 8px;
             object-fit: contain;
             pointer-events: none;
             opacity: 0.9;
             filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
             border-radius: 6px;
+            aspect-ratio: auto;
+            image-rendering: auto;
         }
 
         .room-card .room-banner .room-status {
@@ -444,7 +386,6 @@
             font-size: 0.4rem;
         }
 
-        /* ===== النص الافتراضي للخلفية ===== */
         .room-card .room-banner .default-bg-text {
             position: relative;
             z-index: 2;
@@ -612,6 +553,86 @@
         .room-card .room-footer .join-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 20px rgba(255, 215, 0, 0.25);
+        }
+
+        /* ===== تحسين البنرات للهواتف ===== */
+        @media (max-width: 768px) {
+            .hero-banner-wrapper {
+                height: 160px;
+                margin: 10px 10px 14px;
+                border-radius: 14px;
+            }
+            
+            .hero-banner img {
+                object-fit: cover;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-banner-wrapper {
+                height: 140px;
+                margin: 8px 8px 12px;
+                border-radius: 12px;
+            }
+            
+            .hero-banner {
+                border-radius: 12px;
+            }
+            
+            .hero-banner img {
+                object-fit: cover;
+                object-position: center;
+            }
+            
+            .hero-dots {
+                bottom: 8px;
+                gap: 6px;
+            }
+            
+            .hero-dots .dot {
+                width: 6px;
+                height: 6px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hero-banner-wrapper {
+                height: 120px;
+                margin: 6px 6px 10px;
+                border-radius: 10px;
+            }
+            
+            .hero-banner {
+                border-radius: 10px;
+            }
+        }
+
+        /* ===== تحسين الصور العلوية للشاشات المختلفة ===== */
+        @media (max-width: 768px) {
+            .room-card .room-banner .overlay-image {
+                width: 38%;
+                max-width: 120px;
+                top: 6px;
+                right: 6px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .room-card .room-banner .overlay-image {
+                width: 40%;
+                max-width: 100px;
+                top: 5px;
+                right: 5px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .room-card .room-banner .overlay-image {
+                width: 45%;
+                max-width: 80px;
+                top: 4px;
+                right: 4px;
+            }
         }
 
         .profile-dropdown {
@@ -1993,28 +2014,34 @@
             border: 1px solid #2a2a4a;
             position: relative;
             min-height: 150px;
-            background-size: cover;
+            background-size: contain;
             background-position: center;
+            background-repeat: no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             width: 100%;
             aspect-ratio: 16/9;
+            background-color: #1a1a2e;
         }
 
         .card-preview .preview-overlay-image {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 30%;
-            height: 30%;
+            top: 8px;
+            right: 8px;
+            width: 35%;
+            height: auto;
+            max-height: 45%;
+            min-width: 60px;
+            max-width: 140px;
             object-fit: contain;
             pointer-events: none;
             z-index: 4;
             opacity: 0.9;
             filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
             border-radius: 6px;
+            aspect-ratio: auto;
         }
 
         .card-preview .preview-text {
@@ -2036,6 +2063,34 @@
             color: #444;
             font-size: 0.8rem;
             z-index: 1;
+        }
+
+        /* ===== تحسين معاينة البطاقة للشاشات الصغيرة ===== */
+        @media (max-width: 768px) {
+            .card-preview .preview-overlay-image {
+                width: 38%;
+                max-width: 120px;
+                top: 6px;
+                right: 6px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .card-preview .preview-overlay-image {
+                width: 40%;
+                max-width: 100px;
+                top: 5px;
+                right: 5px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .card-preview .preview-overlay-image {
+                width: 45%;
+                max-width: 80px;
+                top: 4px;
+                right: 4px;
+            }
         }
 
         .bottom-nav {
@@ -2151,16 +2206,6 @@
                 height: 32px;
                 font-size: 0.9rem;
             }
-            .hero-banner-wrapper {
-                height: 140px;
-                margin: 12px 12px 16px;
-            }
-            .hero-banner .hero-title {
-                font-size: 1.5rem;
-            }
-            .hero-banner .hero-subtitle {
-                font-size: 0.85rem;
-            }
             .rooms-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
@@ -2222,12 +2267,6 @@
                 max-width: 92vw;
                 right: 5px;
             }
-            .room-card .room-banner .overlay-image {
-                width: 25%;
-                height: 25%;
-                top: 4px;
-                right: 4px;
-            }
             .room-card .room-body .room-host {
                 gap: 10px;
             }
@@ -2278,13 +2317,6 @@
                 height: 28px;
                 font-size: 0.75rem;
             }
-            .hero-banner-wrapper {
-                height: 120px;
-                margin: 8px 8px 12px;
-            }
-            .hero-banner .hero-title {
-                font-size: 1.2rem;
-            }
             .profile-dropdown {
                 width: 300px;
                 max-width: 95vw;
@@ -2308,10 +2340,6 @@
             .modal-content {
                 padding: 15px;
                 max-width: 98%;
-            }
-            .room-card .room-banner .overlay-image {
-                width: 20%;
-                height: 20%;
             }
             .room-card .room-body .room-host {
                 gap: 8px;
@@ -2488,24 +2516,18 @@
             <!-- ===== HERO BANNER ===== -->
             <div class="hero-banner-wrapper">
                 <div class="hero-banner visible" id="banner1">
-                    <div class="vip-wave"></div>
-                    <div class="hero-content">
-                        <div class="hero-title">🌟 VIP CLUB</div>
-                        <div class="hero-subtitle">نادي كبار الشخصيات</div>
-                        <div class="hero-tag">✨ اللحظات المميزة للأشخاص المميزون فقط ✨</div>
-                    </div>
+                    <img src="images/chathtml/banners/banner1.png" alt="بنر 1" loading="lazy">
                 </div>
                 <div class="hero-banner hidden" id="banner2">
-                    <div class="vip-wave"></div>
-                    <div class="hero-content">
-                        <div class="hero-title">🎙️ مرحباً بك</div>
-                        <div class="hero-subtitle">انضم إلى أفضل الغرف الصوتية</div>
-                        <div class="hero-tag">💬 تواصل مع كبار الشخصيات</div>
-                    </div>
+                    <img src="images/chathtml/banners/banner2.png" alt="بنر 2" loading="lazy">
+                </div>
+                <div class="hero-banner hidden" id="banner3">
+                    <img src="images/chathtml/banners/banner3.png" alt="بنر 3" loading="lazy">
                 </div>
                 <div class="hero-dots">
                     <span class="dot active" onclick="goToBanner(0)"></span>
                     <span class="dot" onclick="goToBanner(1)"></span>
+                    <span class="dot" onclick="goToBanner(2)"></span>
                 </div>
             </div>
 
@@ -2780,6 +2802,7 @@
         let bannerInterval = null;
         let currentBanner = 0;
         let isLoggedIn = false;
+        let allRooms = [];
 
         // ============================================================
         // 🌍 COUNTRIES DATA
@@ -2825,8 +2848,8 @@
         const bgImages = [];
         const overlayImages = [];
 
-        // خلفيات البطاقات (1-10) - من مجلد roomsbg
-        for (let i = 1; i <= 10; i++) {
+        // خلفيات البطاقات (0-10) - من مجلد roomsbg
+        for (let i = 0; i <= 10; i++) {
             bgImages.push(`roomsbg/roommk (${i}).png`);
         }
 
@@ -2873,6 +2896,7 @@
             if (isLoggedIn) {
                 logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> تسجيل الخروج';
                 logoutBtn.className = 'action-btn btn-logout';
+                logoutBtn.onclick = function() { logout(); };
             } else {
                 logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
                 logoutBtn.className = 'action-btn btn-profile';
@@ -2917,14 +2941,16 @@
             if (bgValue && bgValue !== 'default') {
                 // خلفية مخصصة من الصور
                 preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
-                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundSize = 'contain';
                 preview.style.backgroundPosition = 'center';
-                preview.style.backgroundColor = 'transparent';
+                preview.style.backgroundRepeat = 'no-repeat';
+                preview.style.backgroundColor = '#1a1a2e';
             } else {
-                // الخلفية الافتراضية - تدرج لوني مع نص
-                preview.style.backgroundImage = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
-                preview.style.backgroundSize = 'cover';
+                // الخلفية الافتراضية
+                preview.style.backgroundImage = `url('images/chathtml/roomsbg/roommk (0).png')`;
+                preview.style.backgroundSize = 'contain';
                 preview.style.backgroundPosition = 'center';
+                preview.style.backgroundRepeat = 'no-repeat';
                 preview.style.backgroundColor = '#1a1a2e';
             }
 
@@ -2940,23 +2966,9 @@
                 overlayImg.className = 'preview-overlay-image';
                 overlayImg.src = `images/chathtml/${overlayValue}`;
                 overlayImg.alt = 'صورة علوية';
-                overlayImg.style.position = 'absolute';
-                overlayImg.style.top = '6px';
-                overlayImg.style.right = '6px';
-                overlayImg.style.width = '30%';
-                overlayImg.style.height = '30%';
-                overlayImg.style.objectFit = 'contain';
-                overlayImg.style.pointerEvents = 'none';
-                overlayImg.style.zIndex = '4';
-                overlayImg.style.opacity = '0.9';
-                overlayImg.style.filter = 'drop-shadow(0 2px 10px rgba(0,0,0,0.5))';
-                overlayImg.style.borderRadius = '6px';
                 overlayImg.onerror = function() {
                     console.log('❌ فشل تحميل الصورة العلوية:', overlayValue);
                     this.style.display = 'none';
-                };
-                overlayImg.onload = function() {
-                    console.log('✅ تم تحميل الصورة العلوية:', overlayValue);
                 };
                 preview.appendChild(overlayImg);
             }
@@ -3115,7 +3127,10 @@
         // 📋 LOAD ROOMS
         // ============================================================
         async function loadRooms() {
-            if (!database) return;
+            if (!database) {
+                console.error('Database not initialized');
+                return;
+            }
 
             try {
                 const snapshot = await database.ref('rooms').once('value');
@@ -3154,11 +3169,13 @@
                         background: room.background || 'default',
                         overlayImage: room.overlayImage || 'none',
                         hasPassword: room.hasPassword || false,
+                        password: room.password || '',
                         createdAt: room.createdAt || new Date().toISOString()
                     });
                 }
 
-                renderRooms(rooms);
+                allRooms = rooms;
+                applyFiltersAndSearch();
 
             } catch (error) {
                 console.error('Error loading rooms:', error);
@@ -3167,28 +3184,40 @@
                                 <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#ff4757; margin-bottom:15px;"></i>
                                 <h3 style="color:#888;">خطأ في تحميل الغرف</h3>
                                 <p style="font-size:0.9rem;">يرجى تحديث الصفحة</p>
+                                <button onclick="loadRooms()" style="margin-top:15px; padding:8px 20px; background:#ffd700; color:#1a1a2e; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+                                    <i class="fas fa-sync-alt"></i> إعادة تحميل
+                                </button>
                             </div>
                         `;
             }
         }
 
-        function renderRooms(rooms) {
-            const grid = document.getElementById('roomsGrid');
+        function applyFiltersAndSearch() {
+            let filtered = [...allRooms];
 
-            let filtered = rooms;
+            // ترتيب الغرف: الغرفة رقم 1 في المقدمة
+            filtered.sort((a, b) => {
+                const aNum = parseInt(a.id);
+                const bNum = parseInt(b.id);
+                if (aNum === 1) return -1;
+                if (bNum === 1) return 1;
+                return aNum - bNum;
+            });
 
+            // تطبيق الفلتر
             if (currentFilter === 'all') {
-                filtered = rooms;
+                // لا شيء
             } else if (currentFilter === 'vip') {
-                filtered = rooms.filter(room => room.vip === true);
+                filtered = filtered.filter(room => room.vip === true);
             } else if (currentFilter === 'password') {
-                filtered = rooms.filter(room => room.hasPassword === true);
+                filtered = filtered.filter(room => room.hasPassword === true);
             } else if (currentFilter === 'public') {
-                filtered = rooms.filter(room => room.hasPassword === false);
+                filtered = filtered.filter(room => room.hasPassword === false);
             } else {
-                filtered = rooms.filter(room => getRoomTag(room) === currentFilter);
+                filtered = filtered.filter(room => getRoomTag(room) === currentFilter);
             }
 
+            // تطبيق البحث
             if (currentSearch) {
                 const search = currentSearch.toLowerCase();
                 filtered = filtered.filter(room =>
@@ -3199,7 +3228,13 @@
                 );
             }
 
-            if (filtered.length === 0) {
+            renderRooms(filtered);
+        }
+
+        function renderRooms(rooms) {
+            const grid = document.getElementById('roomsGrid');
+
+            if (rooms.length === 0) {
                 grid.innerHTML = `
                             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
                                 <i class="fas fa-microphone-slash" style="font-size:3rem; color:#333; margin-bottom:12px;"></i>
@@ -3210,32 +3245,23 @@
                 return;
             }
 
-            grid.innerHTML = filtered.map(room => {
-                // خلفية البطاقة
+            grid.innerHTML = rooms.map(room => {
                 let bgStyle = '';
                 if (room.background && room.background !== 'default') {
                     bgStyle =
                         `background-image: url('images/chathtml/${room.background}'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 } else {
-                    // الخلفية الافتراضية - تدرج لوني مع نص
+                    // الخلفية الافتراضية
                     bgStyle =
-                        'background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); background-size: cover; background-position: center; background-color: #1a1a2e;';
+                        `background-image: url('images/chathtml/roomsbg/roommk (0).png'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 }
 
-                // الصورة العلوية
                 let overlayImg = '';
                 if (room.overlayImage && room.overlayImage !== 'none') {
                     overlayImg =
                         `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة" onerror="this.style.display='none'">`;
                 }
 
-                // النص الافتراضي للخلفية (يظهر فقط إذا كانت الخلفية default)
-                let defaultText = '';
-                if (!room.background || room.background === 'default') {
-                    defaultText = `<div class="default-bg-text">🎙️ VIP CHAT</div>`;
-                }
-
-                // حالة الخصوصية
                 const privacyClass = room.hasPassword ? 'private' : 'public';
                 const privacyText = room.hasPassword ? '🔒 محمية' : '🔓 عامة';
 
@@ -3247,7 +3273,6 @@
                                 <div class="room-banner" style="${bgStyle}">
                                     <div class="banner-overlay"></div>
                                     ${overlayImg}
-                                    ${defaultText}
                                     <div class="room-status"><i class="fas fa-circle"></i> مباشر</div>
                                 </div>
                                 <div class="room-body">
@@ -3282,16 +3307,16 @@
         }
 
         function filterRooms() {
-            const search = document.getElementById('searchInput').value.trim().toLowerCase();
+            const search = document.getElementById('searchInput').value.trim();
             currentSearch = search;
-            loadRooms();
+            applyFiltersAndSearch();
         }
 
         function setFilter(filter, el) {
             currentFilter = filter;
             document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
             el.classList.add('active');
-            loadRooms();
+            applyFiltersAndSearch();
         }
 
         // ============================================================
@@ -4261,7 +4286,7 @@
             currentBanner = 0;
             showBanner(currentBanner);
             bannerInterval = setInterval(() => {
-                currentBanner = (currentBanner + 1) % 2;
+                currentBanner = (currentBanner + 1) % 3;
                 showBanner(currentBanner);
             }, 4000);
         }
@@ -4274,21 +4299,22 @@
         }
 
         function showBanner(index) {
-            const banner1 = document.getElementById('banner1');
-            const banner2 = document.getElementById('banner2');
+            const banners = [
+                document.getElementById('banner1'),
+                document.getElementById('banner2'),
+                document.getElementById('banner3')
+            ];
             const dots = document.querySelectorAll('.hero-dots .dot');
 
-            if (index === 0) {
-                banner1.classList.remove('hidden');
-                banner1.classList.add('visible');
-                banner2.classList.remove('visible');
-                banner2.classList.add('hidden');
-            } else {
-                banner2.classList.remove('hidden');
-                banner2.classList.add('visible');
-                banner1.classList.remove('visible');
-                banner1.classList.add('hidden');
-            }
+            banners.forEach((banner, i) => {
+                if (i === index) {
+                    banner.classList.remove('hidden');
+                    banner.classList.add('visible');
+                } else {
+                    banner.classList.remove('visible');
+                    banner.classList.add('hidden');
+                }
+            });
 
             dots.forEach((dot, i) => {
                 dot.classList.toggle('active', i === index);
@@ -4300,7 +4326,7 @@
             showBanner(index);
             stopBannerSlider();
             bannerInterval = setInterval(() => {
-                currentBanner = (currentBanner + 1) % 2;
+                currentBanner = (currentBanner + 1) % 3;
                 showBanner(currentBanner);
             }, 4000);
         }
@@ -4532,6 +4558,9 @@
             console.log('✅ تم إضافة عدد المقاعد (2-10)');
             console.log('✅ تم إضافة كلمة المرور مع إظهار/إخفاء');
             console.log('✅ تم إضافة رسالة خطأ مخصصة');
+            console.log('✅ تم تحسين البنرات العلوية للهواتف');
+            console.log('✅ تم تحسين حجم الصور العلوية');
+            console.log('✅ تم ترتيب الغرف (رقم 1 في المقدمة)');
         };
 
         async function updateNotifBadge() {
