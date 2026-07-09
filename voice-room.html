@@ -142,21 +142,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 50px;
+            justify-content: center;
+            gap: 30px;
             width: 100%;
             padding: 10px 0;
+            flex: 1;
         }
 
         .seats-row {
             display: flex;
             justify-content: center;
-            gap: 110px !important;
+            align-items: center;
+            gap: 60px !important;
             width: 100%;
+            flex-wrap: wrap;
         }
-        .seats-row.row-1 { max-width: 200px; }
-        .seats-row.row-2 { max-width: 460px; }
+        
+        .seats-row.row-1 { max-width: 180px; }
+        .seats-row.row-2 { max-width: 450px; }
         .seats-row.row-3 { max-width: 700px; }
-        .seats-row.row-4 { max-width: 940px; }
+        .seats-row.row-4 { max-width: 950px; }
+        .seats-row.row-5 { max-width: 1200px; }
 
         .seat-wrapper {
             position: relative;
@@ -169,8 +175,8 @@
 
         .seat-circle {
             position: relative;
-            width: 110px !important;
-            height: 110px !important;
+            width: 100px !important;
+            height: 100px !important;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -213,13 +219,13 @@
         }
 
         .seat-circle .seat-avatar {
-            width: 65px !important;
-            height: 65px !important;
+            width: 58px !important;
+            height: 58px !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem !important;
+            font-size: 1.6rem !important;
             font-weight: 700;
             color: white;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
@@ -243,10 +249,10 @@
             box-shadow: none;
         }
         .seat-circle .seat-username {
-            font-size: 0.65rem;
-            margin-top: 5px;
+            font-size: 0.6rem;
+            margin-top: 4px;
             color: #a78bfa;
-            max-width: 85px;
+            max-width: 75px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -258,9 +264,9 @@
         }
         .seat-circle .seat-username.owner-name { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.2); }
         .seat-circle .seat-number { 
-            font-size: 0.6rem; 
+            font-size: 0.55rem; 
             color: #ef4444; 
-            margin-top: 2px; 
+            margin-top: 1px; 
             z-index: 3; 
             position: relative;
             font-weight: 700;
@@ -272,8 +278,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 190px !important;
-            height: 190px !important;
+            width: 170px !important;
+            height: 170px !important;
             border-radius: 50%;
             pointer-events: none;
             z-index: 1;
@@ -413,9 +419,9 @@
 
         /* ===== CHAT AREA ===== */
         .chat-area {
-            width: 420px;
-            min-width: 320px;
-            max-width: 480px;
+            width: 380px;
+            min-width: 280px;
+            max-width: 420px;
             background: rgba(255,255,255,0.02);
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.05);
@@ -439,7 +445,6 @@
         .chat-header .online-count { font-size: 0.7rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
         .chat-header .online-count:hover { color: #ffd700; }
 
-        /* ===== تحسين عرض الرسائل ===== */
         .chat-messages {
             flex: 1;
             padding: 12px 16px;
@@ -463,7 +468,6 @@
 
         @keyframes fadeInMsg { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ===== الرسائل النظامية ===== */
         .chat-messages .message.system {
             background: rgba(255,215,0,0.06);
             color: #ffd700;
@@ -479,7 +483,6 @@
             align-self: center;
         }
 
-        /* ===== رسائل المستخدم ===== */
         .chat-messages .message.own {
             background: linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.2));
             align-self: flex-end;
@@ -1100,8 +1103,8 @@
             margin: 10px auto;
             display: inline-block;
             min-width: 140px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
             cursor: pointer;
         }
 
@@ -1646,7 +1649,7 @@
             background: #1a1a2e;
             border-radius: 16px;
             border: 1px solid #333;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             padding: 15px;
             display: none;
             z-index: 1002;
@@ -1720,14 +1723,10 @@
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
             .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 250px; }
             .seats-area { min-height: 400px; }
-            .seats-row { gap: 40px !important; }
-            .seats-row.row-1 { max-width: 160px; }
-            .seats-row.row-2 { max-width: 360px; }
-            .seats-row.row-3 { max-width: 560px; }
-            .seats-row.row-4 { max-width: 760px; }
+            .seats-row { gap: 35px !important; }
             .seat-circle { width: 80px !important; height: 80px !important; }
             .seat-circle .seat-avatar { width: 44px !important; height: 44px !important; font-size: 1.2rem !important; }
-            .seat-frame { width: 150px !important; height: 150px !important; }
+            .seat-frame { width: 140px !important; height: 140px !important; }
         }
 
         @media (max-width: 768px) {
@@ -1738,10 +1737,6 @@
             .seat-circle { width: 70px !important; height: 70px !important; }
             .seat-circle .seat-avatar { width: 38px !important; height: 38px !important; font-size: 1rem !important; }
             .seats-row { gap: 25px !important; }
-            .seats-row.row-1 { max-width: 120px; }
-            .seats-row.row-2 { max-width: 260px; }
-            .seats-row.row-3 { max-width: 400px; }
-            .seats-row.row-4 { max-width: 540px; }
             .chat-area { height: 280px; }
             .audio-controls { bottom: 20px; right: 15px; gap: 8px; }
             .audio-btn { width: 42px; height: 42px; font-size: 1rem; }
@@ -1749,7 +1744,7 @@
             #vipEntrance .vip-video-container { width: 90%; max-width: 400px; }
             #vipEntrance .vip-title { font-size: 1.3rem; padding: 8px 18px; }
             #notifDropdown { right: 10px; width: 320px; }
-            .seat-frame { width: 130px !important; height: 130px !important; }
+            .seat-frame { width: 120px !important; height: 120px !important; }
             .chat-area { width: 100%; min-width: unset; }
         }
 
@@ -2166,7 +2161,7 @@
     let viewingUserId = null;
     let hasLiked = false;
     let currentMaxSlots = 10;
-    let seatSize = 110;
+    let seatSize = 100;
 
     // ============================================================
     // 👤 USER FUNCTIONS
@@ -2323,12 +2318,26 @@
     // 💺 GET SEATS LAYOUT BASED ON MAX SLOTS
     // ============================================================
     function getSeatsLayout(maxSlots) {
-        // توزيع المقاعد في صفوف
+        // توزيع المقاعد في صفوف متوازنة
         if (maxSlots <= 2) return [{ row: 0, seats: maxSlots }];
-        if (maxSlots <= 4) return [{ row: 0, seats: Math.ceil(maxSlots/2) }, { row: 1, seats: Math.floor(maxSlots/2) }];
-        if (maxSlots <= 6) return [{ row: 0, seats: 2 }, { row: 1, seats: 2 }, { row: 2, seats: maxSlots - 4 }];
-        if (maxSlots <= 8) return [{ row: 0, seats: 2 }, { row: 1, seats: 2 }, { row: 2, seats: 2 }, { row: 3, seats: maxSlots - 6 }];
-        return [{ row: 0, seats: 2 }, { row: 1, seats: 2 }, { row: 2, seats: 3 }, { row: 3, seats: maxSlots - 7 }];
+        if (maxSlots <= 4) {
+            const first = Math.ceil(maxSlots / 2);
+            return [{ row: 0, seats: first }, { row: 1, seats: maxSlots - first }];
+        }
+        if (maxSlots <= 6) {
+            return [{ row: 0, seats: 2 }, { row: 1, seats: 2 }, { row: 2, seats: maxSlots - 4 }];
+        }
+        if (maxSlots <= 8) {
+            return [{ row: 0, seats: 2 }, { row: 1, seats: 2 }, { row: 2, seats: 2 }, { row: 3, seats: maxSlots - 6 }];
+        }
+        // 9-10 مقاعد
+        const base = Math.floor(maxSlots / 3);
+        const remainder = maxSlots % 3;
+        const rows = [];
+        for (let i = 0; i < 3; i++) {
+            rows.push({ row: i, seats: base + (i < remainder ? 1 : 0) });
+        }
+        return rows;
     }
 
     // ============================================================
@@ -2417,10 +2426,10 @@
             currentMaxSlots = roomData.maxSlots || 10;
             
             // تحديث حجم المقاعد بناءً على عدد المقاعد
-            if (currentMaxSlots <= 4) seatSize = 110;
-            else if (currentMaxSlots <= 6) seatSize = 100;
-            else if (currentMaxSlots <= 8) seatSize = 90;
-            else seatSize = 85;
+            if (currentMaxSlots <= 4) seatSize = 100;
+            else if (currentMaxSlots <= 6) seatSize = 90;
+            else if (currentMaxSlots <= 8) seatSize = 85;
+            else seatSize = 80;
             
             if (isOwner) showToast('👑 مرحباً بك كمالك الغرفة!', 'success');
             else showToast(`👋 مرحباً بك في غرفة ${roomData.name}`, 'info');
@@ -2543,7 +2552,6 @@
         const container = document.getElementById('seatsContainer');
         let html = '', occupied = 0, globalIndex = 0;
         
-        // استخدام الألوان المتاحة
         const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
         
         const seatsWithFrames = {};
@@ -2560,15 +2568,24 @@
         const creatorId = roomData?.creatorId;
         const currentUserId = currentUser?.numericId;
         
-        // الحصول على توزيع المقاعد حسب العدد الأقصى
         const layout = getSeatsLayout(currentMaxSlots);
         const totalSeats = layout.reduce((sum, row) => sum + row.seats, 0);
         
-        // تحديث حجم المقاعد
-        const seatSizeStyle = seatSize;
+        // حساب التباعد بناءً على عدد المقاعد في الصف
+        const getGap = (seatsCount) => {
+            if (seatsCount <= 1) return 0;
+            if (seatsCount <= 2) return 80;
+            if (seatsCount <= 3) return 65;
+            if (seatsCount <= 4) return 55;
+            return 45;
+        };
         
         layout.forEach((rowData, rowIndex) => {
-            html += `<div class="seats-row row-${rowIndex + 1}">`;
+            const gap = getGap(rowData.seats);
+            const isLastRow = rowIndex === layout.length - 1;
+            const rowClass = `row-${rowIndex + 1}`;
+            
+            html += `<div class="seats-row ${rowClass}" style="gap:${gap}px !important;">`;
             for (let i = 0; i < rowData.seats; i++) {
                 const seat = seats[globalIndex] || null;
                 const isOccupied = seat !== null;
@@ -2602,7 +2619,7 @@
                     if (isSpeaking) seatClass += ' speaking';
                 }
                 
-                // عند الضغط على مقعد مشغول يتم عرض الملف الشخصي
+                // عند الضغط على مقعد - يعرض الملف الشخصي للمستخدم (أو نفسك)
                 let clickHandler = isOccupied ? `onclick="openProfilePopup('${globalIndex}')"` :
                     (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${globalIndex})"` : '';
                 
@@ -2621,16 +2638,21 @@
                     frameHTML = `<div class="seat-frame"></div>`;
                 }
                 
+                // حجم الصورة الرمزية
+                const avatarSize = seatSize * 0.58;
+                const fontSize = seatSize * 0.16;
+                const usernameSize = seatSize * 0.06;
+                
                 html += `
                     <div class="${wrapperClass}">
                         ${frameHTML}
-                        <div class="${seatClass}" ${clickHandler} style="width:${seatSizeStyle}px !important;height:${seatSizeStyle}px !important;${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
+                        <div class="${seatClass}" ${clickHandler} style="width:${seatSize}px !important;height:${seatSize}px !important;${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
                             ${isOccupied ? `
                                 ${isSeatCreator ? `<div class="crown-icon">👑</div>` : ''}
-                                <div class="seat-avatar" style="width:${seatSizeStyle * 0.55}px !important;height:${seatSizeStyle * 0.55}px !important;font-size:${seatSizeStyle * 0.16}rem !important;background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''}">
+                                <div class="seat-avatar" style="width:${avatarSize}px !important;height:${avatarSize}px !important;font-size:${fontSize}rem !important;background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''}">
                                     ${avatarLetter}
                                 </div>
-                                <div class="seat-username ${isSeatCreator ? 'owner-name' : ''}" style="font-size:${seatSizeStyle * 0.06}rem;max-width:${seatSizeStyle * 0.75}px;">${displayName}</div>
+                                <div class="seat-username ${isSeatCreator ? 'owner-name' : ''}" style="font-size:${usernameSize}rem;max-width:${seatSize * 0.75}px;">${displayName}</div>
                                 <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
                                     <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
                                 </div>
@@ -2650,18 +2672,18 @@
                             ` : `
                                 ${isOwnerSeat ? `
                                     <div style="position:absolute;top:-8px;right:-4px;font-size:1.4rem;filter:drop-shadow(0 0 10px rgba(255,215,0,0.3));">👑</div>
-                                    <div class="seat-avatar" style="width:${seatSizeStyle * 0.55}px !important;height:${seatSizeStyle * 0.55}px !important;font-size:${seatSizeStyle * 0.16}rem !important;border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
+                                    <div class="seat-avatar" style="width:${avatarSize}px !important;height:${avatarSize}px !important;font-size:${fontSize}rem !important;border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
                                         <i class="fas fa-crown"></i>
                                     </div>
-                                    <div style="font-size:${seatSizeStyle * 0.05}rem;color:#ffd700;font-weight:bold;">مالك</div>
-                                    ${isOwner ? '<div style="font-size:0.45rem;color:#888;">اضغط للجلوس</div>' : ''}
+                                    <div style="font-size:${usernameSize * 0.8}rem;color:#ffd700;font-weight:bold;">مالك</div>
+                                    ${isOwner ? '<div style="font-size:0.4rem;color:#888;">اضغط للجلوس</div>' : ''}
                                 ` : `
-                                    <div class="seat-avatar" style="width:${seatSizeStyle * 0.55}px !important;height:${seatSizeStyle * 0.55}px !important;font-size:${seatSizeStyle * 0.16}rem !important;background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
+                                    <div class="seat-avatar" style="width:${avatarSize}px !important;height:${avatarSize}px !important;font-size:${fontSize}rem !important;background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
                                         <i class="fas fa-plus"></i>
                                     </div>
-                                    <div style="font-size:${seatSizeStyle * 0.045}rem;color:#555;">مقعد</div>
+                                    <div style="font-size:${usernameSize * 0.7}rem;color:#555;">مقعد</div>
                                 `}
-                                <div class="seat-number" style="font-size:${seatSizeStyle * 0.05}rem;">${globalIndex + 1}</div>
+                                <div class="seat-number" style="font-size:${usernameSize * 0.8}rem;">${globalIndex + 1}</div>
                             `}
                         </div>
                     </div>
@@ -2766,7 +2788,7 @@
     }
 
     // ============================================================
-    // 👤 PROFILE POPUP - عرض الملف الشخصي عند الضغط على مستخدم
+    // 👤 PROFILE POPUP - عرض الملف الشخصي عند الضغط على مستخدم (أو نفسك)
     // ============================================================
     async function openProfilePopup(seatIndex) {
         if (!database || !roomId) return;
@@ -2779,12 +2801,6 @@
             }
             
             const userId = seat.userId;
-            
-            // إذا كان المستخدم هو نفس المستخدم الحالي
-            if (userId == currentUser?.numericId) {
-                showToast('👤 هذا أنت!', 'info');
-                return;
-            }
             
             // جلب بيانات المستخدم من قاعدة البيانات
             const snapshot = await database.ref('users')
@@ -2801,7 +2817,7 @@
             const userKey = Object.keys(userData)[0];
             const user = userData[userKey];
             
-            // عرض الملف الشخصي
+            // عرض الملف الشخصي (سواء كان المستخدم هو نفسك أو شخص آخر)
             await showFullProfile(user, userId);
             
         } catch(error) {
@@ -2822,7 +2838,8 @@
         // التحقق من الإعجاب
         const likedBy = user.likedBy || [];
         const currentUserNumericId = currentUser?.numericId;
-        hasLiked = likedBy.includes(currentUserNumericId);
+        const isCurrentUser = userId == currentUserNumericId;
+        hasLiked = !isCurrentUser && likedBy.includes(currentUserNumericId);
         
         // الحصول على الإطار النشط للمستخدم
         let frameHTML = '';
@@ -2852,6 +2869,25 @@
         const recentVisitors = user.recentVisitors || [];
         const giftsList = user.giftsList || [];
         const totalGifts = giftsList.reduce((sum, g) => sum + (g.value || 0), 0);
+        
+        // إظهار/إخفاء أزرار الإجراءات بناءً على من هو المستخدم
+        const actionButtons = !isCurrentUser ? `
+            <div class="action-buttons-row">
+                <button class="btn-like ${hasLiked ? 'liked' : ''}" id="profileLikeBtn" onclick="sendProfileLike('${userId}')">
+                    <i class="fas fa-heart"></i> ${hasLiked ? 'تم الإعجاب' : 'إعجاب'}
+                </button>
+                <button class="btn-report" onclick="openReportModalForUser('${userId}')">
+                    <i class="fas fa-flag"></i> إبلاغ
+                </button>
+                <button class="btn-gifts" onclick="openUserGifts('${userId}')">
+                    <i class="fas fa-gift"></i> الهدايا
+                </button>
+            </div>
+        ` : `
+            <div style="color:#94a3b8; font-size:0.8rem; padding:8px; background:rgba(139,92,246,0.05); border-radius:10px; border:1px solid rgba(139,92,246,0.1);">
+                <i class="fas fa-user-circle"></i> هذا هو ملفك الشخصي
+            </div>
+        `;
         
         content.innerHTML = `
             ${avatarHTML}
@@ -2889,17 +2925,7 @@
                 </div>
             </div>
             
-            <div class="action-buttons-row">
-                <button class="btn-like ${hasLiked ? 'liked' : ''}" id="profileLikeBtn" onclick="sendProfileLike('${userId}')">
-                    <i class="fas fa-heart"></i> ${hasLiked ? 'تم الإعجاب' : 'إعجاب'}
-                </button>
-                <button class="btn-report" onclick="openReportModalForUser('${userId}')">
-                    <i class="fas fa-flag"></i> إبلاغ
-                </button>
-                <button class="btn-gifts" onclick="openUserGifts('${userId}')">
-                    <i class="fas fa-gift"></i> الهدايا
-                </button>
-            </div>
+            ${actionButtons}
             
             ${recentVisitors.length > 0 ? `
                 <div class="recent-visitors">
@@ -2972,7 +2998,6 @@
             
             const likedBy = user.likedBy || [];
             
-            // التحقق من عدم الإعجاب المسبق
             if (likedBy.includes(currentUser.numericId)) {
                 showToast('⚠️ لقد أعجبت بهذا المستخدم بالفعل', 'warning');
                 return;
@@ -2985,7 +3010,6 @@
                 likes: (user.likes || 0) + 1
             });
             
-            // تحديث زر الإعجاب
             hasLiked = true;
             const likeBtn = document.getElementById('profileLikeBtn');
             if (likeBtn) {
@@ -2993,7 +3017,6 @@
                 likeBtn.innerHTML = '<i class="fas fa-heart"></i> تم الإعجاب';
             }
             
-            // إرسال إشعار للمستخدم
             await database.ref('users/' + userKey + '/notifications').push({
                 text: `❤️ أعجب ${currentUser.nickname || currentUser.username} بملفك الشخصي!`,
                 read: false,
@@ -3004,7 +3027,6 @@
             
             showToast('❤️ تم الإعجاب بالملف الشخصي بنجاح!', 'success');
             
-            // تحديث الإحصائيات في الواجهة
             const statNumber = document.querySelector('.stats-row .stat-item:nth-child(2) .stat-number');
             if (statNumber) {
                 const currentLikes = parseInt(statNumber.textContent) || 0;
@@ -3030,7 +3052,6 @@
         document.getElementById('reportModal').style.display = 'flex';
         document.getElementById('screenOverlay').classList.add('active');
         
-        // تخزين معرف المستخدم المبلغ عنه
         document.getElementById('reportModal').dataset.reportedUserId = userId;
         document.getElementById('reportDescription').value = '';
     }
@@ -3058,7 +3079,6 @@
         }
         
         try {
-            // جلب بيانات المستخدم المبلغ عنه
             const snapshot = await database.ref('users')
                 .orderByChild('numericId')
                 .equalTo(parseInt(reportedUserId))
@@ -3072,7 +3092,6 @@
                 reportedUserName = user.nickname || user.username || 'مستخدم';
             }
             
-            // إرسال البلاغ إلى admin_notifications
             await database.ref('admin_notifications').push({
                 type: 'user_report',
                 reportedUserId: reportedUserId,
@@ -3809,11 +3828,6 @@
     }
 
     async function openProfilePopupByUserId(userId) {
-        if (userId == currentUser?.numericId) {
-            showToast('👤 هذا أنت!', 'info');
-            return;
-        }
-        
         try {
             const snapshot = await database.ref('users')
                 .orderByChild('numericId')
