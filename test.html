@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎙️ تجربة الدردشة</title>
+    <title>🎙️ تجربة الدردشة - VipChat</title>
     <style>
         * {
             margin: 0;
@@ -27,13 +27,14 @@
             background: #000000;
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.03);
-            padding: 20px;
+            padding: 20px 15px 15px;
             width: 100%;
             max-width: 682px;
             max-height: 500px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         /* ===== عنوان المقاعد ===== */
@@ -43,7 +44,8 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
         }
         .seats-title i { color: #ffd700; }
 
@@ -52,18 +54,35 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 20px;
+            justify-content: flex-start;
+            gap: 25px;
             width: 100%;
             flex: 1;
+            padding-top: 5px;
         }
 
         .seats-row {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 35px !important;
+            gap: 50px !important;
             width: 100%;
+            flex-shrink: 0;
+        }
+
+        /* ===== الصف الأول ===== */
+        .seats-row.row-1 {
+            gap: 0 !important;
+            max-width: 100px;
+            margin-bottom: 5px;
+        }
+
+        /* ===== باقي الصفوف ===== */
+        .seats-row.row-2,
+        .seats-row.row-3,
+        .seats-row.row-4 {
+            gap: 50px !important;
+            max-width: 450px;
         }
 
         .seat-wrapper {
@@ -94,6 +113,7 @@
 
         .seat-circle.owner-seat {
             border-color: #ffd700;
+            box-shadow: 0 0 30px rgba(255,215,0,0.1);
         }
 
         .seat-circle .seat-avatar {
@@ -140,6 +160,7 @@
             max-height: 300px;
             min-height: 200px;
             overflow: hidden;
+            position: relative;
         }
 
         .chat-header {
@@ -264,6 +285,7 @@
             align-items: center;
             flex-shrink: 0;
             background: rgba(0,0,0,0.2);
+            position: relative;
         }
 
         .chat-input-area .input-wrapper {
@@ -275,6 +297,7 @@
             border: 1px solid rgba(255,255,255,0.05);
             padding: 0 12px;
             min-height: 40px;
+            position: relative;
         }
 
         .chat-input-area .input-wrapper input {
@@ -289,6 +312,15 @@
         .chat-input-area .input-wrapper input::placeholder {
             color: rgba(255,255,255,0.4);
             font-size: 0.7rem;
+        }
+
+        .chat-input-area .emoji-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 4px 6px;
         }
 
         .chat-input-area .send-btn {
@@ -308,6 +340,37 @@
             box-shadow: 0 5px 20px rgba(102,126,234,0.3);
         }
 
+        .emoji-picker {
+            display: none;
+            position: absolute;
+            bottom: 45px;
+            left: 10px;
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 6px;
+            max-width: 160px;
+            max-height: 100px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            flex-wrap: wrap;
+            gap: 2px;
+            justify-content: center;
+        }
+        .emoji-picker.active { display: flex; }
+        .emoji-picker span {
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 4px;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+        .emoji-picker span:hover {
+            background: rgba(255,255,255,0.08);
+            transform: scale(1.15);
+        }
+
         /* ===== علامة تجريبية ===== */
         .demo-badge {
             background: #ffd700;
@@ -322,10 +385,16 @@
         @media (max-width: 768px) {
             .black-box {
                 max-height: 400px;
-                padding: 15px;
+                padding: 15px 10px;
             }
             .seats-row {
-                gap: 25px !important;
+                gap: 35px !important;
+            }
+            .seats-row.row-2,
+            .seats-row.row-3,
+            .seats-row.row-4 {
+                gap: 35px !important;
+                max-width: 340px;
             }
             .seat-circle {
                 width: 60px !important;
@@ -354,12 +423,21 @@
 
         @media (max-width: 480px) {
             .black-box {
-                max-height: 320px;
-                padding: 10px;
+                max-height: 340px;
+                padding: 10px 8px;
                 border-radius: 16px;
             }
+            .seats-container {
+                gap: 18px;
+            }
             .seats-row {
-                gap: 18px !important;
+                gap: 25px !important;
+            }
+            .seats-row.row-2,
+            .seats-row.row-3,
+            .seats-row.row-4 {
+                gap: 25px !important;
+                max-width: 260px;
             }
             .seat-circle {
                 width: 50px !important;
@@ -437,6 +515,16 @@
                 font-size: 0.5rem;
                 bottom: 48px;
             }
+            .emoji-picker {
+                max-width: 130px;
+                max-height: 70px;
+                bottom: 40px;
+                left: 5px;
+                padding: 4px;
+            }
+            .emoji-picker span {
+                font-size: 0.6rem;
+            }
         }
     </style>
 </head>
@@ -456,8 +544,8 @@
         </div>
 
         <div class="seats-container">
-            <!-- الصف الأول -->
-            <div class="seats-row" style="gap:35px !important; max-width:140px;">
+            <!-- ✅ الصف الأول - مقعد 1 في الأعلى -->
+            <div class="seats-row row-1">
                 <div class="seat-wrapper">
                     <div class="seat-circle owner-seat occupied">
                         <div class="seat-avatar">👑</div>
@@ -466,8 +554,8 @@
                 </div>
             </div>
 
-            <!-- الصف الثاني -->
-            <div class="seats-row" style="gap:35px !important; max-width:380px;">
+            <!-- ✅ الصف الثاني - مقاعد 2, 3, 4 -->
+            <div class="seats-row row-2">
                 <div class="seat-wrapper">
                     <div class="seat-circle occupied">
                         <div class="seat-avatar">أ</div>
@@ -482,7 +570,7 @@
                 </div>
                 <div class="seat-wrapper">
                     <div class="seat-circle">
-                        <div class="seat-avatar" style="background:rgba(255,255,255,0.05);border:2px dashed rgba(255,255,255,0.1);color:#444;">
+                        <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
@@ -490,11 +578,11 @@
                 </div>
             </div>
 
-            <!-- الصف الثالث -->
-            <div class="seats-row" style="gap:35px !important; max-width:380px;">
+            <!-- ✅ الصف الثالث - مقاعد 5, 6, 7 -->
+            <div class="seats-row row-3">
                 <div class="seat-wrapper">
                     <div class="seat-circle">
-                        <div class="seat-avatar" style="background:rgba(255,255,255,0.05);border:2px dashed rgba(255,255,255,0.1);color:#444;">
+                        <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
@@ -502,7 +590,7 @@
                 </div>
                 <div class="seat-wrapper">
                     <div class="seat-circle">
-                        <div class="seat-avatar" style="background:rgba(255,255,255,0.05);border:2px dashed rgba(255,255,255,0.1);color:#444;">
+                        <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
@@ -510,7 +598,7 @@
                 </div>
                 <div class="seat-wrapper">
                     <div class="seat-circle">
-                        <div class="seat-avatar" style="background:rgba(255,255,255,0.05);border:2px dashed rgba(255,255,255,0.1);color:#444;">
+                        <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
@@ -518,11 +606,11 @@
                 </div>
             </div>
 
-            <!-- الصف الرابع -->
-            <div class="seats-row" style="gap:35px !important; max-width:380px;">
+            <!-- ✅ الصف الرابع - مقاعد 8, 9, 10 -->
+            <div class="seats-row row-4">
                 <div class="seat-wrapper">
                     <div class="seat-circle">
-                        <div class="seat-avatar" style="background:rgba(255,255,255,0.05);border:2px dashed rgba(255,255,255,0.1);color:#444;">
+                        <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
@@ -530,7 +618,7 @@
                 </div>
                 <div class="seat-wrapper">
                     <div class="seat-circle">
-                        <div class="seat-avatar" style="background:rgba(255,255,255,0.05);border:2px dashed rgba(255,255,255,0.1);color:#444;">
+                        <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
@@ -538,7 +626,7 @@
                 </div>
                 <div class="seat-wrapper">
                     <div class="seat-circle">
-                        <div class="seat-avatar" style="background:rgba(255,255,255,0.05);border:2px dashed rgba(255,255,255,0.1);color:#444;">
+                        <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
@@ -579,7 +667,7 @@
             </div>
             <div class="message other">
                 <div class="msg-sender">سارة</div>
-                <div class="msg-text">أهلاً بالجميع! كيف أوضاعكم اليوم؟ أنا سعيدة جداً بانضمامي لهذه الغرفة الرائعة</div>
+                <div class="msg-text">أهلاً بالجميع! كيف أوضاعكم اليوم؟</div>
                 <div class="msg-time">10:35</div>
             </div>
         </div>
@@ -590,19 +678,23 @@
 
         <div class="chat-input-area">
             <div class="input-wrapper">
-                <button class="emoji-btn" onclick="toggleEmojiPicker()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;padding:4px 6px;">
+                <button class="emoji-btn" onclick="toggleEmojiPicker()">
                     <i class="fas fa-smile-wink"></i>
                 </button>
                 <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendMessage()">
-                <div class="emoji-picker" id="emojiPicker" style="display:none;position:absolute;bottom:45px;left:10px;background:#1a1a2e;border-radius:12px;padding:6px;z-index:100;flex-wrap:wrap;gap:2px;max-width:160px;">
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('😊')">😊</span>
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('😂')">😂</span>
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('❤️')">❤️</span>
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('🔥')">🔥</span>
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('👍')">👍</span>
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('👋')">👋</span>
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('🎉')">🎉</span>
-                    <span style="cursor:pointer;padding:2px;font-size:0.8rem;" onclick="insertEmoji('💪')">💪</span>
+                <div class="emoji-picker" id="emojiPicker">
+                    <span onclick="insertEmoji('😊')">😊</span>
+                    <span onclick="insertEmoji('😂')">😂</span>
+                    <span onclick="insertEmoji('❤️')">❤️</span>
+                    <span onclick="insertEmoji('🔥')">🔥</span>
+                    <span onclick="insertEmoji('👍')">👍</span>
+                    <span onclick="insertEmoji('👋')">👋</span>
+                    <span onclick="insertEmoji('🎉')">🎉</span>
+                    <span onclick="insertEmoji('💪')">💪</span>
+                    <span onclick="insertEmoji('🤔')">🤔</span>
+                    <span onclick="insertEmoji('😍')">😍</span>
+                    <span onclick="insertEmoji('🥰')">🥰</span>
+                    <span onclick="insertEmoji('😎')">😎</span>
                 </div>
             </div>
             <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
@@ -654,31 +746,29 @@
 
         function toggleEmojiPicker() {
             const picker = document.getElementById('emojiPicker');
-            picker.style.display = picker.style.display === 'flex' ? 'none' : 'flex';
+            picker.classList.toggle('active');
         }
 
         function insertEmoji(emoji) {
             const input = document.getElementById('chatInput');
             input.value += emoji;
             input.focus();
-            document.getElementById('emojiPicker').style.display = 'none';
+            document.getElementById('emojiPicker').classList.remove('active');
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             setupChatScroll();
             scrollToBottom();
 
-            // إرسال بالضغط على Enter
             document.getElementById('chatInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') sendMessage();
             });
 
-            // إغلاق الإيموجي عند الضغط خارجها
             document.addEventListener('click', function(e) {
                 const picker = document.getElementById('emojiPicker');
                 const btn = document.querySelector('.emoji-btn');
                 if (!picker.contains(e.target) && !btn.contains(e.target)) {
-                    picker.style.display = 'none';
+                    picker.classList.remove('active');
                 }
             });
         });
@@ -686,6 +776,8 @@
         console.log('✅ تجربة الدردشة جاهزة!');
         console.log('📐 المربع الأسود: 682px × 500px');
         console.log('💬 الدردشة تحت المربع الأسود');
+        console.log('🪑 المقاعد متباعدة 50px');
+        console.log('👑 المقعد الأول في الأعلى');
     </script>
 </body>
 </html>
