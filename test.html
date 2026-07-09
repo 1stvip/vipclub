@@ -27,9 +27,9 @@
             background: #000000;
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.03);
-            padding: 20px 20px 15px;
+            padding: 20px 25px 15px;
             width: 100%;
-            max-width: 719px;
+            max-width: 820px;
             height: 715px;
             max-height: 715px;
             overflow: hidden;
@@ -57,7 +57,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            gap: 28px;
+            gap: 25px;
             width: 100%;
             flex: 1;
             padding-top: 8px;
@@ -70,7 +70,7 @@
             align-items: center;
             width: 100%;
             flex-shrink: 0;
-            padding: 0 10px;
+            padding: 0 15px;
         }
 
         /* ===== الصف الأول - مقعد واحد في المنتصف ===== */
@@ -95,9 +95,17 @@
             flex-shrink: 0;
         }
 
+        /* ===== توزيع المقاعد في الصفوف ===== */
+        .seats-row.row-2 .seat-wrapper:first-child { align-items: flex-start; }
+        .seats-row.row-2 .seat-wrapper:last-child { align-items: flex-end; }
+        .seats-row.row-3 .seat-wrapper:first-child { align-items: flex-start; }
+        .seats-row.row-3 .seat-wrapper:last-child { align-items: flex-end; }
+        .seats-row.row-4 .seat-wrapper:first-child { align-items: flex-start; }
+        .seats-row.row-4 .seat-wrapper:last-child { align-items: flex-end; }
+
         .seat-circle {
-            width: 80px !important;
-            height: 80px !important;
+            width: 85px !important;
+            height: 85px !important;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -119,13 +127,13 @@
         }
 
         .seat-circle .seat-avatar {
-            width: 34px !important;
-            height: 34px !important;
+            width: 36px !important;
+            height: 36px !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem !important;
+            font-size: 0.85rem !important;
             font-weight: 700;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: white;
@@ -136,23 +144,46 @@
             color: #1a1a2e;
         }
 
+        /* ===== اسم المستخدم تحت المقعد ===== */
         .seat-username {
-            font-size: 0.55rem;
-            margin-top: 8px;
+            font-size: 0.6rem;
+            margin-top: 10px;
             color: #a78bfa;
-            max-width: 70px;
+            max-width: 80px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             text-align: center;
+            font-weight: 600;
+            min-height: 16px;
         }
 
-        .seat-username.owner-name { color: #ffd700; }
+        .seat-username.owner-name { 
+            color: #ffd700; 
+        }
+
+        /* ===== رقم المقعد (للأماكن الفارغة) ===== */
+        .seat-number {
+            font-size: 0.5rem;
+            color: #555;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .seat-wrapper .seat-number {
+            display: none;
+        }
+
+        /* ===== إظهار رقم المقعد فقط للمقاعد الفارغة ===== */
+        .seat-wrapper:not(.occupied) .seat-number {
+            display: block;
+        }
 
         /* ===== الدردشة ===== */
         .chat-container {
             width: 100%;
-            max-width: 719px;
+            max-width: 820px;
             margin-top: 15px;
             background: rgba(255,255,255,0.02);
             border-radius: 24px;
@@ -384,7 +415,7 @@
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
+        @media (max-width: 850px) {
             .black-box {
                 max-width: 100%;
                 height: auto;
@@ -392,60 +423,67 @@
                 padding: 15px 12px;
             }
             .seats-container {
-                gap: 22px;
+                gap: 20px;
+            }
+            .seats-row {
+                padding: 0 10px;
+            }
+            .seat-circle {
+                width: 70px !important;
+                height: 70px !important;
+            }
+            .seat-circle .seat-avatar {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 0.65rem !important;
+            }
+            .seat-username {
+                font-size: 0.5rem;
+                max-width: 60px;
+                margin-top: 8px;
+            }
+            .chat-container {
+                max-height: 250px;
+                min-height: 150px;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .black-box {
+                max-height: 440px;
+                padding: 12px 8px;
+                border-radius: 16px;
+            }
+            .seats-container {
+                gap: 16px;
+                padding-top: 4px;
             }
             .seats-row {
                 padding: 0 5px;
             }
             .seat-circle {
-                width: 65px !important;
-                height: 65px !important;
+                width: 60px !important;
+                height: 60px !important;
             }
             .seat-circle .seat-avatar {
-                width: 26px !important;
-                height: 26px !important;
-                font-size: 0.6rem !important;
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 0.55rem !important;
             }
             .seat-username {
                 font-size: 0.45rem;
-                max-width: 55px;
+                max-width: 50px;
+                margin-top: 6px;
+                min-height: 12px;
             }
-            .chat-container {
-                max-height: 250px;
-                min-height: 150px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .black-box {
-                max-height: 420px;
-                padding: 10px 8px;
-                border-radius: 16px;
-            }
-            .seats-container {
-                gap: 18px;
-                padding-top: 5px;
-            }
-            .seats-row {
-                padding: 0 3px;
-            }
-            .seat-circle {
-                width: 55px !important;
-                height: 55px !important;
-            }
-            .seat-circle .seat-avatar {
-                width: 22px !important;
-                height: 22px !important;
-                font-size: 0.5rem !important;
-            }
-            .seat-username {
+            .seat-number {
                 font-size: 0.4rem;
-                max-width: 45px;
-                margin-top: 5px;
+                margin-top: 6px;
             }
             .chat-container {
-                max-height: 200px;
-                min-height: 120px;
+                max-height: 220px;
+                min-height: 130px;
                 border-radius: 16px;
                 margin-top: 10px;
             }
@@ -516,6 +554,39 @@
                 font-size: 0.6rem;
             }
         }
+
+        @media (max-width: 400px) {
+            .black-box {
+                max-height: 380px;
+                padding: 8px 5px;
+            }
+            .seats-container {
+                gap: 12px;
+            }
+            .seat-circle {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            .seat-circle .seat-avatar {
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 0.45rem !important;
+            }
+            .seat-username {
+                font-size: 0.4rem;
+                max-width: 40px;
+                margin-top: 4px;
+                min-height: 10px;
+            }
+            .seat-number {
+                font-size: 0.35rem;
+                margin-top: 4px;
+            }
+            .chat-container {
+                max-height: 180px;
+                min-height: 100px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -527,7 +598,7 @@
         <span class="demo-badge">تجريبي</span>
     </div>
 
-    <!-- ===== المربع الأسود (المقاعد) ===== -->
+    <!-- ===== المربع الأسود (المقاعد) - عرض 820px ===== -->
     <div class="black-box">
         <div class="seats-title">
             <i class="fas fa-chair"></i> المقاعد <span style="color:#555;">(3/10)</span>
@@ -541,86 +612,96 @@
                         <div class="seat-avatar">👑</div>
                     </div>
                     <div class="seat-username owner-name">المالك</div>
+                    <div class="seat-number">1</div>
                 </div>
             </div>
 
             <!-- ✅ الصف الثاني - مقاعد 2, 3, 4 (يمين - وسط - يسار) -->
             <div class="seats-row row-2">
-                <div class="seat-wrapper" style="align-items:flex-start;">
+                <div class="seat-wrapper">
                     <div class="seat-circle occupied">
                         <div class="seat-avatar">أ</div>
                     </div>
                     <div class="seat-username">أحمد</div>
+                    <div class="seat-number">2</div>
                 </div>
-                <div class="seat-wrapper" style="align-items:center;">
+                <div class="seat-wrapper">
                     <div class="seat-circle occupied">
                         <div class="seat-avatar">م</div>
                     </div>
                     <div class="seat-username">محمد</div>
+                    <div class="seat-number">3</div>
                 </div>
-                <div class="seat-wrapper" style="align-items:flex-end;">
+                <div class="seat-wrapper">
                     <div class="seat-circle">
                         <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
                     <div class="seat-username" style="color:#555;">مقعد 4</div>
+                    <div class="seat-number" style="color:#555;">4</div>
                 </div>
             </div>
 
             <!-- ✅ الصف الثالث - مقاعد 5, 6, 7 (يمين - وسط - يسار) -->
             <div class="seats-row row-3">
-                <div class="seat-wrapper" style="align-items:flex-start;">
+                <div class="seat-wrapper">
                     <div class="seat-circle">
                         <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
                     <div class="seat-username" style="color:#555;">مقعد 5</div>
+                    <div class="seat-number" style="color:#555;">5</div>
                 </div>
-                <div class="seat-wrapper" style="align-items:center;">
+                <div class="seat-wrapper">
                     <div class="seat-circle">
                         <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
                     <div class="seat-username" style="color:#555;">مقعد 6</div>
+                    <div class="seat-number" style="color:#555;">6</div>
                 </div>
-                <div class="seat-wrapper" style="align-items:flex-end;">
+                <div class="seat-wrapper">
                     <div class="seat-circle">
                         <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
                     <div class="seat-username" style="color:#555;">مقعد 7</div>
+                    <div class="seat-number" style="color:#555;">7</div>
                 </div>
             </div>
 
             <!-- ✅ الصف الرابع - مقاعد 8, 9, 10 (يمين - وسط - يسار) -->
             <div class="seats-row row-4">
-                <div class="seat-wrapper" style="align-items:flex-start;">
+                <div class="seat-wrapper">
                     <div class="seat-circle">
                         <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
                     <div class="seat-username" style="color:#555;">مقعد 8</div>
+                    <div class="seat-number" style="color:#555;">8</div>
                 </div>
-                <div class="seat-wrapper" style="align-items:center;">
+                <div class="seat-wrapper">
                     <div class="seat-circle">
                         <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
                     <div class="seat-username" style="color:#555;">مقعد 9</div>
+                    <div class="seat-number" style="color:#555;">9</div>
                 </div>
-                <div class="seat-wrapper" style="align-items:flex-end;">
+                <div class="seat-wrapper">
                     <div class="seat-circle">
                         <div class="seat-avatar" style="background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.08);color:#444;">
                             <i class="fas fa-plus" style="font-size:0.6rem;"></i>
                         </div>
                     </div>
                     <div class="seat-username" style="color:#555;">مقعد 10</div>
+                    <div class="seat-number" style="color:#555;">10</div>
                 </div>
             </div>
         </div>
@@ -764,7 +845,7 @@
         });
 
         console.log('✅ تجربة الدردشة جاهزة!');
-        console.log('📐 المربع الأسود: 719px × 715px');
+        console.log('📐 المربع الأسود: 820px × 715px');
         console.log('📐 توزيع المقاعد: يمين - وسط - يسار');
         console.log('👑 المقعد الأول في أعلى المنتصف');
         console.log('💬 الدردشة تحت المربع الأسود');
