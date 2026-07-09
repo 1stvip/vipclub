@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎙️ VipChat - غرف الدردشة الصوتية</title>
+    <title>⭐ VipClub 🌟</title>
     <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -80,6 +80,13 @@
             color: #ffd700;
         }
 
+        .header-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .header-center .logo {
             font-size: 1.4rem;
             font-weight: bold;
@@ -88,6 +95,7 @@
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            text-align: center;
         }
 
         .header-center .logo i {
@@ -152,9 +160,7 @@
             width: 100%;
             height: 100%;
             transition: opacity 0.8s ease, transform 0.8s ease;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            cursor: pointer;
         }
 
         .hero-banner.hidden {
@@ -332,7 +338,7 @@
             width: 100%;
             aspect-ratio: 16/9;
             overflow: hidden;
-            background-size: contain;
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #1a1a2e;
@@ -384,16 +390,6 @@
 
         .room-card .room-banner .room-status i {
             font-size: 0.4rem;
-        }
-
-        .room-card .room-banner .default-bg-text {
-            position: relative;
-            z-index: 2;
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-            letter-spacing: 3px;
         }
 
         .room-card .room-body {
@@ -604,6 +600,19 @@
             
             .hero-banner {
                 border-radius: 10px;
+            }
+        }
+
+        /* ===== تحسين الخلفيات للشاشات المختلفة ===== */
+        .room-card .room-banner {
+            background-size: cover;
+            background-position: center;
+        }
+
+        @media (max-width: 768px) {
+            .room-card .room-banner {
+                background-size: contain;
+                background-color: #1a1a2e;
             }
         }
 
@@ -1805,7 +1814,7 @@
             height: 12px;
             background: #ff4757;
             border-radius: 50%;
-            border: 2px solid #1a1a2e;
+            border: 2px solid #ffffff;
             animation: pulse-ring 2s infinite;
         }
 
@@ -2014,7 +2023,7 @@
             border: 1px solid #2a2a4a;
             position: relative;
             min-height: 150px;
-            background-size: contain;
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             display: flex;
@@ -2392,8 +2401,9 @@
 
         <div class="header-center">
             <div class="logo" onclick="showHome()">
-                <i class="fas fa-crown"></i>
-                VipChat
+                <i class="fas fa-star" style="color: #ffd700;"></i>
+                VipClub
+                <i class="fas fa-star" style="color: #ffd700;"></i>
             </div>
         </div>
 
@@ -2515,13 +2525,13 @@
 
             <!-- ===== HERO BANNER ===== -->
             <div class="hero-banner-wrapper">
-                <div class="hero-banner visible" id="banner1">
+                <div class="hero-banner visible" id="banner1" onclick="window.location.href='chat.html'">
                     <img src="images/chathtml/banners/banner1.png" alt="بنر 1" loading="lazy">
                 </div>
-                <div class="hero-banner hidden" id="banner2">
+                <div class="hero-banner hidden" id="banner2" onclick="window.location.href='vipsystem.html'">
                     <img src="images/chathtml/banners/banner2.png" alt="بنر 2" loading="lazy">
                 </div>
-                <div class="hero-banner hidden" id="banner3">
+                <div class="hero-banner hidden" id="banner3" onclick="window.location.href='#####'">
                     <img src="images/chathtml/banners/banner3.png" alt="بنر 3" loading="lazy">
                 </div>
                 <div class="hero-dots">
@@ -2535,8 +2545,8 @@
             <div class="search-container">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="ابحث باسم الغرفة، المعرف، أو المضيف..." oninput="filterRooms()">
-                    <button class="search-btn" onclick="filterRooms()">بحث</button>
+                    <input type="text" id="searchInput" placeholder="ابحث باسم الغرفة، المعرف، أو المضيف..." oninput="searchRooms()">
+                    <button class="search-btn" onclick="searchRooms()">بحث</button>
                 </div>
             </div>
 
@@ -2697,7 +2707,7 @@
             <div class="form-group">
                 <label>📋 معاينة البطاقة</label>
                 <div class="card-preview" id="cardPreview">
-                    <div class="preview-placeholder">🎙️ VipChat</div>
+                    <div class="preview-placeholder">🎙️ VipClub</div>
                 </div>
             </div>
 
@@ -2941,14 +2951,14 @@
             if (bgValue && bgValue !== 'default') {
                 // خلفية مخصصة من الصور
                 preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
-                preview.style.backgroundSize = 'contain';
+                preview.style.backgroundSize = 'cover';
                 preview.style.backgroundPosition = 'center';
                 preview.style.backgroundRepeat = 'no-repeat';
                 preview.style.backgroundColor = '#1a1a2e';
             } else {
                 // الخلفية الافتراضية
                 preview.style.backgroundImage = `url('images/chathtml/roomsbg/roommk (0).png')`;
-                preview.style.backgroundSize = 'contain';
+                preview.style.backgroundSize = 'cover';
                 preview.style.backgroundPosition = 'center';
                 preview.style.backgroundRepeat = 'no-repeat';
                 preview.style.backgroundColor = '#1a1a2e';
@@ -2957,7 +2967,7 @@
             // ===== إضافة النص الافتراضي في المنتصف =====
             const textDiv = document.createElement('div');
             textDiv.className = 'preview-text';
-            textDiv.textContent = '🎙️ VIP CHAT';
+            textDiv.textContent = '⭐ VIP CLUB 🌟';
             preview.appendChild(textDiv);
 
             // ===== إضافة الصورة العلوية في أعلى اليمين (مصغرة) =====
@@ -3249,11 +3259,11 @@
                 let bgStyle = '';
                 if (room.background && room.background !== 'default') {
                     bgStyle =
-                        `background-image: url('images/chathtml/${room.background}'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
+                        `background-image: url('images/chathtml/${room.background}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 } else {
                     // الخلفية الافتراضية
                     bgStyle =
-                        `background-image: url('images/chathtml/roomsbg/roommk (0).png'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
+                        `background-image: url('images/chathtml/roomsbg/roommk (0).png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
                 }
 
                 let overlayImg = '';
@@ -3306,9 +3316,10 @@
             }).join('');
         }
 
-        function filterRooms() {
-            const search = document.getElementById('searchInput').value.trim();
-            currentSearch = search;
+        // ===== دالة البحث الجديدة =====
+        function searchRooms() {
+            const searchInput = document.getElementById('searchInput');
+            currentSearch = searchInput.value.trim();
             applyFiltersAndSearch();
         }
 
@@ -4541,7 +4552,7 @@
                             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
                                 <i class="fas fa-sign-in-alt" style="font-size:3.5rem; color:#333; margin-bottom:15px;"></i>
                                 <h3 style="color:#888;">يرجى تسجيل الدخول</h3>
-                                <p style="font-size:0.9rem;">سجل الدخول للاستمتاع بجميع مميزات VipChat</p>
+                                <p style="font-size:0.9rem;">سجل الدخول للاستمتاع بجميع مميزات VipClub</p>
                                 <button onclick="redirectToLogin()" style="margin-top:15px; padding:12px 30px; background:linear-gradient(135deg,#ffd700,#f0c000); color:#1a1a2e; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer;">
                                     <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
                                 </button>
@@ -4551,16 +4562,14 @@
 
             startBannerSlider();
 
-            console.log('🎙️ VipChat جاهز!');
+            console.log('⭐ VipClub جاهز!');
             console.log('✅ قاعدة البيانات: stvipclub');
-            console.log('✅ تم إضافة نظام تسجيل الدخول الإجباري');
-            console.log('✅ تم إضافة خلفيات وصور علوية للبطاقات');
-            console.log('✅ تم إضافة عدد المقاعد (2-10)');
-            console.log('✅ تم إضافة كلمة المرور مع إظهار/إخفاء');
-            console.log('✅ تم إضافة رسالة خطأ مخصصة');
-            console.log('✅ تم تحسين البنرات العلوية للهواتف');
-            console.log('✅ تم تحسين حجم الصور العلوية');
-            console.log('✅ تم ترتيب الغرف (رقم 1 في المقدمة)');
+            console.log('✅ تم إصلاح خاصية البحث');
+            console.log('✅ تم تحسين عرض الخلفيات');
+            console.log('✅ تم تحسين عرض البنرات');
+            console.log('✅ تم تغيير اللوجو إلى VipClub');
+            console.log('✅ تم إضافة روابط للبنرات');
+            console.log('✅ تم تغيير لون الدائرة إلى الأبيض');
         };
 
         async function updateNotifBadge() {
