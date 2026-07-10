@@ -459,7 +459,7 @@
         .seat-wrapper .seat-number { display: block; }
         .seat-wrapper.occupied .seat-number { display: none; }
 
-        /* ===== CHAT AREA - تحسين عرض الشات ===== */
+        /* ===== CHAT AREA ===== */
         .chat-area {
             width: 420px;
             min-width: 320px;
@@ -1453,52 +1453,111 @@
             transform: translateY(-2px);
         }
 
-        .profile-frame-container {
-            margin: 10px auto;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+        /* ===== PROFILE FRAME - تحسينات الإطار الفاخر في الملف الشخصي ===== */
+        .profile-frame-wrapper {
             position: relative;
-            overflow: visible;
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+        }
+
+        .profile-frame-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #000000 !important;
+            z-index: 2;
+            border: none !important;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
         }
 
         .profile-frame-container video {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
             object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
+            display: block;
+            border-radius: 50%;
         }
 
-        .profile-frame-container .profile-avatar-inner {
-            width: 80%;
-            height: 80%;
-            border-radius: 50%;
+        /* ===== الصورة الرمزية داخل الإطار ===== */
+        .profile-avatar-inner {
             position: absolute;
-            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            width: 40%;
+            height: 40%;
+            border-radius: 50%;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.1);
+            z-index: 4;
+            border: 3px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: 0.3s;
+            background: #000000;
         }
 
-        .profile-frame-container .profile-avatar-inner img {
+        /* ===== مواقع الصورة حسب كل إطار ===== */
+        .profile-avatar-inner.frame-manager {
+            top: 38%;
+            width: 44%;
+            height: 44%;
+        }
+
+        .profile-avatar-inner.frame-warrior {
+            top: 58%;
+            width: 40%;
+            height: 40%;
+        }
+
+        .profile-avatar-inner.frame-vip {
+            top: 35%;
+            width: 42%;
+            height: 42%;
+        }
+
+        .profile-avatar-inner.frame-queen {
+            top: 50%;
+            width: 40%;
+            height: 40%;
+        }
+
+        /* ===== بدون إطار - الصورة تكبر لتشغل كامل الدائرة ===== */
+        .profile-avatar-inner.no-frame {
+            width: 100% !important;
+            height: 100% !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%);
+            border: 3px solid rgba(255, 215, 0, 0.08);
+            box-shadow: none;
+        }
+
+        .profile-avatar-inner:hover {
+            transform: translate(-50%, -50%) scale(1.02);
+        }
+
+        .profile-avatar-inner img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 50%;
         }
 
-        .profile-frame-container .profile-avatar-inner .default-avatar {
+        .profile-avatar-inner .default-avatar {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 3rem;
             color: #ffd700;
             background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            border-radius: 50%;
         }
 
         /* ===== REPORT MODAL ===== */
@@ -1794,6 +1853,12 @@
             .luxury-frame { width: 120px; height: 120px; }
             .seat-username { font-size: 0.6rem; max-width: 90px; margin-top: 6px !important; min-height: 18px; }
             .seat-number { font-size: 0.5rem; margin-top: 6px; min-height: 18px; }
+            .profile-frame-wrapper { width: 200px; height: 200px; }
+            .profile-frame-container { width: 200px; height: 200px; }
+            .profile-avatar-inner { width: 38%; height: 38%; }
+            .profile-avatar-inner.frame-manager { width: 42%; height: 42%; }
+            .profile-avatar-inner.frame-warrior { width: 38%; height: 38%; }
+            .profile-avatar-inner.frame-vip { width: 40%; height: 40%; }
         }
 
         @media (max-width: 850px) {
@@ -1807,6 +1872,12 @@
             .luxury-frame { width: 110px; height: 110px; }
             .seat-username { font-size: 0.55rem; max-width: 80px; margin-top: 6px !important; min-height: 16px; }
             .seat-number { font-size: 0.45rem; margin-top: 6px; min-height: 16px; }
+            .profile-frame-wrapper { width: 180px; height: 180px; }
+            .profile-frame-container { width: 180px; height: 180px; }
+            .profile-avatar-inner { width: 36%; height: 36%; }
+            .profile-avatar-inner.frame-manager { width: 40%; height: 40%; }
+            .profile-avatar-inner.frame-warrior { width: 36%; height: 36%; }
+            .profile-avatar-inner.frame-vip { width: 38%; height: 38%; }
         }
 
         @media (max-width: 600px) {
@@ -1830,6 +1901,12 @@
             .chat-input-area .input-wrapper { min-height: 36px; padding: 0 8px; }
             .chat-input-area .input-wrapper input { font-size: 0.8rem; padding: 8px 4px; }
             .chat-input-area .send-btn { padding: 6px 12px; font-size: 0.7rem; }
+            .profile-frame-wrapper { width: 150px; height: 150px; }
+            .profile-frame-container { width: 150px; height: 150px; }
+            .profile-avatar-inner { width: 34%; height: 34%; }
+            .profile-avatar-inner.frame-manager { width: 38%; height: 38%; }
+            .profile-avatar-inner.frame-warrior { width: 34%; height: 34%; }
+            .profile-avatar-inner.frame-vip { width: 36%; height: 36%; }
         }
 
         @media (max-width: 480px) {
@@ -1868,6 +1945,12 @@
             .audio-controls { bottom: 15px; right: 12px; gap: 6px; }
             .audio-btn { width: 38px; height: 38px; font-size: 0.9rem; }
             .btn-leave-seat { width: 38px; height: 38px; font-size: 0.9rem; }
+            .profile-frame-wrapper { width: 130px; height: 130px; }
+            .profile-frame-container { width: 130px; height: 130px; }
+            .profile-avatar-inner { width: 32%; height: 32%; }
+            .profile-avatar-inner.frame-manager { width: 36%; height: 36%; }
+            .profile-avatar-inner.frame-warrior { width: 32%; height: 32%; }
+            .profile-avatar-inner.frame-vip { width: 34%; height: 34%; }
         }
     </style>
 </head>
@@ -3045,7 +3128,7 @@ async function openProfilePopup(seatIndex) {
 }
 
 // ============================================================
-// 👤 SHOW FULL PROFILE
+// 👤 SHOW FULL PROFILE - مع تحسينات الإطار
 // ============================================================
 async function showFullProfile(user, userId) {
     viewingUserId = userId;
@@ -3062,15 +3145,28 @@ async function showFullProfile(user, userId) {
     
     const activeFrame = user.activeFrame || null;
     let frameHTML = '';
+    let frameClass = '';
+    
     if (activeFrame) {
         const frame = FRAMES.find(f => f.id === activeFrame);
         if (frame) {
+            // تحديد كلاس الصورة حسب نوع الإطار
+            switch(activeFrame) {
+                case 'frame1': frameClass = 'frame-manager'; break;
+                case 'frame2': frameClass = 'frame-warrior'; break;
+                case 'frame3': frameClass = 'frame-vip'; break;
+                case 'frame4': frameClass = 'frame-queen'; break;
+                default: frameClass = 'frame-queen';
+            }
+            
             frameHTML = `
-                <div class="profile-frame-container">
-                    <video autoplay loop muted playsinline>
-                        <source src="${frame.embedUrl}" type="video/mp4">
-                    </video>
-                    <div class="profile-avatar-inner">
+                <div class="profile-frame-wrapper">
+                    <div class="profile-frame-container">
+                        <video autoplay loop muted playsinline>
+                            <source src="${frame.embedUrl}" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="profile-avatar-inner ${frameClass}">
                         ${user.avatar ? `<img src="${user.avatar}" alt="صورة المستخدم">` : `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
                     </div>
                 </div>
@@ -3078,70 +3174,23 @@ async function showFullProfile(user, userId) {
         }
     }
     
-    const avatarHTML = frameHTML || `
-        <div class="profile-avatar-container">
-            ${user.avatar ? `<img src="${user.avatar}" alt="صورة المستخدم">` : `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
-        </div>
-    `;
-    
-    const recentVisitors = user.recentVisitors || [];
-    const lastFiveVisitors = recentVisitors.slice(-5).reverse();
-    
-    const giftsList = user.giftsList || [];
-    const totalGifts = giftsList.reduce((sum, g) => sum + (g.value || 0), 0);
-    
-    const actionButtons = !isCurrentUser ? `
-        <div class="action-buttons-row">
-            <button class="btn-like ${hasLiked ? 'liked' : ''}" id="profileLikeBtn" onclick="sendProfileLike('${userId}')">
-                <i class="fas fa-heart"></i> ${hasLiked ? 'تم الإعجاب' : 'إعجاب'}
-            </button>
-            <button class="btn-report" onclick="openReportModalForUser('${userId}')">
-                <i class="fas fa-flag"></i> إبلاغ
-            </button>
-            <button class="btn-gifts" onclick="openUserGifts('${userId}')">
-                <i class="fas fa-gift"></i> الهدايا
-            </button>
-        </div>
-    ` : `
-        <div style="color:#94a3b8; font-size:0.8rem; padding:8px; background:rgba(139,92,246,0.05); border-radius:10px; border:1px solid rgba(139,92,246,0.1);">
-            <i class="fas fa-user-circle"></i> هذا هو ملفك الشخصي
-        </div>
-    `;
-    
-    let giftsHTML = '';
-    if (giftsList.length > 0) {
-        giftsHTML = `
-            <div style="margin:10px 0; padding:12px; background:rgba(255,215,0,0.03); border-radius:12px; border:1px solid rgba(255,215,0,0.05);">
-                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:6px;">🎁 الهدايا المتلقاة (${giftsList.length}) - المجموع: ${totalGifts}</div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:8px;">
-                    ${giftsList.slice(0, 6).map(g => `
-                        <div style="background:rgba(255,255,255,0.03); border-radius:10px; padding:8px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size:2rem;">${g.giftEmoji || '🎁'}</div>
-                            <div style="font-size:0.7rem; color:#10b981; font-weight:bold;">💰 ${g.value || 0}</div>
-                            <div style="font-size:0.55rem; color:#666;">${g.date || ''}</div>
-                        </div>
-                    `).join('')}
+    // إذا لم يوجد إطار - نستخدم وضع no-frame (صورة مكبرة)
+    if (!frameHTML) {
+        frameHTML = `
+            <div class="profile-frame-wrapper">
+                <div class="profile-frame-container" style="border: 3px solid rgba(255,215,0,0.08);">
+                    <div class="profile-avatar-inner no-frame">
+                        ${user.avatar ? `<img src="${user.avatar}" alt="صورة المستخدم">` : `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+                    </div>
                 </div>
             </div>
         `;
     }
     
-    let visitorsHTML = '';
-    if (lastFiveVisitors.length > 0) {
-        visitorsHTML = `
-            <div class="recent-visitors">
-                <div class="visitors-title">👥 آخر الزوار (آخر 5)</div>
-                <div class="visitors-list">
-                    ${lastFiveVisitors.map(v => `
-                        <div class="visitor-item" onclick="viewVisitorProfile('${v.numericId}')" title="${v.name} - ${v.time || ''}">
-                            ${v.avatar ? `<img src="${v.avatar}" alt="${v.name}">` : `<div class="visitor-placeholder">${v.name.charAt(0).toUpperCase()}</div>`}
-                            <div class="visitor-tooltip">${v.name} - ${v.time || ''}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
+    // باقي محتوى الملف الشخصي...
+    const avatarHTML = frameHTML;
+    
+    // ... باقي الكود كما هو ...
     
     content.innerHTML = `
         ${avatarHTML}
@@ -3172,9 +3221,49 @@ async function showFullProfile(user, userId) {
                 <div class="stat-label">👁️ زيارات</div>
             </div>
         </div>
-        ${actionButtons}
-        ${giftsHTML}
-        ${visitorsHTML}
+        ${!isCurrentUser ? `
+            <div class="action-buttons-row">
+                <button class="btn-like ${hasLiked ? 'liked' : ''}" id="profileLikeBtn" onclick="sendProfileLike('${userId}')">
+                    <i class="fas fa-heart"></i> ${hasLiked ? 'تم الإعجاب' : 'إعجاب'}
+                </button>
+                <button class="btn-report" onclick="openReportModalForUser('${userId}')">
+                    <i class="fas fa-flag"></i> إبلاغ
+                </button>
+                <button class="btn-gifts" onclick="openUserGifts('${userId}')">
+                    <i class="fas fa-gift"></i> الهدايا
+                </button>
+            </div>
+        ` : `
+            <div style="color:#94a3b8; font-size:0.8rem; padding:8px; background:rgba(139,92,246,0.05); border-radius:10px; border:1px solid rgba(139,92,246,0.1);">
+                <i class="fas fa-user-circle"></i> هذا هو ملفك الشخصي
+            </div>
+        `}
+        ${user.giftsList && user.giftsList.length > 0 ? `
+            <div style="margin:10px 0; padding:12px; background:rgba(255,215,0,0.03); border-radius:12px; border:1px solid rgba(255,215,0,0.05);">
+                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:6px;">🎁 الهدايا المتلقاة (${user.giftsList.length})</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:8px;">
+                    ${user.giftsList.slice(0, 6).map(g => `
+                        <div style="background:rgba(255,255,255,0.03); border-radius:10px; padding:8px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size:2rem;">${g.giftEmoji || '🎁'}</div>
+                            <div style="font-size:0.7rem; color:#10b981; font-weight:bold;">💰 ${g.value || 0}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
+        ${user.recentVisitors && user.recentVisitors.length > 0 ? `
+            <div class="recent-visitors">
+                <div class="visitors-title">👥 آخر الزوار</div>
+                <div class="visitors-list">
+                    ${user.recentVisitors.slice(-5).reverse().map(v => `
+                        <div class="visitor-item" onclick="viewVisitorProfile('${v.numericId}')" title="${v.name}">
+                            ${v.avatar ? `<img src="${v.avatar}" alt="${v.name}">` : `<div class="visitor-placeholder">${v.name.charAt(0).toUpperCase()}</div>`}
+                            <div class="visitor-tooltip">${v.name}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
         <div class="balance-card">
             <div class="balance-row"><span>رصيد ج.م:</span> <span class="balance-egp">${user.balanceEGP || 0}</span></div>
             <div class="balance-row"><span>رصيد دولار:</span> <span class="balance-usd">${user.balanceUSD || 0}</span></div>
