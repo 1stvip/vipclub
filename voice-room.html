@@ -1468,13 +1468,15 @@
             transform: translateY(-2px);
         }
 
+        /* ===== إطار الفاخر في الملف الشخصي - مكبر بنسبة 35% ===== */
         .profile-frame-container {
-            margin: 10px auto;
-            width: 120px;
-            height: 120px;
+            margin: 0 auto 12px;
+            width: 162px;
+            height: 162px;
             border-radius: 50%;
             position: relative;
             overflow: visible;
+            flex-shrink: 0;
         }
 
         .profile-frame-container video {
@@ -1485,18 +1487,21 @@
             position: absolute;
             top: 0;
             left: 0;
+            border: 2px solid rgba(255,215,0,0.2);
         }
 
         .profile-frame-container .profile-avatar-inner {
-            width: 80%;
-            height: 80%;
+            width: 75%;
+            height: 75%;
             border-radius: 50%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 3px solid rgba(255,215,0,0.15);
+            box-shadow: 0 0 30px rgba(255,215,0,0.1);
+            background: #000;
         }
 
         .profile-frame-container .profile-avatar-inner img {
@@ -1511,7 +1516,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 3rem;
             color: #ffd700;
             background: linear-gradient(135deg, #4f46e5, #8b5cf6);
         }
@@ -3491,6 +3496,17 @@ async function showFullProfile(user, userId) {
         `;
     }
     
+    // عرض الرصيد فقط لصاحب الملف الشخصي
+    let balanceHTML = '';
+    if (isCurrentUser) {
+        balanceHTML = `
+            <div class="balance-card">
+                <div class="balance-row"><span>رصيد ج.م:</span> <span class="balance-egp">${user.balanceEGP || 0}</span></div>
+                <div class="balance-row"><span>رصيد دولار:</span> <span class="balance-usd">${user.balanceUSD || 0}</span></div>
+            </div>
+        `;
+    }
+    
     content.innerHTML = `
         ${avatarHTML}
         <div class="profile-name">${user.nickname || user.username || 'مستخدم'}</div>
@@ -3523,10 +3539,7 @@ async function showFullProfile(user, userId) {
         ${actionButtons}
         ${giftsHTML}
         ${visitorsHTML}
-        <div class="balance-card">
-            <div class="balance-row"><span>رصيد ج.م:</span> <span class="balance-egp">${user.balanceEGP || 0}</span></div>
-            <div class="balance-row"><span>رصيد دولار:</span> <span class="balance-usd">${user.balanceUSD || 0}</span></div>
-        </div>
+        ${balanceHTML}
     `;
     
     modal.classList.add('active');
@@ -3535,7 +3548,7 @@ async function showFullProfile(user, userId) {
 }
 
 // ============================================================
-// 📝 RECORD PROFILE VISIT
+// 📝 RECORD PROFILE VISIT (زيارة حقيقية - مرة واحدة لكل مستخدم)
 // ============================================================
 async function recordProfileVisit(targetUserId) {
     if (!currentUser || targetUserId == currentUser.numericId) return;
@@ -3552,12 +3565,32 @@ async function recordProfileVisit(targetUserId) {
         const userKey = Object.keys(userData)[0];
         const user = userData[userKey];
         
-        const recentVisitors = user.recentVisitors || [];
+        // التحقق من سجل الزيارات الفريد لكل مستخدم
+        const visitorLog = user.visitorLog || {};
+        const visitorKey = `visitor_${currentUser.numericId}`;
         
-        const existingIndex = recentVisitors.findIndex(v => v.numericId == currentUser.numericId);
-        if (existingIndex !== -1) {
-            recentVisitors.splice(existingIndex, 1);
+        // إذا كان المستخدم قد زار بالفعل، لا نزيد عدد الزيارات
+        if (visitorLog[visitorKey]) {
+            // نحدث وقت الزيارة فقط دون زيادة العدد
+            const recentVisitors = user.recentVisitors || [];
+            const existingIndex = recentVisitors.findIndex(v => v.numericId == currentUser.numericId);
+            if (existingIndex !== -1) {
+                recentVisitors[existingIndex].time = new Date().toLocaleString('ar-EG');
+                await database.ref('users/' + userKey).update({
+                    recentVisitors: recentVisitors
+                });
+            }
+            return;
         }
+        
+        // تسجيل الزيارة الجديدة
+        visitorLog[visitorKey] = {
+            firstVisit: new Date().toISOString(),
+            lastVisit: new Date().toISOString(),
+            visitCount: 1
+        };
+        
+        const recentVisitors = user.recentVisitors || [];
         
         recentVisitors.push({
             numericId: currentUser.numericId,
@@ -3572,6 +3605,7 @@ async function recordProfileVisit(targetUserId) {
         
         await database.ref('users/' + userKey).update({
             recentVisitors: recentVisitors,
+            visitorLog: visitorLog,
             visits: (user.visits || 0) + 1
         });
         
