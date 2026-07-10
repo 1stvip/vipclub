@@ -137,17 +137,9 @@
             overflow-x: hidden;
         }
 
-        .seats-area::-webkit-scrollbar {
-            width: 4px;
-        }
-        .seats-area::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.02);
-            border-radius: 10px;
-        }
-        .seats-area::-webkit-scrollbar-thumb {
-            background: rgba(255,215,0,0.2);
-            border-radius: 10px;
-        }
+        .seats-area::-webkit-scrollbar { width: 4px; }
+        .seats-area::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+        .seats-area::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.2); border-radius: 10px; }
 
         .seats-area .seats-title {
             position: absolute;
@@ -184,24 +176,11 @@
             flex-wrap: nowrap;
         }
 
-        /* ===== الصف الأول - مقعد واحد في المنتصف ===== */
-        .seats-row.row-1 {
-            justify-content: center;
-            padding: 0;
-            gap: 0 !important;
-        }
-        .seats-row.row-1 .seat-wrapper {
-            margin: 0 auto;
-        }
+        .seats-row.row-1 { justify-content: center; padding: 0; gap: 0 !important; }
+        .seats-row.row-1 .seat-wrapper { margin: 0 auto; }
+        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 60px !important; }
 
-        /* ===== الصفوف الأخرى - توزيع متساوي ===== */
-        .seats-row.row-2,
-        .seats-row.row-3,
-        .seats-row.row-4 {
-            justify-content: center;
-            gap: 60px !important;
-        }
-
+        /* ===== المقاعد مع الإطار الفاخر ===== */
         .seat-wrapper {
             display: flex;
             flex-direction: column;
@@ -214,6 +193,54 @@
             margin-bottom: 5px;
         }
 
+        /* ===== حاوية المقعد والإطار ===== */
+        .seat-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ===== الإطار الفاخر (خلف المقعد) ===== */
+        .luxury-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+            border: none;
+            display: none;
+        }
+        .luxury-frame.active { display: block; }
+        .luxury-frame video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+        .luxury-frame .fallback {
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 50%;
+        }
+
+        /* ===== المقعد الدائري ===== */
         .seat-circle {
             width: 85px !important;
             height: 85px !important;
@@ -223,23 +250,37 @@
             align-items: center;
             justify-content: center;
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 2px solid #555;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
-            z-index: 2;
+            z-index: 1;
             flex-shrink: 0;
+            margin: 0 auto;
         }
 
+        .seat-circle.empty {
+            border-color: #444;
+            background: rgba(255,255,255,0.02);
+        }
+        .seat-circle.empty:hover {
+            border-color: #8b5cf6;
+            background: rgba(139,92,246,0.1);
+        }
         .seat-circle.occupied {
             border-color: #8b5cf6;
+            background: rgba(139,92,246,0.1);
         }
-
-        .seat-circle.owner-seat {
+        .seat-circle.occupied.owner-seat {
             border-color: #ffd700;
-            box-shadow: 0 0 30px rgba(255,215,0,0.1);
+            box-shadow: 0 0 30px rgba(255,215,0,0.15);
+            background: rgba(255,215,0,0.05);
         }
-
+        .seat-circle.has-luxury-frame {
+            border-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
         .seat-circle.speaking {
             border-color: #ffd700 !important;
             box-shadow: 0 0 50px rgba(255,215,0,0.05);
@@ -251,8 +292,8 @@
         }
 
         .seat-circle .seat-avatar {
-            width: 36px !important;
-            height: 36px !important;
+            width: 38px !important;
+            height: 38px !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -262,19 +303,14 @@
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: white;
             transition: all 0.3s ease;
-            border: 2px solid rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 3;
+            z-index: 2;
             position: relative;
             overflow: hidden;
         }
-        .seat-circle .seat-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
+        .seat-circle .seat-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .seat-circle.owner-seat .seat-avatar {
             background: linear-gradient(135deg, #ffd700, #f59e0b) !important;
             color: #1a1a2e;
@@ -289,12 +325,12 @@
 
         .seat-circle .crown-icon {
             position: absolute;
-            top: -10px;
-            right: -6px;
+            top: -12px;
+            right: -8px;
             font-size: 1.2rem;
             filter: drop-shadow(0 0 15px rgba(255,215,0,0.2));
             animation: crown-float 2.5s ease-in-out infinite;
-            z-index: 4;
+            z-index: 3;
         }
         @keyframes crown-float {
             0%, 100% { transform: rotate(-10deg) scale(1); }
@@ -349,15 +385,15 @@
 
         .seat-circle .mic-indicator {
             position: absolute;
-            bottom: -2px;
-            right: -2px;
+            bottom: -4px;
+            right: -4px;
             font-size: 0.55rem;
             background: rgba(0,0,0,0.8);
             border-radius: 50%;
             padding: 3px;
             border: 2px solid rgba(255,255,255,0.02);
             backdrop-filter: blur(5px);
-            z-index: 4;
+            z-index: 3;
         }
         .seat-circle .mic-indicator.on { color: #10b981; }
         .seat-circle .mic-indicator.off { color: #ef4444; }
@@ -391,79 +427,37 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
-        /* ===== اسم المستخدم تحت المقعد - مسافة أكبر ===== */
+        /* ===== اسم المستخدم تحت الإطار ===== */
         .seat-username {
-            font-size: 0.65rem;
-            margin-top: 18px;
+            font-size: 0.7rem;
+            margin-top: 8px !important;
             color: #a78bfa;
-            max-width: 100px;
+            max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             text-align: center;
             font-weight: 600;
             min-height: 20px;
-            z-index: 3;
-            position: relative;
             width: 100%;
             padding: 0 4px;
+            z-index: 3;
+            position: relative;
         }
         .seat-username.owner-name { color: #ffd700; }
+        .seat-username.empty-text { color: #444; }
 
         /* ===== رقم المقعد (للأماكن الفارغة) ===== */
         .seat-number {
             font-size: 0.55rem;
             color: #555;
-            margin-top: 16px;
+            margin-top: 8px;
             text-align: center;
             font-weight: 500;
             min-height: 20px;
         }
         .seat-wrapper .seat-number { display: block; }
         .seat-wrapper.occupied .seat-number { display: none; }
-
-        /* ===== إطارات الفيديو للمقاعد ===== */
-        .seat-frame {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 120px !important;
-            height: 120px !important;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            overflow: hidden;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        .seat-frame.active {
-            opacity: 1;
-            animation: framePulse 3s ease-in-out infinite;
-        }
-        .seat-frame video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            background: transparent !important;
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
-            opacity: 0.9;
-        }
-        @keyframes framePulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.04); }
-        }
-        .seat-wrapper.has-frame .seat-circle {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
 
         /* ===== CHAT AREA - تحسين عرض الشات ===== */
         .chat-area {
@@ -510,19 +504,10 @@
             overscroll-behavior: contain;
         }
 
-        .chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-        }
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #ffd700;
-            border-radius: 10px;
-        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 10px; }
 
-        /* ===== تحسين عرض الرسائل ===== */
         .chat-messages .message {
             padding: 0;
             border-radius: 14px;
@@ -1797,417 +1782,92 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .main-layout {
-                flex-direction: column;
-                height: auto;
-                padding: 10px;
-            }
-            
-            .chat-area {
-                width: 100%;
-                max-width: 100%;
-                height: 400px;
-                min-height: 300px;
-            }
-            
-            .seats-area {
-                min-height: 550px;
-                max-width: 100%;
-                width: 100%;
-                padding: 25px 15px 15px;
-                height: auto;
-                max-height: 650px;
-            }
-            
-            .seats-container {
-                gap: 38px;
-                padding: 25px 5px 12px;
-            }
-            
-            .seats-row {
-                gap: 40px !important;
-            }
-            
-            .seats-row.row-2,
-            .seats-row.row-3,
-            .seats-row.row-4 {
-                gap: 45px !important;
-            }
-            
-            .seat-circle {
-                width: 75px !important;
-                height: 75px !important;
-            }
-            
-            .seat-circle .seat-avatar {
-                width: 30px !important;
-                height: 30px !important;
-                font-size: 0.7rem !important;
-            }
-            
-            .seat-frame {
-                width: 105px !important;
-                height: 105px !important;
-            }
-            
-            .seat-username {
-                font-size: 0.55rem;
-                max-width: 80px;
-                margin-top: 16px;
-                min-height: 18px;
-            }
-            
-            .seat-number {
-                font-size: 0.5rem;
-                margin-top: 14px;
-                min-height: 18px;
-            }
+            .main-layout { flex-direction: column; height: auto; padding: 10px; }
+            .chat-area { width: 100%; max-width: 100%; height: 400px; min-height: 300px; }
+            .seats-area { min-height: 550px; max-width: 100%; width: 100%; padding: 25px 15px 15px; height: auto; max-height: 650px; }
+            .seats-container { gap: 38px; padding: 25px 5px 12px; }
+            .seats-row { gap: 40px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 45px !important; }
+            .seat-circle { width: 75px !important; height: 75px !important; }
+            .seat-circle .seat-avatar { width: 32px !important; height: 32px !important; font-size: 0.7rem !important; }
+            .seat-container { width: 120px; height: 120px; }
+            .luxury-frame { width: 120px; height: 120px; }
+            .seat-username { font-size: 0.6rem; max-width: 90px; margin-top: 6px !important; min-height: 18px; }
+            .seat-number { font-size: 0.5rem; margin-top: 6px; min-height: 18px; }
         }
 
         @media (max-width: 850px) {
-            .seats-area {
-                min-height: 480px;
-                max-height: 580px;
-                padding: 20px 12px 12px;
-            }
-            
-            .seats-container {
-                gap: 32px;
-            }
-            
-            .seats-row {
-                gap: 35px !important;
-            }
-            
-            .seats-row.row-2,
-            .seats-row.row-3,
-            .seats-row.row-4 {
-                gap: 40px !important;
-            }
-            
-            .seat-circle {
-                width: 70px !important;
-                height: 70px !important;
-            }
-            
-            .seat-circle .seat-avatar {
-                width: 28px !important;
-                height: 28px !important;
-                font-size: 0.65rem !important;
-            }
-            
-            .seat-frame {
-                width: 95px !important;
-                height: 95px !important;
-            }
-            
-            .seat-username {
-                font-size: 0.5rem;
-                max-width: 70px;
-                margin-top: 14px;
-                min-height: 16px;
-            }
-            
-            .seat-number {
-                font-size: 0.45rem;
-                margin-top: 12px;
-                min-height: 16px;
-            }
+            .seats-area { min-height: 480px; max-height: 580px; padding: 20px 12px 12px; }
+            .seats-container { gap: 32px; }
+            .seats-row { gap: 35px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 40px !important; }
+            .seat-circle { width: 70px !important; height: 70px !important; }
+            .seat-circle .seat-avatar { width: 30px !important; height: 30px !important; font-size: 0.65rem !important; }
+            .seat-container { width: 110px; height: 110px; }
+            .luxury-frame { width: 110px; height: 110px; }
+            .seat-username { font-size: 0.55rem; max-width: 80px; margin-top: 6px !important; min-height: 16px; }
+            .seat-number { font-size: 0.45rem; margin-top: 6px; min-height: 16px; }
         }
 
         @media (max-width: 600px) {
-            .main-layout {
-                padding: 8px;
-                gap: 12px;
-            }
-            
-            .seats-area {
-                min-height: 420px;
-                max-height: 520px;
-                border-radius: 16px;
-                padding: 15px 8px 10px;
-            }
-            
-            .seats-container {
-                gap: 28px;
-                padding: 18px 5px 10px;
-            }
-            
-            .seats-row {
-                gap: 25px !important;
-            }
-            
-            .seats-row.row-2,
-            .seats-row.row-3,
-            .seats-row.row-4 {
-                gap: 30px !important;
-            }
-            
-            .seat-circle {
-                width: 60px !important;
-                height: 60px !important;
-            }
-            
-            .seat-circle .seat-avatar {
-                width: 24px !important;
-                height: 24px !important;
-                font-size: 0.55rem !important;
-            }
-            
-            .seat-frame {
-                width: 80px !important;
-                height: 80px !important;
-            }
-            
-            .seat-username {
-                font-size: 0.45rem;
-                max-width: 60px;
-                margin-top: 12px;
-                min-height: 14px;
-            }
-            
-            .seat-number {
-                font-size: 0.4rem;
-                margin-top: 10px;
-                min-height: 14px;
-            }
-            
-            .seats-area .seats-title {
-                font-size: 0.7rem;
-                top: 8px;
-                right: 10px;
-            }
-            
-            .chat-area {
-                max-height: 320px;
-                min-height: 220px;
-                border-radius: 16px;
-            }
-            
-            .chat-messages {
-                padding: 8px 12px;
-                gap: 6px;
-            }
-            
-            .chat-messages .message .message-bg {
-                padding: 12px 16px;
-                min-height: 50px;
-                min-width: 80px;
-            }
-            
-            .chat-messages .message .message-bg .msg-text {
-                font-size: 0.9rem;
-                line-height: 1.6;
-            }
-            
-            .chat-input-area {
-                padding: 6px 10px;
-                min-height: 48px;
-            }
-            
-            .chat-input-area .input-wrapper {
-                min-height: 36px;
-                padding: 0 8px;
-            }
-            
-            .chat-input-area .input-wrapper input {
-                font-size: 0.8rem;
-                padding: 8px 4px;
-            }
-            
-            .chat-input-area .send-btn {
-                padding: 6px 12px;
-                font-size: 0.7rem;
-            }
+            .main-layout { padding: 8px; gap: 12px; }
+            .seats-area { min-height: 420px; max-height: 520px; border-radius: 16px; padding: 15px 8px 10px; }
+            .seats-container { gap: 28px; padding: 18px 5px 10px; }
+            .seats-row { gap: 25px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 30px !important; }
+            .seat-circle { width: 60px !important; height: 60px !important; }
+            .seat-circle .seat-avatar { width: 26px !important; height: 26px !important; font-size: 0.55rem !important; }
+            .seat-container { width: 100px; height: 100px; }
+            .luxury-frame { width: 100px; height: 100px; }
+            .seat-username { font-size: 0.5rem; max-width: 70px; margin-top: 5px !important; min-height: 14px; }
+            .seat-number { font-size: 0.4rem; margin-top: 5px; min-height: 14px; }
+            .seats-area .seats-title { font-size: 0.7rem; top: 8px; right: 10px; }
+            .chat-area { max-height: 320px; min-height: 220px; border-radius: 16px; }
+            .chat-messages { padding: 8px 12px; gap: 6px; }
+            .chat-messages .message .message-bg { padding: 12px 16px; min-height: 50px; min-width: 80px; }
+            .chat-messages .message .message-bg .msg-text { font-size: 0.9rem; line-height: 1.6; }
+            .chat-input-area { padding: 6px 10px; min-height: 48px; }
+            .chat-input-area .input-wrapper { min-height: 36px; padding: 0 8px; }
+            .chat-input-area .input-wrapper input { font-size: 0.8rem; padding: 8px 4px; }
+            .chat-input-area .send-btn { padding: 6px 12px; font-size: 0.7rem; }
         }
 
         @media (max-width: 480px) {
-            .seats-area {
-                min-height: 380px;
-                max-height: 460px;
-                padding: 12px 6px 8px;
-            }
-            
-            .seats-container {
-                gap: 22px;
-                padding: 15px 3px 8px;
-            }
-            
-            .seats-row {
-                gap: 18px !important;
-            }
-            
-            .seats-row.row-2,
-            .seats-row.row-3,
-            .seats-row.row-4 {
-                gap: 22px !important;
-            }
-            
-            .seat-circle {
-                width: 52px !important;
-                height: 52px !important;
-            }
-            
-            .seat-circle .seat-avatar {
-                width: 20px !important;
-                height: 20px !important;
-                font-size: 0.45rem !important;
-            }
-            
-            .seat-frame {
-                width: 70px !important;
-                height: 70px !important;
-            }
-            
-            .seat-username {
-                font-size: 0.4rem;
-                max-width: 50px;
-                margin-top: 10px;
-                min-height: 12px;
-            }
-            
-            .seat-number {
-                font-size: 0.35rem;
-                margin-top: 8px;
-                min-height: 12px;
-            }
-            
-            .seats-area .seats-title {
-                font-size: 0.6rem;
-                top: 6px;
-                right: 8px;
-            }
-            
-            .seat-circle .crown-icon {
-                font-size: 0.9rem;
-                top: -8px;
-                right: -5px;
-            }
-            
-            .seat-circle .mic-indicator {
-                font-size: 0.4rem;
-                padding: 2px;
-                bottom: -1px;
-                right: -1px;
-            }
-            
-            .chat-area {
-                height: 240px;
-                min-height: 180px;
-                max-height: 280px;
-                border-radius: 14px;
-            }
-            
-            .chat-header {
-                padding: 6px 12px;
-                min-height: 36px;
-            }
+            .seats-area { min-height: 380px; max-height: 460px; padding: 12px 6px 8px; }
+            .seats-container { gap: 22px; padding: 15px 3px 8px; }
+            .seats-row { gap: 18px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 22px !important; }
+            .seat-circle { width: 52px !important; height: 52px !important; }
+            .seat-circle .seat-avatar { width: 22px !important; height: 22px !important; font-size: 0.45rem !important; }
+            .seat-container { width: 90px; height: 90px; }
+            .luxury-frame { width: 90px; height: 90px; }
+            .seat-username { font-size: 0.45rem; max-width: 60px; margin-top: 4px !important; min-height: 12px; }
+            .seat-number { font-size: 0.35rem; margin-top: 4px; min-height: 12px; }
+            .seats-area .seats-title { font-size: 0.6rem; top: 6px; right: 8px; }
+            .seat-circle .crown-icon { font-size: 0.9rem; top: -8px; right: -5px; }
+            .seat-circle .mic-indicator { font-size: 0.4rem; padding: 2px; bottom: -1px; right: -1px; }
+            .chat-area { height: 240px; min-height: 180px; max-height: 280px; border-radius: 14px; }
+            .chat-header { padding: 6px 12px; min-height: 36px; }
             .chat-header h3 { font-size: 0.7rem; }
-            
-            .chat-messages {
-                padding: 6px 10px;
-                gap: 4px;
-            }
-            
-            .chat-messages .message {
-                max-width: 95%;
-                min-width: 25%;
-            }
-            
-            .chat-messages .message .message-bg {
-                padding: 10px 14px;
-                min-height: 40px;
-                min-width: 60px;
-                border-radius: 14px;
-            }
-            
-            .chat-messages .message .message-bg .msg-text {
-                font-size: 0.8rem;
-                line-height: 1.5;
-            }
-            
-            .chat-messages .message .message-bg .msg-sender {
-                font-size: 0.5rem;
-            }
-            
-            .chat-messages .message .message-bg .msg-time {
-                font-size: 0.4rem;
-                margin-top: 3px;
-            }
-            
-            .chat-messages .message.system {
-                font-size: 0.6rem;
-                padding: 4px 12px;
-                max-width: 92%;
-            }
-            
-            .chat-input-area {
-                padding: 4px 8px;
-                min-height: 42px;
-                gap: 6px;
-            }
-            
-            .chat-input-area .input-wrapper {
-                min-height: 32px;
-                padding: 0 6px;
-                border-radius: 10px;
-            }
-            
-            .chat-input-area .input-wrapper input {
-                font-size: 0.7rem;
-                padding: 6px 4px;
-            }
-            
-            .chat-input-area .input-wrapper input::placeholder {
-                font-size: 0.6rem;
-            }
-            
-            .chat-input-area .send-btn {
-                padding: 5px 10px;
-                font-size: 0.65rem;
-                border-radius: 8px;
-            }
-            
-            .chat-input-area .emoji-btn {
-                font-size: 0.8rem;
-                padding: 2px 4px;
-            }
-            
-            .scroll-down-btn {
-                width: 26px;
-                height: 26px;
-                font-size: 0.6rem;
-                bottom: 52px;
-            }
-            
-            .emoji-picker {
-                max-width: 140px;
-                max-height: 70px;
-                bottom: 40px;
-                left: 4px;
-                padding: 4px;
-            }
-            .emoji-picker .emoji-item {
-                font-size: 0.6rem;
-                width: 18px;
-                height: 18px;
-            }
-            
-            .audio-controls {
-                bottom: 15px;
-                right: 12px;
-                gap: 6px;
-            }
-            .audio-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 0.9rem;
-            }
-            .btn-leave-seat {
-                width: 38px;
-                height: 38px;
-                font-size: 0.9rem;
-            }
+            .chat-messages { padding: 6px 10px; gap: 4px; }
+            .chat-messages .message { max-width: 95%; min-width: 25%; }
+            .chat-messages .message .message-bg { padding: 10px 14px; min-height: 40px; min-width: 60px; border-radius: 14px; }
+            .chat-messages .message .message-bg .msg-text { font-size: 0.8rem; line-height: 1.5; }
+            .chat-messages .message .message-bg .msg-sender { font-size: 0.5rem; }
+            .chat-messages .message .message-bg .msg-time { font-size: 0.4rem; margin-top: 3px; }
+            .chat-messages .message.system { font-size: 0.6rem; padding: 4px 12px; max-width: 92%; }
+            .chat-input-area { padding: 4px 8px; min-height: 42px; gap: 6px; }
+            .chat-input-area .input-wrapper { min-height: 32px; padding: 0 6px; border-radius: 10px; }
+            .chat-input-area .input-wrapper input { font-size: 0.7rem; padding: 6px 4px; }
+            .chat-input-area .input-wrapper input::placeholder { font-size: 0.6rem; }
+            .chat-input-area .send-btn { padding: 5px 10px; font-size: 0.65rem; border-radius: 8px; }
+            .chat-input-area .emoji-btn { font-size: 0.8rem; padding: 2px 4px; }
+            .scroll-down-btn { width: 26px; height: 26px; font-size: 0.6rem; bottom: 52px; }
+            .emoji-picker { max-width: 140px; max-height: 70px; bottom: 40px; left: 4px; padding: 4px; }
+            .emoji-picker .emoji-item { font-size: 0.6rem; width: 18px; height: 18px; }
+            .audio-controls { bottom: 15px; right: 12px; gap: 6px; }
+            .audio-btn { width: 38px; height: 38px; font-size: 0.9rem; }
+            .btn-leave-seat { width: 38px; height: 38px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -2775,7 +2435,7 @@ async function getUserVIPFromFirebase(userId) {
 }
 
 // ============================================================
-// 💺 GET SEATS LAYOUT (10 مقاعد: 1 + 3 + 3 + 3)
+// 💺 GET SEATS LAYOUT
 // ============================================================
 function getSeatsLayout(maxSlots) {
     if (maxSlots === 10) {
@@ -2786,7 +2446,6 @@ function getSeatsLayout(maxSlots) {
             { row: 3, seats: 3, reversed: false }
         ];
     }
-    
     if (maxSlots === 9) {
         return [
             { row: 0, seats: 3, reversed: false },
@@ -2794,7 +2453,6 @@ function getSeatsLayout(maxSlots) {
             { row: 2, seats: 3, reversed: false }
         ];
     }
-    
     if (maxSlots === 8) {
         return [
             { row: 0, seats: 2, reversed: false },
@@ -2803,7 +2461,6 @@ function getSeatsLayout(maxSlots) {
             { row: 3, seats: 2, reversed: false }
         ];
     }
-    
     if (maxSlots === 7) {
         return [
             { row: 0, seats: 1, reversed: false },
@@ -2812,7 +2469,6 @@ function getSeatsLayout(maxSlots) {
             { row: 3, seats: 2, reversed: false }
         ];
     }
-    
     if (maxSlots === 6) {
         return [
             { row: 0, seats: 2, reversed: false },
@@ -2820,7 +2476,6 @@ function getSeatsLayout(maxSlots) {
             { row: 2, seats: 2, reversed: false }
         ];
     }
-    
     if (maxSlots === 5) {
         return [
             { row: 0, seats: 1, reversed: false },
@@ -2828,25 +2483,21 @@ function getSeatsLayout(maxSlots) {
             { row: 2, seats: 2, reversed: false }
         ];
     }
-    
     if (maxSlots === 4) {
         return [
             { row: 0, seats: 2, reversed: false },
             { row: 1, seats: 2, reversed: false }
         ];
     }
-    
     if (maxSlots === 3) {
         return [
             { row: 0, seats: 1, reversed: false },
             { row: 1, seats: 2, reversed: false }
         ];
     }
-    
     if (maxSlots === 2) {
         return [{ row: 0, seats: 2, reversed: false }];
     }
-    
     return [{ row: 0, seats: 1, reversed: false }];
 }
 
@@ -3073,7 +2724,7 @@ function skipVIPEntrance() {
 }
 
 // ============================================================
-// 💺 SEATS FUNCTIONS
+// 💺 SEATS FUNCTIONS - مع تحسينات الإطار الفاخر
 // ============================================================
 async function renderSeats(seats) {
     const container = document.getElementById('seatsContainer');
@@ -3141,71 +2792,72 @@ async function renderSeats(seats) {
                 if (isSeatCreator) seatClass += ' owner-seat';
                 if (isSpeaking) seatClass += ' speaking';
             }
+            if (hasFrame) seatClass += ' has-luxury-frame';
             
             let clickHandler = isOccupied ? `onclick="openProfilePopup('${index}')"` :
                 (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${index})"` : '';
             
             const wrapperClass = hasFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
             
+            // الإطار الفاخر - يظهر خلف المقعد (z-index: 0)
             let frameHTML = '';
             if (hasFrame && frameConfig) {
                 frameHTML = `
-                    <div class="seat-frame active">
+                    <div class="luxury-frame active">
                         <video autoplay loop muted playsinline>
                             <source src="${frameConfig.embedUrl}" type="video/mp4">
                         </video>
                     </div>
                 `;
             } else {
-                frameHTML = `<div class="seat-frame"></div>`;
+                frameHTML = `<div class="luxury-frame"></div>`;
             }
             
-            const avatarSize = 36;
-            const fontSize = 0.85;
-            const usernameSize = 0.65;
             const seatNumber = index + 1;
             const userAvatar = seat?.avatar ? seat.avatar : null;
             
             html += `
                 <div class="${wrapperClass}">
-                    ${frameHTML}
-                    <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
-                        ${isOccupied ? `
-                            ${isSeatCreator ? `<div class="crown-icon">👑</div>` : ''}
-                            <div class="seat-avatar" style="background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''}">
-                                ${userAvatar ? `<img src="${userAvatar}" alt="${displayName}">` : avatarLetter}
-                            </div>
-                            ${isSpeaking ? `
-                                <div class="sound-waves">
-                                    <div class="wave"></div>
-                                    <div class="wave"></div>
-                                    <div class="wave"></div>
+                    <div class="seat-container">
+                        ${frameHTML}
+                        <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
+                            ${isOccupied ? `
+                                ${isSeatCreator ? `<div class="crown-icon">👑</div>` : ''}
+                                <div class="seat-avatar" style="background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''}">
+                                    ${userAvatar ? `<img src="${userAvatar}" alt="${displayName}">` : avatarLetter}
                                 </div>
-                            ` : ''}
-                            <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
-                                <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
-                            </div>
-                            ${isOwner && !isSeatCreator && isOccupied ? `
-                                <div class="owner-actions" onclick="event.stopPropagation();">
-                                    <button class="btn-mute" onclick="event.stopPropagation();muteUser(${index})">🔇</button>
-                                    <button class="btn-kick" onclick="event.stopPropagation();kickUser(${index})">✖</button>
+                                ${isSpeaking ? `
+                                    <div class="sound-waves">
+                                        <div class="wave"></div>
+                                        <div class="wave"></div>
+                                        <div class="wave"></div>
+                                    </div>
+                                ` : ''}
+                                <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
+                                    <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
                                 </div>
-                            ` : ''}
-                        ` : `
-                            ${isOwnerSeat ? `
-                                <div style="position:absolute;top:-6px;right:-4px;font-size:1rem;filter:drop-shadow(0 0 10px rgba(255,215,0,0.3));">👑</div>
-                                <div class="seat-avatar" style="border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
-                                    <i class="fas fa-crown"></i>
-                                </div>
-                                <div style="font-size:0.4rem;color:#ffd700;font-weight:bold;">مالك</div>
-                                ${isOwner ? '<div style="font-size:0.3rem;color:#888;">اضغط للجلوس</div>' : ''}
+                                ${isOwner && !isSeatCreator && isOccupied ? `
+                                    <div class="owner-actions" onclick="event.stopPropagation();">
+                                        <button class="btn-mute" onclick="event.stopPropagation();muteUser(${index})">🔇</button>
+                                        <button class="btn-kick" onclick="event.stopPropagation();kickUser(${index})">✖</button>
+                                    </div>
+                                ` : ''}
                             ` : `
-                                <div class="seat-avatar" style="background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <div style="font-size:0.4rem;color:#555;">مقعد</div>
+                                ${isOwnerSeat ? `
+                                    <div style="position:absolute;top:-6px;right:-4px;font-size:1rem;filter:drop-shadow(0 0 10px rgba(255,215,0,0.3));">👑</div>
+                                    <div class="seat-avatar" style="border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <div style="font-size:0.4rem;color:#ffd700;font-weight:bold;">مالك</div>
+                                    ${isOwner ? '<div style="font-size:0.3rem;color:#888;">اضغط للجلوس</div>' : ''}
+                                ` : `
+                                    <div class="seat-avatar" style="background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div style="font-size:0.4rem;color:#555;">مقعد</div>
+                                `}
                             `}
-                        `}
+                        </div>
                     </div>
                     ${isOccupied ? `
                         <div class="seat-username ${isSeatCreator ? 'owner-name' : ''}">${displayName}</div>
