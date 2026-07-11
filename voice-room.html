@@ -16,7 +16,7 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
     <style>
-        /* جميع الأنماط كما هي ... */
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
@@ -28,10 +28,11 @@
             overflow-x: hidden;
         }
 
+        /* ===== NAVBAR ===== */
         .navbar {
             background: rgba(10, 10, 30, 0.95);
             backdrop-filter: blur(15px);
-            padding: 0.6rem 4%;
+            padding: 0.6rem 3%;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -41,48 +42,13 @@
             z-index: 100;
             flex-wrap: wrap;
             gap: 8px;
-            min-height: 65px;
+            min-height: 60px;
             box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
 
-        .logo-section { display: flex; align-items: center; gap: 15px; }
-        .logo { font-size: 1.2rem; font-weight: bold; color: #ffd700; display: flex; align-items: center; gap: 8px; cursor: pointer; text-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        .logo i { font-size: 1.3rem; }
+        .nav-left { display: flex; align-items: center; gap: 10px; }
+        .nav-right { display: flex; align-items: center; gap: 8px; }
 
-        .room-info-box {
-            background: rgba(255,255,255,0.05);
-            padding: 6px 18px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.08);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .room-info-box .room-name { font-weight: 700; color: #fff; font-size: 0.9rem; }
-        .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.7rem; background: rgba(255,215,0,0.1); padding: 2px 10px; border-radius: 6px; }
-        .room-info-box .room-owner { color: #ffd700; font-size: 0.75rem; }
-        .room-info-box .member-count { color: #94a3b8; font-size: 0.75rem; }
-        .room-info-box .btn-leave-icon {
-            background: rgba(239,68,68,0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239,68,68,0.2);
-            border-radius: 50%;
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.9rem;
-        }
-        .room-info-box .btn-leave-icon:hover {
-            background: rgba(239,68,68,0.3);
-            transform: scale(1.1);
-        }
-
-        .nav-icons { display: flex; align-items: center; gap: 8px; }
         .icon-btn {
             font-size: 1.1rem; color: #f8fafc; cursor: pointer; position: relative;
             width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
@@ -95,12 +61,50 @@
         .icon-btn.notif-btn:hover { background: #3b82f6; color: white; }
         .icon-btn.style-btn { background: rgba(139,92,246,0.08); color: #a78bfa; }
         .icon-btn.style-btn:hover { background: #8b5cf6; color: white; }
+        .icon-btn.profile-btn { background: rgba(16,185,129,0.08); color: #10b981; }
+        .icon-btn.profile-btn:hover { background: #10b981; color: white; }
+        .icon-btn.users-btn { background: rgba(139,92,246,0.08); color: #a78bfa; }
+        .icon-btn.users-btn:hover { background: #8b5cf6; color: white; }
         .badge {
             position: absolute; top: -5px; right: -5px; background: #ef4444; color: white;
             font-size: 0.55rem; padding: 2px 6px; border-radius: 50%; border: 2px solid #0f0c29;
             min-width: 18px; text-align: center;
         }
 
+        .room-info-box {
+            background: rgba(255,255,255,0.05);
+            padding: 4px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .room-info-box .room-name { font-weight: 700; color: #fff; font-size: 0.85rem; }
+        .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.65rem; background: rgba(255,215,0,0.1); padding: 2px 10px; border-radius: 6px; }
+        .room-info-box .room-owner { color: #ffd700; font-size: 0.7rem; }
+        .room-info-box .member-count { color: #94a3b8; font-size: 0.7rem; }
+        .room-info-box .btn-leave-icon {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.8rem;
+        }
+        .room-info-box .btn-leave-icon:hover {
+            background: rgba(239,68,68,0.3);
+            transform: scale(1.1);
+        }
+
+        /* ===== MAIN LAYOUT ===== */
         .main-layout {
             display: flex;
             flex: 1;
@@ -109,10 +113,11 @@
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
-            height: calc(100vh - 85px);
+            height: calc(100vh - 80px);
             min-height: 500px;
         }
 
+        /* ===== SEATS AREA ===== */
         .seats-area {
             flex: 1;
             background: #000000 !important;
@@ -423,6 +428,7 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
+        /* ===== CHAT AREA ===== */
         .chat-area {
             width: 380px;
             min-width: 300px;
@@ -630,6 +636,7 @@
         }
         .emoji-picker .emoji-item:hover { background: rgba(255,255,255,0.08); transform: scale(1.15); }
 
+        /* ===== AUDIO CONTROLS ===== */
         .audio-controls {
             position: fixed;
             bottom: 30px;
@@ -707,6 +714,7 @@
         }
         .btn-leave-seat:hover .tooltip { opacity: 1; }
 
+        /* ===== TOAST ===== */
         .toast-message {
             position: fixed;
             top: 70px;
@@ -729,6 +737,7 @@
         .toast-message.info { background: rgba(59,130,246,0.9); }
         @keyframes slideDown { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
+        /* ===== VIP ENTRANCE ===== */
         #vipEntrance {
             display: none;
             position: fixed;
@@ -811,6 +820,7 @@
         }
         #vipEntrance .vip-skip-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); border-color: rgba(255,215,0,0.3); }
 
+        /* ===== MODALS ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1004,6 +1014,539 @@
         }
         .notif-actions button:hover { background: #334155; }
 
+        /* ===== PROFILE MODAL ===== */
+        #fullProfileModal .modal-content {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .profile-avatar-container {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            overflow: hidden;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255,215,0,0.2);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .profile-avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar-container .default-avatar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            color: #ffd700;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+        }
+
+        .profile-name {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .profile-bio {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            word-break: break-word;
+            min-height: 20px;
+            margin: 8px 0;
+        }
+
+        .user-id-numeric {
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 10px auto;
+            display: inline-block;
+            min-width: 140px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+
+        .badges-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .badge-item {
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 3px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stats-row .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 60px;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .stats-row .stat-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stats-row .stat-item .stat-number {
+            color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .stats-row .stat-item .stat-label {
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+
+        .action-buttons-row {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons-row button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            font-size: 0.8rem;
+            min-width: 60px;
+        }
+
+        .action-buttons-row .btn-like {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .action-buttons-row .btn-like:hover {
+            transform: scale(1.05);
+        }
+
+        .action-buttons-row .btn-like.liked {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .action-buttons-row .btn-report {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .action-buttons-row .btn-report:hover {
+            transform: scale(1.05);
+        }
+
+        .action-buttons-row .btn-gifts {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .action-buttons-row .btn-gifts:hover {
+            transform: scale(1.05);
+        }
+
+        .recent-visitors {
+            margin: 10px 0;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid #2a2a3e;
+        }
+
+        .recent-visitors .visitors-title {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            text-align: right;
+        }
+
+        .recent-visitors .visitors-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .recent-visitors .visitor-item {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #8b5cf6;
+            cursor: pointer;
+            transition: 0.3s;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .recent-visitors .visitor-item:hover {
+            transform: scale(1.15);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .recent-visitors .visitor-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recent-visitors .visitor-item .visitor-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .recent-visitors .visitor-item .visitor-tooltip {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+        .recent-visitors .visitor-item:hover .visitor-tooltip {
+            opacity: 1;
+        }
+
+        .balance-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 14px;
+            border-radius: 14px;
+            margin: 10px 0;
+            border: 1px solid #334155;
+            width: 100%;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        .balance-row .balance-egp {
+            color: #10b981;
+        }
+
+        .balance-row .balance-usd {
+            color: #60a5fa;
+        }
+
+        .profile-frame-container {
+            margin: 10px auto;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            position: relative;
+            overflow: visible;
+        }
+
+        .profile-frame-container video {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .profile-frame-container .profile-avatar-inner {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-frame-container .profile-avatar-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-frame-container .profile-avatar-inner .default-avatar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #ffd700;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+        }
+
+        .country-selector-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .country-selector-wrapper .country-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 15px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+
+        .country-selector-wrapper .country-display:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #8b5cf6;
+        }
+
+        .country-selector-wrapper .country-display .flag-emoji {
+            font-size: 1.8rem;
+        }
+
+        .country-selector-wrapper .country-display .country-name {
+            color: #ddd;
+            font-size: 0.85rem;
+        }
+
+        .id-label {
+            font-size: 0.75rem;
+            color: #aaa;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* ===== REPORT MODAL ===== */
+        #reportModal .modal-content {
+            max-width: 450px;
+        }
+
+        #reportModal .form-group {
+            margin-bottom: 15px;
+        }
+
+        #reportModal .form-group label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        #reportModal .form-group select,
+        #reportModal .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #1e293b;
+            background: #0f172a;
+            color: white;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        #reportModal .form-group select:focus,
+        #reportModal .form-group textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        #reportModal .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        #reportModal .report-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #reportModal .report-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #reportModal .report-actions .btn-report-submit {
+            background: #f59e0b;
+            color: white;
+        }
+
+        #reportModal .report-actions .btn-report-submit:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        #reportModal .report-actions .btn-report-cancel {
+            background: #333;
+            color: white;
+        }
+
+        #reportModal .report-actions .btn-report-cancel:hover {
+            background: #444;
+        }
+
+        /* ===== GIFTS MODAL ===== */
+        #giftsModal .modal-content {
+            max-width: 600px;
+        }
+
+        #giftsModal .gift-total {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        #giftsModal .gift-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        #giftsModal .gift-item:hover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .gift-emoji-display {
+            font-size: 2.5rem;
+            text-align: center;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .gift-name-display {
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        #giftsModal .gift-item .gift-details {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        #giftsModal .gift-item .gift-details .gift-value {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        #giftsModal .gift-item .gift-details .gift-time {
+            color: #666;
+            font-size: 0.75rem;
+        }
+
+        #giftsModal .no-gifts {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        #giftsModal .no-gifts i {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #giftsModal .close-gifts {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #333;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        #giftsModal .close-gifts:hover {
+            background: #444;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
             .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 250px; }
@@ -1055,16 +1598,17 @@
 
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar">
-    <div class="logo-section">
-        <div class="logo" onclick="window.location.href='chat.html'">
-            <i class="fas fa-crown"></i> VipChat
-        </div>
-        <button class="icon-btn" onclick="toggleUsersList()" title="المستخدمين">
+    <div class="nav-left">
+        <button class="icon-btn profile-btn" onclick="handleProfileClick()" title="الملف الشخصي">
+            <i class="fas fa-user-circle"></i>
+        </button>
+        <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
+            <i class="fas fa-bell"></i>
+            <span class="badge" id="notifBadge">0</span>
+        </button>
+        <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
             <i class="fas fa-users"></i>
             <span class="badge" id="usersBadge">0</span>
-        </button>
-        <button class="icon-btn" onclick="handleProfileClick()" title="الملف الشخصي">
-            <i class="fas fa-user-circle"></i>
         </button>
     </div>
 
@@ -1078,11 +1622,7 @@
         </button>
     </div>
 
-    <div class="nav-icons">
-        <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
-            <i class="fas fa-bell"></i>
-            <span class="badge" id="notifBadge">0</span>
-        </button>
+    <div class="nav-right">
         <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
             <i class="fas fa-gift"></i>
         </button>
@@ -1204,7 +1744,81 @@
     <div id="usersList" style="max-height:400px; overflow-y:auto;"></div>
 </div>
 
-<!-- ===== GIFT MODAL ===== -->
+<!-- ===== FULL PROFILE MODAL ===== -->
+<div id="fullProfileModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:12px; margin-bottom:15px;">
+            <h2 style="margin:0; border:none; padding:0; font-size:1.2rem;"><i class="fas fa-id-card" style="color: #ffd700;"></i> الملف الشخصي</h2>
+            <button onclick="closeModal('fullProfileModal')" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.3rem; cursor:pointer; padding:4px 10px; border-radius:8px; transition:0.3s;">
+                ✕
+            </button>
+        </div>
+        <div id="fullProfileContent" style="text-align:center;"></div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="action-btn btn-secondary" onclick="closeModal('fullProfileModal')" style="flex:1;">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== GIFTS MODAL ===== -->
+<div id="giftsModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:12px; margin-bottom:15px;">
+            <h2 style="margin:0; border:none; padding:0; font-size:1.2rem;"><i class="fas fa-gift" style="color:#ffd700;"></i> الهدايا المتلقاة</h2>
+            <button onclick="closeGiftsModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.3rem; cursor:pointer; padding:4px 10px; border-radius:8px; transition:0.3s;">
+                ✕
+            </button>
+        </div>
+        <div class="gift-total" id="giftTotal">
+            مجموع قيمة الهدايا: <span id="totalGiftValue">0</span> 💰
+        </div>
+        <div id="giftsList">
+            <div class="no-gifts">
+                <i class="fas fa-gift"></i>
+                <p>لا توجد هدايا</p>
+            </div>
+        </div>
+        <button class="close-gifts" onclick="closeGiftsModal()">إغلاق</button>
+    </div>
+</div>
+
+<!-- ===== REPORT MODAL ===== -->
+<div id="reportModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:12px; margin-bottom:15px;">
+            <h2 style="margin:0; border:none; padding:0; font-size:1.2rem;"><i class="fas fa-flag" style="color:#f59e0b;"></i> الإبلاغ عن المستخدم</h2>
+            <button onclick="closeReportModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.3rem; cursor:pointer; padding:4px 10px; border-radius:8px; transition:0.3s;">
+                ✕
+            </button>
+        </div>
+        <p style="color:#aaa; text-align:center; margin-bottom:15px; font-size:0.85rem;">
+            سيتم إرسال البلاغ إلى الإدارة للتحقيق
+        </p>
+        <div class="form-group">
+            <label>نوع البلاغ</label>
+            <select id="reportType">
+                <option value="محتوى غير لائق">محتوى غير لائق</option>
+                <option value="تحريض على العنف">تحريض على العنف</option>
+                <option value="انتحال شخصية">انتحال شخصية</option>
+                <option value="مضايقة">مضايقة</option>
+                <option value="صور غير لائقة">صور غير لائقة</option>
+                <option value="أخرى">أخرى</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>وصف البلاغ</label>
+            <textarea id="reportDescription" placeholder="أدخل تفاصيل البلاغ..."></textarea>
+        </div>
+        <div class="report-actions">
+            <button class="btn-report-submit" onclick="submitReport()">
+                <i class="fas fa-paper-plane"></i> إرسال البلاغ
+            </button>
+            <button class="btn-report-cancel" onclick="closeReportModal()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== GIFT SEND MODAL ===== -->
 <div id="giftSendModal" class="modal">
     <h3><i class="fas fa-gift" style="color:#ffd700;"></i> إرسال هدية</h3>
     <p style="font-size:0.85rem;">اختر المستخدم والهدية المناسبة</p>
@@ -1275,7 +1889,7 @@
 
 <script>
     // ============================================================
-    // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات إدارة المستخدمين (stvipclub)
+    // 🔥 FIREBASE CONFIG
     // ============================================================
     const firebaseConfig = {
         apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -1289,7 +1903,7 @@
     };
 
     // ============================================================
-    // 📋 FRAMES DATA - مطابقة مع vipsystem.html
+    // 📋 DATA
     // ============================================================
     const FRAMES = [
         { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true, isSpecial: true },
@@ -1317,8 +1931,6 @@
         { id: 'gold_ring', name: '👑 خاتم ذهب', emoji: '👑', price: 2500 },
         { id: 'lion', name: '🦁 أسد', emoji: '🦁', price: 3000 }
     ];
-
-    const SEATS_LAYOUT = [{ row: 0, seats: 1 }, { row: 1, seats: 2 }, { row: 2, seats: 3 }, { row: 3, seats: 4 }];
 
     // ============================================================
     // 📋 VARIABLES
@@ -1350,6 +1962,9 @@
     let vipShownForUsers = {};
     let isProcessingJoin = false;
     let vipQueue = [];
+    let viewingUserId = null;
+    let hasLiked = false;
+    let currentMaxSlots = 10;
 
     // ============================================================
     // 👤 USER FUNCTIONS
@@ -1420,12 +2035,12 @@
             if (firebase.apps.length > 0) await firebase.app().delete();
             firebase.initializeApp(firebaseConfig);
             database = firebase.database();
-            console.log('✅ Firebase initialized:', firebaseConfig.projectId);
+            console.log('✅ Firebase initialized');
         } catch(error) { console.error('❌ Firebase error:', error); }
     }
 
     // ============================================================
-    // 🖼️ GET USER FRAME - من قاعدة بيانات stvipclub
+    // 🖼️ GET USER FRAME
     // ============================================================
     async function getUserFrameFromFirebase(userId) {
         try {
@@ -1452,7 +2067,7 @@
     }
 
     // ============================================================
-    // 👤 GET USER CHAT STYLE - من قاعدة بيانات stvipclub
+    // 👤 GET USER CHAT STYLE
     // ============================================================
     async function getUserChatStyleFromFirebase(userId) {
         try {
@@ -1479,7 +2094,7 @@
     }
 
     // ============================================================
-    // 👑 CHECK VIP - من قاعدة بيانات stvipclub
+    // 👑 CHECK VIP
     // ============================================================
     async function getUserVIPFromFirebase(userId) {
         try {
@@ -1500,6 +2115,73 @@
             
             return VIP_CONFIG[activeVIP] || null;
         } catch(e) { console.error('Error getting user VIP:', e); return null; }
+    }
+
+    // ============================================================
+    // 💺 GET SEATS LAYOUT
+    // ============================================================
+    function getSeatsLayout(maxSlots) {
+        if (maxSlots === 10) {
+            return [
+                { row: 0, seats: 1, reversed: false },
+                { row: 1, seats: 3, reversed: false },
+                { row: 2, seats: 3, reversed: false },
+                { row: 3, seats: 3, reversed: false }
+            ];
+        }
+        if (maxSlots === 9) {
+            return [
+                { row: 0, seats: 3, reversed: false },
+                { row: 1, seats: 3, reversed: false },
+                { row: 2, seats: 3, reversed: false }
+            ];
+        }
+        if (maxSlots === 8) {
+            return [
+                { row: 0, seats: 2, reversed: false },
+                { row: 1, seats: 2, reversed: false },
+                { row: 2, seats: 2, reversed: false },
+                { row: 3, seats: 2, reversed: false }
+            ];
+        }
+        if (maxSlots === 7) {
+            return [
+                { row: 0, seats: 1, reversed: false },
+                { row: 1, seats: 2, reversed: false },
+                { row: 2, seats: 2, reversed: false },
+                { row: 3, seats: 2, reversed: false }
+            ];
+        }
+        if (maxSlots === 6) {
+            return [
+                { row: 0, seats: 2, reversed: false },
+                { row: 1, seats: 2, reversed: false },
+                { row: 2, seats: 2, reversed: false }
+            ];
+        }
+        if (maxSlots === 5) {
+            return [
+                { row: 0, seats: 1, reversed: false },
+                { row: 1, seats: 2, reversed: false },
+                { row: 2, seats: 2, reversed: false }
+            ];
+        }
+        if (maxSlots === 4) {
+            return [
+                { row: 0, seats: 2, reversed: false },
+                { row: 1, seats: 2, reversed: false }
+            ];
+        }
+        if (maxSlots === 3) {
+            return [
+                { row: 0, seats: 1, reversed: false },
+                { row: 1, seats: 2, reversed: false }
+            ];
+        }
+        if (maxSlots === 2) {
+            return [{ row: 0, seats: 2, reversed: false }];
+        }
+        return [{ row: 0, seats: 1, reversed: false }];
     }
 
     // ============================================================
@@ -1532,19 +2214,18 @@
             let roomSnapshot = await database.ref('rooms/' + roomId).once('value');
             
             if (!roomSnapshot.exists()) {
-                console.log('⚠️ الغرفة غير موجودة في rooms، جاري البحث في room_requests...');
                 const requestSnapshot = await database.ref('room_requests/' + roomId).once('value');
                 
                 if (requestSnapshot.exists()) {
                     const requestData = requestSnapshot.val();
                     if (requestData.status === 'approved') {
-                        console.log('✅ تم العثور على طلب موافق عليه، جاري إنشاء الغرفة...');
                         await database.ref('rooms/' + roomId).set({
                             roomId: roomId,
                             name: requestData.name || 'غرفة صوتية',
                             description: requestData.description || '',
                             creatorId: requestData.creatorId || 'admin',
                             creatorName: requestData.creatorName || 'المالك',
+                            maxSlots: requestData.maxSlots || 10,
                             createdAt: requestData.createdAt || new Date().toISOString(),
                             status: 'approved',
                             members: 0,
@@ -1584,6 +2265,7 @@
             }
             
             document.getElementById('roomOwnerDisplay').textContent = '👑 ' + creatorName;
+            currentMaxSlots = roomData.maxSlots || 10;
             
             if (isOwner) showToast('👑 مرحباً بك كمالك الغرفة!', 'success');
             else showToast(`👋 مرحباً بك في غرفة ${roomData.name}`, 'info');
@@ -1593,7 +2275,6 @@
             listenChat();
             listenSeats();
             setupChatScroll();
-            
             listenForNewUsers();
             
             if (userData?.numericId) {
@@ -1608,7 +2289,7 @@
             
         } catch(error) {
             console.error('❌ Error loading room:', error);
-            showToast('❌ حدث خطأ في تحميل الغرفة: ' + error.message, 'error');
+            showToast('❌ حدث خطأ في تحميل الغرفة', 'error');
         }
     }
 
@@ -1720,11 +2401,22 @@
         
         const creatorId = roomData?.creatorId;
         const currentUserId = currentUser?.numericId;
+        const maxSlots = roomData?.maxSlots || 10;
+        const layout = getSeatsLayout(maxSlots);
         
-        SEATS_LAYOUT.forEach((rowData, rowIndex) => {
-            html += `<div class="seats-row row-${rowIndex + 1}">`;
-            for (let i = 0; i < rowData.seats; i++) {
-                const seat = seats[globalIndex] || null;
+        layout.forEach((rowData, rowIndex) => {
+            const rowClass = `row-${rowIndex + 1}`;
+            const seatsInRow = rowData.seats;
+            
+            let seatIndices = [];
+            for (let i = 0; i < seatsInRow; i++) {
+                seatIndices.push(globalIndex + i);
+            }
+            
+            html += `<div class="seats-row ${rowClass}">`;
+            
+            seatIndices.forEach((index) => {
+                const seat = seats[index] || null;
                 const isOccupied = seat !== null;
                 if (isOccupied) occupied++;
                 
@@ -1732,21 +2424,21 @@
                 const isMySeat = seat && seat.userId == currentUserId;
                 
                 if (isMySeat) {
-                    mySeatIndex = globalIndex;
+                    mySeatIndex = index;
                     document.getElementById('leaveSeatBtn').style.display = 'flex';
                     if (peer && myPeerId) {
                         database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(myPeerId);
                     }
                 }
                 
-                const isOwnerSeat = globalIndex === 0 || isSeatCreator;
+                const isOwnerSeat = index === 0 || isSeatCreator;
                 const isMuted = seat?.muted === true;
                 const isSpeaking = seat?.speaking === true;
-                const userColor = seat?.color || colors[globalIndex % colors.length];
+                const userColor = seat?.color || colors[index % colors.length];
                 const displayName = seat ? seat.username : '';
                 const avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
-                const hasFrame = seatsWithFrames[globalIndex] ? true : false;
-                const frameConfig = hasFrame ? FRAMES.find(f => f.id === seatsWithFrames[globalIndex]) : null;
+                const hasFrame = seatsWithFrames[index] ? true : false;
+                const frameConfig = hasFrame ? FRAMES.find(f => f.id === seatsWithFrames[index]) : null;
                 
                 let seatClass = 'seat-circle';
                 if (!isOccupied) seatClass += ' empty';
@@ -1755,9 +2447,10 @@
                     if (isSeatCreator) seatClass += ' owner-seat';
                     if (isSpeaking) seatClass += ' speaking';
                 }
+                if (hasFrame) seatClass += ' has-luxury-frame';
                 
-                let clickHandler = isOccupied ? `onclick="openProfilePopup('${globalIndex}')"` :
-                    (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${globalIndex})"` : '';
+                let clickHandler = isOccupied ? `onclick="openProfilePopup('${index}')"` :
+                    (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${index})"` : '';
                 
                 const wrapperClass = hasFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
                 
@@ -1774,6 +2467,8 @@
                     frameHTML = `<div class="seat-frame"></div>`;
                 }
                 
+                const seatNumber = index + 1;
+                
                 html += `
                     <div class="${wrapperClass}">
                         ${frameHTML}
@@ -1783,10 +2478,6 @@
                                 <div class="seat-avatar" style="background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''}">
                                     ${avatarLetter}
                                 </div>
-                                <div class="seat-username ${isSeatCreator ? 'owner-name' : ''}">${displayName}</div>
-                                <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
-                                    <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
-                                </div>
                                 ${isSpeaking ? `
                                     <div class="sound-waves">
                                         <div class="wave"></div>
@@ -1794,10 +2485,13 @@
                                         <div class="wave"></div>
                                     </div>
                                 ` : ''}
+                                <div class="mic-indicator ${isMuted ? 'off' : 'on'}">
+                                    <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
+                                </div>
                                 ${isOwner && !isSeatCreator && isOccupied ? `
                                     <div class="owner-actions" onclick="event.stopPropagation();">
-                                        <button class="btn-mute" onclick="event.stopPropagation();muteUser(${globalIndex})">🔇</button>
-                                        <button class="btn-kick" onclick="event.stopPropagation();kickUser(${globalIndex})">✖</button>
+                                        <button class="btn-mute" onclick="event.stopPropagation();muteUser(${index})">🔇</button>
+                                        <button class="btn-kick" onclick="event.stopPropagation();kickUser(${index})">✖</button>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -1814,15 +2508,17 @@
                                     </div>
                                     <div style="font-size:0.5rem;color:#555;">مقعد</div>
                                 `}
-                                <div class="seat-number">${globalIndex + 1}</div>
+                                <div class="seat-number">${seatNumber}</div>
                             `}
                         </div>
                     </div>
                 `;
-                globalIndex++;
-            }
+            });
+            
             html += `</div>`;
+            globalIndex += seatsInRow;
         });
+        
         container.innerHTML = html;
         document.getElementById('seatsCount').textContent = `(${occupied}/${globalIndex})`;
         document.getElementById('memberCount').textContent = occupied;
@@ -1918,12 +2614,481 @@
         } catch(error) { showToast('❌ حدث خطأ', 'error'); }
     }
 
-    function openProfilePopup(seatIndex) {
-        database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value').then(s => {
-            const seat = s.val();
-            if (!seat) return;
-            const isCreator = seat.userId == roomData?.creatorId;
-            showToast(`👤 ${seat.username}\n🆔 ${seat.userId}\n${isCreator ? '👑 مالك الغرفة' : '👤 عضو'}`, 'info');
+    // ============================================================
+    // 👤 FULL PROFILE POPUP
+    // ============================================================
+    async function openProfilePopup(seatIndex) {
+        if (!database || !roomId) return;
+        
+        try {
+            const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
+            if (!seat || !seat.userId) {
+                showToast('❌ لا يوجد مستخدم في هذا المقعد', 'error');
+                return;
+            }
+            
+            const userId = seat.userId;
+            
+            const snapshot = await database.ref('users')
+                .orderByChild('numericId')
+                .equalTo(parseInt(userId))
+                .once('value');
+            
+            if (!snapshot.exists()) {
+                showToast('❌ المستخدم غير موجود', 'error');
+                return;
+            }
+            
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            
+            await showFullProfile(user, userId);
+            
+        } catch(error) {
+            console.error('Error opening profile:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    async function showFullProfile(user, userId) {
+        viewingUserId = userId;
+        
+        await recordProfileVisit(userId);
+        
+        const modal = document.getElementById('fullProfileModal');
+        const content = document.getElementById('fullProfileContent');
+        
+        const likedBy = user.likedBy || [];
+        const currentUserNumericId = currentUser?.numericId;
+        const isCurrentUser = userId == currentUserNumericId;
+        hasLiked = !isCurrentUser && likedBy.includes(currentUserNumericId);
+        
+        const activeFrame = user.activeFrame || null;
+        let frameHTML = '';
+        if (activeFrame) {
+            const frame = FRAMES.find(f => f.id === activeFrame);
+            if (frame) {
+                frameHTML = `
+                    <div class="profile-frame-container">
+                        <video autoplay loop muted playsinline>
+                            <source src="${frame.embedUrl}" type="video/mp4">
+                        </video>
+                        <div class="profile-avatar-inner">
+                            ${user.avatar ? `<img src="${user.avatar}" alt="صورة المستخدم">` : `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        const avatarHTML = frameHTML || `
+            <div class="profile-avatar-container">
+                ${user.avatar ? `<img src="${user.avatar}" alt="صورة المستخدم">` : `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+            </div>
+        `;
+        
+        const recentVisitors = user.recentVisitors || [];
+        const lastFiveVisitors = recentVisitors.slice(-5).reverse();
+        
+        const giftsList = user.giftsList || [];
+        const totalGifts = giftsList.reduce((sum, g) => sum + (g.value || 0), 0);
+        
+        const actionButtons = !isCurrentUser ? `
+            <div class="action-buttons-row">
+                <button class="btn-like ${hasLiked ? 'liked' : ''}" id="profileLikeBtn" onclick="sendProfileLike('${userId}')">
+                    <i class="fas fa-heart"></i> ${hasLiked ? 'تم الإعجاب' : 'إعجاب'}
+                </button>
+                <button class="btn-report" onclick="openReportModalForUser('${userId}')">
+                    <i class="fas fa-flag"></i> إبلاغ
+                </button>
+                <button class="btn-gifts" onclick="openUserGifts('${userId}')">
+                    <i class="fas fa-gift"></i> الهدايا
+                </button>
+            </div>
+        ` : `
+            <div style="color:#94a3b8; font-size:0.8rem; padding:8px; background:rgba(139,92,246,0.05); border-radius:10px; border:1px solid rgba(139,92,246,0.1);">
+                <i class="fas fa-user-circle"></i> هذا هو ملفك الشخصي
+            </div>
+        `;
+        
+        let giftsHTML = '';
+        if (giftsList.length > 0) {
+            giftsHTML = `
+                <div style="margin:10px 0; padding:12px; background:rgba(255,215,0,0.03); border-radius:12px; border:1px solid rgba(255,215,0,0.05);">
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:6px;">🎁 الهدايا المتلقاة (${giftsList.length}) - المجموع: ${totalGifts}</div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:8px;">
+                        ${giftsList.slice(0, 6).map(g => `
+                            <div style="background:rgba(255,255,255,0.03); border-radius:10px; padding:8px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size:2rem;">${g.giftEmoji || '🎁'}</div>
+                                <div style="font-size:0.7rem; color:#10b981; font-weight:bold;">💰 ${g.value || 0}</div>
+                                <div style="font-size:0.55rem; color:#666;">${g.date || ''}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        let visitorsHTML = '';
+        if (lastFiveVisitors.length > 0) {
+            visitorsHTML = `
+                <div class="recent-visitors">
+                    <div class="visitors-title">👥 آخر الزوار (آخر 5)</div>
+                    <div class="visitors-list">
+                        ${lastFiveVisitors.map(v => `
+                            <div class="visitor-item" onclick="viewVisitorProfile('${v.numericId}')" title="${v.name} - ${v.time || ''}">
+                                ${v.avatar ? `<img src="${v.avatar}" alt="${v.name}">` : `<div class="visitor-placeholder">${v.name.charAt(0).toUpperCase()}</div>`}
+                                <div class="visitor-tooltip">${v.name} - ${v.time || ''}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        content.innerHTML = `
+            ${avatarHTML}
+            <div class="profile-name">${user.nickname || user.username || 'مستخدم'}</div>
+            <div class="profile-bio">${user.bio || 'لا توجد سيرة ذاتية'}</div>
+            <div class="country-selector-wrapper" style="margin:5px auto;">
+                <div class="country-display">
+                    <span class="flag-emoji">${user.flag || '🌍'}</span>
+                    <span class="country-name">${user.countryName || 'العالم'}</span>
+                </div>
+            </div>
+            <span class="id-label">معرف المستخدم</span>
+            <div class="user-id-numeric" onclick="copyTextContent('${user.numericId}')">${String(user.numericId).padStart(6, '0')}</div>
+            <div class="badges-section">
+                ${(user.badges || ['🏆 مميز']).map(b => `<span class="badge-item">${b}</span>`).join('')}
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number">${user.gifts || 0}</div>
+                    <div class="stat-label">🎁 هدايا</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${user.likes || 0}</div>
+                    <div class="stat-label">❤️ إعجابات</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${user.visits || 0}</div>
+                    <div class="stat-label">👁️ زيارات</div>
+                </div>
+            </div>
+            ${actionButtons}
+            ${giftsHTML}
+            ${visitorsHTML}
+            <div class="balance-card">
+                <div class="balance-row"><span>رصيد ج.م:</span> <span class="balance-egp">${user.balanceEGP || 0}</span></div>
+                <div class="balance-row"><span>رصيد دولار:</span> <span class="balance-usd">${user.balanceUSD || 0}</span></div>
+            </div>
+        `;
+        
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        document.getElementById('screenOverlay').classList.add('active');
+    }
+
+    // ============================================================
+    // 📝 RECORD PROFILE VISIT
+    // ============================================================
+    async function recordProfileVisit(targetUserId) {
+        if (!currentUser || targetUserId == currentUser.numericId) return;
+        
+        try {
+            const snapshot = await database.ref('users')
+                .orderByChild('numericId')
+                .equalTo(parseInt(targetUserId))
+                .once('value');
+            
+            if (!snapshot.exists()) return;
+            
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            
+            const recentVisitors = user.recentVisitors || [];
+            
+            const existingIndex = recentVisitors.findIndex(v => v.numericId == currentUser.numericId);
+            if (existingIndex !== -1) {
+                recentVisitors.splice(existingIndex, 1);
+            }
+            
+            recentVisitors.push({
+                numericId: currentUser.numericId,
+                name: currentUser.nickname || currentUser.username || 'مستخدم',
+                avatar: currentUser.avatar || null,
+                time: new Date().toLocaleString('ar-EG')
+            });
+            
+            if (recentVisitors.length > 20) {
+                recentVisitors.splice(0, recentVisitors.length - 20);
+            }
+            
+            await database.ref('users/' + userKey).update({
+                recentVisitors: recentVisitors,
+                visits: (user.visits || 0) + 1
+            });
+            
+        } catch(error) {
+            console.error('Error recording visit:', error);
+        }
+    }
+
+    // ============================================================
+    // ❤️ SEND PROFILE LIKE
+    // ============================================================
+    async function sendProfileLike(targetUserId) {
+        if (!currentUser) {
+            showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+            return;
+        }
+        
+        if (targetUserId == currentUser.numericId) {
+            showToast('⚠️ لا يمكنك الإعجاب بملفك الشخصي', 'warning');
+            return;
+        }
+        
+        try {
+            const snapshot = await database.ref('users')
+                .orderByChild('numericId')
+                .equalTo(parseInt(targetUserId))
+                .once('value');
+            
+            if (!snapshot.exists()) {
+                showToast('❌ المستخدم غير موجود', 'error');
+                return;
+            }
+            
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            
+            const likedBy = user.likedBy || [];
+            
+            if (likedBy.includes(currentUser.numericId)) {
+                showToast('⚠️ لقد أعجبت بهذا المستخدم بالفعل', 'warning');
+                return;
+            }
+            
+            likedBy.push(currentUser.numericId);
+            
+            await database.ref('users/' + userKey).update({
+                likedBy: likedBy,
+                likes: (user.likes || 0) + 1
+            });
+            
+            hasLiked = true;
+            const likeBtn = document.getElementById('profileLikeBtn');
+            if (likeBtn) {
+                likeBtn.classList.add('liked');
+                likeBtn.innerHTML = '<i class="fas fa-heart"></i> تم الإعجاب';
+            }
+            
+            await database.ref('admin_notifications').push({
+                type: 'user_like',
+                likerId: currentUser.numericId,
+                likerName: currentUser.nickname || currentUser.username || 'مستخدم',
+                targetUserId: targetUserId,
+                targetUserName: user.nickname || user.username || 'مستخدم',
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleString('ar-EG'),
+                read: false,
+                createdAt: new Date().toISOString()
+            });
+            
+            await database.ref('users/' + userKey + '/notifications').push({
+                text: `❤️ أعجب ${currentUser.nickname || currentUser.username} بملفك الشخصي!`,
+                read: false,
+                date: new Date().toLocaleString('ar-EG'),
+                type: 'like',
+                createdAt: new Date().toISOString()
+            });
+            
+            showToast('❤️ تم الإعجاب بالملف الشخصي بنجاح!', 'success');
+            
+        } catch(error) {
+            console.error('Error sending like:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    // ============================================================
+    // 🚩 REPORT FUNCTIONS
+    // ============================================================
+    function openReportModalForUser(userId) {
+        if (userId == currentUser?.numericId) {
+            showToast('⚠️ لا يمكنك الإبلاغ عن نفسك', 'warning');
+            return;
+        }
+        
+        document.getElementById('reportModal').classList.add('active');
+        document.getElementById('reportModal').style.display = 'flex';
+        document.getElementById('screenOverlay').classList.add('active');
+        
+        document.getElementById('reportModal').dataset.reportedUserId = userId;
+        document.getElementById('reportDescription').value = '';
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportModal').classList.remove('active');
+        document.getElementById('reportModal').style.display = 'none';
+        document.getElementById('screenOverlay').classList.remove('active');
+        document.getElementById('reportDescription').value = '';
+    }
+
+    async function submitReport() {
+        const reportedUserId = document.getElementById('reportModal').dataset.reportedUserId;
+        const reportType = document.getElementById('reportType').value;
+        const description = document.getElementById('reportDescription').value.trim();
+        
+        if (!description) {
+            showToast('⚠️ يرجى كتابة وصف البلاغ', 'warning');
+            return;
+        }
+        
+        if (!reportedUserId) {
+            showToast('❌ خطأ في البيانات', 'error');
+            return;
+        }
+        
+        try {
+            const snapshot = await database.ref('users')
+                .orderByChild('numericId')
+                .equalTo(parseInt(reportedUserId))
+                .once('value');
+            
+            let reportedUserName = 'مستخدم';
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+                const user = userData[userKey];
+                reportedUserName = user.nickname || user.username || 'مستخدم';
+            }
+            
+            await database.ref('admin_notifications').push({
+                type: 'user_report',
+                reportedUserId: reportedUserId,
+                reportedUserName: reportedUserName,
+                reportType: reportType,
+                description: description,
+                reporterId: currentUser.numericId,
+                reporterName: currentUser.nickname || currentUser.username || 'مستخدم',
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleString('ar-EG'),
+                read: false,
+                createdAt: new Date().toISOString()
+            });
+            
+            showToast('✅ تم إرسال البلاغ بنجاح!', 'success');
+            closeReportModal();
+            
+        } catch(error) {
+            console.error('Error submitting report:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    // ============================================================
+    // 🎁 VIEW USER GIFTS
+    // ============================================================
+    async function openUserGifts(userId) {
+        try {
+            const snapshot = await database.ref('users')
+                .orderByChild('numericId')
+                .equalTo(parseInt(userId))
+                .once('value');
+            
+            if (!snapshot.exists()) {
+                showToast('❌ المستخدم غير موجود', 'error');
+                return;
+            }
+            
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            
+            const giftsList = user.giftsList || [];
+            const total = giftsList.reduce((sum, g) => sum + (g.value || 0), 0);
+            
+            const modal = document.getElementById('giftsModal');
+            const list = document.getElementById('giftsList');
+            const totalSpan = document.getElementById('totalGiftValue');
+            
+            totalSpan.textContent = total;
+            
+            if (giftsList.length === 0) {
+                list.innerHTML = `
+                    <div class="no-gifts">
+                        <i class="fas fa-gift"></i>
+                        <p>لا توجد هدايا</p>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = giftsList.slice().reverse().map(gift => `
+                    <div class="gift-item">
+                        <div class="gift-emoji-display">${gift.giftEmoji || '🎁'}</div>
+                        <div class="gift-name-display">${gift.giftName || 'هدية'}</div>
+                        <div class="gift-details">
+                            <span class="gift-value">💰 ${gift.value || 0}</span>
+                            <span class="gift-time">📅 ${gift.date || ''}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+            document.getElementById('screenOverlay').classList.add('active');
+            
+        } catch(error) {
+            console.error('Error loading gifts:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    function closeGiftsModal() {
+        document.getElementById('giftsModal').classList.remove('active');
+        document.getElementById('giftsModal').style.display = 'none';
+        document.getElementById('screenOverlay').classList.remove('active');
+    }
+
+    // ============================================================
+    // 👁️ VIEW VISITOR PROFILE
+    // ============================================================
+    async function viewVisitorProfile(numericId) {
+        try {
+            const snapshot = await database.ref('users')
+                .orderByChild('numericId')
+                .equalTo(parseInt(numericId))
+                .once('value');
+            
+            if (!snapshot.exists()) {
+                showToast('❌ المستخدم غير موجود', 'error');
+                return;
+            }
+            
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            
+            await showFullProfile(user, numericId);
+            
+        } catch(error) {
+            console.error('Error viewing visitor:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
+    }
+
+    // ============================================================
+    // 📋 COPY TEXT
+    // ============================================================
+    function copyTextContent(text) {
+        navigator.clipboard.writeText(text.toString()).then(() => {
+            showToast('✅ تم نسخ المعرف', 'success');
+        }).catch(() => {
+            showToast('❌ حدث خطأ في النسخ', 'error');
         });
     }
 
@@ -2143,7 +3308,7 @@
     }
 
     // ============================================================
-    // 🎨 CHAT STYLES MODAL - (يتم استدعاؤها من زر الناف بار)
+    // 🎨 CHAT STYLES MODAL
     // ============================================================
     async function openChatStylesModal() {
         if (!isLoggedIn()) {
@@ -2511,7 +3676,7 @@
                 return;
             }
             list.innerHTML = users.map(u => `
-                <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid ${u.isOwner ? 'rgba(255,215,0,0.2)' : 'transparent'};transition:0.3s;">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid ${u.isOwner ? 'rgba(255,215,0,0.2)' : 'transparent'};transition:0.3s;cursor:pointer;" onclick="openProfilePopupByUserId('${u.userId}')">
                     <div style="width:40px;height:40px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;flex-shrink:0;">
                         ${u.username.charAt(0).toUpperCase()}
                     </div>
@@ -2529,6 +3694,30 @@
                 </div>
             `).join('');
         } catch(e) { console.error('Error loading users:', e); }
+    }
+
+    async function openProfilePopupByUserId(userId) {
+        try {
+            const snapshot = await database.ref('users')
+                .orderByChild('numericId')
+                .equalTo(parseInt(userId))
+                .once('value');
+            
+            if (!snapshot.exists()) {
+                showToast('❌ المستخدم غير موجود', 'error');
+                return;
+            }
+            
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            
+            await showFullProfile(user, userId);
+            
+        } catch(error) {
+            console.error('Error opening profile:', error);
+            showToast('❌ حدث خطأ', 'error');
+        }
     }
 
     // ============================================================
@@ -2683,6 +3872,18 @@
         document.getElementById('chatStylesModal').style.display = 'none';
         document.getElementById('chatStylesModal').classList.remove('active');
         document.getElementById('usersListContainer').style.display = 'none';
+        document.getElementById('fullProfileModal').style.display = 'none';
+        document.getElementById('fullProfileModal').classList.remove('active');
+        document.getElementById('giftsModal').style.display = 'none';
+        document.getElementById('giftsModal').classList.remove('active');
+        document.getElementById('reportModal').style.display = 'none';
+        document.getElementById('reportModal').classList.remove('active');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        document.getElementById(modalId).classList.remove('active');
+        document.getElementById('screenOverlay').classList.remove('active');
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -2775,6 +3976,7 @@
                         deposit: 'money-bill-wave',
                         gift_received: 'gift',
                         vip_purchased: 'crown',
+                        like: 'heart',
                         general: 'info-circle'
                     };
                     const colorMap = {
@@ -2783,6 +3985,7 @@
                         deposit: '#6366f1',
                         gift_received: '#f59e0b',
                         vip_purchased: '#ffd700',
+                        like: '#ef4444',
                         general: '#94a3b8'
                     };
                     const icon = iconMap[n.type] || 'info-circle';
