@@ -65,8 +65,6 @@
         .icon-btn.profile-btn:hover { background: #10b981; color: white; }
         .icon-btn.users-btn { background: rgba(139,92,246,0.06); color: #a78bfa; }
         .icon-btn.users-btn:hover { background: #8b5cf6; color: white; }
-        .icon-btn.exit-gift-btn { background: rgba(239,68,68,0.08); color: #ef4444; }
-        .icon-btn.exit-gift-btn:hover { background: #ef4444; color: white; }
         .badge {
             position: absolute; top: -3px; right: -3px; background: #ef4444; color: white;
             font-size: 0.45rem; padding: 1px 4px; border-radius: 50%; border: 2px solid #0f0c29;
@@ -448,7 +446,7 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
-        /* ===== CHAT AREA - مع تقليص الطول ===== */
+        /* ===== CHAT AREA ===== */
         .chat-area {
             width: 380px;
             min-width: 280px;
@@ -1772,10 +1770,7 @@
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar">
     <div class="nav-left">
-        <!-- أيقونة الخروج من صفحة الهدايا (موجودة دائماً) -->
-        <button class="icon-btn exit-gift-btn" onclick="closeAllGiftModals()" title="الخروج من الهدايا">
-            <i class="fas fa-times"></i>
-        </button>
+        <!-- فارغ -->
     </div>
 
     <div class="room-info-box">
@@ -1938,7 +1933,7 @@
     </div>
 </div>
 
-<!-- ===== GIFTS MODAL ===== -->
+<!-- ===== GIFTS MODAL (الهدايا المتلقاة) ===== -->
 <div id="giftsModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.15); padding-bottom:8px; margin-bottom:10px;">
@@ -1996,9 +1991,14 @@
     </div>
 </div>
 
-<!-- ===== GIFT SEND MODAL ===== -->
+<!-- ===== GIFT SEND MODAL (نافذة إرسال الهدايا مع زر الخروج) ===== -->
 <div id="giftSendModal" class="modal">
-    <h3><i class="fas fa-gift" style="color:#ffd700;"></i> إرسال هدية</h3>
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.15); padding-bottom:8px; margin-bottom:10px;">
+        <h3 style="margin:0; border:none; padding:0; font-size:1rem;"><i class="fas fa-gift" style="color:#ffd700;"></i> إرسال هدية</h3>
+        <button onclick="closeGiftModal()" style="background:rgba(255,255,255,0.04); border:none; color:#ffd700; font-size:1.1rem; cursor:pointer; padding:3px 6px; border-radius:5px; transition:0.3s;">
+            ✕
+        </button>
+    </div>
     <p style="font-size:0.75rem;">اختر المستخدم والهدية المناسبة</p>
     
     <label style="font-weight:bold; font-size:0.75rem; margin-top:6px;">👤 إرسال إلى:</label>
@@ -2023,7 +2023,12 @@
 
 <!-- ===== CHAT STYLES MODAL ===== -->
 <div id="chatStylesModal" class="modal">
-    <h3><i class="fas fa-pen-fancy" style="color:#a78bfa;"></i> أشكال الكتابة</h3>
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.15); padding-bottom:8px; margin-bottom:10px;">
+        <h3 style="margin:0; border:none; padding:0; font-size:1rem;"><i class="fas fa-pen-fancy" style="color:#a78bfa;"></i> أشكال الكتابة</h3>
+        <button onclick="closeChatStylesModal()" style="background:rgba(255,255,255,0.04); border:none; color:#ffd700; font-size:1.1rem; cursor:pointer; padding:3px 6px; border-radius:5px; transition:0.3s;">
+            ✕
+        </button>
+    </div>
     <p style="font-size:0.75rem;">اختر أسلوب الكتابة الذي تريده لرسائلك</p>
     <div id="chatStylesList" style="margin:10px 0; display:flex; flex-direction:column; gap:6px;"></div>
     <button class="action-btn btn-secondary" onclick="closeChatStylesModal()" style="font-size:0.75rem; padding:6px;">إغلاق</button>
@@ -2497,15 +2502,6 @@
             wrapper.style.backgroundImage = 'none';
             wrapper.style.background = 'rgba(255,255,255,0.04)';
         }
-    }
-
-    // ============================================================
-    // 🚪 CLOSE ALL GIFT MODALS
-    // ============================================================
-    function closeAllGiftModals() {
-        closeGiftModal();
-        closeGiftsModal();
-        showToast('✅ تم إغلاق جميع نوافذ الهدايا', 'success');
     }
 
     // ============================================================
@@ -3742,6 +3738,15 @@
         selectedGift = null;
     }
 
+    function closeGiftModal() {
+        document.getElementById('giftSendModal').classList.remove('active');
+        document.getElementById('giftSendModal').style.display = 'none';
+        document.getElementById('screenOverlay').classList.remove('active');
+        selectedGift = null;
+        document.getElementById('giftStatusMessage').textContent = '';
+        document.querySelectorAll('.gift-option-card').forEach(el => el.classList.remove('selected'));
+    }
+
     async function loadGiftReceivers() {
         if (!database || !roomId) return;
         try {
@@ -3895,15 +3900,6 @@
             document.getElementById('confirmGiftBtn').disabled = false;
             document.getElementById('confirmGiftBtn').textContent = 'تأكيد الإرسال';
         }
-    }
-
-    function closeGiftModal() {
-        document.getElementById('giftSendModal').classList.remove('active');
-        document.getElementById('giftSendModal').style.display = 'none';
-        document.getElementById('screenOverlay').classList.remove('active');
-        selectedGift = null;
-        document.getElementById('giftStatusMessage').textContent = '';
-        document.querySelectorAll('.gift-option-card').forEach(el => el.classList.remove('selected'));
     }
 
     // ============================================================
