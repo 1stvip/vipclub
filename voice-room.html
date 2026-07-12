@@ -50,16 +50,25 @@
         .logo { font-size: 1.1rem; font-weight: bold; color: #ffd700; display: flex; align-items: center; gap: 6px; cursor: pointer; text-shadow: 0 0 20px rgba(255,215,0,0.2); }
         .logo i { font-size: 1.1rem; }
 
+        /* ===== مربع معلومات الغرفة ===== */
         .room-info-box {
             background: rgba(255,255,255,0.05);
-            padding: 5px 14px;
+            padding: 6px 16px;
             border-radius: 14px;
             border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .room-info-top {
             display: flex;
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
         }
+
         .room-info-box .room-name { font-weight: 700; color: #fff; font-size: 0.85rem; }
         .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.65rem; background: rgba(255,215,0,0.1); padding: 2px 8px; border-radius: 6px; }
         .room-info-box .room-owner { color: #ffd700; font-size: 0.7rem; }
@@ -69,25 +78,46 @@
             color: #ef4444;
             border: 1px solid rgba(239,68,68,0.2);
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         .room-info-box .btn-leave-icon:hover {
             background: rgba(239,68,68,0.3);
             transform: scale(1.1);
         }
 
-        .nav-icons { display: flex; align-items: center; gap: 6px; }
+        /* ===== مربع الأيقونات تحت معلومات الغرفة ===== */
+        .icon-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding-top: 2px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            width: 100%;
+            justify-content: center;
+        }
+
         .icon-btn {
-            font-size: 1rem; color: #f8fafc; cursor: pointer; position: relative;
-            width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; transition: 0.3s; text-decoration: none; background: rgba(255,255,255,0.05); border: none;
+            font-size: 0.85rem;
+            color: #f8fafc;
+            cursor: pointer;
+            position: relative;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-decoration: none;
+            background: rgba(255,255,255,0.05);
+            border: none;
         }
         .icon-btn:hover { background: #8b5cf6; color: white; transform: translateY(-2px); }
         .icon-btn.gift-btn { background: rgba(255,215,0,0.08); color: #ffd700; }
@@ -98,18 +128,29 @@
         .icon-btn.style-btn:hover { background: #8b5cf6; color: white; }
         .icon-btn.users-btn { background: rgba(16,185,129,0.08); color: #10b981; }
         .icon-btn.users-btn:hover { background: #10b981; color: white; }
+        .icon-btn.profile-btn { background: rgba(236,72,153,0.08); color: #ec4899; }
+        .icon-btn.profile-btn:hover { background: #ec4899; color: white; }
+
         .badge {
-            position: absolute; top: -5px; right: -5px; background: #ef4444; color: white;
-            font-size: 0.5rem; padding: 2px 5px; border-radius: 50%; border: 2px solid #0f0c29;
-            min-width: 16px; text-align: center;
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.45rem;
+            padding: 1px 4px;
+            border-radius: 50%;
+            border: 2px solid #0f0c29;
+            min-width: 14px;
+            text-align: center;
         }
 
         /* ===== MAIN LAYOUT ===== */
         .main-layout {
             display: flex;
             flex: 1;
-            padding: 12px 18px 18px;
-            gap: 18px;
+            padding: 10px 18px 18px;
+            gap: 16px;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
@@ -117,9 +158,9 @@
             min-height: 500px;
         }
 
-        /* ===== SEATS AREA - المربع الأسود ===== */
+        /* ===== SEATS AREA - موسع ===== */
         .seats-area {
-            flex: 1;
+            flex: 1.4;
             background: #000000 !important;
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.03) !important;
@@ -155,7 +196,7 @@
             padding: 5px 0;
         }
 
-        /* ===== نظام المقاعد من الكود الأول ===== */
+        /* ===== نظام المقاعد ===== */
         .seats-row {
             display: flex;
             justify-content: center;
@@ -194,7 +235,7 @@
             flex-shrink: 0;
         }
 
-        /* ===== SEAT FRAME (خلف المقعد) ===== */
+        /* ===== SEAT FRAME ===== */
         .seat-frame {
             position: absolute;
             top: 50%;
@@ -216,18 +257,6 @@
             object-fit: cover;
             border-radius: 50%;
             display: block;
-        }
-        .seat-frame .fallback {
-            width: 100%;
-            height: 100%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #ffd700, #f59e0b);
-            color: #1a1a2e;
-            font-weight: bold;
-            font-size: 0.9rem;
-            border-radius: 50%;
         }
 
         /* ===== SEAT CIRCLE ===== */
@@ -452,11 +481,11 @@
         }
         .seat-wrapper.occupied .seat-number { display: none; }
 
-        /* ===== CHAT AREA - ثابت ===== */
+        /* ===== CHAT AREA - مصغر قليلاً ===== */
         .chat-area {
-            width: 360px;
-            min-width: 280px;
-            max-width: 400px;
+            width: 340px;
+            min-width: 260px;
+            max-width: 380px;
             background: rgba(255,255,255,0.02);
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.05);
@@ -471,23 +500,22 @@
         }
 
         .chat-header {
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
-            min-height: 44px;
+            min-height: 40px;
             background: rgba(0,0,0,0.2);
         }
-        .chat-header h3 { font-size: 0.8rem; color: #ffd700; display: flex; align-items: center; gap: 6px; }
-        .chat-header .online-count { font-size: 0.65rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
+        .chat-header h3 { font-size: 0.75rem; color: #ffd700; display: flex; align-items: center; gap: 6px; }
+        .chat-header .online-count { font-size: 0.6rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
         .chat-header .online-count:hover { color: #ffd700; }
 
-        /* ===== CHAT MESSAGES - ثابت مع سكرول ===== */
         .chat-messages {
             flex: 1;
-            padding: 10px 14px;
+            padding: 8px 12px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -497,18 +525,18 @@
             scroll-behavior: smooth;
             overscroll-behavior: contain;
         }
-        .chat-messages::-webkit-scrollbar { width: 4px; }
-        .chat-messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 10px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.15); border-radius: 10px; }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.12); border-radius: 10px; }
 
         .chat-messages .message {
             padding: 0;
-            border-radius: 14px;
+            border-radius: 12px;
             max-width: 92%;
             word-wrap: break-word;
             animation: fadeInMsg 0.2s ease;
             width: fit-content;
-            min-width: 25%;
+            min-width: 20%;
             position: relative;
             overflow: visible;
             background: transparent;
@@ -518,87 +546,80 @@
 
         .chat-messages .message .message-bg {
             position: relative;
-            padding: 14px 20px;
-            border-radius: 16px;
+            padding: 12px 16px;
+            border-radius: 14px;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            min-height: 55px;
+            min-height: 48px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
             width: 100%;
-            min-width: 100px;
+            min-width: 80px;
             max-width: 100%;
             overflow: hidden;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
         }
 
         .chat-messages .message .message-bg .msg-sender {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: rgba(255,255,255,0.85);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
             text-shadow: 0 1px 4px rgba(0,0,0,0.6);
             justify-content: center;
             font-weight: 600;
+            width: 100%;
+            position: relative;
+            z-index: 2;
         }
         .chat-messages .message .message-bg .msg-sender.owner { color: #ffd700; }
 
         .chat-messages .message .message-bg .msg-text {
-            font-size: 0.9rem;
-            line-height: 1.7;
+            font-size: 0.85rem;
+            line-height: 1.6;
             word-break: break-word;
             color: #fff;
             text-shadow: 0 1px 5px rgba(0,0,0,0.7);
             text-align: center;
-            padding: 4px 0;
+            padding: 2px 0;
             font-weight: 500;
             max-width: 100%;
-        }
-
-        .chat-messages .message .message-bg .msg-time {
-            font-size: 0.5rem;
-            color: rgba(255,255,255,0.6);
-            margin-top: 4px;
-            opacity: 0.8;
-            text-align: center;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-
-        .chat-messages .message .message-bg .msg-badge {
-            font-size: 0.45rem;
-            background: #ffd700;
-            color: #1a1a2e;
-            padding: 1px 8px;
-            border-radius: 8px;
-            font-weight: 700;
-        }
-
-        /* ===== توسيط النصوص داخل صور أشكال الكتابة مع دعم السطور المتعددة ===== */
-        .chat-messages .message .message-bg .style-image-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 4px;
-            width: 100%;
-        }
-        .chat-messages .message .message-bg .style-image-container img {
-            max-width: 100%;
-            max-height: 40px;
-            object-fit: contain;
-            opacity: 0.8;
-            border-radius: 6px;
-            display: block;
-        }
-
-        /* ===== دعم السطور المتعددة في الرسالة ===== */
-        .chat-messages .message .message-bg .msg-text {
+            position: relative;
+            z-index: 2;
             white-space: pre-wrap;
             word-wrap: break-word;
             overflow-wrap: break-word;
+        }
+
+        .chat-messages .message .message-bg .msg-time {
+            font-size: 0.45rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 2px;
+            opacity: 0.8;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .chat-messages .message .message-bg .msg-badge {
+            font-size: 0.4rem;
+            background: #ffd700;
+            color: #1a1a2e;
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        /* ===== لا تظهر صورة صغيرة إضافية - النص داخل صورة الخلفية ===== */
+        .chat-messages .message .message-bg .style-image-container {
+            display: none !important;
         }
 
         .chat-messages .message.system {
@@ -606,11 +627,11 @@
             color: #ffd700;
             text-align: center;
             width: auto;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             border: 1px solid rgba(255,215,0,0.06);
-            border-radius: 14px;
-            padding: 6px 16px;
-            margin: 3px auto;
+            border-radius: 12px;
+            padding: 4px 14px;
+            margin: 2px auto;
             max-width: 85%;
             opacity: 0.9;
             align-self: center;
@@ -625,12 +646,12 @@
         }
 
         .chat-messages .message.own .message-bg {
-            border-radius: 18px 18px 4px 18px;
+            border-radius: 16px 16px 4px 16px;
             direction: rtl;
             text-align: right;
         }
         .chat-messages .message.other .message-bg {
-            border-radius: 18px 18px 18px 4px;
+            border-radius: 16px 16px 16px 4px;
             direction: ltr;
             text-align: left;
         }
@@ -642,16 +663,16 @@
 
         .scroll-down-btn {
             position: absolute;
-            bottom: 60px;
+            bottom: 52px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             background: rgba(102,126,234,0.4);
             border: 2px solid rgba(102,126,234,0.2);
             color: white;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             cursor: pointer;
             transition: 0.3s;
             display: none;
@@ -670,29 +691,29 @@
 
         /* ===== CHAT INPUT ===== */
         .chat-input-area {
-            padding: 6px 10px;
+            padding: 4px 8px;
             border-top: 1px solid rgba(255,255,255,0.05);
             display: flex;
-            gap: 6px;
+            gap: 4px;
             align-items: center;
             flex-shrink: 0;
             background: rgba(0,0,0,0.3);
             position: relative;
-            min-height: 48px;
+            min-height: 42px;
         }
 
         .chat-input-area .input-wrapper {
             flex: 1;
             display: flex;
             align-items: center;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none;
-            padding: 0 10px;
+            padding: 0 8px;
             position: relative;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            min-height: 36px;
+            min-height: 32px;
             overflow: hidden;
             background: rgba(255,255,255,0.05);
         }
@@ -700,27 +721,27 @@
         .chat-input-area .input-wrapper .style-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.15);
+            background: rgba(0,0,0,0.2);
             z-index: 1;
-            border-radius: 12px;
+            border-radius: 10px;
         }
 
         .chat-input-area .input-wrapper input {
             flex: 1;
-            padding: 8px 4px;
+            padding: 6px 4px;
             background: transparent;
             border: none;
             color: white;
             outline: none;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
             z-index: 2;
             position: relative;
-            min-width: 40px;
+            min-width: 30px;
         }
         .chat-input-area .input-wrapper input::placeholder { 
             color: rgba(255,255,255,0.4); 
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
@@ -728,11 +749,11 @@
             background: transparent;
             border: none;
             color: rgba(255,255,255,0.5);
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            padding: 4px 5px;
+            padding: 2px 4px;
             transition: 0.3s;
-            border-radius: 6px;
+            border-radius: 4px;
             z-index: 2;
             position: relative;
             flex-shrink: 0;
@@ -740,15 +761,15 @@
         .chat-input-area .emoji-btn:hover { color: #ffd700; background: rgba(255,215,0,0.1); }
 
         .chat-input-area .send-btn {
-            padding: 6px 14px;
+            padding: 5px 12px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: 0.3s;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             z-index: 2;
             position: relative;
             flex-shrink: 0;
@@ -758,14 +779,14 @@
         .emoji-picker {
             display: none;
             position: absolute;
-            bottom: 45px;
-            left: 10px;
+            bottom: 40px;
+            left: 8px;
             background: #1a1a2e;
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 5px;
-            max-width: 180px;
-            max-height: 80px;
+            border-radius: 10px;
+            padding: 4px;
+            max-width: 160px;
+            max-height: 70px;
             overflow-y: auto;
             z-index: 1000;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
@@ -775,13 +796,13 @@
         }
         .emoji-picker.active { display: flex; }
         .emoji-picker .emoji-item {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             cursor: pointer;
             padding: 2px;
             border-radius: 4px;
             transition: 0.2s;
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1825,9 +1846,8 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
-            .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 260px; }
-            .seats-area { min-height: 400px; max-height: 550px; padding: 20px 15px; }
-            .seats-container { gap: 35px; }
+            .chat-area { width: 100%; max-width: 100%; height: 320px; min-height: 240px; }
+            .seats-area { min-height: 400px; max-height: 550px; }
             .seats-row { gap: 40px !important; }
             .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 45px !important; }
             .seat-circle { width: 75px !important; height: 75px !important; }
@@ -1841,23 +1861,23 @@
         @media (max-width: 850px) {
             .seats-area { min-height: 380px; max-height: 500px; padding: 15px 12px; }
             .seats-container { gap: 30px; }
-            .seats-row { gap: 35px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 40px !important; }
+            .seats-row { gap: 30px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 35px !important; }
             .seat-circle { width: 70px !important; height: 70px !important; }
             .seat-circle .seat-avatar { width: 30px !important; height: 30px !important; font-size: 0.65rem !important; }
             .seat-container { width: 110px; height: 110px; }
             .seat-frame { width: 110px; height: 110px; }
             .seat-username { font-size: 0.55rem; max-width: 80px; margin-top: 6px !important; min-height: 16px; }
             .seat-number { font-size: 0.45rem; margin-top: 6px; min-height: 16px; }
-            .chat-area { height: 300px; min-height: 220px; }
+            .chat-area { height: 280px; min-height: 200px; }
         }
 
         @media (max-width: 600px) {
-            .main-layout { padding: 8px; gap: 12px; }
+            .main-layout { padding: 8px; gap: 10px; }
             .seats-area { min-height: 340px; max-height: 440px; border-radius: 16px; padding: 15px 8px; }
             .seats-container { gap: 25px; }
-            .seats-row { gap: 25px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 30px !important; }
+            .seats-row { gap: 20px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 25px !important; }
             .seat-circle { width: 60px !important; height: 60px !important; }
             .seat-circle .seat-avatar { width: 26px !important; height: 26px !important; font-size: 0.55rem !important; }
             .seat-container { width: 100px; height: 100px; }
@@ -1865,25 +1885,25 @@
             .seat-username { font-size: 0.5rem; max-width: 70px; margin-top: 5px !important; min-height: 14px; }
             .seat-number { font-size: 0.4rem; margin-top: 5px; min-height: 14px; }
             .seats-area .seats-title { font-size: 0.7rem; top: 8px; right: 10px; }
-            .chat-area { height: 240px; min-height: 180px; max-height: 280px; border-radius: 16px; }
-            .chat-header { padding: 6px 12px; min-height: 36px; }
+            .chat-area { height: 220px; min-height: 160px; max-height: 260px; border-radius: 14px; }
+            .chat-header { padding: 6px 10px; min-height: 34px; }
             .chat-header h3 { font-size: 0.7rem; }
-            .chat-messages { padding: 6px 10px; gap: 4px; }
-            .chat-messages .message { max-width: 95%; min-width: 20%; }
-            .chat-messages .message .message-bg { padding: 10px 14px; min-height: 40px; min-width: 60px; border-radius: 14px; }
-            .chat-messages .message .message-bg .msg-text { font-size: 0.8rem; line-height: 1.5; }
+            .chat-messages { padding: 6px 8px; gap: 3px; }
+            .chat-messages .message { max-width: 95%; min-width: 15%; }
+            .chat-messages .message .message-bg { padding: 8px 12px; min-height: 36px; min-width: 50px; border-radius: 12px; }
+            .chat-messages .message .message-bg .msg-text { font-size: 0.75rem; line-height: 1.5; }
             .chat-messages .message .message-bg .msg-sender { font-size: 0.5rem; }
             .chat-messages .message .message-bg .msg-time { font-size: 0.4rem; margin-top: 2px; }
             .chat-messages .message.system { font-size: 0.6rem; padding: 4px 10px; max-width: 92%; }
-            .chat-input-area { padding: 4px 8px; min-height: 40px; gap: 4px; }
-            .chat-input-area .input-wrapper { min-height: 30px; padding: 0 6px; border-radius: 10px; }
-            .chat-input-area .input-wrapper input { font-size: 0.7rem; padding: 6px 4px; }
+            .chat-input-area { padding: 4px 6px; min-height: 38px; gap: 4px; }
+            .chat-input-area .input-wrapper { min-height: 28px; padding: 0 6px; border-radius: 8px; }
+            .chat-input-area .input-wrapper input { font-size: 0.7rem; padding: 4px 4px; }
             .chat-input-area .input-wrapper input::placeholder { font-size: 0.6rem; }
-            .chat-input-area .send-btn { padding: 4px 10px; font-size: 0.65rem; border-radius: 8px; }
-            .chat-input-area .emoji-btn { font-size: 0.8rem; padding: 2px 4px; }
-            .scroll-down-btn { width: 24px; height: 24px; font-size: 0.6rem; bottom: 48px; }
-            .emoji-picker { max-width: 140px; max-height: 60px; bottom: 38px; left: 4px; padding: 4px; }
-            .emoji-picker .emoji-item { font-size: 0.6rem; width: 18px; height: 18px; }
+            .chat-input-area .send-btn { padding: 4px 10px; font-size: 0.65rem; border-radius: 6px; }
+            .chat-input-area .emoji-btn { font-size: 0.75rem; padding: 2px 4px; }
+            .scroll-down-btn { width: 22px; height: 22px; font-size: 0.5rem; bottom: 44px; }
+            .emoji-picker { max-width: 120px; max-height: 50px; bottom: 36px; left: 4px; padding: 3px; }
+            .emoji-picker .emoji-item { font-size: 0.6rem; width: 16px; height: 16px; }
             .audio-controls { bottom: 12px; right: 10px; gap: 5px; }
             .audio-btn { width: 36px; height: 36px; font-size: 0.9rem; }
             .btn-leave-seat { width: 36px; height: 36px; font-size: 0.9rem; }
@@ -1902,15 +1922,20 @@
             #usersListContainer { width: 95%; padding: 14px; }
             #usersList { max-height: 280px; }
             .navbar { padding: 0.3rem 2%; min-height: 50px; }
-            .nav-icons .icon-btn { width: 30px; height: 30px; font-size: 0.85rem; }
-            .badge { font-size: 0.4rem; min-width: 14px; top: -4px; right: -4px; }
+            .icon-btn { width: 28px; height: 28px; font-size: 0.75rem; }
+            .badge { font-size: 0.4rem; min-width: 12px; top: -3px; right: -3px; padding: 1px 3px; }
+            .room-info-box { padding: 4px 10px; }
+            .room-info-box .room-name { font-size: 0.75rem; }
+            .room-info-box .room-id { font-size: 0.55rem; }
+            .room-info-box .room-owner { font-size: 0.6rem; }
+            .room-info-box .member-count { font-size: 0.6rem; }
         }
 
         @media (max-width: 400px) {
             .seats-area { min-height: 280px; max-height: 380px; padding: 12px 6px; }
-            .seats-container { gap: 20px; }
-            .seats-row { gap: 18px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 22px !important; }
+            .seats-container { gap: 18px; }
+            .seats-row { gap: 15px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 18px !important; }
             .seat-circle { width: 52px !important; height: 52px !important; }
             .seat-circle .seat-avatar { width: 22px !important; height: 22px !important; font-size: 0.45rem !important; }
             .seat-container { width: 90px; height: 90px; }
@@ -1919,9 +1944,9 @@
             .seat-number { font-size: 0.35rem; margin-top: 4px; min-height: 12px; }
             .seat-circle .crown-icon { font-size: 0.9rem; top: -8px; right: -5px; }
             .seat-circle .mic-indicator { font-size: 0.4rem; padding: 2px; bottom: -1px; right: -1px; }
-            .chat-area { height: 180px; min-height: 150px; max-height: 220px; }
-            .chat-messages .message .message-bg { padding: 8px 10px; min-height: 32px; min-width: 40px; }
-            .chat-messages .message .message-bg .msg-text { font-size: 0.7rem; line-height: 1.4; }
+            .chat-area { height: 160px; min-height: 140px; max-height: 200px; }
+            .chat-messages .message .message-bg { padding: 6px 8px; min-height: 28px; min-width: 40px; }
+            .chat-messages .message .message-bg .msg-text { font-size: 0.65rem; line-height: 1.4; }
         }
     </style>
 </head>
@@ -1930,37 +1955,46 @@
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar">
     <div class="logo-section">
-        <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
-            <i class="fas fa-users"></i>
-            <span class="badge" id="usersBadge">0</span>
-        </button>
-        <button class="icon-btn" onclick="handleProfileClick()" title="الملف الشخصي">
-            <i class="fas fa-user-circle"></i>
-        </button>
+        <div class="logo" onclick="window.location.href='chat.html'">
+            <i class="fas fa-crown"></i> VipChat
+        </div>
     </div>
 
+    <!-- ===== مربع معلومات الغرفة مع الأيقونات تحته ===== -->
     <div class="room-info-box">
-        <span class="room-name" id="roomNameDisplay">غرفة صوتية</span>
-        <span class="room-id" id="roomIdDisplay">🔑 ---</span>
-        <span class="room-owner" id="roomOwnerDisplay">👑 ---</span>
-        <span class="member-count">👥 <span id="memberCount">0</span></span>
-        <button class="btn-leave-icon" onclick="leaveRoom()" title="مغادرة الغرفة">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
+        <div class="room-info-top">
+            <span class="room-name" id="roomNameDisplay">غرفة صوتية</span>
+            <span class="room-id" id="roomIdDisplay">🔑 ---</span>
+            <span class="room-owner" id="roomOwnerDisplay">👑 ---</span>
+            <span class="member-count">👥 <span id="memberCount">0</span></span>
+            <button class="btn-leave-icon" onclick="leaveRoom()" title="مغادرة الغرفة">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+        
+        <!-- ===== شريط الأيقونات تحت معلومات الغرفة ===== -->
+        <div class="icon-bar">
+            <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
+                <i class="fas fa-users"></i>
+                <span class="badge" id="usersBadge">0</span>
+            </button>
+            <button class="icon-btn profile-btn" onclick="handleProfileClick()" title="الملف الشخصي">
+                <i class="fas fa-user-circle"></i>
+            </button>
+            <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
+                <i class="fas fa-bell"></i>
+                <span class="badge" id="notifBadge">0</span>
+            </button>
+            <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
+                <i class="fas fa-gift"></i>
+            </button>
+            <button class="icon-btn style-btn" onclick="openChatStylesModal()" title="أشكال الكتابة">
+                <i class="fas fa-pen-fancy"></i>
+            </button>
+        </div>
     </div>
 
-    <div class="nav-icons">
-        <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
-            <i class="fas fa-bell"></i>
-            <span class="badge" id="notifBadge">0</span>
-        </button>
-        <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
-            <i class="fas fa-gift"></i>
-        </button>
-        <button class="icon-btn style-btn" onclick="openChatStylesModal()" title="أشكال الكتابة">
-            <i class="fas fa-pen-fancy"></i>
-        </button>
-    </div>
+    <div style="width:60px;"></div> <!-- فراغ للحفاظ على التوزان -->
 </nav>
 
 <!-- ===== VIP ENTRANCE ===== -->
@@ -2701,7 +2735,7 @@ function skipVIPEntrance() {
 }
 
 // ============================================================
-// 💺 SEATS FUNCTIONS - نظام المقاعد من الكود الأول
+// 💺 SEATS FUNCTIONS
 // ============================================================
 async function renderSeats(seats) {
     const container = document.getElementById('seatsContainer');
@@ -2723,7 +2757,6 @@ async function renderSeats(seats) {
     const creatorId = roomData?.creatorId;
     const currentUserId = currentUser?.numericId;
     
-    // استخدام ترتيب المقاعد من الكود الأول
     SEATS_LAYOUT.forEach((rowData, rowIndex) => {
         const rowClass = `row-${rowIndex + 1}`;
         const seatsInRow = rowData.seats;
@@ -2775,7 +2808,6 @@ async function renderSeats(seats) {
             
             const wrapperClass = hasFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
             
-            // الإطار الفاخر - يظهر خلف المقعد (z-index: 0)
             let frameHTML = '';
             if (hasFrame && frameConfig) {
                 frameHTML = `
@@ -3522,18 +3554,12 @@ function displayMessage(msg) {
     
     let bgStyle = '';
     let styleNameHTML = '';
-    let styleImageHTML = '';
     
     if (msg.styleId) {
         const style = CHAT_STYLES.find(s => s.id === msg.styleId);
         if (style) {
             styleNameHTML = ` <span style="font-size:0.5rem; color:#ffd700;">✍️ ${style.name}</span>`;
             bgStyle = `background-image: url('${style.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
-            styleImageHTML = `
-                <div class="style-image-container">
-                    <img src="${style.image}" alt="${style.name}">
-                </div>
-            `;
         }
     }
     
@@ -3544,12 +3570,12 @@ function displayMessage(msg) {
     }
     
     const textLength = msg.text.length;
-    let padding = '14px 20px';
-    let minHeight = '55px';
-    let minWidth = '100px';
-    if (textLength > 50) { padding = '16px 24px'; minHeight = '65px'; minWidth = '120px'; }
-    if (textLength > 100) { padding = '18px 28px'; minHeight = '75px'; minWidth = '140px'; }
-    if (textLength > 200) { padding = '22px 32px'; minHeight = '90px'; minWidth = '180px'; }
+    let padding = '12px 16px';
+    let minHeight = '48px';
+    let minWidth = '80px';
+    if (textLength > 50) { padding = '14px 20px'; minHeight = '55px'; minWidth = '100px'; }
+    if (textLength > 100) { padding = '16px 24px'; minHeight = '65px'; minWidth = '120px'; }
+    if (textLength > 200) { padding = '20px 28px'; minHeight = '80px'; minWidth = '160px'; }
     
     div.innerHTML = `
         <div class="message-bg" style="${bgStyle}; padding: ${padding}; min-height: ${minHeight}; min-width: ${minWidth};">
@@ -3559,7 +3585,6 @@ function displayMessage(msg) {
                 ${styleNameHTML}
             </div>
             <div class="msg-text" style="text-align:center;">${msg.text}</div>
-            ${styleImageHTML}
             <div class="msg-time">${msg.time || ''}</div>
         </div>
     `;
