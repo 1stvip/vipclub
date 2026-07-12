@@ -46,7 +46,6 @@
             box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
 
-        /* ===== إخفاء شعار VipChat والتاج ===== */
         .logo-section { display: none !important; }
 
         /* ===== مربع معلومات الغرفة ===== */
@@ -91,7 +90,7 @@
             transform: scale(1.1);
         }
 
-        /* ===== مربع الأيقونات تحت معلومات الغرفة ===== */
+        /* ===== شريط الأيقونات ===== */
         .icon-bar {
             display: flex;
             align-items: center;
@@ -157,7 +156,7 @@
             min-height: 500px;
         }
 
-        /* ===== SEATS AREA - موسع ===== */
+        /* ===== SEATS AREA ===== */
         .seats-area {
             flex: 1.8;
             background: #000000 !important;
@@ -195,22 +194,21 @@
             padding: 5px 0;
         }
 
-        /* ===== نظام المقاعد ===== */
+        /* ===== نظام المقاعد - مكبر ===== */
         .seats-row {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
             flex-shrink: 0;
-            gap: 50px !important;
+            gap: 60px !important;
             flex-wrap: nowrap;
         }
 
         .seats-row.row-1 { justify-content: center; padding: 0; gap: 0 !important; }
         .seats-row.row-1 .seat-wrapper { margin: 0 auto; }
-        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 60px !important; }
+        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 70px !important; }
 
-        /* ===== SEAT WRAPPER ===== */
         .seat-wrapper {
             display: flex;
             flex-direction: column;
@@ -219,29 +217,29 @@
             flex-shrink: 0;
             position: relative;
             width: auto;
-            min-width: 80px;
+            min-width: 90px;
             margin-bottom: 5px;
         }
 
-        /* ===== SEAT CONTAINER ===== */
+        /* ===== SEAT CONTAINER - مكبر ===== */
         .seat-container {
             position: relative;
-            width: 140px;
-            height: 140px;
+            width: 160px !important;
+            height: 160px !important;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
 
-        /* ===== SEAT FRAME ===== */
+        /* ===== SEAT FRAME - مكبر ===== */
         .seat-frame {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 140px;
-            height: 140px;
+            width: 160px !important;
+            height: 160px !important;
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
@@ -258,10 +256,10 @@
             display: block;
         }
 
-        /* ===== SEAT CIRCLE ===== */
+        /* ===== SEAT CIRCLE - مكبر ===== */
         .seat-circle {
-            width: 85px !important;
-            height: 85px !important;
+            width: 100px !important;
+            height: 100px !important;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -277,10 +275,8 @@
             margin: 0 auto;
         }
 
-        /* ===== إخفاء التاج ===== */
         .seat-circle .crown-icon { display: none !important; }
 
-        /* ===== ألوان المقاعد الفارغة بتدرج جذاب ===== */
         .seat-circle.empty {
             border-color: transparent;
             background: linear-gradient(145deg, rgba(139,92,246,0.12), rgba(99,102,241,0.08));
@@ -296,6 +292,10 @@
             box-shadow: 0 0 20px rgba(139,92,246,0.05) !important;
         }
 
+        .seat-circle.empty .seat-avatar i {
+            color: rgba(139,92,246,0.3);
+        }
+
         .seat-circle.empty:hover {
             border-color: rgba(139,92,246,0.3);
             background: linear-gradient(145deg, rgba(139,92,246,0.2), rgba(99,102,241,0.15));
@@ -306,10 +306,6 @@
         @keyframes glowPulse {
             0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.03), inset 0 0 20px rgba(139,92,246,0.02); }
             50% { box-shadow: 0 0 40px rgba(139,92,246,0.08), inset 0 0 40px rgba(139,92,246,0.04); }
-        }
-
-        .seat-circle.empty .seat-avatar i {
-            color: rgba(139,92,246,0.3);
         }
 
         .seat-circle.occupied {
@@ -337,13 +333,13 @@
         }
 
         .seat-circle .seat-avatar {
-            width: 38px !important;
-            height: 38px !important;
+            width: 48px !important;
+            height: 48px !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem !important;
+            font-size: 1.1rem !important;
             font-weight: 700;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: white;
@@ -463,18 +459,17 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
-        /* ===== USERNAME UNDER SEAT ===== */
         .seat-username {
-            font-size: 0.7rem;
-            margin-top: 8px !important;
+            font-size: 0.75rem !important;
+            margin-top: 10px !important;
             color: #a78bfa;
-            max-width: 120px;
+            max-width: 130px !important;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             text-align: center;
             font-weight: 600;
-            min-height: 20px;
+            min-height: 22px !important;
             width: 100%;
             padding: 0 4px;
             z-index: 3;
@@ -484,17 +479,17 @@
         .seat-username.empty-text { color: #444; }
 
         .seat-number {
-            font-size: 0.55rem;
+            font-size: 0.6rem !important;
             color: rgba(139,92,246,0.5);
-            margin-top: 8px;
+            margin-top: 10px !important;
             text-align: center;
             font-weight: 500;
-            min-height: 20px;
+            min-height: 22px !important;
             transition: 0.3s;
         }
         .seat-wrapper.occupied .seat-number { display: none; }
 
-        /* ===== CHAT AREA - مصغر قليلاً ===== */
+        /* ===== CHAT AREA ===== */
         .chat-area {
             width: 340px;
             min-width: 260px;
@@ -630,7 +625,6 @@
             font-weight: 700;
         }
 
-        /* ===== لا تظهر صورة صغيرة إضافية - النص داخل صورة الخلفية ===== */
         .chat-messages .message .message-bg .style-image-container {
             display: none !important;
         }
@@ -1689,173 +1683,6 @@
             background: #444;
         }
 
-        /* ===== TOP UP MODAL ===== */
-        #currencyModal select,
-        #topUpModal select,
-        #topUpModal input[type="number"],
-        #topUpModal input[type="file"] {
-            width: 100%;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            margin: 5px 0;
-            font-size: 0.85rem;
-        }
-
-        #topUpModal #walletBox {
-            background: #0f172a;
-            padding: 10px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px dashed #8b5cf6;
-            margin: 5px 0;
-        }
-
-        #topUpModal #walletBox button {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        #topUpModal #binanceDetails {
-            display: none;
-            font-size: 0.8rem;
-            line-height: 1.6;
-            margin: 5px 0;
-        }
-
-        #topUpModal #binanceDetails button {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 2px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-
-        /* ===== USERS LIST ===== */
-        #usersListContainer {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #1a1a2e;
-            border-radius: 20px;
-            border: 1px solid #333;
-            z-index: 10001;
-            width: 380px;
-            max-width: 92vw;
-            max-height: 80vh;
-            overflow: hidden;
-            padding: 18px;
-        }
-
-        #usersListContainer .users-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 8px;
-        }
-
-        #usersListContainer .users-header h3 {
-            color: #ffd700;
-            font-size: 0.95rem;
-        }
-
-        #usersListContainer .users-header button {
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-
-        #usersList {
-            max-height: 350px;
-            overflow-y: auto;
-        }
-
-        .user-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border-radius: 10px;
-            border: 1px solid transparent;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .user-item:hover {
-            background: rgba(255,255,255,0.03);
-            border-color: rgba(255,255,255,0.05);
-        }
-
-        .user-item.owner-item {
-            border-color: rgba(255,215,0,0.15);
-            background: rgba(255,215,0,0.03);
-        }
-
-        .user-item .user-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .user-item .user-info {
-            flex: 1;
-        }
-
-        .user-item .user-info .user-name {
-            font-weight: bold;
-            font-size: 0.85rem;
-        }
-
-        .user-item .user-info .user-id {
-            font-size: 0.65rem;
-            color: #94a3b8;
-        }
-
-        .user-item .user-info .user-status {
-            font-size: 0.6rem;
-        }
-
-        .user-item .user-status.muted { color: #ef4444; }
-        .user-item .user-status.active { color: #10b981; }
-
-        .user-item .gift-btn-small {
-            padding: 4px 12px;
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.65rem;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .user-item .gift-btn-small:hover {
-            transform: scale(1.05);
-        }
-
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
@@ -1863,26 +1690,12 @@
             .seats-area { min-height: 400px; max-height: 550px; }
             .seats-row { gap: 40px !important; }
             .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 45px !important; }
-            .seat-circle { width: 75px !important; height: 75px !important; }
-            .seat-circle .seat-avatar { width: 32px !important; height: 32px !important; font-size: 0.7rem !important; }
-            .seat-container { width: 120px; height: 120px; }
-            .seat-frame { width: 120px; height: 120px; }
-            .seat-username { font-size: 0.6rem; max-width: 90px; margin-top: 6px !important; min-height: 18px; }
-            .seat-number { font-size: 0.5rem; margin-top: 6px; min-height: 18px; }
-        }
-
-        @media (max-width: 850px) {
-            .seats-area { min-height: 380px; max-height: 500px; padding: 15px 12px; overflow: visible !important; }
-            .seats-container { gap: 30px; overflow: visible !important; }
-            .seats-row { gap: 30px !important; overflow: visible !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 35px !important; }
-            .seat-circle { width: 70px !important; height: 70px !important; }
-            .seat-circle .seat-avatar { width: 30px !important; height: 30px !important; font-size: 0.65rem !important; }
-            .seat-container { width: 110px; height: 110px; }
-            .seat-frame { width: 110px; height: 110px; }
-            .seat-username { font-size: 0.55rem; max-width: 80px; margin-top: 6px !important; min-height: 16px; }
-            .seat-number { font-size: 0.45rem; margin-top: 6px; min-height: 16px; }
-            .chat-area { height: 280px; min-height: 200px; }
+            .seat-circle { width: 85px !important; height: 85px !important; }
+            .seat-circle .seat-avatar { width: 38px !important; height: 38px !important; font-size: 0.85rem !important; }
+            .seat-container { width: 130px !important; height: 130px !important; }
+            .seat-frame { width: 130px !important; height: 130px !important; }
+            .seat-username { font-size: 0.7rem !important; max-width: 100px !important; margin-top: 8px !important; min-height: 20px !important; }
+            .seat-number { font-size: 0.55rem !important; margin-top: 8px !important; min-height: 20px !important; }
         }
 
         @media (max-width: 600px) {
@@ -1899,7 +1712,7 @@
                 overflow: visible !important; 
             }
             .seats-row { 
-                gap: 12px !important; 
+                gap: 25px !important; 
                 flex-wrap: nowrap !important; 
                 overflow: visible !important; 
                 width: 100%; 
@@ -1910,58 +1723,44 @@
                 margin: 0 auto; 
                 gap: 0 !important; 
             }
-            .seats-row.row-2 { 
-                max-width: 100%; 
-                gap: 12px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-3 { 
-                max-width: 100%; 
-                gap: 12px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-4 { 
-                max-width: 100%; 
-                gap: 12px !important; 
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { 
+                gap: 30px !important; 
                 justify-content: center; 
             }
             .seat-wrapper { 
-                min-width: 60px; 
+                min-width: 70px; 
                 flex-shrink: 0; 
             }
             .seat-container { 
-                width: 90px !important; 
-                height: 90px !important; 
+                width: 100px !important; 
+                height: 100px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle { 
-                width: 55px !important; 
-                height: 55px !important; 
+                width: 65px !important; 
+                height: 65px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle .seat-avatar { 
-                width: 24px !important; 
-                height: 24px !important; 
-                font-size: 0.5rem !important; 
+                width: 32px !important; 
+                height: 32px !important; 
+                font-size: 0.7rem !important; 
             }
             .seat-frame { 
-                width: 90px !important; 
-                height: 90px !important; 
+                width: 100px !important; 
+                height: 100px !important; 
             }
             .seat-username { 
-                font-size: 0.45rem; 
-                max-width: 55px; 
-                margin-top: 4px !important; 
-                min-height: 14px; 
+                font-size: 0.55rem !important; 
+                max-width: 70px !important; 
+                margin-top: 6px !important; 
+                min-height: 16px !important; 
             }
             .seat-number { 
-                font-size: 0.4rem; 
-                margin-top: 4px; 
-                min-height: 14px; 
+                font-size: 0.5rem !important; 
+                margin-top: 6px !important; 
+                min-height: 16px !important; 
                 color: rgba(139,92,246,0.4); 
-            }
-            .seats-row.row-4 .seat-wrapper:nth-child(3) {
-                margin-left: 0;
             }
             .seat-circle .crown-icon { display: none !important; }
             .seat-circle .mic-indicator { font-size: 0.4rem; padding: 2px; bottom: -1px; right: -1px; }
@@ -2002,10 +1801,6 @@
             #profileDropdown { right: 5px; width: 280px; }
             .modal { width: 95%; padding: 16px; }
             .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
-            .user-item { padding: 6px 8px; }
-            .user-item .user-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
-            #usersListContainer { width: 95%; padding: 14px; }
-            #usersList { max-height: 280px; }
             .navbar { padding: 0.3rem 2%; min-height: 50px; }
             .icon-btn { width: 28px; height: 28px; font-size: 0.75rem; }
             .badge { font-size: 0.4rem; min-width: 12px; top: -3px; right: -3px; padding: 1px 3px; }
@@ -2030,7 +1825,7 @@
                 overflow: visible !important; 
             }
             .seats-row { 
-                gap: 8px !important; 
+                gap: 12px !important; 
                 flex-wrap: nowrap !important; 
                 overflow: visible !important; 
                 width: 100%; 
@@ -2041,55 +1836,44 @@
                 margin: 0 auto; 
                 gap: 0 !important; 
             }
-            .seats-row.row-2 { 
-                max-width: 100%; 
-                gap: 8px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-3 { 
-                max-width: 100%; 
-                gap: 8px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-4 { 
-                max-width: 100%; 
-                gap: 8px !important; 
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { 
+                gap: 15px !important; 
                 justify-content: center; 
             }
             .seat-wrapper { 
-                min-width: 48px; 
+                min-width: 55px; 
                 flex-shrink: 0; 
             }
             .seat-container { 
-                width: 72px !important; 
-                height: 72px !important; 
+                width: 80px !important; 
+                height: 80px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle { 
-                width: 44px !important; 
-                height: 44px !important; 
+                width: 50px !important; 
+                height: 50px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle .seat-avatar { 
-                width: 20px !important; 
-                height: 20px !important; 
-                font-size: 0.4rem !important; 
+                width: 24px !important; 
+                height: 24px !important; 
+                font-size: 0.5rem !important; 
                 border-width: 1.5px !important; 
             }
             .seat-frame { 
-                width: 72px !important; 
-                height: 72px !important; 
+                width: 80px !important; 
+                height: 80px !important; 
             }
             .seat-username { 
-                font-size: 0.4rem; 
-                max-width: 44px; 
-                margin-top: 3px !important; 
-                min-height: 12px; 
+                font-size: 0.45rem !important; 
+                max-width: 50px !important; 
+                margin-top: 4px !important; 
+                min-height: 14px !important; 
             }
             .seat-number { 
-                font-size: 0.35rem; 
-                margin-top: 3px; 
-                min-height: 12px; 
+                font-size: 0.4rem !important; 
+                margin-top: 4px !important; 
+                min-height: 14px !important; 
                 color: rgba(139,92,246,0.35); 
             }
             .seat-circle .crown-icon { display: none !important; }
@@ -2120,10 +1904,8 @@
 
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar">
-    <!-- ===== تم إخفاء شعار VipChat ===== -->
     <div style="display:none;"></div>
 
-    <!-- ===== مربع معلومات الغرفة مع الأيقونات تحته ===== -->
     <div class="room-info-box">
         <div class="room-info-top">
             <span class="room-name" id="roomNameDisplay">غرفة صوتية</span>
@@ -2135,7 +1917,6 @@
             </button>
         </div>
         
-        <!-- ===== شريط الأيقونات تحت معلومات الغرفة ===== -->
         <div class="icon-bar">
             <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
                 <i class="fas fa-users"></i>
@@ -2157,7 +1938,7 @@
         </div>
     </div>
 
-    <div style="width:60px;"></div> <!-- فراغ للحفاظ على التوزان -->
+    <div style="width:60px;"></div>
 </nav>
 
 <!-- ===== VIP ENTRANCE ===== -->
@@ -2176,7 +1957,6 @@
 
 <!-- ===== MAIN LAYOUT ===== -->
 <div class="main-layout">
-    <!-- ===== SEATS AREA ===== -->
     <div class="seats-area">
         <div class="seats-title">
             <i class="fas fa-chair"></i> المقاعد <span id="seatsCount" style="color:#555;">(0/10)</span>
@@ -2184,7 +1964,6 @@
         <div class="seats-container" id="seatsContainer"></div>
     </div>
 
-    <!-- ===== CHAT AREA ===== -->
     <div class="chat-area">
         <div class="chat-header">
             <h3><i class="fas fa-comment-dots"></i> الشات</h3>
@@ -2235,7 +2014,7 @@
     </button>
 </div>
 
-<!-- ===== PROFILE DROPDOWN ===== -->
+<!-- ===== DROPDOWNS & MODALS ===== -->
 <div id="profileDropdown" class="dropdown-overlay">
     <div style="text-align:center; padding:18px;">
         <div style="font-size:2.5rem; color:#8b5cf6;">👤</div>
@@ -2252,7 +2031,6 @@
     </div>
 </div>
 
-<!-- ===== NOTIFICATIONS DROPDOWN ===== -->
 <div id="notifDropdown" class="dropdown-overlay">
     <div class="notif-header">
         <span>الإشعارات</span>
@@ -2266,23 +2044,19 @@
     </div>
 </div>
 
-<!-- ===== USERS LIST ===== -->
-<div id="usersListContainer">
-    <div class="users-header">
-        <h3><i class="fas fa-users"></i> المستخدمين</h3>
-        <button onclick="closeUsersList()">✕</button>
+<div id="usersListContainer" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#1a1a2e; border-radius:20px; border:1px solid #333; z-index:10001; width:380px; max-width:92vw; max-height:80vh; overflow:hidden; padding:18px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">
+        <h3 style="color:#ffd700; font-size:0.95rem;"><i class="fas fa-users"></i> المستخدمين</h3>
+        <button onclick="document.getElementById('usersListContainer').style.display='none'" style="background:none; border:none; color:#888; font-size:1.1rem; cursor:pointer;">✕</button>
     </div>
-    <div id="usersList"></div>
+    <div id="usersList" style="max-height:350px; overflow-y:auto;"></div>
 </div>
 
-<!-- ===== FULL PROFILE MODAL ===== -->
 <div id="fullProfileModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:10px; margin-bottom:12px;">
             <h2 style="margin:0; border:none; padding:0; font-size:1.1rem;"><i class="fas fa-id-card" style="color: #ffd700;"></i> الملف الشخصي</h2>
-            <button onclick="closeModal('fullProfileModal')" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">
-                ✕
-            </button>
+            <button onclick="closeModal('fullProfileModal')" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">✕</button>
         </div>
         <div id="fullProfileContent" style="text-align:center;"></div>
         <div style="display:flex; gap:8px; margin-top:12px;">
@@ -2291,29 +2065,22 @@
     </div>
 </div>
 
-<!-- ===== GIFT MODAL ===== -->
 <div id="giftSendModal" class="modal">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:10px; margin-bottom:12px;">
         <h3 style="margin:0; border:none; padding:0; font-size:1rem;"><i class="fas fa-gift" style="color:#ffd700;"></i> إرسال هدية</h3>
-        <button onclick="closeGiftModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">
-            ✕
-        </button>
+        <button onclick="closeGiftModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">✕</button>
     </div>
     <p style="font-size:0.8rem;">اختر المستخدم والهدية المناسبة</p>
-    
     <label style="font-weight:bold; font-size:0.8rem; margin-top:8px;">👤 إرسال إلى:</label>
     <select id="giftReceiverSelect" class="gift-receiver-select">
         <option value="">-- اختر مستخدم --</option>
     </select>
-    
     <label style="font-weight:bold; font-size:0.8rem; margin-top:8px;">🎁 اختر الهدية:</label>
     <div class="gift-options-grid" id="giftOptionsGrid"></div>
-    
     <div style="padding:10px; background:rgba(255,255,255,0.03); border-radius:12px; margin:8px 0; text-align:center; border:1px solid rgba(255,255,255,0.05);">
         <span style="color:#94a3b8; font-size:0.8rem;">رصيدك الحالي: </span>
         <span id="giftSenderBalance" style="color:#10b981; font-weight:bold; font-size:0.85rem;">0 ج.م</span>
     </div>
-    
     <div style="display:flex; gap:8px; margin-top:4px;">
         <button onclick="confirmSendGift()" id="confirmGiftBtn" class="action-btn btn-primary" style="flex:2; font-size:0.8rem;">تأكيد الإرسال</button>
         <button onclick="closeGiftModal()" class="action-btn btn-secondary" style="flex:1; font-size:0.8rem;">إلغاء</button>
@@ -2321,40 +2088,25 @@
     <div id="giftStatusMessage" style="text-align:center; margin-top:6px; font-size:0.75rem; color:#94a3b8;"></div>
 </div>
 
-<!-- ===== GIFTS MODAL ===== -->
 <div id="giftsModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:10px; margin-bottom:12px;">
             <h2 style="margin:0; border:none; padding:0; font-size:1.1rem;"><i class="fas fa-gift" style="color:#ffd700;"></i> الهدايا المتلقاة</h2>
-            <button onclick="closeGiftsModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">
-                ✕
-            </button>
+            <button onclick="closeGiftsModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">✕</button>
         </div>
-        <div class="gift-total" id="giftTotal">
-            مجموع قيمة الهدايا: <span id="totalGiftValue">0</span> 💰
-        </div>
-        <div id="giftsList">
-            <div class="no-gifts">
-                <i class="fas fa-gift"></i>
-                <p>لا توجد هدايا</p>
-            </div>
-        </div>
+        <div class="gift-total" id="giftTotal">مجموع قيمة الهدايا: <span id="totalGiftValue">0</span> 💰</div>
+        <div id="giftsList"><div class="no-gifts"><i class="fas fa-gift"></i><p>لا توجد هدايا</p></div></div>
         <button class="close-gifts" onclick="closeGiftsModal()">إغلاق</button>
     </div>
 </div>
 
-<!-- ===== REPORT MODAL ===== -->
 <div id="reportModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:10px; margin-bottom:12px;">
             <h2 style="margin:0; border:none; padding:0; font-size:1.1rem;"><i class="fas fa-flag" style="color:#f59e0b;"></i> الإبلاغ عن المستخدم</h2>
-            <button onclick="closeReportModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">
-                ✕
-            </button>
+            <button onclick="closeReportModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">✕</button>
         </div>
-        <p style="color:#aaa; text-align:center; margin-bottom:12px; font-size:0.8rem;">
-            سيتم إرسال البلاغ إلى الإدارة للتحقيق
-        </p>
+        <p style="color:#aaa; text-align:center; margin-bottom:12px; font-size:0.8rem;">سيتم إرسال البلاغ إلى الإدارة للتحقيق</p>
         <div class="form-group">
             <label>نوع البلاغ</label>
             <select id="reportType">
@@ -2371,34 +2123,26 @@
             <textarea id="reportDescription" placeholder="أدخل تفاصيل البلاغ..."></textarea>
         </div>
         <div class="report-actions">
-            <button class="btn-report-submit" onclick="submitReport()">
-                <i class="fas fa-paper-plane"></i> إرسال البلاغ
-            </button>
+            <button class="btn-report-submit" onclick="submitReport()"><i class="fas fa-paper-plane"></i> إرسال البلاغ</button>
             <button class="btn-report-cancel" onclick="closeReportModal()">إلغاء</button>
         </div>
     </div>
 </div>
 
-<!-- ===== CHAT STYLES MODAL ===== -->
 <div id="chatStylesModal" class="modal">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:10px; margin-bottom:12px;">
         <h3 style="margin:0; border:none; padding:0; font-size:1rem;"><i class="fas fa-pen-fancy" style="color:#a78bfa;"></i> أشكال الكتابة</h3>
-        <button onclick="closeChatStylesModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">
-            ✕
-        </button>
+        <button onclick="closeChatStylesModal()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">✕</button>
     </div>
     <p style="font-size:0.8rem;">اختر أسلوب الكتابة الذي تريده لرسائلك</p>
     <div id="chatStylesList" style="margin:12px 0; display:flex; flex-direction:column; gap:8px;"></div>
     <button class="action-btn btn-secondary" onclick="closeChatStylesModal()" style="font-size:0.8rem;">إغلاق</button>
 </div>
 
-<!-- ===== CURRENCY MODAL ===== -->
 <div id="currencyModal" class="modal">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:10px; margin-bottom:12px;">
         <h3 style="margin:0; border:none; padding:0; font-size:1rem;">إيداع رصيد</h3>
-        <button onclick="closeAll()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">
-            ✕
-        </button>
+        <button onclick="closeAll()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">✕</button>
     </div>
     <p style="font-size:0.85rem;">اختر العملة:</p>
     <button class="action-btn btn-primary" onclick="handleCurrencyChoice('EGP')" style="font-size:0.85rem;">جنيه مصري (EGP)</button>
@@ -2406,13 +2150,10 @@
     <button class="action-btn btn-secondary" onclick="closeAll()" style="font-size:0.85rem;">إلغاء</button>
 </div>
 
-<!-- ===== TOP UP MODAL ===== -->
 <div id="topUpModal" class="modal">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,215,0,0.2); padding-bottom:10px; margin-bottom:12px;">
         <h3 id="topUpTitle" style="margin:0; border:none; padding:0; font-size:1rem;">شحن رصيد</h3>
-        <button onclick="closeAll()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">
-            ✕
-        </button>
+        <button onclick="closeAll()" style="background:rgba(255,255,255,0.05); border:none; color:#ffd700; font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:8px; transition:0.3s;">✕</button>
     </div>
     <select id="paymentMethod" onchange="updatePaymentDetails()"></select>
     <input type="number" id="topUpAmount" placeholder="المبلغ" oninput="calculateRequiredAmount()">
@@ -2421,12 +2162,12 @@
     </div>
     <div id="paymentDetails" style="margin:8px 0;">
         <p id="methodHint" style="font-size:0.75rem; color:#94a3b8;"></p>
-        <div id="walletBox">
+        <div id="walletBox" style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px; border-radius:12px; border:1px dashed #8b5cf6; margin:5px 0;">
             <b id="walletNumber">01022797043</b>
-            <button onclick="copyText('walletNumber')">نسخ</button>
+            <button onclick="copyText('walletNumber')" style="background:#8b5cf6; color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer;">نسخ</button>
         </div>
-        <div id="binanceDetails">
-            <div>المعرف: <b id="binanceID">803045359</b> <button onclick="copyText('binanceID')">نسخ</button></div>
+        <div id="binanceDetails" style="display:none; font-size:0.8rem; line-height:1.6; margin:5px 0;">
+            <div>المعرف: <b id="binanceID">803045359</b> <button onclick="copyText('binanceID')" style="background:#8b5cf6; color:white; border:none; padding:2px 6px; border-radius:4px; cursor:pointer; font-size:0.7rem;">نسخ</button></div>
             <div>الاسم: <b id="binanceName">iMrJoe</b></div>
         </div>
     </div>
@@ -2435,9 +2176,7 @@
     <button class="action-btn btn-secondary" onclick="closeAll()" style="font-size:0.85rem;">إلغاء</button>
 </div>
 
-<!-- ===== OVERLAY ===== -->
 <div id="screenOverlay" class="modal-overlay" onclick="closeAll()"></div>
-
 <script>
 // ============================================================
 // 🔥 FIREBASE CONFIG
@@ -2481,14 +2220,6 @@ const GIFT_TYPES = [
     { id: 'diamond_ring', name: '💎 خاتم ألماس', emoji: '💎', price: 500 },
     { id: 'gold_ring', name: '👑 خاتم ذهب', emoji: '👑', price: 2500 },
     { id: 'lion', name: '🦁 أسد', emoji: '🦁', price: 3000 }
-];
-
-// ===== ترتيب المقاعد من الكود الأول =====
-const SEATS_LAYOUT = [
-    { row: 0, seats: 1 },
-    { row: 1, seats: 3 },
-    { row: 2, seats: 3 },
-    { row: 3, seats: 3 }
 ];
 
 // ============================================================
@@ -2677,6 +2408,25 @@ async function getUserVIPFromFirebase(userId) {
 }
 
 // ============================================================
+// 🎨 APPLY CHAT STYLE TO INPUT
+// ============================================================
+function applyChatStyleToInput(imageUrl) {
+    const wrapper = document.getElementById('chatInputWrapper');
+    if (!wrapper) return;
+    
+    if (imageUrl) {
+        wrapper.style.backgroundImage = `url('${imageUrl}')`;
+        wrapper.style.backgroundSize = 'cover';
+        wrapper.style.backgroundPosition = 'center';
+        wrapper.style.backgroundRepeat = 'no-repeat';
+        wrapper.style.background = 'none';
+    } else {
+        wrapper.style.backgroundImage = 'none';
+        wrapper.style.background = 'rgba(255,255,255,0.05)';
+    }
+}
+
+// ============================================================
 // 🏠 ROOM INIT
 // ============================================================
 function getRoomIdFromURL() {
@@ -2701,7 +2451,11 @@ function initRoom() {
 async function loadRoomData() {
     if (!database) return;
     try {
-        console.log('🔍 جاري البحث عن الغرفة:', roomId);
+        // ===== استقبال عدد المقاعد من الـ URL =====
+        const params = new URLSearchParams(window.location.search);
+        const slotsParam = parseInt(params.get('slots'));
+        
+        console.log('🔍 جاري البحث عن الغرفة:', roomId, 'المقاعد:', slotsParam);
         
         let roomSnapshot = await database.ref('rooms/' + roomId).once('value');
         
@@ -2720,7 +2474,8 @@ async function loadRoomData() {
                         createdAt: requestData.createdAt || new Date().toISOString(),
                         status: 'approved',
                         members: 0,
-                        isActive: true
+                        isActive: true,
+                        maxSlots: slotsParam || requestData.maxSlots || 10
                     });
                     roomSnapshot = await database.ref('rooms/' + roomId).once('value');
                 } else {
@@ -2792,117 +2547,50 @@ async function loadRoomData() {
 }
 
 // ============================================================
-// 🎨 APPLY CHAT STYLE TO INPUT
-// ============================================================
-function applyChatStyleToInput(imageUrl) {
-    const wrapper = document.getElementById('chatInputWrapper');
-    if (!wrapper) return;
-    
-    if (imageUrl) {
-        wrapper.style.backgroundImage = `url('${imageUrl}')`;
-        wrapper.style.backgroundSize = 'cover';
-        wrapper.style.backgroundPosition = 'center';
-        wrapper.style.backgroundRepeat = 'no-repeat';
-        wrapper.style.background = 'none';
-    } else {
-        wrapper.style.backgroundImage = 'none';
-        wrapper.style.background = 'rgba(255,255,255,0.05)';
-    }
-}
-
-// ============================================================
-// 👑 VIP ENTRANCE
-// ============================================================
-function listenForNewUsers() {
-    if (!database || !roomId) return;
-    
-    database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
-        const seat = snapshot.val();
-        if (seat && seat.userId) {
-            const userId = seat.userId;
-            const username = seat.username || 'مستخدم';
-            
-            if (vipShownForUsers[userId]) return;
-            if (userId == currentUser?.numericId) return;
-            
-            vipShownForUsers[userId] = true;
-            vipQueue.push({ userId, username });
-            processVIPQueue();
-        }
-    });
-}
-
-function processVIPQueue() {
-    if (isProcessingJoin || vipQueue.length === 0) return;
-    
-    const item = vipQueue.shift();
-    isProcessingJoin = true;
-    
-    checkAndShowVIPEntrance(item.userId, item.username).finally(() => {
-        isProcessingJoin = false;
-        setTimeout(processVIPQueue, 1000);
-    });
-}
-
-async function checkAndShowVIPEntrance(userId, username) {
-    if (!database || isVIPEntranceActive) return;
-    
-    try {
-        const vipConfig = await getUserVIPFromFirebase(userId);
-        if (!vipConfig) return;
-        
-        isVIPEntranceActive = true;
-        const entrance = document.getElementById('vipEntrance');
-        const video = document.getElementById('vipVideoPlayer');
-        const title = document.getElementById('vipTitle');
-        const userDisplay = document.getElementById('vipEntranceUser');
-        
-        video.pause();
-        video.currentTime = 0;
-        video.muted = false;
-        video.src = vipConfig.video;
-        video.load();
-        
-        title.textContent = `${vipConfig.emoji} ${vipConfig.title}`;
-        userDisplay.textContent = `👤 ${username}`;
-        entrance.classList.add('active');
-        
-        try { await video.play(); } catch(e) {}
-        
-        return new Promise((resolve) => {
-            if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
-            vipEntranceTimeout = setTimeout(() => {
-                skipVIPEntrance();
-                resolve();
-            }, 8000);
-        });
-        
-    } catch(error) { 
-        console.error('VIP entrance error:', error); 
-        isVIPEntranceActive = false;
-    }
-}
-
-function skipVIPEntrance() {
-    const entrance = document.getElementById('vipEntrance');
-    const video = document.getElementById('vipVideoPlayer');
-    entrance.classList.remove('active');
-    video.pause();
-    video.currentTime = 0;
-    isVIPEntranceActive = false;
-    if (vipEntranceTimeout) { 
-        clearTimeout(vipEntranceTimeout); 
-        vipEntranceTimeout = null; 
-    }
-    isProcessingJoin = false;
-}
-
-// ============================================================
 // 💺 SEATS FUNCTIONS
 // ============================================================
 async function renderSeats(seats) {
     const container = document.getElementById('seatsContainer');
     let html = '', occupied = 0, globalIndex = 0;
+    
+    // ===== استقبال عدد المقاعد من الـ URL =====
+    const params = new URLSearchParams(window.location.search);
+    const slotsParam = parseInt(params.get('slots'));
+    let totalSeats = 10; // القيمة الافتراضية
+    
+    if (slotsParam && slotsParam >= 2 && slotsParam <= 10) {
+        totalSeats = slotsParam;
+    } else if (roomData && roomData.maxSlots) {
+        totalSeats = roomData.maxSlots;
+    }
+    
+    // ===== حساب توزيع المقاعد حسب العدد =====
+    let rowsLayout = [];
+    
+    if (totalSeats <= 4) {
+        rowsLayout = [totalSeats];
+    } else if (totalSeats <= 6) {
+        const firstRow = Math.min(2, totalSeats);
+        const secondRow = totalSeats - firstRow;
+        rowsLayout = [firstRow, secondRow];
+    } else if (totalSeats <= 8) {
+        rowsLayout = [2, 3, 3];
+        let remaining = totalSeats - 8;
+        if (remaining > 0) {
+            rowsLayout[rowsLayout.length - 1] += remaining;
+        }
+    } else {
+        rowsLayout = [1, 3, 3, 3];
+        let remaining = totalSeats - 10;
+        if (remaining > 0) {
+            rowsLayout[rowsLayout.length - 1] += remaining;
+        }
+    }
+    
+    const actualRows = [];
+    for (let i = 0; i < rowsLayout.length; i++) {
+        if (rowsLayout[i] > 0) actualRows.push(rowsLayout[i]);
+    }
     
     const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
     
@@ -2920,18 +2608,15 @@ async function renderSeats(seats) {
     const creatorId = roomData?.creatorId;
     const currentUserId = currentUser?.numericId;
     
-    SEATS_LAYOUT.forEach((rowData, rowIndex) => {
+    let globalIndexCounter = 0;
+    
+    actualRows.forEach((seatsInRow, rowIndex) => {
         const rowClass = `row-${rowIndex + 1}`;
-        const seatsInRow = rowData.seats;
-        
-        let seatIndices = [];
-        for (let i = 0; i < seatsInRow; i++) {
-            seatIndices.push(globalIndex + i);
-        }
         
         html += `<div class="seats-row ${rowClass}">`;
         
-        seatIndices.forEach((index) => {
+        for (let i = 0; i < seatsInRow; i++) {
+            const index = globalIndexCounter;
             const seat = seats[index] || null;
             const isOccupied = seat !== null;
             if (isOccupied) occupied++;
@@ -2987,13 +2672,13 @@ async function renderSeats(seats) {
             const seatNumber = index + 1;
             
             html += `
-                <div class="${wrapperClass}">
-                    <div class="seat-container">
+                <div class="${wrapperClass}" style="min-width: 90px;">
+                    <div class="seat-container" style="width: 160px; height: 160px;">
                         ${frameHTML}
                         <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
                             ${isOccupied ? `
                                 ${isSeatCreator ? `<div class="crown-icon" style="display:none !important;">👑</div>` : ''}
-                                <div class="seat-avatar" style="background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''}">
+                                <div class="seat-avatar" style="width: 48px !important; height: 48px !important; background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''} font-size: 1.1rem !important;">
                                     ${userAvatar ? `<img src="${userAvatar}" alt="${displayName}">` : avatarLetter}
                                 </div>
                                 ${isSpeaking ? `
@@ -3015,13 +2700,13 @@ async function renderSeats(seats) {
                             ` : `
                                 ${isOwnerSeat ? `
                                     <div style="position:absolute;top:-6px;right:-4px;font-size:1.2rem;filter:drop-shadow(0 0 10px rgba(255,215,0,0.3));">👑</div>
-                                    <div class="seat-avatar" style="border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700;">
+                                    <div class="seat-avatar" style="width: 48px !important; height: 48px !important; border-color:#ffd700!important;background:rgba(255,215,0,0.1)!important;color:#ffd700; font-size: 1.1rem !important;">
                                         <i class="fas fa-crown"></i>
                                     </div>
                                     <div style="font-size:0.5rem;color:#ffd700;font-weight:bold;">مالك</div>
                                     ${isOwner ? '<div style="font-size:0.4rem;color:#888;">اضغط للجلوس</div>' : ''}
                                 ` : `
-                                    <div class="seat-avatar" style="background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
+                                    <div class="seat-avatar" style="width: 48px !important; height: 48px !important; background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444; font-size: 1.1rem !important;">
                                         <i class="fas fa-plus"></i>
                                     </div>
                                     <div style="font-size:0.5rem;color:#555;">مقعد</div>
@@ -3030,20 +2715,21 @@ async function renderSeats(seats) {
                         </div>
                     </div>
                     ${isOccupied ? `
-                        <div class="seat-username ${isSeatCreator ? 'owner-name' : ''}">${displayName}</div>
+                        <div class="seat-username ${isSeatCreator ? 'owner-name' : ''}" style="font-size: 0.75rem !important; max-width: 130px !important; margin-top: 10px !important; min-height: 22px !important;">${displayName}</div>
                     ` : `
-                        <div class="seat-number">مقعد ${seatNumber}</div>
+                        <div class="seat-number" style="font-size: 0.6rem !important; margin-top: 10px !important; min-height: 22px !important; color: rgba(139,92,246,0.5);">مقعد ${seatNumber}</div>
                     `}
                 </div>
             `;
-        });
+            
+            globalIndexCounter++;
+        }
         
         html += `</div>`;
-        globalIndex += seatsInRow;
     });
     
     container.innerHTML = html;
-    document.getElementById('seatsCount').textContent = `(${occupied}/${globalIndex})`;
+    document.getElementById('seatsCount').textContent = `(${occupied}/${totalSeats})`;
     document.getElementById('memberCount').textContent = occupied;
     document.getElementById('usersBadge').textContent = occupied;
     document.getElementById('chatMemberCount').textContent = occupied;
@@ -3136,6 +2822,93 @@ async function leaveSeat() {
         document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
         showToast('✅ تم مغادرة المقعد', 'success');
     } catch(error) { showToast('❌ حدث خطأ', 'error'); }
+}
+
+// ============================================================
+// 👑 VIP ENTRANCE
+// ============================================================
+function listenForNewUsers() {
+    if (!database || !roomId) return;
+    
+    database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
+        const seat = snapshot.val();
+        if (seat && seat.userId) {
+            const userId = seat.userId;
+            const username = seat.username || 'مستخدم';
+            
+            if (vipShownForUsers[userId]) return;
+            if (userId == currentUser?.numericId) return;
+            
+            vipShownForUsers[userId] = true;
+            vipQueue.push({ userId, username });
+            processVIPQueue();
+        }
+    });
+}
+
+function processVIPQueue() {
+    if (isProcessingJoin || vipQueue.length === 0) return;
+    
+    const item = vipQueue.shift();
+    isProcessingJoin = true;
+    
+    checkAndShowVIPEntrance(item.userId, item.username).finally(() => {
+        isProcessingJoin = false;
+        setTimeout(processVIPQueue, 1000);
+    });
+}
+
+async function checkAndShowVIPEntrance(userId, username) {
+    if (!database || isVIPEntranceActive) return;
+    
+    try {
+        const vipConfig = await getUserVIPFromFirebase(userId);
+        if (!vipConfig) return;
+        
+        isVIPEntranceActive = true;
+        const entrance = document.getElementById('vipEntrance');
+        const video = document.getElementById('vipVideoPlayer');
+        const title = document.getElementById('vipTitle');
+        const userDisplay = document.getElementById('vipEntranceUser');
+        
+        video.pause();
+        video.currentTime = 0;
+        video.muted = false;
+        video.src = vipConfig.video;
+        video.load();
+        
+        title.textContent = `${vipConfig.emoji} ${vipConfig.title}`;
+        userDisplay.textContent = `👤 ${username}`;
+        entrance.classList.add('active');
+        
+        try { await video.play(); } catch(e) {}
+        
+        return new Promise((resolve) => {
+            if (vipEntranceTimeout) clearTimeout(vipEntranceTimeout);
+            vipEntranceTimeout = setTimeout(() => {
+                skipVIPEntrance();
+                resolve();
+            }, 8000);
+        });
+        
+    } catch(error) { 
+        console.error('VIP entrance error:', error); 
+        isVIPEntranceActive = false;
+    }
+}
+
+function skipVIPEntrance() {
+    const entrance = document.getElementById('vipEntrance');
+    const video = document.getElementById('vipVideoPlayer');
+    entrance.classList.remove('active');
+    video.pause();
+    video.currentTime = 0;
+    isVIPEntranceActive = false;
+    if (vipEntranceTimeout) { 
+        clearTimeout(vipEntranceTimeout); 
+        vipEntranceTimeout = null; 
+    }
+    isProcessingJoin = false;
 }
 
 // ============================================================
