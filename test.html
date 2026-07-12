@@ -3,168 +3,813 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحسينات بسيطة</title>
+    <title>🎨 تجربة أساليب الكتابة - محسّنة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ===== تحسينات المقاعد ===== */
-        .seat-wrapper {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0a1a, #1a1040);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .title {
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        /* ===== معاينة الأساليب ===== */
+        .style-preview {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .style-preview-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.75rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .style-preview-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .style-preview-item.active {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.08);
+            color: #ffd700;
+        }
+
+        .style-preview-item img {
+            width: 40px;
+            height: 20px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== حالة الأسلوب النشط ===== */
+        .active-style-info {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .active-style-info span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* ===== أزرار التحكم ===== */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+            color: white;
+            flex: 1;
+            min-width: 70px;
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-style1 {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .btn-style2 {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        .btn-normal {
+            background: linear-gradient(135deg, #666, #444);
+        }
+        .btn-clear {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        /* ===== منطقة عرض الرسائل ===== */
+        .chat-messages {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            max-height: 450px;
+            min-height: 300px;
+            overflow-y: auto;
         }
 
-        /* اسم المستخدم تحت المقعد - مسافة أكبر */
-        .seat-username {
-            font-size: 0.7rem;
-            margin-top: 25px !important; /* مسافة كبيرة تحت المقعد */
-            color: #a78bfa;
-            max-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: center;
-            font-weight: 600;
-            min-height: 22px;
-            z-index: 3;
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.12);
+            border-radius: 10px;
+        }
+
+        /* ===== مجموعة الرسالة ===== */
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            animation: fadeInMsg 0.3s ease;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .message-group.own {
+            align-items: flex-end;
+        }
+        .message-group.other {
+            align-items: flex-start;
+        }
+
+        @keyframes fadeInMsg {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== خلفية الرسالة مع صورة أسلوب الكتابة ===== */
+        .message {
+            max-width: 75%;
+            width: auto;
+            min-width: 100px;
+        }
+
+        /* للهاتف */
+        @media (max-width: 600px) {
+            .message {
+                max-width: 85%;
+                min-width: 80px;
+            }
+        }
+
+        .message .message-bg {
             position: relative;
+            padding: 14px 20px;
+            border-radius: 16px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
             width: 100%;
-            padding: 0 4px;
-        }
-
-        /* ===== تحسين الإطار في الملف الشخصي ===== */
-        .profile-frame-container {
-            margin: 10px auto;
-            width: 150px !important; /* أكبر */
-            height: 150px !important;
-            border-radius: 50%;
-            position: relative;
-            overflow: visible;
-            border: 4px solid #ffd700;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
-        }
-
-        .profile-frame-container video {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* الصورة الرمزية داخل الإطار - أصغر من الإطار */
-        .profile-frame-container .profile-avatar-inner {
-            width: 75% !important; /* 75% من حجم الإطار */
-            height: 75% !important;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .profile-frame-container .profile-avatar-inner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* للهاتف */
+        @media (max-width: 600px) {
+            .message .message-bg {
+                padding: 12px 16px;
+                min-height: 50px;
+                border-radius: 14px;
+            }
         }
 
-        .profile-frame-container .profile-avatar-inner .default-avatar {
-            width: 100%;
-            height: 100%;
+        /* للكمبيوتر */
+        @media (min-width: 1024px) {
+            .message .message-bg {
+                padding: 18px 28px;
+                min-height: 70px;
+                border-radius: 20px;
+            }
+        }
+
+        /* ===== الطبقة الشفافة فوق الصورة ===== */
+        .message .message-bg .style-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+            border-radius: 16px;
+        }
+
+        /* ===== النصوص فوق الطبقة الشفافة ===== */
+        .message .message-bg .msg-sender {
+            position: relative;
+            z-index: 2;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
+            gap: 6px;
+            flex-wrap: wrap;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+            font-weight: 600;
+        }
+
+        /* للكمبيوتر */
+        @media (min-width: 1024px) {
+            .message .message-bg .msg-sender {
+                font-size: 0.75rem;
+                gap: 8px;
+            }
+        }
+
+        .message .message-bg .msg-sender.owner {
             color: #ffd700;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
         }
 
-        /* ===== تحسين الدردشة ===== */
-        .chat-area {
-            background: transparent !important;
-            border: none !important;
-            backdrop-filter: none !important;
-            box-shadow: none !important;
+        .message .message-bg .msg-text {
+            position: relative;
+            z-index: 2;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            word-break: break-word;
+            color: #fff;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.7);
+            padding: 4px 0;
+            font-weight: 500;
+            max-width: 100%;
         }
 
-        .chat-messages {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 0;
-            padding: 12px 16px;
-        }
-
-        .chat-messages .message .message-bg {
-            border-radius: 12px !important;
-            padding: 14px 20px !important;
-            min-height: 50px !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .chat-messages .message.own .message-bg {
-            border-radius: 12px 12px 4px 12px !important;
-        }
-
-        .chat-messages .message.other .message-bg {
-            border-radius: 12px 12px 12px 4px !important;
-        }
-
-        .chat-input-area {
-            background: rgba(0, 0, 0, 0.3);
-            border-top: none !important;
-            border-radius: 0;
-            padding: 8px 12px;
-        }
-
-        .chat-input-area .input-wrapper {
-            border-radius: 10px !important;
-            background: rgba(255,255,255,0.06) !important;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .chat-input-area .input-wrapper input {
-            font-size: 0.9rem;
-            padding: 10px 8px;
-        }
-
-        .chat-input-area .send-btn {
-            border-radius: 10px !important;
-            padding: 10px 18px;
-        }
-
-        /* ===== RESPONSIVE ===== */
+        /* للهاتف */
         @media (max-width: 600px) {
-            .seat-username {
+            .message .message-bg .msg-text {
+                font-size: 0.85rem;
+                line-height: 1.5;
+                padding: 3px 0;
+            }
+        }
+
+        /* للكمبيوتر */
+        @media (min-width: 1024px) {
+            .message .message-bg .msg-text {
+                font-size: 1.05rem;
+                line-height: 1.8;
+                padding: 6px 0;
+            }
+        }
+
+        .message .message-bg .msg-time {
+            position: relative;
+            z-index: 2;
+            font-size: 0.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+            opacity: 0.8;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* للكمبيوتر */
+        @media (min-width: 1024px) {
+            .message .message-bg .msg-time {
                 font-size: 0.55rem;
-                margin-top: 20px !important;
-                max-width: 70px;
+                margin-top: 6px;
             }
-            
-            .profile-frame-container {
-                width: 120px !important;
-                height: 120px !important;
+        }
+
+        /* ===== اسم أسلوب الكتابة ===== */
+        .message .message-bg .msg-sender .style-badge {
+            font-size: 0.45rem;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+            padding: 2px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            font-weight: 600;
+        }
+
+        /* للكمبيوتر */
+        @media (min-width: 1024px) {
+            .message .message-bg .msg-sender .style-badge {
+                font-size: 0.5rem;
+                padding: 3px 12px;
             }
-            
-            .profile-frame-container .profile-avatar-inner {
-                width: 72% !important;
-                height: 72% !important;
+        }
+
+        /* ===== رسائل عادية ===== */
+        .message.own .message-bg.no-style {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.25));
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            border-radius: 14px 14px 14px 4px;
+        }
+
+        .message.other .message-bg.no-style {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px 14px 4px 14px;
+        }
+
+        /* ===== مدخل الرسالة ===== */
+        .input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .input-area input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-area button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .input-area button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* ===== Toast ===== */
+        .toast-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            animation: slideDown 0.3s ease-out;
+            max-width: 300px;
+            direction: rtl;
+            font-size: 0.85rem;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== التجاوب ===== */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .title {
+                font-size: 1.1rem;
+            }
+            .style-preview-item {
+                padding: 6px 10px;
+                font-size: 0.65rem;
+            }
+            .style-preview-item img {
+                width: 30px;
+                height: 15px;
+            }
+            .controls button {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+                min-width: 60px;
+            }
+            .input-area input {
+                font-size: 0.75rem;
+                padding: 8px 12px;
+            }
+            .input-area button {
+                font-size: 0.75rem;
+                padding: 8px 14px;
+            }
+            .chat-messages {
+                max-height: 350px;
+                min-height: 250px;
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 10px;
+            }
+            .message .message-bg {
+                padding: 10px 12px;
+                min-height: 40px;
+            }
+            .message .message-bg .msg-text {
+                font-size: 0.75rem;
+            }
+            .message .message-bg .msg-sender {
+                font-size: 0.55rem;
+            }
+            .message {
+                max-width: 90%;
+                min-width: 60px;
+            }
+            .style-preview-item {
+                padding: 4px 8px;
+                font-size: 0.55rem;
+            }
+            .style-preview-item img {
+                width: 24px;
+                height: 12px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 900px;
+                padding: 30px;
+            }
+            .message .message-bg {
+                padding: 22px 32px;
+                min-height: 80px;
+                border-radius: 22px;
+            }
+            .message .message-bg .msg-text {
+                font-size: 1.1rem;
+            }
+            .message {
+                max-width: 65%;
             }
         }
     </style>
 </head>
 <body>
-    <!-- هذا الكود للتوضيح فقط - سيتم دمج التحسينات في الكود الكامل -->
+
+    <div class="container">
+        <h1 class="title">🎨 تجربة أساليب الكتابة</h1>
+
+        <!-- ===== معاينة الأساليب ===== -->
+        <div class="style-preview" id="stylePreview">
+            <div class="style-preview-item" data-style="chatstyle1" onclick="applyStyle('chatstyle1')">
+                <img src="images/vipsystem/chatstyles/chat1style.png" alt="أسلوب 1" onerror="this.style.display='none'">
+                <span>أسلوب 1</span>
+            </div>
+            <div class="style-preview-item" data-style="chatstyle2" onclick="applyStyle('chatstyle2')">
+                <img src="images/vipsystem/chatstyles/chat2style.png" alt="أسلوب 2" onerror="this.style.display='none'">
+                <span>أسلوب 2</span>
+            </div>
+            <div class="style-preview-item active" data-style="normal" onclick="applyStyle(null)">
+                <span>📝 عادي</span>
+            </div>
+        </div>
+
+        <!-- ===== حالة الأسلوب النشط ===== -->
+        <div class="active-style-info" id="activeStyleInfo">
+            📝 الأسلوب النشط: <span id="currentStyleName">عادي</span>
+        </div>
+
+        <!-- ===== أزرار التحكم ===== -->
+        <div class="controls">
+            <button class="btn-style1" onclick="applyStyle('chatstyle1')">✨ أسلوب 1</button>
+            <button class="btn-style2" onclick="applyStyle('chatstyle2')">🌸 أسلوب 2</button>
+            <button class="btn-normal" onclick="applyStyle(null)">📝 عادي</button>
+            <button class="btn-clear" onclick="clearMessages()">🗑️ مسح</button>
+        </div>
+
+        <!-- ===== منطقة الشات ===== -->
+        <div class="chat-messages" id="chatMessages">
+            <!-- رسائل تجريبية -->
+        </div>
+
+        <!-- ===== مدخل الرسالة ===== -->
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
     <script>
-        // التحسينات سيتم تطبيقها تلقائياً مع الكود الكامل
-        console.log('✅ تم تطبيق التحسينات التالية:');
-        console.log('1. ✅ زيادة المسافة تحت المقاعد للأسماء');
-        console.log('2. ✅ تكبير الإطار في الملف الشخصي مع تصغير الصورة الرمزية داخله');
-        console.log('3. ✅ تحسين عرض الدردشة وإزالة الحواف');
-        console.log('4. ✅ الحفاظ على جميع الأكواد القديمة');
+        // ============================================================
+        // 📋 تعريف أساليب الكتابة
+        // ============================================================
+        const CHAT_STYLES = {
+            chatstyle1: {
+                id: 'chatstyle1',
+                name: 'أسلوب كتابة 1',
+                image: 'images/vipsystem/chatstyles/chat1style.png',
+                description: 'أسلوب كتابة مميز للدردشة'
+            },
+            chatstyle2: {
+                id: 'chatstyle2',
+                name: 'أسلوب كتابة 2',
+                image: 'images/vipsystem/chatstyles/chat2style.png',
+                description: 'أسلوب كتابة أنيق وجذاب'
+            }
+        };
+
+        // ============================================================
+        // 📋 المتغيرات
+        // ============================================================
+        let activeStyle = null;
+        let messageCounter = 0;
+        const currentUser = {
+            numericId: 123,
+            nickname: 'أحمد'
+        };
+
+        // ============================================================
+        // 🎨 دالة تطبيق الأسلوب
+        // ============================================================
+        function applyStyle(styleId) {
+            document.querySelectorAll('.style-preview-item').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            if (styleId && CHAT_STYLES[styleId]) {
+                activeStyle = CHAT_STYLES[styleId];
+                document.getElementById('currentStyleName').textContent = activeStyle.name;
+                
+                const previewItem = document.querySelector(`.style-preview-item[data-style="${styleId}"]`);
+                if (previewItem) previewItem.classList.add('active');
+                
+                showToast(`✅ تم تفعيل "${activeStyle.name}"`, 'success');
+            } else {
+                activeStyle = null;
+                document.getElementById('currentStyleName').textContent = 'عادي';
+                
+                const normalItem = document.querySelector('.style-preview-item[data-style="normal"]');
+                if (normalItem) normalItem.classList.add('active');
+                
+                showToast('📝 تم التبديل إلى النمط العادي', 'info');
+            }
+        }
+
+        // ============================================================
+        // 💬 دالة إرسال الرسالة
+        // ============================================================
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) {
+                showToast('⚠️ يرجى كتابة رسالة', 'warning');
+                return;
+            }
+
+            const isOwn = true;
+            const senderName = currentUser.nickname;
+            const senderId = currentUser.numericId;
+
+            const msg = {
+                id: Date.now() + messageCounter++,
+                text: text,
+                time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+                userId: senderId,
+                username: senderName,
+                isOwner: false
+            };
+
+            if (activeStyle) {
+                msg.styleId = activeStyle.id;
+                msg.styleName = activeStyle.name;
+                msg.styleImage = activeStyle.image;
+            }
+
+            displayMessage(msg);
+            input.value = '';
+            input.focus();
+            scrollToBottom();
+        }
+
+        // ============================================================
+        // 📝 دالة عرض الرسالة
+        // ============================================================
+        function displayMessage(msg) {
+            const container = document.getElementById('chatMessages');
+            
+            if (container.querySelector(`[data-msg-id="${msg.id}"]`)) return;
+
+            const isOwn = msg.userId == currentUser.numericId;
+            const group = document.createElement('div');
+            group.className = `message-group ${isOwn ? 'own' : 'other'}`;
+
+            const div = document.createElement('div');
+            div.className = `message ${isOwn ? 'own' : 'other'}`;
+            div.setAttribute('data-msg-id', msg.id);
+
+            const styleImage = msg.styleImage || null;
+            const styleName = msg.styleName || null;
+
+            let bgStyle = '';
+            let overlayHTML = '';
+            let badgeHTML = '';
+            let extraClass = '';
+
+            if (styleImage) {
+                bgStyle = `background-image: url('${styleImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
+                overlayHTML = `<div class="style-overlay"></div>`;
+                
+                if (styleName) {
+                    badgeHTML = `<span class="style-badge">✨ ${styleName}</span>`;
+                }
+            } else {
+                extraClass = 'no-style';
+                if (isOwn) {
+                    bgStyle = 'background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.25));';
+                } else {
+                    bgStyle = 'background: rgba(255,255,255,0.06);';
+                }
+            }
+
+            const isCreator = msg.isOwner || false;
+
+            div.innerHTML = `
+                <div class="message-bg ${extraClass}" style="${bgStyle};">
+                    ${overlayHTML}
+                    <div class="msg-sender ${isCreator ? 'owner' : ''}">
+                        ${isCreator ? '👑 ' : ''}${msg.username || 'مستخدم'}
+                        ${badgeHTML}
+                    </div>
+                    <div class="msg-text">${msg.text}</div>
+                    <div class="msg-time">${msg.time || ''}</div>
+                </div>
+            `;
+
+            group.appendChild(div);
+            container.appendChild(group);
+        }
+
+        // ============================================================
+        // 📜 دالة إضافة رسالة نظام
+        // ============================================================
+        function addSystemMessage(text) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.style.cssText = `
+                text-align: center;
+                padding: 6px 14px;
+                background: rgba(255,215,0,0.06);
+                color: #ffd700;
+                border-radius: 10px;
+                font-size: 0.7rem;
+                border: 1px solid rgba(255,215,0,0.06);
+                margin: 4px auto;
+                max-width: 85%;
+                align-self: center;
+            `;
+            div.textContent = text;
+            container.appendChild(div);
+            scrollToBottom();
+        }
+
+        // ============================================================
+        // 🗑️ دالة مسح الرسائل
+        // ============================================================
+        function clearMessages() {
+            document.getElementById('chatMessages').innerHTML = '';
+            addSystemMessage('🗑️ تم مسح الشات');
+            showToast('🗑️ تم مسح جميع الرسائل', 'info');
+        }
+
+        // ============================================================
+        // 📜 دالة التمرير للأسفل
+        // ============================================================
+        function scrollToBottom() {
+            const container = document.getElementById('chatMessages');
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // ============================================================
+        // 🍞 دالة Toast
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+
+            const old = document.querySelector('.toast-message');
+            if (old) old.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.style.cssText = `
+                background: ${colors[type] || colors.info};
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================================
+        // 🚀 إضافة رسائل تجريبية عند التحميل
+        // ============================================================
+        window.onload = function() {
+            applyStyle(null);
+
+            addSystemMessage('👋 مرحباً! جرب إرسال رسائل مع أساليب مختلفة');
+
+            setTimeout(() => {
+                const demoMessages = [
+                    { text: 'هذه رسالة عادية بدون أسلوب', username: 'مستخدم 1', isOwn: false },
+                    { text: 'مرحباً! هذه رسالة مني', username: currentUser.nickname, isOwn: true },
+                    { text: 'يمكنك تجربة الأساليب المختلفة', username: 'مستخدم 2', isOwn: false },
+                ];
+
+                demoMessages.forEach(msg => {
+                    displayMessage({
+                        id: Date.now() + messageCounter++,
+                        text: msg.text,
+                        time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+                        userId: msg.isOwn ? currentUser.numericId : 999,
+                        username: msg.username,
+                        isOwner: false
+                    });
+                });
+
+                setTimeout(scrollToBottom, 100);
+            }, 500);
+
+            document.getElementById('messageInput').focus();
+        };
     </script>
+
 </body>
 </html>
