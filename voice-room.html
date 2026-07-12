@@ -49,76 +49,52 @@
         /* ===== إخفاء شعار VipChat والتاج ===== */
         .logo-section { display: none !important; }
 
-        /* ===== مربع معلومات الغرفة ===== */
+        /* ===== مربع معلومات الغرفة - شكل جديد من الكود الثاني ===== */
         .room-info-box {
             background: rgba(255,255,255,0.05);
-            padding: 6px 16px;
-            border-radius: 14px;
             border: 1px solid rgba(255,255,255,0.08);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .room-info-top {
+            border-radius: 14px;
+            padding: 8px 18px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
-        .room-info-box .room-name { font-weight: 700; color: #fff; font-size: 0.85rem; }
-        .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.65rem; background: rgba(255,215,0,0.1); padding: 2px 8px; border-radius: 6px; }
-        .room-info-box .room-owner { color: #ffd700; font-size: 0.7rem; }
-        .room-info-box .member-count { color: #94a3b8; font-size: 0.7rem; }
-        .room-info-box .btn-leave-icon {
-            background: rgba(239,68,68,0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239,68,68,0.2);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.75rem;
-        }
-        .room-info-box .btn-leave-icon:hover {
-            background: rgba(239,68,68,0.3);
-            transform: scale(1.1);
-        }
+        .room-info-box .room-name { font-weight: 700; color: #fff; font-size: 0.9rem; }
+        .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.7rem; background: rgba(255,215,0,0.1); padding: 2px 10px; border-radius: 6px; }
+        .room-info-box .room-owner { color: #ffd700; font-size: 0.75rem; }
+        .room-info-box .room-members { color: #94a3b8; font-size: 0.75rem; }
 
-        /* ===== مربع الأيقونات تحت معلومات الغرفة ===== */
-        .icon-bar {
+        /* ===== مربع الأيقونات - شكل جديد من الكود الثاني ===== */
+        .icons-box {
             display: flex;
             align-items: center;
             gap: 4px;
-            padding-top: 2px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            width: 100%;
-            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 6px 10px;
         }
 
         .icon-btn {
-            font-size: 0.85rem;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03);
             color: #f8fafc;
             cursor: pointer;
-            position: relative;
-            width: 30px;
-            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            transition: 0.3s;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
             text-decoration: none;
-            background: rgba(255,255,255,0.05);
-            border: none;
         }
-        .icon-btn:hover { background: #8b5cf6; color: white; transform: translateY(-2px); }
+
+        .icon-btn:hover { background: #8b5cf6; transform: translateY(-2px); border-color: #8b5cf6; }
         .icon-btn.gift-btn { background: rgba(255,215,0,0.08); color: #ffd700; }
         .icon-btn.gift-btn:hover { background: #ffd700; color: #1a1a2e; }
         .icon-btn.notif-btn { background: rgba(59,130,246,0.08); color: #3b82f6; }
@@ -130,18 +106,41 @@
         .icon-btn.profile-btn { background: rgba(236,72,153,0.08); color: #ec4899; }
         .icon-btn.profile-btn:hover { background: #ec4899; color: white; }
 
+        /* ===== زر الخروج داخل مربع الأيقونات ===== */
+        .icon-btn.exit-btn {
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+            border-color: rgba(239,68,68,0.15);
+            font-size: 1.1rem;
+        }
+
+        .icon-btn.exit-btn:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            transform: scale(1.08);
+            box-shadow: 0 0 30px rgba(239,68,68,0.2);
+        }
+
+        .icons-box .separator {
+            width: 1px;
+            height: 28px;
+            background: rgba(255,255,255,0.06);
+            margin: 0 2px;
+        }
+
         .badge {
             position: absolute;
             top: -4px;
             right: -4px;
             background: #ef4444;
             color: white;
-            font-size: 0.45rem;
+            font-size: 0.4rem;
             padding: 1px 4px;
             border-radius: 50%;
-            border: 2px solid #0f0c29;
             min-width: 14px;
             text-align: center;
+            border: 2px solid #0f0c29;
         }
 
         /* ===== MAIN LAYOUT ===== */
@@ -190,25 +189,25 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 45px;
             width: 100%;
             padding: 5px 0;
         }
 
-        /* ===== نظام المقاعد ===== */
+        /* ===== نظام المقاعد - موسع مع مسافات أكبر ===== */
         .seats-row {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
             flex-shrink: 0;
-            gap: 50px !important;
+            gap: 90px !important;
             flex-wrap: nowrap;
         }
 
         .seats-row.row-1 { justify-content: center; padding: 0; gap: 0 !important; }
         .seats-row.row-1 .seat-wrapper { margin: 0 auto; }
-        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 60px !important; }
+        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 100px !important; }
 
         /* ===== SEAT WRAPPER ===== */
         .seat-wrapper {
@@ -219,38 +218,62 @@
             flex-shrink: 0;
             position: relative;
             width: auto;
-            min-width: 80px;
+            min-width: 110px;
             margin-bottom: 5px;
         }
 
-        /* ===== SEAT CONTAINER ===== */
+        /* ===== SEAT CONTAINER - أكبر ===== */
         .seat-container {
             position: relative;
-            width: 140px;
-            height: 140px;
+            width: 190px;
+            height: 190px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
 
-        /* ===== SEAT FRAME ===== */
-        .seat-frame {
+        /* ===== الإطار الفاخر - أكبر ===== */
+        .luxury-frame {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 140px;
-            height: 140px;
+            width: 190px;
+            height: 190px;
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
             overflow: hidden;
-            border: none;
+            border: 3px solid rgba(255,215,0,0.15);
+            box-shadow: 0 0 60px rgba(255,215,0,0.05), inset 0 0 60px rgba(255,215,0,0.02);
             display: none;
         }
-        .seat-frame.active { display: block; }
-        .seat-frame video {
+
+        .luxury-frame.active {
+            display: block;
+            animation: frameGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes frameGlow {
+            0%, 100% { box-shadow: 0 0 40px rgba(255,215,0,0.03), inset 0 0 40px rgba(255,215,0,0.01); }
+            50% { box-shadow: 0 0 80px rgba(255,215,0,0.08), inset 0 0 80px rgba(255,215,0,0.04); }
+        }
+
+        .luxury-frame .fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 50%;
+        }
+
+        .luxury-frame video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -258,10 +281,10 @@
             display: block;
         }
 
-        /* ===== SEAT CIRCLE ===== */
+        /* ===== SEAT CIRCLE - أكبر ===== */
         .seat-circle {
-            width: 85px !important;
-            height: 85px !important;
+            width: 105px !important;
+            height: 105px !important;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -280,7 +303,7 @@
         /* ===== إخفاء التاج ===== */
         .seat-circle .crown-icon { display: none !important; }
 
-        /* ===== ألوان المقاعد الفارغة بتدرج جذاب ===== */
+        /* ===== ألوان المقاعد الفارغة ===== */
         .seat-circle.empty {
             border-color: transparent;
             background: linear-gradient(145deg, rgba(139,92,246,0.12), rgba(99,102,241,0.08));
@@ -290,10 +313,10 @@
         }
 
         .seat-circle.empty .seat-avatar {
-            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.08)) !important;
-            border: 2px solid rgba(139,92,246,0.15) !important;
-            color: rgba(139,92,246,0.4) !important;
-            box-shadow: 0 0 20px rgba(139,92,246,0.05) !important;
+            background: rgba(255,255,255,0.03) !important;
+            border: 2px dashed rgba(139,92,246,0.15) !important;
+            color: rgba(139,92,246,0.3) !important;
+            box-shadow: none;
         }
 
         .seat-circle.empty:hover {
@@ -318,7 +341,7 @@
         }
         .seat-circle.owner-seat {
             border-color: #ffd700;
-            box-shadow: 0 0 30px rgba(255,215,0,0.15);
+            box-shadow: 0 0 40px rgba(255,215,0,0.15);
             background: rgba(255,215,0,0.05);
         }
         .seat-circle.has-frame {
@@ -336,14 +359,15 @@
             50% { box-shadow: 0 0 60px rgba(255,215,0,0.08); }
         }
 
+        /* ===== AVATAR - أكبر ===== */
         .seat-circle .seat-avatar {
-            width: 38px !important;
-            height: 38px !important;
+            width: 48px !important;
+            height: 48px !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem !important;
+            font-size: 1.1rem !important;
             font-weight: 700;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: white;
@@ -367,9 +391,9 @@
             box-shadow: 0 4px 25px rgba(255,215,0,0.1);
         }
         .seat-circle.empty .seat-avatar {
-            background: rgba(255,255,255,0.01);
-            border: 2px dashed rgba(255,255,255,0.02);
-            color: #444;
+            background: rgba(255,255,255,0.03) !important;
+            border: 2px dashed rgba(139,92,246,0.15) !important;
+            color: rgba(139,92,246,0.3) !important;
             box-shadow: none;
         }
 
@@ -423,7 +447,7 @@
             position: absolute;
             bottom: -4px;
             right: -4px;
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             background: rgba(0,0,0,0.8);
             border-radius: 50%;
             padding: 3px;
@@ -463,18 +487,18 @@
         .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
         .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
-        /* ===== USERNAME UNDER SEAT ===== */
+        /* ===== USERNAME UNDER SEAT - أكبر ===== */
         .seat-username {
-            font-size: 0.7rem;
-            margin-top: 8px !important;
+            font-size: 0.8rem;
+            margin-top: 10px !important;
             color: #a78bfa;
-            max-width: 120px;
+            max-width: 130px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             text-align: center;
             font-weight: 600;
-            min-height: 20px;
+            min-height: 22px;
             width: 100%;
             padding: 0 4px;
             z-index: 3;
@@ -484,23 +508,23 @@
         .seat-username.empty-text { color: #444; }
 
         .seat-number {
-            font-size: 0.55rem;
-            color: rgba(139,92,246,0.5);
+            font-size: 0.6rem;
+            color: rgba(139,92,246,0.4);
             margin-top: 8px;
             text-align: center;
             font-weight: 500;
-            min-height: 20px;
+            min-height: 18px;
             transition: 0.3s;
         }
         .seat-wrapper.occupied .seat-number { display: none; }
 
-        /* ===== CHAT AREA - مصغر قليلاً ===== */
+        /* ===== CHAT AREA - شكل جديد من الكود الثاني ===== */
         .chat-area {
-            width: 340px;
-            min-width: 260px;
-            max-width: 380px;
+            width: 380px;
+            min-width: 300px;
+            max-width: 420px;
             background: rgba(255,255,255,0.02);
-            border-radius: 24px;
+            border-radius: 20px;
             border: 1px solid rgba(255,255,255,0.05);
             display: flex;
             flex-direction: column;
@@ -508,170 +532,160 @@
             height: 100%;
             max-height: 100%;
             overflow: hidden;
-            position: relative;
             flex-shrink: 0;
+            min-height: 450px;
+            max-height: 550px;
         }
 
         .chat-header {
-            padding: 8px 14px;
+            padding: 10px 16px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
-            min-height: 40px;
+            min-height: 44px;
             background: rgba(0,0,0,0.2);
         }
-        .chat-header h3 { font-size: 0.75rem; color: #ffd700; display: flex; align-items: center; gap: 6px; }
-        .chat-header .online-count { font-size: 0.6rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
+        .chat-header h3 { font-size: 0.85rem; color: #ffd700; display: flex; align-items: center; gap: 6px; }
+        .chat-header .online-count { font-size: 0.65rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
         .chat-header .online-count:hover { color: #ffd700; }
 
         .chat-messages {
             flex: 1;
-            padding: 8px 12px;
+            padding: 10px 14px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             min-height: 0;
             max-height: 100%;
             scroll-behavior: smooth;
             overscroll-behavior: contain;
         }
-        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
         .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.12); border-radius: 10px; }
 
-        .chat-messages .message {
-            padding: 0;
-            border-radius: 12px;
-            max-width: 92%;
-            word-wrap: break-word;
-            animation: fadeInMsg 0.2s ease;
-            width: fit-content;
-            min-width: 20%;
-            position: relative;
-            overflow: visible;
-            background: transparent;
-            border: none;
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            animation: fadeInMsg 0.3s ease;
+            width: 100%;
             flex-shrink: 0;
         }
 
-        .chat-messages .message .message-bg {
-            position: relative;
-            padding: 12px 16px;
+        .message-group.own { align-items: flex-end; }
+        .message-group.other { align-items: flex-start; }
+
+        @keyframes fadeInMsg {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message {
+            padding: 8px 14px;
             border-radius: 14px;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 48px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            min-width: 80px;
-            max-width: 100%;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-        }
-
-        .chat-messages .message .message-bg .msg-sender {
-            font-size: 0.55rem;
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-wrap: wrap;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            justify-content: center;
-            font-weight: 600;
-            width: 100%;
-            position: relative;
-            z-index: 2;
-        }
-        .chat-messages .message .message-bg .msg-sender.owner { color: #ffd700; }
-
-        .chat-messages .message .message-bg .msg-text {
-            font-size: 0.85rem;
-            line-height: 1.6;
-            word-break: break-word;
-            color: #fff;
-            text-shadow: 0 1px 5px rgba(0,0,0,0.7);
-            text-align: center;
-            padding: 2px 0;
-            font-weight: 500;
-            max-width: 100%;
-            position: relative;
-            z-index: 2;
-            white-space: pre-wrap;
+            max-width: 85%;
             word-wrap: break-word;
-            overflow-wrap: break-word;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.04);
+            flex-shrink: 0;
         }
 
-        .chat-messages .message .message-bg .msg-time {
+        .message .msg-sender {
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .message .msg-sender.owner { color: #ffd700; }
+
+        .message .msg-text {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #fff;
+            text-align: right;
+        }
+
+        .message .msg-time {
             font-size: 0.45rem;
-            color: rgba(255,255,255,0.6);
-            margin-top: 2px;
-            opacity: 0.8;
-            text-align: center;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-            position: relative;
-            z-index: 2;
+            color: rgba(255,255,255,0.4);
+            margin-top: 3px;
+            text-align: left;
         }
 
-        .chat-messages .message .message-bg .msg-badge {
-            font-size: 0.4rem;
-            background: #ffd700;
-            color: #1a1a2e;
-            padding: 1px 6px;
-            border-radius: 6px;
-            font-weight: 700;
+        .message.own {
+            background: linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.2));
+            border-color: rgba(102,126,234,0.1);
         }
 
-        /* ===== لا تظهر صورة صغيرة إضافية - النص داخل صورة الخلفية ===== */
-        .chat-messages .message .message-bg .style-image-container {
-            display: none !important;
+        .message.other {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.03);
         }
 
-        .chat-messages .message.system {
+        .message.system {
             background: rgba(255,215,0,0.06);
             color: #ffd700;
             text-align: center;
             width: auto;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             border: 1px solid rgba(255,215,0,0.06);
             border-radius: 12px;
-            padding: 4px 14px;
+            padding: 6px 16px;
             margin: 2px auto;
             max-width: 85%;
             opacity: 0.9;
             align-self: center;
             flex-shrink: 0;
-            font-weight: 500;
         }
-        .chat-messages .message.system .message-bg {
-            background: transparent !important;
-            padding: 0;
-            min-height: auto;
-            box-shadow: none;
+        .message.system .msg-text { color: #ffd700; }
+
+        /* ===== CHAT INPUT - شكل جديد ===== */
+        .chat-input-area {
+            padding: 6px 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.3);
+            min-height: 48px;
         }
 
-        .chat-messages .message.own .message-bg {
-            border-radius: 16px 16px 4px 16px;
-            direction: rtl;
-            text-align: right;
-        }
-        .chat-messages .message.other .message-bg {
-            border-radius: 16px 16px 16px 4px;
-            direction: ltr;
-            text-align: left;
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            font-size: 0.85rem;
         }
 
-        @keyframes fadeInMsg {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .chat-input-area input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .chat-input-area .send-btn {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .chat-input-area .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.3);
         }
 
         .scroll-down-btn {
@@ -701,126 +715,6 @@
             to { opacity: 1; transform: translateX(-50%) scale(1); }
         }
         .scroll-down-btn:hover { background: rgba(102,126,234,0.6); transform: translateX(-50%) scale(1.1); }
-
-        /* ===== CHAT INPUT ===== */
-        .chat-input-area {
-            padding: 4px 8px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            flex-shrink: 0;
-            background: rgba(0,0,0,0.3);
-            position: relative;
-            min-height: 42px;
-        }
-
-        .chat-input-area .input-wrapper {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            border-radius: 10px;
-            border: none;
-            padding: 0 8px;
-            position: relative;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 32px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.05);
-        }
-
-        .chat-input-area .input-wrapper .style-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 10px;
-        }
-
-        .chat-input-area .input-wrapper input {
-            flex: 1;
-            padding: 6px 4px;
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 0.75rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            z-index: 2;
-            position: relative;
-            min-width: 30px;
-        }
-        .chat-input-area .input-wrapper input::placeholder { 
-            color: rgba(255,255,255,0.4); 
-            font-size: 0.65rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .chat-input-area .emoji-btn {
-            background: transparent;
-            border: none;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.9rem;
-            cursor: pointer;
-            padding: 2px 4px;
-            transition: 0.3s;
-            border-radius: 4px;
-            z-index: 2;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .chat-input-area .emoji-btn:hover { color: #ffd700; background: rgba(255,215,0,0.1); }
-
-        .chat-input-area .send-btn {
-            padding: 5px 12px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: 600;
-            font-size: 0.7rem;
-            z-index: 2;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .chat-input-area .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(102,126,234,0.3); }
-
-        .emoji-picker {
-            display: none;
-            position: absolute;
-            bottom: 40px;
-            left: 8px;
-            background: #1a1a2e;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 4px;
-            max-width: 160px;
-            max-height: 70px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            flex-wrap: wrap;
-            gap: 2px;
-            justify-content: center;
-        }
-        .emoji-picker.active { display: flex; }
-        .emoji-picker .emoji-item {
-            font-size: 0.75rem;
-            cursor: pointer;
-            padding: 2px;
-            border-radius: 4px;
-            transition: 0.2s;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .emoji-picker .emoji-item:hover { background: rgba(255,255,255,0.08); transform: scale(1.15); }
 
         /* ===== AUDIO CONTROLS ===== */
         .audio-controls {
@@ -1856,33 +1750,168 @@
             transform: scale(1.05);
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* ===== نافذة الخروج المنبثقة - من الكود الثاني ===== */
+        .exit-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .exit-popup-overlay.active {
+            display: flex;
+            animation: fadeInPopup 0.3s ease;
+        }
+
+        @keyframes fadeInPopup {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .exit-popup {
+            background: #1a1a2e;
+            border-radius: 28px;
+            padding: 35px 40px 40px;
+            width: 320px;
+            max-width: 92%;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            text-align: center;
+        }
+
+        .exit-popup .popup-title {
+            color: #ffd700;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .exit-popup .popup-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .exit-popup .popup-btn-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .exit-popup .popup-btn-wrapper:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 2rem;
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-btn.leave-btn {
+            border-color: rgba(239,68,68,0.3);
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-btn.leave-btn:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 0 40px rgba(239,68,68,0.3);
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-btn.minimize-btn {
+            border-color: rgba(245,158,11,0.3);
+            background: rgba(245,158,11,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-btn.minimize-btn img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-btn.minimize-btn:hover {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            box-shadow: 0 0 40px rgba(245,158,11,0.3);
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .exit-popup .popup-btn-wrapper .popup-label.leave-label { color: #ef4444; }
+        .exit-popup .popup-btn-wrapper .popup-label.minimize-label { color: #f59e0b; }
+
+        /* ===== RESPONSIVE - محسّن مع المقاعد الأكبر ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
-            .chat-area { width: 100%; max-width: 100%; height: 320px; min-height: 240px; }
+            .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 300px; max-height: 400px; }
             .seats-area { min-height: 400px; max-height: 550px; }
-            .seats-row { gap: 40px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 45px !important; }
-            .seat-circle { width: 75px !important; height: 75px !important; }
-            .seat-circle .seat-avatar { width: 32px !important; height: 32px !important; font-size: 0.7rem !important; }
-            .seat-container { width: 120px; height: 120px; }
-            .seat-frame { width: 120px; height: 120px; }
-            .seat-username { font-size: 0.6rem; max-width: 90px; margin-top: 6px !important; min-height: 18px; }
-            .seat-number { font-size: 0.5rem; margin-top: 6px; min-height: 18px; }
+            .seats-row { gap: 70px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 80px !important; }
+            .seat-container { width: 170px; height: 170px; }
+            .luxury-frame { width: 170px; height: 170px; }
+            .seat-circle { width: 95px !important; height: 95px !important; }
+            .seat-circle .seat-avatar { width: 44px !important; height: 44px !important; font-size: 1rem !important; }
+            .seat-username { font-size: 0.7rem; max-width: 110px; min-height: 20px; margin-top: 8px !important; }
+            .seat-number { font-size: 0.55rem; margin-top: 6px; min-height: 16px; }
+            .top-bar { flex-wrap: wrap; justify-content: center; }
         }
 
         @media (max-width: 850px) {
+            .top-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+            .room-info-box { justify-content: center; flex-wrap: wrap; }
+            .icons-box { justify-content: center; flex-wrap: wrap; }
             .seats-area { min-height: 380px; max-height: 500px; padding: 15px 12px; overflow: visible !important; }
-            .seats-container { gap: 30px; overflow: visible !important; }
-            .seats-row { gap: 30px !important; overflow: visible !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 35px !important; }
-            .seat-circle { width: 70px !important; height: 70px !important; }
-            .seat-circle .seat-avatar { width: 30px !important; height: 30px !important; font-size: 0.65rem !important; }
-            .seat-container { width: 110px; height: 110px; }
-            .seat-frame { width: 110px; height: 110px; }
-            .seat-username { font-size: 0.55rem; max-width: 80px; margin-top: 6px !important; min-height: 16px; }
-            .seat-number { font-size: 0.45rem; margin-top: 6px; min-height: 16px; }
-            .chat-area { height: 280px; min-height: 200px; }
+            .seats-container { gap: 35px; overflow: visible !important; }
+            .seats-row { gap: 50px !important; overflow: visible !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 60px !important; }
+            .seat-container { width: 150px; height: 150px; }
+            .luxury-frame { width: 150px; height: 150px; }
+            .seat-circle { width: 85px !important; height: 85px !important; }
+            .seat-circle .seat-avatar { width: 40px !important; height: 40px !important; font-size: 0.9rem !important; }
+            .seat-username { font-size: 0.65rem; max-width: 100px; margin-top: 8px !important; min-height: 18px; }
+            .seat-number { font-size: 0.5rem; margin-top: 6px; min-height: 16px; }
+            .chat-area { height: 320px; min-height: 280px; max-height: 380px; }
         }
 
         @media (max-width: 600px) {
@@ -1894,127 +1923,92 @@
                 overflow: visible !important; 
             }
             .seats-container { 
-                gap: 22px; 
+                gap: 28px; 
                 padding: 10px 0; 
                 overflow: visible !important; 
             }
             .seats-row { 
-                gap: 12px !important; 
+                gap: 30px !important; 
                 flex-wrap: nowrap !important; 
                 overflow: visible !important; 
                 width: 100%; 
                 justify-content: center; 
             }
             .seats-row.row-1 { 
-                max-width: 120px; 
+                max-width: 140px; 
                 margin: 0 auto; 
                 gap: 0 !important; 
             }
-            .seats-row.row-2 { 
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { 
                 max-width: 100%; 
-                gap: 12px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-3 { 
-                max-width: 100%; 
-                gap: 12px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-4 { 
-                max-width: 100%; 
-                gap: 12px !important; 
+                gap: 35px !important; 
                 justify-content: center; 
             }
             .seat-wrapper { 
-                min-width: 60px; 
+                min-width: 80px; 
                 flex-shrink: 0; 
             }
             .seat-container { 
-                width: 90px !important; 
-                height: 90px !important; 
+                width: 130px !important; 
+                height: 130px !important; 
                 flex-shrink: 0; 
             }
+            .luxury-frame { 
+                width: 130px !important; 
+                height: 130px !important; 
+            }
             .seat-circle { 
-                width: 55px !important; 
-                height: 55px !important; 
+                width: 75px !important; 
+                height: 75px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle .seat-avatar { 
-                width: 24px !important; 
-                height: 24px !important; 
-                font-size: 0.5rem !important; 
-            }
-            .seat-frame { 
-                width: 90px !important; 
-                height: 90px !important; 
+                width: 36px !important; 
+                height: 36px !important; 
+                font-size: 0.8rem !important; 
             }
             .seat-username { 
-                font-size: 0.45rem; 
-                max-width: 55px; 
-                margin-top: 4px !important; 
-                min-height: 14px; 
+                font-size: 0.55rem; 
+                max-width: 80px; 
+                margin-top: 6px !important; 
+                min-height: 16px; 
             }
             .seat-number { 
-                font-size: 0.4rem; 
+                font-size: 0.45rem; 
                 margin-top: 4px; 
                 min-height: 14px; 
                 color: rgba(139,92,246,0.4); 
             }
-            .seats-row.row-4 .seat-wrapper:nth-child(3) {
-                margin-left: 0;
-            }
             .seat-circle .crown-icon { display: none !important; }
-            .seat-circle .mic-indicator { font-size: 0.4rem; padding: 2px; bottom: -1px; right: -1px; }
+            .seat-circle .mic-indicator { font-size: 0.5rem; padding: 2px; bottom: -2px; right: -2px; }
             .seats-area .seats-title { font-size: 0.65rem; top: 8px; right: 10px; }
             .chat-area { 
-                height: 220px; 
-                min-height: 160px; 
-                max-height: 260px; 
+                height: 280px; 
+                min-height: 240px; 
+                max-height: 320px; 
                 border-radius: 14px; 
             }
-            .chat-header { padding: 6px 10px; min-height: 34px; }
-            .chat-header h3 { font-size: 0.7rem; }
-            .chat-messages { padding: 6px 8px; gap: 3px; }
-            .chat-messages .message { max-width: 95%; min-width: 15%; }
-            .chat-messages .message .message-bg { padding: 8px 12px; min-height: 36px; min-width: 50px; border-radius: 12px; }
-            .chat-messages .message .message-bg .msg-text { font-size: 0.75rem; line-height: 1.5; }
-            .chat-messages .message .message-bg .msg-sender { font-size: 0.5rem; }
-            .chat-messages .message .message-bg .msg-time { font-size: 0.4rem; margin-top: 2px; }
-            .chat-messages .message.system { font-size: 0.6rem; padding: 4px 10px; max-width: 92%; }
-            .chat-input-area { padding: 4px 6px; min-height: 38px; gap: 4px; }
-            .chat-input-area .input-wrapper { min-height: 28px; padding: 0 6px; border-radius: 8px; }
-            .chat-input-area .input-wrapper input { font-size: 0.7rem; padding: 4px 4px; }
-            .chat-input-area .input-wrapper input::placeholder { font-size: 0.6rem; }
-            .chat-input-area .send-btn { padding: 4px 10px; font-size: 0.65rem; border-radius: 6px; }
-            .chat-input-area .emoji-btn { font-size: 0.75rem; padding: 2px 4px; }
-            .scroll-down-btn { width: 22px; height: 22px; font-size: 0.5rem; bottom: 44px; }
-            .emoji-picker { max-width: 120px; max-height: 50px; bottom: 36px; left: 4px; padding: 3px; }
-            .emoji-picker .emoji-item { font-size: 0.6rem; width: 16px; height: 16px; }
+            .chat-header { padding: 8px 12px; min-height: 38px; }
+            .chat-header h3 { font-size: 0.75rem; }
+            .chat-messages { padding: 8px 10px; gap: 4px; }
+            .message { padding: 6px 12px; font-size: 0.75rem; }
+            .message .msg-text { font-size: 0.75rem; }
+            .chat-input-area { padding: 4px 8px; min-height: 40px; }
+            .chat-input-area input { padding: 8px 10px; font-size: 0.75rem; }
+            .chat-input-area .send-btn { padding: 8px 14px; font-size: 0.7rem; }
+            .room-info-box { padding: 6px 12px; gap: 10px; flex-wrap: wrap; justify-content: center; }
+            .room-info-box .room-name { font-size: 0.8rem; }
+            .room-info-box .room-id { font-size: 0.6rem; padding: 2px 8px; }
+            .room-info-box .room-owner { font-size: 0.65rem; }
+            .room-info-box .room-members { font-size: 0.65rem; }
+            .icons-box { padding: 4px 8px; gap: 3px; flex-wrap: wrap; justify-content: center; }
+            .icon-btn { width: 34px; height: 34px; font-size: 0.85rem; }
+            .exit-popup { padding: 25px 20px; width: 300px; }
+            .exit-popup .popup-btn-wrapper .popup-btn { width: 60px; height: 60px; font-size: 1.5rem; }
+            .exit-popup .popup-btn-wrapper .popup-btn.minimize-btn img { width: 30px; height: 30px; }
             .audio-controls { bottom: 12px; right: 10px; gap: 5px; }
             .audio-btn { width: 36px; height: 36px; font-size: 0.9rem; }
             .btn-leave-seat { width: 36px; height: 36px; font-size: 0.9rem; }
-            .audio-btn .tooltip, .btn-leave-seat .tooltip { right: 42px; font-size: 0.5rem; padding: 2px 8px; }
-            #vipEntrance .vip-video-container { width: 90%; max-width: 350px; }
-            #vipEntrance .vip-title { font-size: 1.2rem; padding: 6px 14px; white-space: normal; }
-            #vipEntrance .vip-user { font-size: 0.9rem; }
-            #vipEntrance .vip-skip-btn { font-size: 0.8rem; padding: 8px 24px; }
-            #notifDropdown { right: 5px; width: 280px; }
-            #profileDropdown { right: 5px; width: 280px; }
-            .modal { width: 95%; padding: 16px; }
-            .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
-            .user-item { padding: 6px 8px; }
-            .user-item .user-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
-            #usersListContainer { width: 95%; padding: 14px; }
-            #usersList { max-height: 280px; }
-            .navbar { padding: 0.3rem 2%; min-height: 50px; }
-            .icon-btn { width: 28px; height: 28px; font-size: 0.75rem; }
-            .badge { font-size: 0.4rem; min-width: 12px; top: -3px; right: -3px; padding: 1px 3px; }
-            .room-info-box { padding: 4px 10px; }
-            .room-info-box .room-name { font-size: 0.75rem; }
-            .room-info-box .room-id { font-size: 0.55rem; }
-            .room-info-box .room-owner { font-size: 0.6rem; }
-            .room-info-box .member-count { font-size: 0.6rem; }
-            .logo-section { display: none !important; }
         }
 
         @media (max-width: 400px) {
@@ -2025,94 +2019,88 @@
                 overflow: visible !important; 
             }
             .seats-container { 
-                gap: 18px; 
+                gap: 22px; 
                 padding: 8px 0; 
                 overflow: visible !important; 
             }
             .seats-row { 
-                gap: 8px !important; 
+                gap: 20px !important; 
                 flex-wrap: nowrap !important; 
                 overflow: visible !important; 
                 width: 100%; 
                 justify-content: center; 
             }
             .seats-row.row-1 { 
-                max-width: 90px; 
+                max-width: 110px; 
                 margin: 0 auto; 
                 gap: 0 !important; 
             }
-            .seats-row.row-2 { 
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { 
                 max-width: 100%; 
-                gap: 8px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-3 { 
-                max-width: 100%; 
-                gap: 8px !important; 
-                justify-content: center; 
-            }
-            .seats-row.row-4 { 
-                max-width: 100%; 
-                gap: 8px !important; 
+                gap: 22px !important; 
                 justify-content: center; 
             }
             .seat-wrapper { 
-                min-width: 48px; 
+                min-width: 65px; 
                 flex-shrink: 0; 
             }
             .seat-container { 
-                width: 72px !important; 
-                height: 72px !important; 
+                width: 105px !important; 
+                height: 105px !important; 
                 flex-shrink: 0; 
             }
+            .luxury-frame { 
+                width: 105px !important; 
+                height: 105px !important; 
+            }
             .seat-circle { 
-                width: 44px !important; 
-                height: 44px !important; 
+                width: 62px !important; 
+                height: 62px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle .seat-avatar { 
-                width: 20px !important; 
-                height: 20px !important; 
-                font-size: 0.4rem !important; 
+                width: 30px !important; 
+                height: 30px !important; 
+                font-size: 0.65rem !important; 
                 border-width: 1.5px !important; 
             }
-            .seat-frame { 
-                width: 72px !important; 
-                height: 72px !important; 
-            }
             .seat-username { 
-                font-size: 0.4rem; 
-                max-width: 44px; 
-                margin-top: 3px !important; 
-                min-height: 12px; 
+                font-size: 0.45rem; 
+                max-width: 60px; 
+                margin-top: 4px !important; 
+                min-height: 14px; 
             }
             .seat-number { 
-                font-size: 0.35rem; 
-                margin-top: 3px; 
+                font-size: 0.4rem; 
+                margin-top: 4px; 
                 min-height: 12px; 
                 color: rgba(139,92,246,0.35); 
             }
             .seat-circle .crown-icon { display: none !important; }
             .seat-circle .mic-indicator { 
-                font-size: 0.35rem; 
+                font-size: 0.4rem; 
                 padding: 1.5px; 
                 bottom: -1px; 
                 right: -1px; 
             }
             .chat-area { 
-                height: 160px; 
-                min-height: 140px; 
-                max-height: 200px; 
+                height: 200px; 
+                min-height: 180px; 
+                max-height: 240px; 
             }
-            .chat-messages .message .message-bg { 
-                padding: 6px 8px; 
-                min-height: 28px; 
-                min-width: 40px; 
-            }
-            .chat-messages .message .message-bg .msg-text { 
-                font-size: 0.65rem; 
-                line-height: 1.4; 
-            }
+            .chat-messages .message { padding: 5px 10px; }
+            .chat-messages .message .msg-text { font-size: 0.7rem; line-height: 1.4; }
+            .exit-popup { padding: 20px 15px; width: 280px; }
+            .exit-popup .popup-btn-wrapper .popup-btn { width: 50px; height: 50px; font-size: 1.2rem; }
+            .exit-popup .popup-btn-wrapper .popup-btn.minimize-btn img { width: 24px; height: 24px; }
+            .exit-popup .popup-btn-wrapper .popup-label { font-size: 0.75rem; }
+            .room-info-box { padding: 4px 8px; gap: 6px; flex-wrap: wrap; justify-content: center; }
+            .room-info-box .room-name { font-size: 0.7rem; }
+            .room-info-box .room-id { font-size: 0.5rem; padding: 1px 6px; }
+            .room-info-box .room-owner { font-size: 0.55rem; }
+            .room-info-box .room-members { font-size: 0.55rem; }
+            .icons-box { padding: 3px 6px; gap: 2px; flex-wrap: wrap; }
+            .icon-btn { width: 30px; height: 30px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -2123,41 +2111,39 @@
     <!-- ===== تم إخفاء شعار VipChat ===== -->
     <div style="display:none;"></div>
 
-    <!-- ===== مربع معلومات الغرفة مع الأيقونات تحته ===== -->
+    <!-- ===== مربع معلومات الغرفة - شكل جديد ===== -->
     <div class="room-info-box">
-        <div class="room-info-top">
-            <span class="room-name" id="roomNameDisplay">غرفة صوتية</span>
-            <span class="room-id" id="roomIdDisplay">🔑 ---</span>
-            <span class="room-owner" id="roomOwnerDisplay">👑 ---</span>
-            <span class="member-count">👥 <span id="memberCount">0</span></span>
-            <button class="btn-leave-icon" onclick="leaveRoom()" title="مغادرة الغرفة">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
-        
-        <!-- ===== شريط الأيقونات تحت معلومات الغرفة ===== -->
-        <div class="icon-bar">
-            <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
-                <i class="fas fa-users"></i>
-                <span class="badge" id="usersBadge">0</span>
-            </button>
-            <button class="icon-btn profile-btn" onclick="handleProfileClick()" title="الملف الشخصي">
-                <i class="fas fa-user-circle"></i>
-            </button>
-            <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
-                <i class="fas fa-bell"></i>
-                <span class="badge" id="notifBadge">0</span>
-            </button>
-            <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
-                <i class="fas fa-gift"></i>
-            </button>
-            <button class="icon-btn style-btn" onclick="openChatStylesModal()" title="أشكال الكتابة">
-                <i class="fas fa-pen-fancy"></i>
-            </button>
-        </div>
+        <span class="room-name" id="roomNameDisplay">🎙️ غرفة صوتية</span>
+        <span class="room-id" id="roomIdDisplay">🔑 VIP-001</span>
+        <span class="room-owner" id="roomOwnerDisplay">👑 المالك</span>
+        <span class="room-members">👥 <span id="memberCount">5</span></span>
     </div>
 
-    <div style="width:60px;"></div> <!-- فراغ للحفاظ على التوزان -->
+    <!-- ===== مربع الأيقونات - شكل جديد ===== -->
+    <div class="icons-box">
+        <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
+            <i class="fas fa-users"></i>
+            <span class="badge" id="usersBadge">0</span>
+        </button>
+        <button class="icon-btn profile-btn" onclick="handleProfileClick()" title="الملف الشخصي">
+            <i class="fas fa-user-circle"></i>
+        </button>
+        <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
+            <i class="fas fa-bell"></i>
+            <span class="badge" id="notifBadge">0</span>
+        </button>
+        <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
+            <i class="fas fa-gift"></i>
+        </button>
+        <button class="icon-btn style-btn" onclick="openChatStylesModal()" title="أشكال الكتابة">
+            <i class="fas fa-pen-fancy"></i>
+        </button>
+        <div class="separator"></div>
+        <!-- ===== زر الخروج - شكل جديد ===== -->
+        <button class="icon-btn exit-btn" onclick="openExitPopup()" title="خروج">
+            <i class="fas fa-power-off"></i>
+        </button>
+    </div>
 </nav>
 
 <!-- ===== VIP ENTRANCE ===== -->
@@ -2184,7 +2170,7 @@
         <div class="seats-container" id="seatsContainer"></div>
     </div>
 
-    <!-- ===== CHAT AREA ===== -->
+    <!-- ===== CHAT AREA - شكل جديد ===== -->
     <div class="chat-area">
         <div class="chat-header">
             <h3><i class="fas fa-comment-dots"></i> الشات</h3>
@@ -2195,25 +2181,7 @@
             <i class="fas fa-arrow-down"></i>
         </button>
         <div class="chat-input-area">
-            <div class="input-wrapper" id="chatInputWrapper">
-                <div class="style-overlay"></div>
-                <button class="emoji-btn" onclick="toggleEmojiPicker()"><i class="fas fa-smile-wink"></i></button>
-                <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <div class="emoji-picker" id="emojiPicker">
-                    <span class="emoji-item" onclick="insertEmoji('😊')">😊</span>
-                    <span class="emoji-item" onclick="insertEmoji('😂')">😂</span>
-                    <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
-                    <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
-                    <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
-                    <span class="emoji-item" onclick="insertEmoji('👋')">👋</span>
-                    <span class="emoji-item" onclick="insertEmoji('🎉')">🎉</span>
-                    <span class="emoji-item" onclick="insertEmoji('💪')">💪</span>
-                    <span class="emoji-item" onclick="insertEmoji('🤔')">🤔</span>
-                    <span class="emoji-item" onclick="insertEmoji('😍')">😍</span>
-                    <span class="emoji-item" onclick="insertEmoji('🥰')">🥰</span>
-                    <span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
-                </div>
-            </div>
+            <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChatMessage()">
             <button class="send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -2437,6 +2405,29 @@
 
 <!-- ===== OVERLAY ===== -->
 <div id="screenOverlay" class="modal-overlay" onclick="closeAll()"></div>
+
+<!-- ===== نافذة الخروج المنبثقة - من الكود الثاني ===== -->
+<div class="exit-popup-overlay" id="exitPopup">
+    <div class="exit-popup">
+        <div class="popup-title">اختر الإجراء</div>
+        <div class="popup-buttons">
+            <!-- زر الخروج -->
+            <div class="popup-btn-wrapper" onclick="leaveRoom()">
+                <button class="popup-btn leave-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+                <span class="popup-label leave-label">خروج</span>
+            </div>
+            <!-- زر التصغير -->
+            <div class="popup-btn-wrapper" onclick="minimizeRoom()">
+                <button class="popup-btn minimize-btn">
+                    <img src="images/voiceroom/esc.png" alt="تصغير" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-window-minimize\' style=\'font-size:1.8rem; color:#f59e0b;\'></i>'">
+                </button>
+                <span class="popup-label minimize-label">تصغير</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 // ============================================================
@@ -2744,7 +2735,7 @@ async function loadRoomData() {
         roomData = roomSnapshot.val();
         console.log('✅ تم تحميل بيانات الغرفة:', roomData);
         
-        document.getElementById('roomNameDisplay').textContent = roomData.name || 'غرفة صوتية';
+        document.getElementById('roomNameDisplay').textContent = roomData.name || '🎙️ غرفة صوتية';
         
         const creatorId = roomData.creatorId;
         const creatorName = roomData.creatorName || 'غير معروف';
@@ -2764,7 +2755,6 @@ async function loadRoomData() {
             const style = await getUserChatStyleFromFirebase(currentUser.numericId);
             if (style) {
                 activeChatStyle = style;
-                applyChatStyleToInput(style.image);
             }
         }
         
@@ -2788,25 +2778,6 @@ async function loadRoomData() {
     } catch(error) {
         console.error('❌ Error loading room:', error);
         showToast('❌ حدث خطأ في تحميل الغرفة', 'error');
-    }
-}
-
-// ============================================================
-// 🎨 APPLY CHAT STYLE TO INPUT
-// ============================================================
-function applyChatStyleToInput(imageUrl) {
-    const wrapper = document.getElementById('chatInputWrapper');
-    if (!wrapper) return;
-    
-    if (imageUrl) {
-        wrapper.style.backgroundImage = `url('${imageUrl}')`;
-        wrapper.style.backgroundSize = 'cover';
-        wrapper.style.backgroundPosition = 'center';
-        wrapper.style.backgroundRepeat = 'no-repeat';
-        wrapper.style.background = 'none';
-    } else {
-        wrapper.style.backgroundImage = 'none';
-        wrapper.style.background = 'rgba(255,255,255,0.05)';
     }
 }
 
@@ -2974,14 +2945,12 @@ async function renderSeats(seats) {
             let frameHTML = '';
             if (hasFrame && frameConfig) {
                 frameHTML = `
-                    <div class="seat-frame active">
-                        <video autoplay loop muted playsinline>
-                            <source src="${frameConfig.embedUrl}" type="video/mp4">
-                        </video>
+                    <div class="luxury-frame active">
+                        ${frameConfig.isVideo ? `<video autoplay loop muted playsinline><source src="${frameConfig.embedUrl}" type="video/mp4"></video>` : `<div class="fallback">${frameConfig.name}</div>`}
                     </div>
                 `;
             } else {
-                frameHTML = `<div class="seat-frame"></div>`;
+                frameHTML = `<div class="luxury-frame"></div>`;
             }
             
             const seatNumber = index + 1;
@@ -3021,7 +2990,7 @@ async function renderSeats(seats) {
                                     <div style="font-size:0.5rem;color:#ffd700;font-weight:bold;">مالك</div>
                                     ${isOwner ? '<div style="font-size:0.4rem;color:#888;">اضغط للجلوس</div>' : ''}
                                 ` : `
-                                    <div class="seat-avatar" style="background:rgba(255,255,255,0.03)!important;border:2px dashed rgba(255,255,255,0.08)!important;color:#444;">
+                                    <div class="seat-avatar">
                                         <i class="fas fa-plus"></i>
                                     </div>
                                     <div style="font-size:0.5rem;color:#555;">مقعد</div>
@@ -3696,11 +3665,10 @@ function listenChat() {
 function displayMessage(msg) {
     const container = document.getElementById('chatMessages');
     if (container.querySelector(`[data-msg-id="${msg.id}"]`)) return;
-    const div = document.createElement('div');
-    let className = 'message';
+    
     if (msg.type === 'system') {
-        className += ' system';
-        div.className = className;
+        const div = document.createElement('div');
+        div.className = 'message system';
         div.setAttribute('data-msg-id', msg.id || Date.now());
         div.innerHTML = `<div class="msg-text">${msg.text}</div>`;
         container.appendChild(div);
@@ -3709,49 +3677,23 @@ function displayMessage(msg) {
     }
     
     const isOwn = msg.userId == currentUser?.numericId;
-    className += isOwn ? ' own' : ' other';
-    div.className = className;
+    const group = document.createElement('div');
+    group.className = `message-group ${isOwn ? 'own' : 'other'}`;
+    
+    const div = document.createElement('div');
+    div.className = `message ${isOwn ? 'own' : 'other'}`;
     div.setAttribute('data-msg-id', msg.id || Date.now());
     
     const isCreator = msg.userId == roomData?.creatorId;
     
-    let bgStyle = '';
-    let styleNameHTML = '';
-    
-    if (msg.styleId) {
-        const style = CHAT_STYLES.find(s => s.id === msg.styleId);
-        if (style) {
-            styleNameHTML = ` <span style="font-size:0.5rem; color:#ffd700;">✍️ ${style.name}</span>`;
-            bgStyle = `background-image: url('${style.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
-        }
-    }
-    
-    if (!bgStyle) {
-        bgStyle = isOwn ? 
-            'background: linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.2));' : 
-            'background: rgba(255,255,255,0.05);';
-    }
-    
-    const textLength = msg.text.length;
-    let padding = '12px 16px';
-    let minHeight = '48px';
-    let minWidth = '80px';
-    if (textLength > 50) { padding = '14px 20px'; minHeight = '55px'; minWidth = '100px'; }
-    if (textLength > 100) { padding = '16px 24px'; minHeight = '65px'; minWidth = '120px'; }
-    if (textLength > 200) { padding = '20px 28px'; minHeight = '80px'; minWidth = '160px'; }
-    
     div.innerHTML = `
-        <div class="message-bg" style="${bgStyle}; padding: ${padding}; min-height: ${minHeight}; min-width: ${minWidth};">
-            <div class="msg-sender ${isCreator ? 'owner' : ''}">
-                ${isCreator ? '<span class="msg-badge">👑 مالك</span>' : ''}
-                ${msg.username || 'مستخدم'}
-                ${styleNameHTML}
-            </div>
-            <div class="msg-text" style="text-align:center;">${msg.text}</div>
-            <div class="msg-time">${msg.time || ''}</div>
-        </div>
+        <div class="msg-sender ${isCreator ? 'owner' : ''}">${isCreator ? '👑 ' : ''}${msg.username || 'مستخدم'}</div>
+        <div class="msg-text">${msg.text}</div>
+        <div class="msg-time">${msg.time || ''}</div>
     `;
-    container.appendChild(div);
+    
+    group.appendChild(div);
+    container.appendChild(group);
     scrollToBottom();
 }
 
@@ -3790,7 +3732,6 @@ async function sendChatMessage() {
     await addChatMessage('user', text, user?.nickname || user?.username || 'مستخدم', user?.numericId);
     input.value = '';
     input.focus();
-    document.getElementById('emojiPicker').classList.remove('active');
     setTimeout(scrollToBottom, 50);
 }
 
@@ -3828,17 +3769,6 @@ function setupChatScroll() {
             btn.classList.remove('visible');
         }
     });
-}
-
-function toggleEmojiPicker() {
-    document.getElementById('emojiPicker').classList.toggle('active');
-}
-
-function insertEmoji(emoji) {
-    const input = document.getElementById('chatInput');
-    input.value += emoji;
-    input.focus();
-    document.getElementById('emojiPicker').classList.remove('active');
 }
 
 // ============================================================
@@ -3960,7 +3890,6 @@ async function activateChatStyleFromRoom(styleId) {
         const styleObj = CHAT_STYLES.find(s => s.id === styleId);
         if (styleObj) {
             activeChatStyle = styleObj;
-            applyChatStyleToInput(styleObj.image);
         }
 
         showToast(`✅ تم تفعيل ${styleObj ? styleObj.name : 'أسلوب الكتابة'} بنجاح`, 'success');
@@ -3989,7 +3918,6 @@ async function deactivateChatStyleFromRoom() {
         }
         
         activeChatStyle = null;
-        applyChatStyleToInput(null);
 
         showToast('✅ تم إلغاء تفعيل أسلوب الكتابة', 'success');
         closeChatStylesModal();
@@ -4368,10 +4296,24 @@ function listenRoomUpdates() {
     });
 }
 
-async function leaveRoom() {
-    try {
+// ============================================================
+// 🚪 نافذة الخروج المنبثقة - من الكود الثاني
+// ============================================================
+function openExitPopup() {
+    document.getElementById('exitPopup').classList.add('active');
+}
+
+function closeExitPopup() {
+    document.getElementById('exitPopup').classList.remove('active');
+}
+
+function leaveRoom() {
+    closeExitPopup();
+    showToast('🚪 جاري الخروج من الغرفة...', 'error');
+    setTimeout(() => {
+        // الخروج الفعلي
         if (mySeatIndex !== -1) {
-            await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
+            database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
         }
         if (roomListener) database.ref('rooms/' + roomId).off();
         if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
@@ -4380,7 +4322,13 @@ async function leaveRoom() {
         if (audioContext) audioContext.close();
         if (peer) peer.destroy();
         window.location.href = 'chat.html';
-    } catch(e) { window.location.href = 'chat.html'; }
+    }, 800);
+}
+
+function minimizeRoom() {
+    closeExitPopup();
+    showToast('⬇️ تم تصغير الغرفة', 'info');
+    // هنا يمكن إضافة منطق التصغير
 }
 
 // ============================================================
@@ -4425,6 +4373,7 @@ function closeAll() {
     document.getElementById('reportModal').style.display = 'none';
     document.getElementById('reportModal').classList.remove('active');
     document.getElementById('usersListContainer').style.display = 'none';
+    document.getElementById('exitPopup').classList.remove('active');
 }
 
 function closeModal(modalId) {
@@ -4797,5 +4746,6 @@ window.addEventListener('beforeunload', function() {
     document.getElementById('vipEntrance').classList.remove('active');
 });
 </script>
+
 </body>
 </html>
