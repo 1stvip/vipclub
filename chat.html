@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <style>
+        /* ===== جميع الأنماط السابقة ===== */
         * {
             margin: 0;
             padding: 0;
@@ -95,10 +96,6 @@
             width: auto;
             object-fit: contain;
             border-radius: 8px;
-        }
-
-        .header-center .logo i {
-            font-size: 1.6rem;
         }
 
         .header-right {
@@ -240,7 +237,6 @@
             color: #fff;
         }
 
-        /* ===== أيقونة إغلاق الإشعارات ===== */
         .notif-close-btn {
             background: rgba(239, 68, 68, 0.12);
             color: #ef4444;
@@ -442,16 +438,6 @@
             font-size: 0.4rem;
         }
 
-        .room-card .room-banner .default-bg-text {
-            position: relative;
-            z-index: 2;
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-            letter-spacing: 3px;
-        }
-
         .room-card .room-body {
             padding: 4px 14px 10px;
             flex: 1;
@@ -611,7 +597,6 @@
             box-shadow: 0 4px 20px rgba(255, 215, 0, 0.25);
         }
 
-        /* ===== تحسين البنرات ===== */
         @media (max-width: 768px) {
             .hero-banner-wrapper {
                 height: 160px;
@@ -684,7 +669,7 @@
             }
         }
 
-        /* ===== PROFILE DROPDOWN - مع أيقونة إغلاق ===== */
+        /* ===== PROFILE DROPDOWN ===== */
         .profile-dropdown {
             position: absolute;
             top: 55px;
@@ -1182,7 +1167,7 @@
             transform: translateY(-2px);
         }
 
-        /* ===== NOTIFICATION DROPDOWN - مع أيقونة إغلاق ===== */
+        /* ===== NOTIFICATION DROPDOWN ===== */
         .notif-dropdown {
             position: absolute;
             top: 55px;
@@ -1933,7 +1918,7 @@
             }
         }
 
-        /* ===== بطاقة تصغير الغرفة - مع أيقونة إغلاق ===== */
+        /* ===== بطاقة تصغير الغرفة ===== */
         .minimize-room-card {
             position: fixed;
             bottom: 90px;
@@ -2065,7 +2050,6 @@
             font-size: 0.3rem;
         }
 
-        /* أيقونة إغلاق البطاقة المصغرة - بشكل أيقونة فقط */
         .minimize-room-card .close-mini-icon {
             position: absolute;
             top: -8px;
@@ -2775,7 +2759,6 @@
 
         <!-- ===== PROFILE DROPDOWN ===== -->
         <div id="profileDropdown" class="profile-dropdown">
-            <!-- أيقونة إغلاق الملف الشخصي -->
             <button class="profile-close-btn" onclick="closeProfile()" title="إغلاق الملف الشخصي">
                 <i class="fas fa-times"></i>
             </button>
@@ -3791,7 +3774,7 @@
         }
 
         // ============================================================
-        // 🎯 JOIN ROOM
+        // 🎯 JOIN ROOM - تم إصلاح المشكلة
         // ============================================================
         async function joinRoom(roomId) {
             if (!requireLogin('joinRoom')) return;
@@ -3805,15 +3788,26 @@
                     return;
                 }
 
+                // التحقق من كلمة المرور
                 if (room.hasPassword && room.password) {
                     showPasswordPrompt(roomId, room);
                     return;
                 }
 
-                window.location.href = `voice-room.html?room=${roomId}`;
+                // الانتقال إلى صفحة الغرفة الصوتية
+                const roomUrl = `voice-room.html?room=${roomId}`;
+                console.log('🔄 جاري الانتقال إلى:', roomUrl);
+                
+                // محاولة فتح الصفحة مع التحقق من وجودها
+                try {
+                    window.location.href = roomUrl;
+                } catch (navError) {
+                    console.error('❌ خطأ في التنقل:', navError);
+                    showToast('❌ حدث خطأ في الانتقال إلى الغرفة', 'error');
+                }
 
             } catch (error) {
-                console.error('Error joining room:', error);
+                console.error('❌ Error joining room:', error);
                 showToast('❌ حدث خطأ في الدخول إلى الغرفة', 'error');
             }
         }
@@ -5037,6 +5031,7 @@
             console.log('✅ تم إضافة روابط للبنرات');
             console.log('✅ تم إضافة دعم تصغير الغرف الصوتية');
             console.log('✅ تم تغيير زر إغلاق البطاقة المصغرة إلى أيقونة فقط');
+            console.log('✅ تم إصلاح مشكلة الانتقال إلى voice-room.html');
         };
 
         async function updateNotifBadge() {
