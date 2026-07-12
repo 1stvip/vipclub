@@ -34,7 +34,7 @@
             backdrop-filter: blur(15px);
             padding: 0.6rem 4%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             border-bottom: 2px solid rgba(255,215,0,0.15);
             position: sticky;
@@ -52,12 +52,19 @@
         /* ===== مربع معلومات الغرفة ===== */
         .room-info-box {
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
             padding: 6px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .room-info-top {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
@@ -65,16 +72,34 @@
         .room-info-box .room-id { color: #ffd700; font-family: monospace; font-size: 0.65rem; background: rgba(255,215,0,0.1); padding: 2px 8px; border-radius: 6px; }
         .room-info-box .room-owner { color: #ffd700; font-size: 0.7rem; }
         .room-info-box .member-count { color: #94a3b8; font-size: 0.7rem; }
+        .room-info-box .btn-leave-icon {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.75rem;
+        }
+        .room-info-box .btn-leave-icon:hover {
+            background: rgba(239,68,68,0.3);
+            transform: scale(1.1);
+        }
 
-        /* ===== مربع الأيقونات ===== */
-        .icons-box {
+        /* ===== مربع الأيقونات تحت معلومات الغرفة ===== */
+        .icon-bar {
             display: flex;
             align-items: center;
             gap: 4px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 6px 10px;
+            padding-top: 2px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            width: 100%;
+            justify-content: center;
         }
 
         .icon-btn {
@@ -82,12 +107,12 @@
             color: #f8fafc;
             cursor: pointer;
             position: relative;
-            width: 34px;
-            height: 34px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: 0.3s;
             text-decoration: none;
             background: rgba(255,255,255,0.05);
@@ -104,29 +129,6 @@
         .icon-btn.users-btn:hover { background: #10b981; color: white; }
         .icon-btn.profile-btn { background: rgba(236,72,153,0.08); color: #ec4899; }
         .icon-btn.profile-btn:hover { background: #ec4899; color: white; }
-
-        /* ===== زر الخروج داخل مربع الأيقونات ===== */
-        .icon-btn.exit-btn {
-            background: rgba(239,68,68,0.1);
-            color: #ef4444;
-            border-color: rgba(239,68,68,0.15);
-            font-size: 1rem;
-            border: 1px solid rgba(239,68,68,0.15);
-        }
-        .icon-btn.exit-btn:hover {
-            background: #ef4444;
-            color: white;
-            transform: scale(1.08);
-            border-color: #ef4444;
-            box-shadow: 0 0 30px rgba(239,68,68,0.2);
-        }
-
-        .icons-box .separator {
-            width: 1px;
-            height: 28px;
-            background: rgba(255,255,255,0.06);
-            margin: 0 2px;
-        }
 
         .badge {
             position: absolute;
@@ -155,7 +157,7 @@
             min-height: 500px;
         }
 
-        /* ===== SEATS AREA ===== */
+        /* ===== SEATS AREA - موسع ===== */
         .seats-area {
             flex: 1.8;
             background: #000000 !important;
@@ -184,30 +186,29 @@
         }
         .seats-area .seats-title i { color: #ffd700; }
 
-        /* ===== تكبير التباعد بين المقاعد ===== */
         .seats-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 45px;
+            gap: 30px;
             width: 100%;
-            padding: 10px 0;
+            padding: 5px 0;
         }
 
-        /* ===== نظام المقاعد - تكبير المقاعد والأطراف ===== */
+        /* ===== نظام المقاعد ===== */
         .seats-row {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
             flex-shrink: 0;
-            gap: 65px !important;
+            gap: 50px !important;
             flex-wrap: nowrap;
         }
 
         .seats-row.row-1 { justify-content: center; padding: 0; gap: 0 !important; }
         .seats-row.row-1 .seat-wrapper { margin: 0 auto; }
-        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 75px !important; }
+        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 60px !important; }
 
         /* ===== SEAT WRAPPER ===== */
         .seat-wrapper {
@@ -218,29 +219,29 @@
             flex-shrink: 0;
             position: relative;
             width: auto;
-            min-width: 100px;
+            min-width: 80px;
             margin-bottom: 5px;
         }
 
-        /* ===== SEAT CONTAINER - تكبير ===== */
+        /* ===== SEAT CONTAINER ===== */
         .seat-container {
             position: relative;
-            width: 170px;
-            height: 170px;
+            width: 140px;
+            height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
 
-        /* ===== SEAT FRAME - تكبير ===== */
+        /* ===== SEAT FRAME ===== */
         .seat-frame {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 170px;
-            height: 170px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
@@ -257,10 +258,10 @@
             display: block;
         }
 
-        /* ===== SEAT CIRCLE - تكبير ===== */
+        /* ===== SEAT CIRCLE ===== */
         .seat-circle {
-            width: 100px !important;
-            height: 100px !important;
+            width: 85px !important;
+            height: 85px !important;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
@@ -279,7 +280,7 @@
         /* ===== إخفاء التاج ===== */
         .seat-circle .crown-icon { display: none !important; }
 
-        /* ===== ألوان المقاعد الفارغة ===== */
+        /* ===== ألوان المقاعد الفارغة بتدرج جذاب ===== */
         .seat-circle.empty {
             border-color: transparent;
             background: linear-gradient(145deg, rgba(139,92,246,0.12), rgba(99,102,241,0.08));
@@ -335,15 +336,14 @@
             50% { box-shadow: 0 0 60px rgba(255,215,0,0.08); }
         }
 
-        /* ===== تكبير الصورة الرمزية ===== */
         .seat-circle .seat-avatar {
-            width: 48px !important;
-            height: 48px !important;
+            width: 38px !important;
+            height: 38px !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem !important;
+            font-size: 0.85rem !important;
             font-weight: 700;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: white;
@@ -373,7 +373,6 @@
             box-shadow: none;
         }
 
-        /* ===== موجات الصوت ===== */
         .seat-circle .sound-waves {
             position: absolute;
             top: 50%;
@@ -420,7 +419,21 @@
             100% { transform: translate(-50%, -50%) scale(1.7); opacity: 0; }
         }
 
-        /* ===== إزالة أيقونة الكتم واستبدالها بطرد نهائي ===== */
+        .seat-circle .mic-indicator {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            font-size: 0.55rem;
+            background: rgba(0,0,0,0.8);
+            border-radius: 50%;
+            padding: 3px;
+            border: 2px solid rgba(255,255,255,0.02);
+            backdrop-filter: blur(5px);
+            z-index: 3;
+        }
+        .seat-circle .mic-indicator.on { color: #10b981; }
+        .seat-circle .mic-indicator.off { color: #ef4444; }
+
         .seat-circle .owner-actions {
             position: absolute;
             bottom: -20px;
@@ -445,24 +458,10 @@
             transition: 0.3s;
             font-weight: 600;
         }
-        /* زر الطرد النهائي - يحل محل الكتم */
-        .seat-circle .owner-actions .btn-ban {
-            background: #ef4444;
-            color: white;
-        }
-        .seat-circle .owner-actions .btn-ban:hover {
-            background: #dc2626;
-            transform: scale(1.05);
-        }
-        /* زر الطرد المؤقت */
-        .seat-circle .owner-actions .btn-kick {
-            background: #f59e0b;
-            color: white;
-        }
-        .seat-circle .owner-actions .btn-kick:hover {
-            background: #d97706;
-            transform: scale(1.05);
-        }
+        .seat-circle .owner-actions .btn-kick { background: #ef4444; color: white; }
+        .seat-circle .owner-actions .btn-kick:hover { background: #dc2626; transform: scale(1.05); }
+        .seat-circle .owner-actions .btn-mute { background: #f59e0b; color: white; }
+        .seat-circle .owner-actions .btn-mute:hover { background: #d97706; transform: scale(1.05); }
 
         /* ===== USERNAME UNDER SEAT ===== */
         .seat-username {
@@ -495,11 +494,11 @@
         }
         .seat-wrapper.occupied .seat-number { display: none; }
 
-        /* ===== CHAT AREA - نظام الدردشة من الكود التجريبي ===== */
+        /* ===== CHAT AREA - مصغر قليلاً ===== */
         .chat-area {
-            width: 360px;
-            min-width: 280px;
-            max-width: 400px;
+            width: 340px;
+            min-width: 260px;
+            max-width: 380px;
             background: rgba(255,255,255,0.02);
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.05);
@@ -511,236 +510,169 @@
             overflow: hidden;
             position: relative;
             flex-shrink: 0;
-            min-height: 450px;
-            max-height: 550px;
         }
 
         .chat-header {
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
-            min-height: 44px;
+            min-height: 40px;
             background: rgba(0,0,0,0.2);
         }
-        .chat-header h3 { font-size: 0.85rem; color: #ffd700; display: flex; align-items: center; gap: 6px; }
-        .chat-header .online-count { font-size: 0.65rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
+        .chat-header h3 { font-size: 0.75rem; color: #ffd700; display: flex; align-items: center; gap: 6px; }
+        .chat-header .online-count { font-size: 0.6rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
         .chat-header .online-count:hover { color: #ffd700; }
 
-        /* ===== رسائل الشات - نظام المجموعات ===== */
         .chat-messages {
             flex: 1;
-            padding: 10px 14px;
+            padding: 8px 12px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             min-height: 0;
             max-height: 100%;
             scroll-behavior: smooth;
             overscroll-behavior: contain;
         }
-        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
         .chat-messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
         .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.12); border-radius: 10px; }
 
-        .message-group {
+        .chat-messages .message {
+            padding: 0;
+            border-radius: 12px;
+            max-width: 92%;
+            word-wrap: break-word;
+            animation: fadeInMsg 0.2s ease;
+            width: fit-content;
+            min-width: 20%;
+            position: relative;
+            overflow: visible;
+            background: transparent;
+            border: none;
+            flex-shrink: 0;
+        }
+
+        .chat-messages .message .message-bg {
+            position: relative;
+            padding: 12px 16px;
+            border-radius: 14px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 48px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            animation: fadeInMsg 0.3s ease;
+            align-items: center;
+            justify-content: center;
             width: 100%;
-            flex-shrink: 0;
+            min-width: 80px;
+            max-width: 100%;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
         }
 
-        .message-group.own { align-items: flex-end; }
-        .message-group.other { align-items: flex-start; }
-
-        @keyframes fadeInMsg {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message {
-            padding: 8px 14px;
-            border-radius: 14px;
-            max-width: 85%;
-            word-wrap: break-word;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.04);
-            flex-shrink: 0;
-        }
-
-        .message .msg-sender {
+        .chat-messages .message .message-bg .msg-sender {
             font-size: 0.55rem;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.85);
             margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+            justify-content: center;
             font-weight: 600;
+            width: 100%;
+            position: relative;
+            z-index: 2;
         }
+        .chat-messages .message .message-bg .msg-sender.owner { color: #ffd700; }
 
-        .message .msg-sender.owner { color: #ffd700; }
-
-        .message .msg-text {
+        .chat-messages .message .message-bg .msg-text {
             font-size: 0.85rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            word-break: break-word;
             color: #fff;
-            text-align: right;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.7);
+            text-align: center;
+            padding: 2px 0;
+            font-weight: 500;
+            max-width: 100%;
+            position: relative;
+            z-index: 2;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        .message .msg-time {
+        .chat-messages .message .message-bg .msg-time {
             font-size: 0.45rem;
-            color: rgba(255,255,255,0.4);
-            margin-top: 3px;
-            text-align: left;
+            color: rgba(255,255,255,0.6);
+            margin-top: 2px;
+            opacity: 0.8;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
         }
 
-        .message.own {
-            background: linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.2));
-            border-color: rgba(102,126,234,0.1);
+        .chat-messages .message .message-bg .msg-badge {
+            font-size: 0.4rem;
+            background: #ffd700;
+            color: #1a1a2e;
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-weight: 700;
         }
 
-        .message.other {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.03);
+        /* ===== لا تظهر صورة صغيرة إضافية - النص داخل صورة الخلفية ===== */
+        .chat-messages .message .message-bg .style-image-container {
+            display: none !important;
         }
 
-        .message.system {
+        .chat-messages .message.system {
             background: rgba(255,215,0,0.06);
             color: #ffd700;
             text-align: center;
             width: auto;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             border: 1px solid rgba(255,215,0,0.06);
             border-radius: 12px;
-            padding: 6px 16px;
+            padding: 4px 14px;
             margin: 2px auto;
             max-width: 85%;
             opacity: 0.9;
             align-self: center;
             flex-shrink: 0;
+            font-weight: 500;
         }
-        .message.system .msg-text { color: #ffd700; }
-
-        /* ===== مدخل الشات ===== */
-        .chat-input-area {
-            padding: 6px 10px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-shrink: 0;
-            background: rgba(0,0,0,0.3);
-            min-height: 48px;
+        .chat-messages .message.system .message-bg {
+            background: transparent !important;
+            padding: 0;
+            min-height: auto;
+            box-shadow: none;
         }
 
-        .chat-input-area .input-wrapper {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            border-radius: 10px;
-            border: none;
-            padding: 0 8px;
-            position: relative;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 32px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.05);
+        .chat-messages .message.own .message-bg {
+            border-radius: 16px 16px 4px 16px;
+            direction: rtl;
+            text-align: right;
+        }
+        .chat-messages .message.other .message-bg {
+            border-radius: 16px 16px 16px 4px;
+            direction: ltr;
+            text-align: left;
         }
 
-        .chat-input-area .input-wrapper .style-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 10px;
+        @keyframes fadeInMsg {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .chat-input-area .input-wrapper input {
-            flex: 1;
-            padding: 8px 4px;
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 0.8rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            z-index: 2;
-            position: relative;
-            min-width: 30px;
-        }
-        .chat-input-area .input-wrapper input::placeholder { 
-            color: rgba(255,255,255,0.4); 
-            font-size: 0.7rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .chat-input-area .emoji-btn {
-            background: transparent;
-            border: none;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.9rem;
-            cursor: pointer;
-            padding: 2px 4px;
-            transition: 0.3s;
-            border-radius: 4px;
-            z-index: 2;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .chat-input-area .emoji-btn:hover { color: #ffd700; background: rgba(255,215,0,0.1); }
-
-        .chat-input-area .send-btn {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: 600;
-            font-size: 0.8rem;
-            z-index: 2;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .chat-input-area .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(102,126,234,0.3); }
-
-        .emoji-picker {
-            display: none;
-            position: absolute;
-            bottom: 45px;
-            left: 8px;
-            background: #1a1a2e;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 4px;
-            max-width: 160px;
-            max-height: 70px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            flex-wrap: wrap;
-            gap: 2px;
-            justify-content: center;
-        }
-        .emoji-picker.active { display: flex; }
-        .emoji-picker .emoji-item {
-            font-size: 0.75rem;
-            cursor: pointer;
-            padding: 2px;
-            border-radius: 4px;
-            transition: 0.2s;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .emoji-picker .emoji-item:hover { background: rgba(255,255,255,0.08); transform: scale(1.15); }
 
         .scroll-down-btn {
             position: absolute;
@@ -770,141 +702,125 @@
         }
         .scroll-down-btn:hover { background: rgba(102,126,234,0.6); transform: translateX(-50%) scale(1.1); }
 
-        /* ===== نافذة الخروج المنبثقة ===== */
-        .exit-popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            z-index: 99999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .exit-popup-overlay.active {
+        /* ===== CHAT INPUT ===== */
+        .chat-input-area {
+            padding: 4px 8px;
+            border-top: 1px solid rgba(255,255,255,0.05);
             display: flex;
-            animation: fadeInPopup 0.3s ease;
+            gap: 4px;
+            align-items: center;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.3);
+            position: relative;
+            min-height: 42px;
         }
 
-        @keyframes fadeInPopup {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .exit-popup {
-            background: #1a1a2e;
-            border-radius: 28px;
-            padding: 35px 40px 40px;
-            width: 380px;
-            max-width: 92%;
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-            text-align: center;
-        }
-
-        .exit-popup .popup-icon {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 15px;
-            border-radius: 50%;
-            background: rgba(239,68,68,0.1);
-            border: 2px solid rgba(239,68,68,0.2);
+        .chat-input-area .input-wrapper {
+            flex: 1;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 2.2rem;
-            color: #ef4444;
+            border-radius: 10px;
+            border: none;
+            padding: 0 8px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 32px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
         }
 
-        .exit-popup h2 {
-            color: #ffd700;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
+        .chat-input-area .input-wrapper .style-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 10px;
         }
 
-        .exit-popup p {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            margin-bottom: 25px;
-        }
-
-        .exit-popup .popup-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .exit-popup .popup-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 100px;
-        }
-
-        .exit-popup .popup-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .exit-popup .popup-item .popup-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.03);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 2rem;
-        }
-
-        .exit-popup .popup-item .popup-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .exit-popup .popup-item .popup-btn.leave-btn {
-            border-color: rgba(239,68,68,0.3);
-            background: rgba(239,68,68,0.1);
-            color: #ef4444;
-        }
-
-        .exit-popup .popup-item .popup-btn.leave-btn:hover {
-            background: #ef4444;
+        .chat-input-area .input-wrapper input {
+            flex: 1;
+            padding: 6px 4px;
+            background: transparent;
+            border: none;
             color: white;
-            border-color: #ef4444;
-            box-shadow: 0 0 40px rgba(239,68,68,0.3);
+            outline: none;
+            font-size: 0.75rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 2;
+            position: relative;
+            min-width: 30px;
+        }
+        .chat-input-area .input-wrapper input::placeholder { 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.65rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        .exit-popup .popup-item .popup-btn.minimize-btn {
-            border-color: rgba(245,158,11,0.3);
-            background: rgba(245,158,11,0.1);
-            color: #f59e0b;
+        .chat-input-area .emoji-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 2px 4px;
+            transition: 0.3s;
+            border-radius: 4px;
+            z-index: 2;
+            position: relative;
+            flex-shrink: 0;
         }
+        .chat-input-area .emoji-btn:hover { color: #ffd700; background: rgba(255,215,0,0.1); }
 
-        .exit-popup .popup-item .popup-btn.minimize-btn:hover {
-            background: #f59e0b;
-            color: #1a1a2e;
-            border-color: #f59e0b;
-            box-shadow: 0 0 40px rgba(245,158,11,0.3);
-        }
-
-        .exit-popup .popup-item .popup-label {
-            color: #94a3b8;
-            font-size: 0.8rem;
+        .chat-input-area .send-btn {
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
             font-weight: 600;
+            font-size: 0.7rem;
+            z-index: 2;
+            position: relative;
+            flex-shrink: 0;
         }
+        .chat-input-area .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(102,126,234,0.3); }
 
-        .exit-popup .popup-item .popup-label.leave-label { color: #ef4444; }
-        .exit-popup .popup-item .popup-label.minimize-label { color: #f59e0b; }
+        .emoji-picker {
+            display: none;
+            position: absolute;
+            bottom: 40px;
+            left: 8px;
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 4px;
+            max-width: 160px;
+            max-height: 70px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            flex-wrap: wrap;
+            gap: 2px;
+            justify-content: center;
+        }
+        .emoji-picker.active { display: flex; }
+        .emoji-picker .emoji-item {
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 4px;
+            transition: 0.2s;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .emoji-picker .emoji-item:hover { background: rgba(255,255,255,0.08); transform: scale(1.15); }
 
         /* ===== AUDIO CONTROLS ===== */
         .audio-controls {
@@ -1943,34 +1859,30 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .main-layout { flex-direction: column; height: auto; padding: 10px; }
-            .chat-area { width: 100%; max-width: 100%; height: 320px; min-height: 240px; max-height: 400px; }
+            .chat-area { width: 100%; max-width: 100%; height: 320px; min-height: 240px; }
             .seats-area { min-height: 400px; max-height: 550px; }
-            .seats-row { gap: 50px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 55px !important; }
-            .seat-circle { width: 85px !important; height: 85px !important; }
-            .seat-circle .seat-avatar { width: 38px !important; height: 38px !important; font-size: 0.85rem !important; }
-            .seat-container { width: 150px; height: 150px; }
-            .seat-frame { width: 150px; height: 150px; }
+            .seats-row { gap: 40px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 45px !important; }
+            .seat-circle { width: 75px !important; height: 75px !important; }
+            .seat-circle .seat-avatar { width: 32px !important; height: 32px !important; font-size: 0.7rem !important; }
+            .seat-container { width: 120px; height: 120px; }
+            .seat-frame { width: 120px; height: 120px; }
             .seat-username { font-size: 0.6rem; max-width: 90px; margin-top: 6px !important; min-height: 18px; }
             .seat-number { font-size: 0.5rem; margin-top: 6px; min-height: 18px; }
-            .seats-container { gap: 35px; }
         }
 
         @media (max-width: 850px) {
             .seats-area { min-height: 380px; max-height: 500px; padding: 15px 12px; overflow: visible !important; }
             .seats-container { gap: 30px; overflow: visible !important; }
-            .seats-row { gap: 35px !important; overflow: visible !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 40px !important; }
-            .seat-circle { width: 75px !important; height: 75px !important; }
-            .seat-circle .seat-avatar { width: 32px !important; height: 32px !important; font-size: 0.7rem !important; }
-            .seat-container { width: 130px; height: 130px; }
-            .seat-frame { width: 130px; height: 130px; }
+            .seats-row { gap: 30px !important; overflow: visible !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 35px !important; }
+            .seat-circle { width: 70px !important; height: 70px !important; }
+            .seat-circle .seat-avatar { width: 30px !important; height: 30px !important; font-size: 0.65rem !important; }
+            .seat-container { width: 110px; height: 110px; }
+            .seat-frame { width: 110px; height: 110px; }
             .seat-username { font-size: 0.55rem; max-width: 80px; margin-top: 6px !important; min-height: 16px; }
             .seat-number { font-size: 0.45rem; margin-top: 6px; min-height: 16px; }
-            .chat-area { height: 280px; min-height: 200px; max-height: 350px; }
-            .navbar { flex-wrap: wrap; justify-content: center; }
-            .room-info-box { justify-content: center; }
-            .icons-box { justify-content: center; flex-wrap: wrap; }
+            .chat-area { height: 280px; min-height: 200px; }
         }
 
         @media (max-width: 600px) {
@@ -1982,12 +1894,12 @@
                 overflow: visible !important; 
             }
             .seats-container { 
-                gap: 25px; 
+                gap: 22px; 
                 padding: 10px 0; 
                 overflow: visible !important; 
             }
             .seats-row { 
-                gap: 15px !important; 
+                gap: 12px !important; 
                 flex-wrap: nowrap !important; 
                 overflow: visible !important; 
                 width: 100%; 
@@ -2000,51 +1912,51 @@
             }
             .seats-row.row-2 { 
                 max-width: 100%; 
-                gap: 15px !important; 
+                gap: 12px !important; 
                 justify-content: center; 
             }
             .seats-row.row-3 { 
                 max-width: 100%; 
-                gap: 15px !important; 
+                gap: 12px !important; 
                 justify-content: center; 
             }
             .seats-row.row-4 { 
                 max-width: 100%; 
-                gap: 15px !important; 
+                gap: 12px !important; 
                 justify-content: center; 
             }
             .seat-wrapper { 
-                min-width: 65px; 
+                min-width: 60px; 
                 flex-shrink: 0; 
             }
             .seat-container { 
-                width: 105px !important; 
-                height: 105px !important; 
+                width: 90px !important; 
+                height: 90px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle { 
-                width: 65px !important; 
-                height: 65px !important; 
+                width: 55px !important; 
+                height: 55px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle .seat-avatar { 
-                width: 28px !important; 
-                height: 28px !important; 
-                font-size: 0.6rem !important; 
+                width: 24px !important; 
+                height: 24px !important; 
+                font-size: 0.5rem !important; 
             }
             .seat-frame { 
-                width: 105px !important; 
-                height: 105px !important; 
+                width: 90px !important; 
+                height: 90px !important; 
             }
             .seat-username { 
-                font-size: 0.5rem; 
-                max-width: 65px; 
-                margin-top: 5px !important; 
-                min-height: 16px; 
+                font-size: 0.45rem; 
+                max-width: 55px; 
+                margin-top: 4px !important; 
+                min-height: 14px; 
             }
             .seat-number { 
                 font-size: 0.4rem; 
-                margin-top: 5px; 
+                margin-top: 4px; 
                 min-height: 14px; 
                 color: rgba(139,92,246,0.4); 
             }
@@ -2055,12 +1967,12 @@
             .seat-circle .mic-indicator { font-size: 0.4rem; padding: 2px; bottom: -1px; right: -1px; }
             .seats-area .seats-title { font-size: 0.65rem; top: 8px; right: 10px; }
             .chat-area { 
-                height: 240px; 
-                min-height: 180px; 
-                max-height: 300px; 
+                height: 220px; 
+                min-height: 160px; 
+                max-height: 260px; 
                 border-radius: 14px; 
             }
-            .chat-header { padding: 6px 10px; min-height: 36px; }
+            .chat-header { padding: 6px 10px; min-height: 34px; }
             .chat-header h3 { font-size: 0.7rem; }
             .chat-messages { padding: 6px 8px; gap: 3px; }
             .chat-messages .message { max-width: 95%; min-width: 15%; }
@@ -2069,19 +1981,19 @@
             .chat-messages .message .message-bg .msg-sender { font-size: 0.5rem; }
             .chat-messages .message .message-bg .msg-time { font-size: 0.4rem; margin-top: 2px; }
             .chat-messages .message.system { font-size: 0.6rem; padding: 4px 10px; max-width: 92%; }
-            .chat-input-area { padding: 4px 6px; min-height: 40px; gap: 4px; }
-            .chat-input-area .input-wrapper { min-height: 30px; padding: 0 6px; border-radius: 8px; }
-            .chat-input-area .input-wrapper input { font-size: 0.7rem; padding: 6px 4px; }
+            .chat-input-area { padding: 4px 6px; min-height: 38px; gap: 4px; }
+            .chat-input-area .input-wrapper { min-height: 28px; padding: 0 6px; border-radius: 8px; }
+            .chat-input-area .input-wrapper input { font-size: 0.7rem; padding: 4px 4px; }
             .chat-input-area .input-wrapper input::placeholder { font-size: 0.6rem; }
-            .chat-input-area .send-btn { padding: 5px 10px; font-size: 0.7rem; border-radius: 6px; }
-            .chat-input-area .emoji-btn { font-size: 0.8rem; padding: 2px 4px; }
-            .scroll-down-btn { width: 24px; height: 24px; font-size: 0.55rem; bottom: 46px; }
-            .emoji-picker { max-width: 130px; max-height: 55px; bottom: 38px; left: 4px; padding: 3px; }
-            .emoji-picker .emoji-item { font-size: 0.65rem; width: 18px; height: 18px; }
+            .chat-input-area .send-btn { padding: 4px 10px; font-size: 0.65rem; border-radius: 6px; }
+            .chat-input-area .emoji-btn { font-size: 0.75rem; padding: 2px 4px; }
+            .scroll-down-btn { width: 22px; height: 22px; font-size: 0.5rem; bottom: 44px; }
+            .emoji-picker { max-width: 120px; max-height: 50px; bottom: 36px; left: 4px; padding: 3px; }
+            .emoji-picker .emoji-item { font-size: 0.6rem; width: 16px; height: 16px; }
             .audio-controls { bottom: 12px; right: 10px; gap: 5px; }
-            .audio-btn { width: 38px; height: 38px; font-size: 0.95rem; }
-            .btn-leave-seat { width: 38px; height: 38px; font-size: 0.95rem; }
-            .audio-btn .tooltip, .btn-leave-seat .tooltip { right: 44px; font-size: 0.5rem; padding: 2px 8px; }
+            .audio-btn { width: 36px; height: 36px; font-size: 0.9rem; }
+            .btn-leave-seat { width: 36px; height: 36px; font-size: 0.9rem; }
+            .audio-btn .tooltip, .btn-leave-seat .tooltip { right: 42px; font-size: 0.5rem; padding: 2px 8px; }
             #vipEntrance .vip-video-container { width: 90%; max-width: 350px; }
             #vipEntrance .vip-title { font-size: 1.2rem; padding: 6px 14px; white-space: normal; }
             #vipEntrance .vip-user { font-size: 0.9rem; }
@@ -2094,16 +2006,15 @@
             .user-item .user-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
             #usersListContainer { width: 95%; padding: 14px; }
             #usersList { max-height: 280px; }
-            .navbar { padding: 0.3rem 2%; min-height: 55px; }
-            .icon-btn { width: 30px; height: 30px; font-size: 0.8rem; }
+            .navbar { padding: 0.3rem 2%; min-height: 50px; }
+            .icon-btn { width: 28px; height: 28px; font-size: 0.75rem; }
             .badge { font-size: 0.4rem; min-width: 12px; top: -3px; right: -3px; padding: 1px 3px; }
-            .room-info-box { padding: 4px 10px; gap: 8px; }
+            .room-info-box { padding: 4px 10px; }
             .room-info-box .room-name { font-size: 0.75rem; }
             .room-info-box .room-id { font-size: 0.55rem; }
             .room-info-box .room-owner { font-size: 0.6rem; }
             .room-info-box .member-count { font-size: 0.6rem; }
             .logo-section { display: none !important; }
-            .icons-box { padding: 4px 6px; gap: 2px; }
         }
 
         @media (max-width: 400px) {
@@ -2119,7 +2030,7 @@
                 overflow: visible !important; 
             }
             .seats-row { 
-                gap: 10px !important; 
+                gap: 8px !important; 
                 flex-wrap: nowrap !important; 
                 overflow: visible !important; 
                 width: 100%; 
@@ -2132,52 +2043,52 @@
             }
             .seats-row.row-2 { 
                 max-width: 100%; 
-                gap: 10px !important; 
+                gap: 8px !important; 
                 justify-content: center; 
             }
             .seats-row.row-3 { 
                 max-width: 100%; 
-                gap: 10px !important; 
+                gap: 8px !important; 
                 justify-content: center; 
             }
             .seats-row.row-4 { 
                 max-width: 100%; 
-                gap: 10px !important; 
+                gap: 8px !important; 
                 justify-content: center; 
             }
             .seat-wrapper { 
-                min-width: 52px; 
+                min-width: 48px; 
                 flex-shrink: 0; 
             }
             .seat-container { 
-                width: 85px !important; 
-                height: 85px !important; 
+                width: 72px !important; 
+                height: 72px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle { 
-                width: 52px !important; 
-                height: 52px !important; 
+                width: 44px !important; 
+                height: 44px !important; 
                 flex-shrink: 0; 
             }
             .seat-circle .seat-avatar { 
-                width: 24px !important; 
-                height: 24px !important; 
-                font-size: 0.5rem !important; 
+                width: 20px !important; 
+                height: 20px !important; 
+                font-size: 0.4rem !important; 
                 border-width: 1.5px !important; 
             }
             .seat-frame { 
-                width: 85px !important; 
-                height: 85px !important; 
+                width: 72px !important; 
+                height: 72px !important; 
             }
             .seat-username { 
-                font-size: 0.45rem; 
-                max-width: 50px; 
-                margin-top: 4px !important; 
+                font-size: 0.4rem; 
+                max-width: 44px; 
+                margin-top: 3px !important; 
                 min-height: 12px; 
             }
             .seat-number { 
                 font-size: 0.35rem; 
-                margin-top: 4px; 
+                margin-top: 3px; 
                 min-height: 12px; 
                 color: rgba(139,92,246,0.35); 
             }
@@ -2189,9 +2100,9 @@
                 right: -1px; 
             }
             .chat-area { 
-                height: 180px; 
-                min-height: 160px; 
-                max-height: 220px; 
+                height: 160px; 
+                min-height: 140px; 
+                max-height: 200px; 
             }
             .chat-messages .message .message-bg { 
                 padding: 6px 8px; 
@@ -2199,20 +2110,9 @@
                 min-width: 40px; 
             }
             .chat-messages .message .message-bg .msg-text { 
-                font-size: 0.7rem; 
+                font-size: 0.65rem; 
                 line-height: 1.4; 
             }
-            .exit-popup { padding: 20px 15px; width: 300px; }
-            .exit-popup .popup-buttons { gap: 15px; }
-            .exit-popup .popup-item .popup-btn { width: 55px; height: 55px; font-size: 1.3rem; }
-            .exit-popup .popup-item .popup-label { font-size: 0.7rem; }
-            .room-info-box { padding: 4px 6px; gap: 4px; flex-wrap: wrap; justify-content: center; }
-            .room-info-box .room-name { font-size: 0.65rem; }
-            .room-info-box .room-id { font-size: 0.5rem; }
-            .room-info-box .room-owner { font-size: 0.55rem; }
-            .room-info-box .member-count { font-size: 0.55rem; }
-            .icons-box { padding: 3px 4px; gap: 2px; flex-wrap: wrap; }
-            .icon-btn { width: 28px; height: 28px; font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -2223,40 +2123,41 @@
     <!-- ===== تم إخفاء شعار VipChat ===== -->
     <div style="display:none;"></div>
 
-    <!-- ===== مربع معلومات الغرفة ===== -->
+    <!-- ===== مربع معلومات الغرفة مع الأيقونات تحته ===== -->
     <div class="room-info-box">
-        <span class="room-name" id="roomNameDisplay">غرفة صوتية</span>
-        <span class="room-id" id="roomIdDisplay">🔑 ---</span>
-        <span class="room-owner" id="roomOwnerDisplay">👑 ---</span>
-        <span class="member-count">👥 <span id="memberCount">0</span></span>
+        <div class="room-info-top">
+            <span class="room-name" id="roomNameDisplay">غرفة صوتية</span>
+            <span class="room-id" id="roomIdDisplay">🔑 ---</span>
+            <span class="room-owner" id="roomOwnerDisplay">👑 ---</span>
+            <span class="member-count">👥 <span id="memberCount">0</span></span>
+            <button class="btn-leave-icon" onclick="leaveRoom()" title="مغادرة الغرفة">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+        
+        <!-- ===== شريط الأيقونات تحت معلومات الغرفة ===== -->
+        <div class="icon-bar">
+            <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
+                <i class="fas fa-users"></i>
+                <span class="badge" id="usersBadge">0</span>
+            </button>
+            <button class="icon-btn profile-btn" onclick="handleProfileClick()" title="الملف الشخصي">
+                <i class="fas fa-user-circle"></i>
+            </button>
+            <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
+                <i class="fas fa-bell"></i>
+                <span class="badge" id="notifBadge">0</span>
+            </button>
+            <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
+                <i class="fas fa-gift"></i>
+            </button>
+            <button class="icon-btn style-btn" onclick="openChatStylesModal()" title="أشكال الكتابة">
+                <i class="fas fa-pen-fancy"></i>
+            </button>
+        </div>
     </div>
 
-    <!-- ===== مربع الأيقونات ===== -->
-    <div class="icons-box">
-        <button class="icon-btn users-btn" onclick="toggleUsersList()" title="المستخدمين">
-            <i class="fas fa-users"></i>
-            <span class="badge" id="usersBadge">0</span>
-        </button>
-        <button class="icon-btn profile-btn" onclick="handleProfileClick()" title="الملف الشخصي">
-            <i class="fas fa-user-circle"></i>
-        </button>
-        <button class="icon-btn notif-btn" onclick="openNotifDropdown()" title="الإشعارات">
-            <i class="fas fa-bell"></i>
-            <span class="badge" id="notifBadge">0</span>
-        </button>
-        <button class="icon-btn gift-btn" onclick="openGiftModalFromNav()" title="إرسال هدية">
-            <i class="fas fa-gift"></i>
-        </button>
-        <button class="icon-btn style-btn" onclick="openChatStylesModal()" title="أشكال الكتابة">
-            <i class="fas fa-pen-fancy"></i>
-        </button>
-        <div class="separator"></div>
-        <button class="icon-btn exit-btn" onclick="openExitPopup()" title="خروج">
-            <i class="fas fa-power-off"></i>
-        </button>
-    </div>
-
-    <div style="width:40px;"></div>
+    <div style="width:60px;"></div> <!-- فراغ للحفاظ على التوزان -->
 </nav>
 
 <!-- ===== VIP ENTRANCE ===== -->
@@ -2537,31 +2438,6 @@
 <!-- ===== OVERLAY ===== -->
 <div id="screenOverlay" class="modal-overlay" onclick="closeAll()"></div>
 
-<!-- ===== نافذة الخروج المنبثقة ===== -->
-<div class="exit-popup-overlay" id="exitPopup">
-    <div class="exit-popup">
-        <div class="popup-icon">
-            <i class="fas fa-power-off"></i>
-        </div>
-        <h2>اختر الإجراء</h2>
-        <p>هل تريد الخروج أم تصغير الغرفة؟</p>
-        <div class="popup-buttons">
-            <div class="popup-item" onclick="leaveRoom()">
-                <button class="popup-btn leave-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-                <span class="popup-label leave-label">خروج</span>
-            </div>
-            <div class="popup-item" onclick="minimizeRoom()">
-                <button class="popup-btn minimize-btn">
-                    <i class="fas fa-window-minimize"></i>
-                </button>
-                <span class="popup-label minimize-label">تصغير</span>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 // ============================================================
 // 🔥 FIREBASE CONFIG
@@ -2607,7 +2483,7 @@ const GIFT_TYPES = [
     { id: 'lion', name: '🦁 أسد', emoji: '🦁', price: 3000 }
 ];
 
-// ===== ترتيب المقاعد =====
+// ===== ترتيب المقاعد من الكود الأول =====
 const SEATS_LAYOUT = [
     { row: 0, seats: 1 },
     { row: 1, seats: 3 },
@@ -2648,7 +2524,6 @@ let vipQueue = [];
 let viewingUserId = null;
 let hasLiked = false;
 let activeChatStyle = null;
-let isMinimized = false;
 
 // ============================================================
 // 👤 USER FUNCTIONS
@@ -3023,7 +2898,7 @@ function skipVIPEntrance() {
 }
 
 // ============================================================
-// 💺 SEATS FUNCTIONS - مع تكبير المقاعد والأطراف
+// 💺 SEATS FUNCTIONS
 // ============================================================
 async function renderSeats(seats) {
     const container = document.getElementById('seatsContainer');
@@ -3133,8 +3008,8 @@ async function renderSeats(seats) {
                                 </div>
                                 ${isOwner && !isSeatCreator && isOccupied ? `
                                     <div class="owner-actions" onclick="event.stopPropagation();">
-                                        <button class="btn-ban" onclick="event.stopPropagation();banUser(${index})" title="طرد نهائي">🚫</button>
-                                        <button class="btn-kick" onclick="event.stopPropagation();kickUser(${index})" title="طرد مؤقت">✖</button>
+                                        <button class="btn-mute" onclick="event.stopPropagation();muteUser(${index})">🔇</button>
+                                        <button class="btn-kick" onclick="event.stopPropagation();kickUser(${index})">✖</button>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -3264,59 +3139,484 @@ async function leaveSeat() {
 }
 
 // ============================================================
-// 👑 OWNER FUNCTIONS - طرد نهائي وطرد مؤقت
+// 👤 PROFILE POPUP
+// ============================================================
+async function openProfilePopup(seatIndex) {
+    if (!database || !roomId) return;
+    
+    try {
+        const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
+        if (!seat || !seat.userId) {
+            showToast('❌ لا يوجد مستخدم في هذا المقعد', 'error');
+            return;
+        }
+        
+        const userId = seat.userId;
+        
+        const snapshot = await database.ref('users')
+            .orderByChild('numericId')
+            .equalTo(parseInt(userId))
+            .once('value');
+        
+        if (!snapshot.exists()) {
+            showToast('❌ المستخدم غير موجود', 'error');
+            return;
+        }
+        
+        const userData = snapshot.val();
+        const userKey = Object.keys(userData)[0];
+        const user = userData[userKey];
+        
+        await showFullProfile(user, userId);
+        
+    } catch(error) {
+        console.error('Error opening profile:', error);
+        showToast('❌ حدث خطأ', 'error');
+    }
+}
+
+// ============================================================
+// 👤 SHOW FULL PROFILE
+// ============================================================
+async function showFullProfile(user, userId) {
+    viewingUserId = userId;
+    
+    await recordProfileVisit(userId);
+    
+    const modal = document.getElementById('fullProfileModal');
+    const content = document.getElementById('fullProfileContent');
+    
+    const likedBy = user.likedBy || [];
+    const currentUserNumericId = currentUser?.numericId;
+    const isCurrentUser = userId == currentUserNumericId;
+    hasLiked = !isCurrentUser && likedBy.includes(currentUserNumericId);
+    
+    const avatarHTML = `
+        <div class="profile-avatar-container">
+            ${user.avatar ? `<img src="${user.avatar}" alt="صورة المستخدم">` : `<div class="default-avatar"><i class="fas fa-user"></i></div>`}
+        </div>
+    `;
+    
+    const recentVisitors = user.recentVisitors || [];
+    const lastFiveVisitors = recentVisitors.slice(-5).reverse();
+    
+    const giftsList = user.giftsList || [];
+    const totalGifts = giftsList.reduce((sum, g) => sum + (g.value || 0), 0);
+    
+    const actionButtons = !isCurrentUser ? `
+        <div class="action-buttons-row">
+            <button class="btn-like ${hasLiked ? 'liked' : ''}" id="profileLikeBtn" onclick="sendProfileLike('${userId}')">
+                <i class="fas fa-heart"></i> ${hasLiked ? 'تم الإعجاب' : 'إعجاب'}
+            </button>
+            <button class="btn-report" onclick="openReportModalForUser('${userId}')">
+                <i class="fas fa-flag"></i> إبلاغ
+            </button>
+            <button class="btn-gifts" onclick="openUserGifts('${userId}')">
+                <i class="fas fa-gift"></i> الهدايا
+            </button>
+        </div>
+    ` : `
+        <div style="color:#94a3b8; font-size:0.75rem; padding:6px; background:rgba(139,92,246,0.05); border-radius:10px; border:1px solid rgba(139,92,246,0.1); margin:8px 0;">
+            <i class="fas fa-user-circle"></i> هذا هو ملفك الشخصي
+        </div>
+    `;
+    
+    let giftsHTML = '';
+    if (giftsList.length > 0) {
+        giftsHTML = `
+            <div style="margin:8px 0; padding:10px; background:rgba(255,215,0,0.03); border-radius:12px; border:1px solid rgba(255,215,0,0.05);">
+                <div style="font-size:0.7rem; color:#94a3b8; margin-bottom:4px;">🎁 الهدايا المتلقاة (${giftsList.length}) - المجموع: ${totalGifts}</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(70px, 1fr)); gap:6px;">
+                    ${giftsList.slice(0, 6).map(g => `
+                        <div style="background:rgba(255,255,255,0.03); border-radius:10px; padding:6px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size:1.8rem;">${g.giftEmoji || '🎁'}</div>
+                            <div style="font-size:0.65rem; color:#10b981; font-weight:bold;">💰 ${g.value || 0}</div>
+                            <div style="font-size:0.5rem; color:#666;">${g.date || ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    let visitorsHTML = '';
+    if (lastFiveVisitors.length > 0) {
+        visitorsHTML = `
+            <div class="recent-visitors">
+                <div class="visitors-title">👥 آخر الزوار (آخر 5)</div>
+                <div class="visitors-list">
+                    ${lastFiveVisitors.map(v => `
+                        <div class="visitor-item" onclick="viewVisitorProfile('${v.numericId}')" title="${v.name} - ${v.time || ''}">
+                            ${v.avatar ? `<img src="${v.avatar}" alt="${v.name}">` : `<div class="visitor-placeholder">${v.name.charAt(0).toUpperCase()}</div>`}
+                            <div class="visitor-tooltip">${v.name} - ${v.time || ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    content.innerHTML = `
+        ${avatarHTML}
+        <div class="profile-name">${user.nickname || user.username || 'مستخدم'}</div>
+        <div class="profile-bio">${user.bio || 'لا توجد سيرة ذاتية'}</div>
+        <span class="id-label" style="font-size:0.65rem; color:#aaa; display:block; margin-top:4px;">معرف المستخدم</span>
+        <div class="user-id-numeric" onclick="copyTextContent('${user.numericId}')">${String(user.numericId).padStart(6, '0')}</div>
+        <div class="badges-section">
+            ${(user.badges || ['🏆 مميز']).map(b => `<span class="badge-item">${b}</span>`).join('')}
+        </div>
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-number">${user.gifts || 0}</div>
+                <div class="stat-label">🎁 هدايا</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">${user.likes || 0}</div>
+                <div class="stat-label">❤️ إعجابات</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">${user.visits || 0}</div>
+                <div class="stat-label">👁️ زيارات</div>
+            </div>
+        </div>
+        ${actionButtons}
+        ${giftsHTML}
+        ${visitorsHTML}
+        <div class="balance-card">
+            <div class="balance-row"><span>رصيد ج.م:</span> <span class="balance-egp">${user.balanceEGP || 0}</span></div>
+            <div class="balance-row"><span>رصيد دولار:</span> <span class="balance-usd">${user.balanceUSD || 0}</span></div>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+    document.getElementById('screenOverlay').classList.add('active');
+}
+
+// ============================================================
+// 📝 RECORD PROFILE VISIT
+// ============================================================
+async function recordProfileVisit(targetUserId) {
+    if (!currentUser || targetUserId == currentUser.numericId) return;
+    
+    try {
+        const snapshot = await database.ref('users')
+            .orderByChild('numericId')
+            .equalTo(parseInt(targetUserId))
+            .once('value');
+        
+        if (!snapshot.exists()) return;
+        
+        const userData = snapshot.val();
+        const userKey = Object.keys(userData)[0];
+        const user = userData[userKey];
+        
+        const recentVisitors = user.recentVisitors || [];
+        
+        const existingIndex = recentVisitors.findIndex(v => v.numericId == currentUser.numericId);
+        if (existingIndex !== -1) {
+            recentVisitors.splice(existingIndex, 1);
+        }
+        
+        recentVisitors.push({
+            numericId: currentUser.numericId,
+            name: currentUser.nickname || currentUser.username || 'مستخدم',
+            avatar: currentUser.avatar || null,
+            time: new Date().toLocaleString('ar-EG')
+        });
+        
+        if (recentVisitors.length > 20) {
+            recentVisitors.splice(0, recentVisitors.length - 20);
+        }
+        
+        await database.ref('users/' + userKey).update({
+            recentVisitors: recentVisitors,
+            visits: (user.visits || 0) + 1
+        });
+        
+    } catch(error) {
+        console.error('Error recording visit:', error);
+    }
+}
+
+// ============================================================
+// ❤️ SEND PROFILE LIKE
+// ============================================================
+async function sendProfileLike(targetUserId) {
+    if (!currentUser) {
+        showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+        return;
+    }
+    
+    if (targetUserId == currentUser.numericId) {
+        showToast('⚠️ لا يمكنك الإعجاب بملفك الشخصي', 'warning');
+        return;
+    }
+    
+    try {
+        const snapshot = await database.ref('users')
+            .orderByChild('numericId')
+            .equalTo(parseInt(targetUserId))
+            .once('value');
+        
+        if (!snapshot.exists()) {
+            showToast('❌ المستخدم غير موجود', 'error');
+            return;
+        }
+        
+        const userData = snapshot.val();
+        const userKey = Object.keys(userData)[0];
+        const user = userData[userKey];
+        
+        const likedBy = user.likedBy || [];
+        
+        if (likedBy.includes(currentUser.numericId)) {
+            showToast('⚠️ لقد أعجبت بهذا المستخدم بالفعل', 'warning');
+            return;
+        }
+        
+        likedBy.push(currentUser.numericId);
+        
+        await database.ref('users/' + userKey).update({
+            likedBy: likedBy,
+            likes: (user.likes || 0) + 1
+        });
+        
+        hasLiked = true;
+        const likeBtn = document.getElementById('profileLikeBtn');
+        if (likeBtn) {
+            likeBtn.classList.add('liked');
+            likeBtn.innerHTML = '<i class="fas fa-heart"></i> تم الإعجاب';
+        }
+        
+        await database.ref('admin_notifications').push({
+            type: 'user_like',
+            likerId: currentUser.numericId,
+            likerName: currentUser.nickname || currentUser.username || 'مستخدم',
+            targetUserId: targetUserId,
+            targetUserName: user.nickname || user.username || 'مستخدم',
+            timestamp: new Date().toISOString(),
+            date: new Date().toLocaleString('ar-EG'),
+            read: false,
+            createdAt: new Date().toISOString()
+        });
+        
+        await database.ref('users/' + userKey + '/notifications').push({
+            text: `❤️ أعجب ${currentUser.nickname || currentUser.username} بملفك الشخصي!`,
+            read: false,
+            date: new Date().toLocaleString('ar-EG'),
+            type: 'like',
+            createdAt: new Date().toISOString()
+        });
+        
+        showToast('❤️ تم الإعجاب بالملف الشخصي بنجاح!', 'success');
+        
+    } catch(error) {
+        console.error('Error sending like:', error);
+        showToast('❌ حدث خطأ', 'error');
+    }
+}
+
+// ============================================================
+// 🚩 REPORT FUNCTIONS
+// ============================================================
+function openReportModalForUser(userId) {
+    if (userId == currentUser?.numericId) {
+        showToast('⚠️ لا يمكنك الإبلاغ عن نفسك', 'warning');
+        return;
+    }
+    
+    document.getElementById('reportModal').classList.add('active');
+    document.getElementById('reportModal').style.display = 'flex';
+    document.getElementById('screenOverlay').classList.add('active');
+    
+    document.getElementById('reportModal').dataset.reportedUserId = userId;
+    document.getElementById('reportDescription').value = '';
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').classList.remove('active');
+    document.getElementById('reportModal').style.display = 'none';
+    document.getElementById('screenOverlay').classList.remove('active');
+    document.getElementById('reportDescription').value = '';
+}
+
+async function submitReport() {
+    const reportedUserId = document.getElementById('reportModal').dataset.reportedUserId;
+    const reportType = document.getElementById('reportType').value;
+    const description = document.getElementById('reportDescription').value.trim();
+    
+    if (!description) {
+        showToast('⚠️ يرجى كتابة وصف البلاغ', 'warning');
+        return;
+    }
+    
+    if (!reportedUserId) {
+        showToast('❌ خطأ في البيانات', 'error');
+        return;
+    }
+    
+    try {
+        const snapshot = await database.ref('users')
+            .orderByChild('numericId')
+            .equalTo(parseInt(reportedUserId))
+            .once('value');
+        
+        let reportedUserName = 'مستخدم';
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            const userKey = Object.keys(userData)[0];
+            const user = userData[userKey];
+            reportedUserName = user.nickname || user.username || 'مستخدم';
+        }
+        
+        await database.ref('admin_notifications').push({
+            type: 'user_report',
+            reportedUserId: reportedUserId,
+            reportedUserName: reportedUserName,
+            reportType: reportType,
+            description: description,
+            reporterId: currentUser.numericId,
+            reporterName: currentUser.nickname || currentUser.username || 'مستخدم',
+            timestamp: new Date().toISOString(),
+            date: new Date().toLocaleString('ar-EG'),
+            read: false,
+            createdAt: new Date().toISOString()
+        });
+        
+        showToast('✅ تم إرسال البلاغ بنجاح!', 'success');
+        closeReportModal();
+        
+    } catch(error) {
+        console.error('Error submitting report:', error);
+        showToast('❌ حدث خطأ', 'error');
+    }
+}
+
+// ============================================================
+// 🎁 VIEW USER GIFTS
+// ============================================================
+async function openUserGifts(userId) {
+    try {
+        const snapshot = await database.ref('users')
+            .orderByChild('numericId')
+            .equalTo(parseInt(userId))
+            .once('value');
+        
+        if (!snapshot.exists()) {
+            showToast('❌ المستخدم غير موجود', 'error');
+            return;
+        }
+        
+        const userData = snapshot.val();
+        const userKey = Object.keys(userData)[0];
+        const user = userData[userKey];
+        
+        const giftsList = user.giftsList || [];
+        const total = giftsList.reduce((sum, g) => sum + (g.value || 0), 0);
+        
+        const modal = document.getElementById('giftsModal');
+        const list = document.getElementById('giftsList');
+        const totalSpan = document.getElementById('totalGiftValue');
+        
+        totalSpan.textContent = total;
+        
+        if (giftsList.length === 0) {
+            list.innerHTML = `
+                <div class="no-gifts">
+                    <i class="fas fa-gift"></i>
+                    <p>لا توجد هدايا</p>
+                </div>
+            `;
+        } else {
+            list.innerHTML = giftsList.slice().reverse().map(gift => `
+                <div class="gift-item">
+                    <div class="gift-emoji-display">${gift.giftEmoji || '🎁'}</div>
+                    <div class="gift-name-display">${gift.giftName || 'هدية'}</div>
+                    <div class="gift-details">
+                        <span class="gift-value">💰 ${gift.value || 0}</span>
+                        <span class="gift-time">📅 ${gift.date || ''}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        document.getElementById('screenOverlay').classList.add('active');
+        
+    } catch(error) {
+        console.error('Error loading gifts:', error);
+        showToast('❌ حدث خطأ', 'error');
+    }
+}
+
+function closeGiftsModal() {
+    document.getElementById('giftsModal').classList.remove('active');
+    document.getElementById('giftsModal').style.display = 'none';
+    document.getElementById('screenOverlay').classList.remove('active');
+}
+
+// ============================================================
+// 👁️ VIEW VISITOR PROFILE
+// ============================================================
+async function viewVisitorProfile(numericId) {
+    try {
+        const snapshot = await database.ref('users')
+            .orderByChild('numericId')
+            .equalTo(parseInt(numericId))
+            .once('value');
+        
+        if (!snapshot.exists()) {
+            showToast('❌ المستخدم غير موجود', 'error');
+            return;
+        }
+        
+        const userData = snapshot.val();
+        const userKey = Object.keys(userData)[0];
+        const user = userData[userKey];
+        
+        await showFullProfile(user, numericId);
+        
+    } catch(error) {
+        console.error('Error viewing visitor:', error);
+        showToast('❌ حدث خطأ', 'error');
+    }
+}
+
+// ============================================================
+// 📋 COPY TEXT
+// ============================================================
+function copyTextContent(text) {
+    navigator.clipboard.writeText(text.toString()).then(() => {
+        showToast('✅ تم نسخ المعرف', 'success');
+    }).catch(() => {
+        showToast('❌ حدث خطأ في النسخ', 'error');
+    });
+}
+
+// ============================================================
+// 👑 OWNER FUNCTIONS
 // ============================================================
 async function kickUser(seatIndex) {
-    if (!isOwner || !confirm('طرد المستخدم مؤقتاً؟')) return;
+    if (!isOwner || !confirm('طرد المستخدم؟')) return;
     try {
         const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
         if (!seat) return;
         await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
-        showToast('✅ تم طرد المستخدم مؤقتاً', 'success');
+        showToast('✅ تم طرد المستخدم', 'success');
     } catch(e) { showToast('❌ حدث خطأ', 'error'); }
 }
 
-async function banUser(seatIndex) {
-    if (!isOwner || !confirm('⚠️ طرد نهائي للمستخدم؟ سيتم منعه من دخول الغرفة مجدداً!')) return;
+async function muteUser(seatIndex) {
+    if (!isOwner) return;
     try {
         const seat = (await database.ref('rooms/' + roomId + '/seats/' + seatIndex).once('value')).val();
-        if (!seat || !seat.userId) return;
-        
-        const userId = seat.userId;
-        
-        // إضافة المستخدم إلى قائمة المحظورين في الغرفة
-        await database.ref('rooms/' + roomId + '/bannedUsers/' + userId).set({
-            userId: userId,
-            username: seat.username || 'مستخدم',
-            bannedAt: new Date().toISOString(),
-            bannedBy: currentUser?.numericId || 'unknown'
-        });
-        
-        // إزالة المستخدم من المقعد
-        await database.ref('rooms/' + roomId + '/seats/' + seatIndex).remove();
-        
-        showToast(`🚫 تم طرد ${seat.username || 'المستخدم'} نهائياً من الغرفة!`, 'error');
-        
-        // محاولة إرسال إشعار للمستخدم المحظور
-        try {
-            const userSnapshot = await database.ref('users').orderByChild('numericId').equalTo(parseInt(userId)).once('value');
-            if (userSnapshot.exists()) {
-                const userData = userSnapshot.val();
-                const userKey = Object.keys(userData)[0];
-                await database.ref('users/' + userKey + '/notifications').push({
-                    text: `🚫 تم طردك نهائياً من غرفة ${roomData?.name || 'الصوتية'}`,
-                    read: false,
-                    date: new Date().toLocaleString('ar-EG'),
-                    type: 'banned',
-                    createdAt: new Date().toISOString()
-                });
-            }
-        } catch(e) {}
-        
-    } catch(e) { 
-        console.error('Ban error:', e);
-        showToast('❌ حدث خطأ', 'error'); 
-    }
+        if (!seat) return;
+        const newState = !seat.muted;
+        await database.ref('rooms/' + roomId + '/seats/' + seatIndex + '/muted').set(newState);
+        showToast(newState ? '🔇 تم كتم الميكروفون' : '🔊 تم فك الكتم', 'success');
+    } catch(e) { showToast('❌ حدث خطأ', 'error'); }
 }
 
 // ============================================================
@@ -3372,7 +3672,7 @@ function toggleSpeaker() {
 }
 
 // ============================================================
-// 💬 CHAT - نظام المجموعات
+// 💬 CHAT
 // ============================================================
 function listenChat() {
     if (!database) return;
@@ -3396,33 +3696,11 @@ function listenChat() {
 function displayMessage(msg) {
     const container = document.getElementById('chatMessages');
     if (container.querySelector(`[data-msg-id="${msg.id}"]`)) return;
-    
-    const isOwn = msg.userId == currentUser?.numericId;
-    const isCreator = msg.userId == roomData?.creatorId;
-    
-    // البحث عن آخر مجموعة من نفس النوع (own/other) والمرسل نفسه
-    const lastGroup = container.lastElementChild;
-    const lastMsg = lastGroup?.lastElementChild;
-    const lastSender = lastMsg?.querySelector('.msg-sender')?.textContent?.trim();
-    const currentSender = msg.username || 'مستخدم';
-    const lastGroupType = lastGroup?.classList.contains('own') ? 'own' : 'other';
-    const currentGroupType = isOwn ? 'own' : 'other';
-    
-    let group;
-    // إذا كانت آخر مجموعة من نفس النوع ونفس المرسل، نضيف الرسالة لنفس المجموعة
-    if (lastGroup && lastGroupType === currentGroupType && lastSender === currentSender) {
-        group = lastGroup;
-    } else {
-        // إنشاء مجموعة جديدة
-        group = document.createElement('div');
-        group.className = `message-group ${currentGroupType}`;
-        container.appendChild(group);
-    }
-    
     const div = document.createElement('div');
     let className = 'message';
     if (msg.type === 'system') {
-        div.className = 'message system';
+        className += ' system';
+        div.className = className;
         div.setAttribute('data-msg-id', msg.id || Date.now());
         div.innerHTML = `<div class="msg-text">${msg.text}</div>`;
         container.appendChild(div);
@@ -3430,9 +3708,12 @@ function displayMessage(msg) {
         return;
     }
     
+    const isOwn = msg.userId == currentUser?.numericId;
     className += isOwn ? ' own' : ' other';
     div.className = className;
     div.setAttribute('data-msg-id', msg.id || Date.now());
+    
+    const isCreator = msg.userId == roomData?.creatorId;
     
     let bgStyle = '';
     let styleNameHTML = '';
@@ -3451,18 +3732,26 @@ function displayMessage(msg) {
             'background: rgba(255,255,255,0.05);';
     }
     
+    const textLength = msg.text.length;
+    let padding = '12px 16px';
+    let minHeight = '48px';
+    let minWidth = '80px';
+    if (textLength > 50) { padding = '14px 20px'; minHeight = '55px'; minWidth = '100px'; }
+    if (textLength > 100) { padding = '16px 24px'; minHeight = '65px'; minWidth = '120px'; }
+    if (textLength > 200) { padding = '20px 28px'; minHeight = '80px'; minWidth = '160px'; }
+    
     div.innerHTML = `
-        <div class="message-bg" style="${bgStyle};">
+        <div class="message-bg" style="${bgStyle}; padding: ${padding}; min-height: ${minHeight}; min-width: ${minWidth};">
             <div class="msg-sender ${isCreator ? 'owner' : ''}">
                 ${isCreator ? '<span class="msg-badge">👑 مالك</span>' : ''}
                 ${msg.username || 'مستخدم'}
                 ${styleNameHTML}
             </div>
-            <div class="msg-text">${msg.text}</div>
+            <div class="msg-text" style="text-align:center;">${msg.text}</div>
             <div class="msg-time">${msg.time || ''}</div>
         </div>
     `;
-    group.appendChild(div);
+    container.appendChild(div);
     scrollToBottom();
 }
 
@@ -3979,6 +4268,122 @@ async function openProfilePopupByUserId(userId) {
 }
 
 // ============================================================
+// 🎵 PEERJS
+// ============================================================
+function initPeerJS() {
+    if (!mediaStream) { setTimeout(initPeerJS, 1000); return; }
+    if (mediaStream) mediaStream.getAudioTracks().forEach(track => track.enabled = false);
+    const peerId = currentUser ? currentUser.numericId : 'user_' + Date.now();
+    try { peer = new Peer(peerId, { debug: 2, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }); }
+    catch(e) { peer = new Peer(peerId + '_' + Date.now(), { debug: 2, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }); }
+    myPeerId = peer.id;
+    peer.on('open', (id) => {
+        myPeerId = id;
+        if (mySeatIndex !== -1) {
+            database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(id);
+        }
+        connectToExistingPeers();
+    });
+    peer.on('call', (call) => {
+        try {
+            call.answer(mediaStream);
+            call.on('stream', (stream) => {
+                peerStreams[call.peer] = stream;
+                if (isSpeakerActive) playRemoteAudio(stream, call.peer);
+            });
+            call.on('close', () => { delete peerStreams[call.peer]; removeRemoteAudio(call.peer); });
+            call.on('error', () => { delete peerStreams[call.peer]; removeRemoteAudio(call.peer); });
+            peerConnections[call.peer] = call;
+        } catch(e) {}
+    });
+    listenForPeerConnections();
+}
+
+function listenForPeerConnections() {
+    if (!database || !roomId) return;
+    database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
+        const seat = snapshot.val();
+        if (seat && seat.userId && seat.userId !== currentUser?.numericId && seat.peerId && seat.peerId !== myPeerId) {
+            setTimeout(() => connectToPeer(seat.peerId, seat.userId), 1000);
+        }
+    });
+}
+
+function connectToExistingPeers() {
+    if (!database || !roomId) return;
+    database.ref('rooms/' + roomId + '/seats').once('value', (snapshot) => {
+        const seats = snapshot.val() || {};
+        Object.keys(seats).forEach(key => {
+            const seat = seats[key];
+            if (seat && seat.userId && seat.userId !== currentUser?.numericId && seat.peerId && seat.peerId !== myPeerId) {
+                setTimeout(() => connectToPeer(seat.peerId, seat.userId), 500);
+            }
+        });
+    });
+}
+
+function connectToPeer(peerId, userId) {
+    if (!peer || !mediaStream || peerId === myPeerId || peerConnections[peerId]) return;
+    try {
+        const call = peer.call(peerId, mediaStream);
+        if (!call) return;
+        call.on('stream', (stream) => {
+            peerStreams[peerId] = stream;
+            if (isSpeakerActive) playRemoteAudio(stream, peerId);
+        });
+        call.on('close', () => { delete peerStreams[peerId]; removeRemoteAudio(peerId); delete peerConnections[peerId]; });
+        call.on('error', () => { delete peerStreams[peerId]; removeRemoteAudio(peerId); delete peerConnections[peerId]; });
+        peerConnections[peerId] = call;
+    } catch(e) {}
+}
+
+function playRemoteAudio(stream, peerId) {
+    if (!isSpeakerActive) return;
+    try {
+        removeRemoteAudio(peerId);
+        const audio = document.createElement('audio');
+        audio.id = 'audio-' + peerId;
+        audio.srcObject = stream;
+        audio.autoplay = true;
+        audio.style.display = 'none';
+        document.body.appendChild(audio);
+    } catch(e) {}
+}
+
+function removeRemoteAudio(peerId) {
+    const audio = document.getElementById('audio-' + peerId);
+    if (audio) { audio.pause(); audio.srcObject = null; audio.remove(); }
+}
+
+// ============================================================
+// 📻 ROOM FUNCTIONS
+// ============================================================
+function listenRoomUpdates() {
+    if (!database) return;
+    roomListener = database.ref('rooms/' + roomId).on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            roomData = snapshot.val();
+            document.getElementById('roomOwnerDisplay').textContent = '👑 ' + (roomData.creatorName || 'غير معروف');
+        }
+    });
+}
+
+async function leaveRoom() {
+    try {
+        if (mySeatIndex !== -1) {
+            await database.ref('rooms/' + roomId + '/seats/' + mySeatIndex).remove();
+        }
+        if (roomListener) database.ref('rooms/' + roomId).off();
+        if (chatListener) database.ref('rooms/' + roomId + '/chat').off();
+        if (seatsListener) database.ref('rooms/' + roomId + '/seats').off();
+        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        if (audioContext) audioContext.close();
+        if (peer) peer.destroy();
+        window.location.href = 'chat.html';
+    } catch(e) { window.location.href = 'chat.html'; }
+}
+
+// ============================================================
 // 👤 PROFILE FUNCTIONS
 // ============================================================
 function handleProfileClick() {
@@ -4020,7 +4425,6 @@ function closeAll() {
     document.getElementById('reportModal').style.display = 'none';
     document.getElementById('reportModal').classList.remove('active');
     document.getElementById('usersListContainer').style.display = 'none';
-    document.getElementById('exitPopup').classList.remove('active');
 }
 
 function closeModal(modalId) {
@@ -4342,152 +4746,6 @@ async function logout() {
     try { if (firebase.auth) await firebase.auth().signOut(); } catch(e) {}
     localStorage.removeItem('currentUser');
     window.location.reload();
-}
-
-// ============================================================
-// 🚪 EXIT POPUP FUNCTIONS
-// ============================================================
-function openExitPopup() {
-    document.getElementById('exitPopup').classList.add('active');
-    document.getElementById('screenOverlay').classList.add('active');
-}
-
-function closeExitPopup() {
-    document.getElementById('exitPopup').classList.remove('active');
-    document.getElementById('screenOverlay').classList.remove('active');
-}
-
-// ===== خروج حقيقي =====
-function leaveRoom() {
-    closeExitPopup();
-    showToast('🚪 جاري الخروج من الغرفة...', 'error');
-    setTimeout(() => {
-        // window.location.href = 'chat.html';
-        showToast('✅ تم الخروج إلى صفحة chat.html', 'success');
-    }, 1000);
-}
-
-// ===== تصغير =====
-function minimizeRoom() {
-    closeExitPopup();
-    const container = document.querySelector('.room-container') || document.querySelector('.main-layout');
-    if (container) {
-        container.style.transition = 'all 0.5s ease';
-        container.style.transform = 'scale(0.3)';
-        container.style.opacity = '0.5';
-        container.style.height = '100px';
-        container.style.overflow = 'hidden';
-        showToast('⬇️ تم تصغير الغرفة', 'info');
-        
-        setTimeout(() => {
-            container.style.transform = 'scale(1)';
-            container.style.opacity = '1';
-            container.style.height = 'auto';
-            container.style.overflow = 'visible';
-            showToast('🔄 تم استعادة حجم الغرفة', 'success');
-        }, 3000);
-    }
-}
-
-// ============================================================
-// 🎵 PEERJS
-// ============================================================
-function initPeerJS() {
-    if (!mediaStream) { setTimeout(initPeerJS, 1000); return; }
-    if (mediaStream) mediaStream.getAudioTracks().forEach(track => track.enabled = false);
-    const peerId = currentUser ? currentUser.numericId : 'user_' + Date.now();
-    try { peer = new Peer(peerId, { debug: 2, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }); }
-    catch(e) { peer = new Peer(peerId + '_' + Date.now(), { debug: 2, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }); }
-    myPeerId = peer.id;
-    peer.on('open', (id) => {
-        myPeerId = id;
-        if (mySeatIndex !== -1) {
-            database.ref('rooms/' + roomId + '/seats/' + mySeatIndex + '/peerId').set(id);
-        }
-        connectToExistingPeers();
-    });
-    peer.on('call', (call) => {
-        try {
-            call.answer(mediaStream);
-            call.on('stream', (stream) => {
-                peerStreams[call.peer] = stream;
-                if (isSpeakerActive) playRemoteAudio(stream, call.peer);
-            });
-            call.on('close', () => { delete peerStreams[call.peer]; removeRemoteAudio(call.peer); });
-            call.on('error', () => { delete peerStreams[call.peer]; removeRemoteAudio(call.peer); });
-            peerConnections[call.peer] = call;
-        } catch(e) {}
-    });
-    listenForPeerConnections();
-}
-
-function listenForPeerConnections() {
-    if (!database || !roomId) return;
-    database.ref('rooms/' + roomId + '/seats').on('child_added', (snapshot) => {
-        const seat = snapshot.val();
-        if (seat && seat.userId && seat.userId !== currentUser?.numericId && seat.peerId && seat.peerId !== myPeerId) {
-            setTimeout(() => connectToPeer(seat.peerId, seat.userId), 1000);
-        }
-    });
-}
-
-function connectToExistingPeers() {
-    if (!database || !roomId) return;
-    database.ref('rooms/' + roomId + '/seats').once('value', (snapshot) => {
-        const seats = snapshot.val() || {};
-        Object.keys(seats).forEach(key => {
-            const seat = seats[key];
-            if (seat && seat.userId && seat.userId !== currentUser?.numericId && seat.peerId && seat.peerId !== myPeerId) {
-                setTimeout(() => connectToPeer(seat.peerId, seat.userId), 500);
-            }
-        });
-    });
-}
-
-function connectToPeer(peerId, userId) {
-    if (!peer || !mediaStream || peerId === myPeerId || peerConnections[peerId]) return;
-    try {
-        const call = peer.call(peerId, mediaStream);
-        if (!call) return;
-        call.on('stream', (stream) => {
-            peerStreams[peerId] = stream;
-            if (isSpeakerActive) playRemoteAudio(stream, peerId);
-        });
-        call.on('close', () => { delete peerStreams[peerId]; removeRemoteAudio(peerId); delete peerConnections[peerId]; });
-        call.on('error', () => { delete peerStreams[peerId]; removeRemoteAudio(peerId); delete peerConnections[peerId]; });
-        peerConnections[peerId] = call;
-    } catch(e) {}
-}
-
-function playRemoteAudio(stream, peerId) {
-    if (!isSpeakerActive) return;
-    try {
-        removeRemoteAudio(peerId);
-        const audio = document.createElement('audio');
-        audio.id = 'audio-' + peerId;
-        audio.srcObject = stream;
-        audio.autoplay = true;
-        audio.style.display = 'none';
-        document.body.appendChild(audio);
-    } catch(e) {}
-}
-
-function removeRemoteAudio(peerId) {
-    const audio = document.getElementById('audio-' + peerId);
-    if (audio) { audio.pause(); audio.srcObject = null; audio.remove(); }
-}
-
-// ============================================================
-// 📻 ROOM FUNCTIONS
-// ============================================================
-function listenRoomUpdates() {
-    if (!database) return;
-    roomListener = database.ref('rooms/' + roomId).on('value', (snapshot) => {
-        if (snapshot.exists()) {
-            roomData = snapshot.val();
-            document.getElementById('roomOwnerDisplay').textContent = '👑 ' + (roomData.creatorName || 'غير معروف');
-        }
-    });
 }
 
 // ============================================================
