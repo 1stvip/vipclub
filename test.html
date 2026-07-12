@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎬 عرض الدخلة المميزة</title>
+    <title>🎬 عرض الدخلة المميزة VIP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -14,7 +14,7 @@
         }
 
         body {
-            background: linear-gradient(145deg, #0a0a1a, #1a1040);
+            background: linear-gradient(145deg, #0a0a1a, #1a1040, #0f0c29);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -34,52 +34,52 @@
         .title {
             color: #ffd700;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
             font-size: 1.5rem;
         }
 
         .subtitle {
             color: #94a3b8;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             font-size: 0.9rem;
         }
 
-        /* ===== حاوية الفيديو ===== */
-        .video-wrapper {
+        /* ===== حاوية الفيديو - نفس تصميم الكود الأصلي ===== */
+        #vipEntrance {
             position: relative;
             width: 100%;
             background: #000;
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.1), 0 0 120px rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.15), 0 0 150px rgba(255, 215, 0, 0.05);
             border: 2px solid rgba(255, 215, 0, 0.15);
             margin-bottom: 20px;
         }
 
-        /* ===== الحل السحري: نسبة العرض إلى الارتفاع 16:9 مع الحد الأقصى للارتفاع ===== */
-        .video-wrapper .video-container {
+        /* ===== الحل السحري: استخدام padding-bottom للحفاظ على النسبة ===== */
+        #vipEntrance .vip-video-container {
             position: relative;
             width: 100%;
-            padding-bottom: 56.25%; /* 16:9 */
+            padding-bottom: 56.25%; /* نسبة 16:9 */
             height: 0;
             overflow: hidden;
             background: #000;
         }
 
-        .video-wrapper .video-container video {
+        #vipEntrance .vip-video-container video {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* تغطية كاملة بدون قص */
+            object-fit: cover; /* تغطية كاملة بدون تشويه أو قص */
             display: block;
             background: #000;
         }
 
-        /* ===== عنوان الفيديو ===== */
-        .video-title {
+        /* ===== عنوان الفيديو - نفس الكود الأصلي ===== */
+        #vipEntrance .vip-title {
             position: absolute;
             top: 20px;
             left: 50%;
@@ -101,8 +101,8 @@
             pointer-events: none;
         }
 
-        /* ===== اسم المستخدم ===== */
-        .video-user {
+        /* ===== اسم المستخدم - نفس الكود الأصلي ===== */
+        #vipEntrance .vip-user {
             position: absolute;
             bottom: 30px;
             left: 50%;
@@ -116,6 +116,30 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 10;
             pointer-events: none;
+        }
+
+        /* ===== زر تخطي - نفس الكود الأصلي ===== */
+        #vipEntrance .vip-skip-btn {
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+
+        #vipEntrance .vip-skip-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            border-color: rgba(255, 215, 0, 0.3);
         }
 
         /* ===== أزرار التحكم ===== */
@@ -150,9 +174,6 @@
         }
         .btn-vip2 {
             background: linear-gradient(135deg, #f093fb, #f5576c);
-        }
-        .btn-vip3 {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
         }
         .btn-close {
             background: linear-gradient(135deg, #ef4444, #dc2626);
@@ -212,71 +233,107 @@
             }
         }
 
-        /* ===== التجاوب ===== */
-
-        /* للشاشات الصغيرة (الهواتف) */
-        @media (max-width: 600px) {
+        /* ===== التجاوب - نفس الكود الأصلي ===== */
+        @media (max-width: 768px) {
             .container {
                 padding: 15px;
             }
             .title {
-                font-size: 1.1rem;
-                margin-bottom: 15px;
+                font-size: 1.2rem;
             }
             .subtitle {
-                font-size: 0.75rem;
+                font-size: 0.8rem;
                 margin-bottom: 15px;
             }
-            .video-title {
-                font-size: 1rem;
-                padding: 6px 16px;
+            #vipEntrance .vip-title {
+                font-size: 1.2rem;
+                padding: 8px 18px;
                 top: 12px;
                 white-space: normal;
                 max-width: 90%;
             }
-            .video-user {
+            #vipEntrance .vip-user {
                 font-size: 0.9rem;
                 padding: 6px 16px;
                 bottom: 20px;
             }
-            .controls button {
-                font-size: 0.7rem;
+            #vipEntrance .vip-skip-btn {
+                font-size: 0.75rem;
                 padding: 8px 16px;
-                min-width: 70px;
+                bottom: 65px;
+                right: 12px;
             }
-            .video-info {
-                padding: 10px 12px;
+            .controls button {
+                font-size: 0.75rem;
+                padding: 8px 16px;
+                min-width: 80px;
             }
             .video-info .info-item {
                 font-size: 0.7rem;
             }
         }
 
-        /* للشاشات المتوسطة (التابلت) */
-        @media (min-width: 601px) and (max-width: 1024px) {
-            .video-title {
-                font-size: 1.4rem;
-                padding: 8px 24px;
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
             }
-            .video-user {
+            .title {
                 font-size: 1rem;
+            }
+            #vipEntrance .vip-title {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+                top: 8px;
+                border-radius: 12px;
+            }
+            #vipEntrance .vip-user {
+                font-size: 0.75rem;
+                padding: 4px 12px;
+                bottom: 14px;
+            }
+            #vipEntrance .vip-skip-btn {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+                bottom: 50px;
+                right: 8px;
+                border-radius: 10px;
+            }
+            .controls button {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+                min-width: 60px;
+            }
+            .video-info {
+                padding: 8px 10px;
+            }
+            .video-info .info-item {
+                font-size: 0.6rem;
+                gap: 4px;
+            }
+            .video-info .info-item i {
+                font-size: 0.7rem;
             }
         }
 
-        /* للشاشات الكبيرة (الكمبيوتر) */
-        @media (min-width: 1025px) {
+        @media (min-width: 1024px) {
             .container {
                 padding: 40px;
                 max-width: 900px;
             }
-            .video-title {
-                font-size: 2rem;
-                padding: 12px 40px;
+            #vipEntrance .vip-title {
+                font-size: 2.2rem;
+                padding: 14px 40px;
             }
-            .video-user {
+            #vipEntrance .vip-user {
                 font-size: 1.3rem;
                 padding: 10px 40px;
                 bottom: 35px;
+            }
+            #vipEntrance .vip-skip-btn {
+                font-size: 1rem;
+                padding: 12px 30px;
+                bottom: 90px;
+                right: 30px;
             }
             .controls button {
                 font-size: 0.95rem;
@@ -284,74 +341,63 @@
             }
         }
 
-        /* للشاشات فائقة الكبر */
         @media (min-width: 1400px) {
             .container {
                 max-width: 1100px;
                 padding: 50px;
             }
-            .video-title {
-                font-size: 2.4rem;
-                padding: 14px 50px;
+            #vipEntrance .vip-title {
+                font-size: 2.6rem;
+                padding: 16px 50px;
             }
-            .video-user {
+            #vipEntrance .vip-user {
                 font-size: 1.5rem;
                 padding: 12px 50px;
                 bottom: 40px;
             }
         }
 
-        /* ===== زر تخطي ===== */
-        .skip-btn {
+        /* ===== زر إعادة التشغيل ===== */
+        .replay-btn {
             display: inline-block;
-            margin-top: 15px;
-            padding: 10px 30px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             transition: 0.3s;
-            backdrop-filter: blur(5px);
             text-align: center;
         }
 
-        .skip-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .replay-btn:hover {
+            background: rgba(139, 92, 246, 0.3);
             transform: scale(1.05);
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        .skip-btn i {
-            margin-left: 8px;
-        }
-
-        .controls-center {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1 class="title">🎬 الدخلة المميزة VIP</h1>
-        <p class="subtitle">عرض فيديو الدخلة بشكل متجاوب مع جميع الشاشات</p>
+        <h1 class="title">🎬 عرض الدخلة المميزة VIP</h1>
+        <p class="subtitle">فيديو متجاوب مع جميع الشاشات - بدون قص</p>
 
-        <!-- ===== حاوية الفيديو ===== -->
-        <div class="video-wrapper" id="videoWrapper">
-            <div class="video-container">
-                <video id="vipVideo" playsinline autoplay muted>
+        <!-- ===== حاوية الفيديو - نفس الكود الأصلي ===== -->
+        <div id="vipEntrance">
+            <div class="vip-video-container">
+                <video id="vipVideoPlayer" playsinline autoplay muted>
                     <source src="" type="video/mp4">
                 </video>
                 <!-- عنوان الفيديو -->
-                <div class="video-title" id="videoTitle">🚗 VIP 1 - السيارة الرياضية</div>
+                <div class="vip-title" id="vipTitle">🚗 VIP 1 - السيارة الرياضية</div>
                 <!-- اسم المستخدم -->
-                <div class="video-user" id="videoUser">👤 أحمد</div>
+                <div class="vip-user" id="vipEntranceUser">👤 أحمد</div>
+                <!-- زر تخطي -->
+                <button class="vip-skip-btn" onclick="skipVideo()">
+                    <i class="fas fa-forward"></i> تخطي
+                </button>
             </div>
         </div>
 
@@ -369,50 +415,34 @@
                 <i class="fas fa-user"></i>
                 <span>المستخدم: <span id="videoUserName">أحمد</span></span>
             </div>
+            <div class="info-item">
+                <i class="fas fa-play-circle" style="color:#10b981;"></i>
+                <span id="videoStatus">تشغيل</span>
+            </div>
         </div>
 
         <!-- ===== أزرار التحكم ===== -->
         <div class="controls">
             <button class="btn-vip1" onclick="loadVideo('vip1')">🚗 VIP 1</button>
             <button class="btn-vip2" onclick="loadVideo('vip2')">🦁 VIP 2</button>
-            <button class="btn-vip3" onclick="loadVideo('vip3')">👑 VIP 3</button>
             <button class="btn-close" onclick="closeVideo()">✕ إغلاق</button>
         </div>
 
-        <!-- ===== زر تخطي ===== -->
-        <div class="controls-center" style="margin-top:15px;">
-            <button class="skip-btn" onclick="skipVideo()">
-                <i class="fas fa-forward"></i> تخطي الفيديو
+        <!-- ===== زر إعادة التشغيل ===== -->
+        <div style="text-align:center; margin-top:10px;">
+            <button class="replay-btn" onclick="replayVideo()">
+                <i class="fas fa-redo"></i> إعادة التشغيل
             </button>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // 📋 بيانات الفيديوهات
+        // 📋 بيانات الفيديوهات - نفس الكود الأصلي
         // ============================================================
-        const VIDEOS = {
-            vip1: {
-                title: '🚗 VIP 1 - السيارة الرياضية',
-                video: 'images/vipsystem/car.mp4',
-                duration: 30,
-                level: 'VIP 1',
-                user: 'أحمد'
-            },
-            vip2: {
-                title: '🦁 VIP 2 - هيبة الأسد',
-                video: 'images/vipsystem/lion.mp4',
-                duration: 60,
-                level: 'VIP 2',
-                user: 'محمد'
-            },
-            vip3: {
-                title: '👑 VIP 3 - الملك',
-                video: 'images/vipsystem/queen.mp4',
-                duration: 45,
-                level: 'VIP 3',
-                user: 'سارة'
-            }
+        const VIP_CONFIG = {
+            1: { level: 1, name: 'VIP 1', emoji: '🚗', title: 'VIP 1 - السيارة الرياضية', video: 'images/vipsystem/car.mp4', duration: 30, requirements: { EGP: 1000, USD: 20 } },
+            2: { level: 2, name: 'VIP 2', emoji: '🦁', title: 'VIP 2 - هيبة الأسد', video: 'images/vipsystem/lion.mp4', duration: 60, requirements: { EGP: 2500, USD: null } }
         };
 
         // ============================================================
@@ -421,12 +451,13 @@
         let currentVideo = null;
         let videoTimeout = null;
         let isVideoActive = false;
+        let isVideoPaused = false;
 
         // ============================================================
         // 🎬 دالة تحميل الفيديو
         // ============================================================
         function loadVideo(videoId) {
-            const videoData = VIDEOS[videoId];
+            const videoData = VIP_CONFIG[videoId.replace('vip', '')];
             if (!videoData) {
                 showToast('❌ الفيديو غير موجود', 'error');
                 return;
@@ -438,19 +469,22 @@
                 videoTimeout = null;
             }
 
-            const video = document.getElementById('vipVideo');
-            const title = document.getElementById('videoTitle');
-            const user = document.getElementById('videoUser');
+            const video = document.getElementById('vipVideoPlayer');
+            const title = document.getElementById('vipTitle');
+            const user = document.getElementById('vipEntranceUser');
             const duration = document.getElementById('videoDuration');
             const level = document.getElementById('videoLevel');
             const userName = document.getElementById('videoUserName');
+            const status = document.getElementById('videoStatus');
 
             // تحديث البيانات
-            title.textContent = videoData.title;
-            user.textContent = `👤 ${videoData.user}`;
+            title.textContent = `${videoData.emoji} ${videoData.title}`;
+            user.textContent = `👤 أحمد`; // يمكن تغيير الاسم حسب المستخدم
             duration.textContent = videoData.duration;
-            level.textContent = videoData.level;
-            userName.textContent = videoData.user;
+            level.textContent = videoData.name;
+            userName.textContent = 'أحمد';
+            status.textContent = '⏳ جارِ التحميل...';
+            status.style.color = '#f59e0b';
 
             // تحميل الفيديو
             video.pause();
@@ -460,8 +494,14 @@
             video.muted = false;
 
             // محاولة تشغيل الفيديو
-            video.play().catch(e => {
+            video.play().then(() => {
+                status.textContent = '▶️ تشغيل';
+                status.style.color = '#10b981';
+                showToast(`▶️ تشغيل: ${videoData.title}`, 'success');
+            }).catch(e => {
                 console.log('Auto-play prevented:', e);
+                status.textContent = '⏸️ متوقف (انقر لتشغيل)';
+                status.style.color = '#f59e0b';
                 // إذا لم يتمكن من التشغيل تلقائياً، حاول مرة أخرى
                 setTimeout(() => {
                     video.play().catch(() => {});
@@ -469,15 +509,14 @@
             });
 
             // إظهار الفيديو
-            document.getElementById('videoWrapper').style.display = 'block';
+            document.getElementById('vipEntrance').style.display = 'block';
             isVideoActive = true;
+            isVideoPaused = false;
             currentVideo = videoData;
-
-            showToast(`▶️ تشغيل: ${videoData.title}`, 'success');
 
             // إضافة تايمر لإيقاف الفيديو تلقائياً
             videoTimeout = setTimeout(() => {
-                if (isVideoActive) {
+                if (isVideoActive && !isVideoPaused) {
                     showToast('⏰ انتهت مدة الفيديو', 'info');
                     closeVideo();
                 }
@@ -486,8 +525,27 @@
             // إضافة حدث عند انتهاء الفيديو
             video.onended = function() {
                 if (isVideoActive) {
+                    status.textContent = '✅ انتهى';
+                    status.style.color = '#10b981';
                     showToast('✅ انتهى الفيديو', 'success');
                     closeVideo();
+                }
+            };
+
+            // إضافة حدث عند التشغيل والإيقاف
+            video.onplay = function() {
+                if (isVideoActive) {
+                    status.textContent = '▶️ تشغيل';
+                    status.style.color = '#10b981';
+                    isVideoPaused = false;
+                }
+            };
+
+            video.onpause = function() {
+                if (isVideoActive) {
+                    status.textContent = '⏸️ متوقف مؤقت';
+                    status.style.color = '#f59e0b';
+                    isVideoPaused = true;
                 }
             };
         }
@@ -496,7 +554,7 @@
         // ❌ دالة إغلاق الفيديو
         // ============================================================
         function closeVideo() {
-            const video = document.getElementById('vipVideo');
+            const video = document.getElementById('vipVideoPlayer');
             video.pause();
             video.currentTime = 0;
             video.src = '';
@@ -508,8 +566,11 @@
             }
             
             isVideoActive = false;
+            isVideoPaused = false;
             currentVideo = null;
-            document.getElementById('videoWrapper').style.display = 'block';
+            
+            document.getElementById('videoStatus').textContent = '⏹️ متوقف';
+            document.getElementById('videoStatus').style.color = '#ef4444';
             
             showToast('📴 تم إغلاق الفيديو', 'info');
         }
@@ -525,6 +586,25 @@
             
             showToast('⏭️ تم تخطي الفيديو', 'info');
             closeVideo();
+        }
+
+        // ============================================================
+        // 🔄 دالة إعادة التشغيل
+        // ============================================================
+        function replayVideo() {
+            if (!currentVideo) {
+                showToast('⚠️ لا يوجد فيديو لإعادة تشغيله', 'warning');
+                return;
+            }
+
+            const video = document.getElementById('vipVideoPlayer');
+            video.currentTime = 0;
+            video.play().then(() => {
+                showToast('🔄 إعادة تشغيل الفيديو', 'success');
+                document.getElementById('videoStatus').textContent = '▶️ تشغيل';
+                document.getElementById('videoStatus').style.color = '#10b981';
+                isVideoPaused = false;
+            }).catch(() => {});
         }
 
         // ============================================================
@@ -571,7 +651,7 @@
         // 🧹 تنظيف عند إغلاق الصفحة
         // ============================================================
         window.addEventListener('beforeunload', function() {
-            const video = document.getElementById('vipVideo');
+            const video = document.getElementById('vipVideoPlayer');
             if (video) {
                 video.pause();
                 video.currentTime = 0;
@@ -580,6 +660,21 @@
             if (videoTimeout) {
                 clearTimeout(videoTimeout);
                 videoTimeout = null;
+            }
+        });
+
+        // ============================================================
+        // ⌨️ دعم لوحة المفاتيح (مفتاح المسافة للإيقاف/التشغيل)
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === ' ' && isVideoActive) {
+                e.preventDefault();
+                const video = document.getElementById('vipVideoPlayer');
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
             }
         });
     </script>
