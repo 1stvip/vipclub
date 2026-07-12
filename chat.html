@@ -14,7 +14,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <style>
-        /* ===== جميع الأنماط السابقة ===== */
         * {
             margin: 0;
             padding: 0;
@@ -1291,7 +1290,7 @@
             margin-bottom: 10px;
         }
 
-        /* ===== بقية الأنماط ===== */
+        /* ===== CROP MODAL ===== */
         .crop-modal {
             display: none;
             position: fixed;
@@ -1371,6 +1370,7 @@
             background: #444;
         }
 
+        /* ===== GIFTS MODAL ===== */
         .gifts-modal {
             display: none;
             position: fixed;
@@ -1532,6 +1532,7 @@
             background: #444;
         }
 
+        /* ===== REPORT MODAL ===== */
         .report-modal {
             display: none;
             position: fixed;
@@ -1635,6 +1636,7 @@
             background: #444;
         }
 
+        /* ===== MESSAGES PAGE ===== */
         .messages-page {
             display: none;
             flex-direction: column;
@@ -1760,6 +1762,7 @@
             background: #3a3a5a;
         }
 
+        /* ===== GAMES PAGE ===== */
         .games-page {
             display: none;
             flex-direction: column;
@@ -1811,6 +1814,7 @@
             background: #3a3a5a;
         }
 
+        /* ===== FLOATING BUTTONS ===== */
         .floating-support {
             position: fixed;
             bottom: 24px;
@@ -2081,6 +2085,7 @@
             font-size: 0.5rem;
         }
 
+        /* استجابة للشاشات الصغيرة */
         @media (max-width: 600px) {
             .minimize-room-card {
                 width: 90px;
@@ -2147,6 +2152,7 @@
             }
         }
 
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -2275,6 +2281,7 @@
             background: #3a3a5a;
         }
 
+        /* ===== CARD PREVIEW ===== */
         .card-preview {
             background: #0f0f1f;
             border-radius: 12px;
@@ -2360,6 +2367,7 @@
             }
         }
 
+        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             background: #14142a;
             border-top: 1px solid #1e1e3a;
@@ -2414,6 +2422,7 @@
             border: 1px solid #14142a;
         }
 
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             top: 80px;
@@ -2762,7 +2771,7 @@
             <button class="profile-close-btn" onclick="closeProfile()" title="إغلاق الملف الشخصي">
                 <i class="fas fa-times"></i>
             </button>
-            
+
             <div class="profile-avatar-container" onclick="document.getElementById('avatarInput').click()">
                 <div id="profileAvatarDisplay" class="default-avatar">
                     <i class="fas fa-user"></i>
@@ -3547,7 +3556,6 @@
 
                 allRooms = rooms;
                 applyFiltersAndSearch();
-                checkMinimizedRoom();
 
             } catch (error) {
                 console.error('Error loading rooms:', error);
@@ -3578,6 +3586,7 @@
                 } catch (e) {
                     localStorage.removeItem('minimizeRoomData');
                     localStorage.removeItem('minimizeRoomId');
+                    localStorage.removeItem('minimizeRoom');
                 }
             } else {
                 document.getElementById('minimizeRoomCard').style.display = 'none';
@@ -3591,6 +3600,7 @@
             const roomName = document.getElementById('miniRoomName');
             const roomId = document.getElementById('miniRoomId');
 
+            // تعيين الخلفية
             if (data.background && data.background !== 'default') {
                 bg.style.backgroundImage = `url('images/chathtml/${data.background}')`;
                 bg.style.backgroundSize = 'contain';
@@ -3605,6 +3615,7 @@
                 bg.style.backgroundColor = '#0a0a1a';
             }
 
+            // تعيين الصورة العلوية
             if (data.overlayImage && data.overlayImage !== 'none') {
                 overlayImg.src = `images/chathtml/${data.overlayImage}`;
                 overlayImg.style.display = 'block';
@@ -3615,9 +3626,11 @@
                 overlayImg.style.display = 'none';
             }
 
+            // تعيين النصوص
             roomName.textContent = data.name || 'غرفة صوتية';
             roomId.textContent = `🔑 ${data.roomId || '---'}`;
 
+            // إظهار البطاقة مع تأثير حركي
             card.style.display = 'flex';
             card.style.animation = 'none';
             setTimeout(() => {
@@ -3639,6 +3652,7 @@
             document.getElementById('minimizeRoomCard').style.display = 'none';
             localStorage.removeItem('minimizeRoomData');
             localStorage.removeItem('minimizeRoomId');
+            localStorage.removeItem('minimizeRoom');
             showToast('🗑️ تم إزالة الغرفة المصغرة', 'info');
         }
 
@@ -3653,6 +3667,7 @@
         function applyFiltersAndSearch() {
             let filtered = [...allRooms];
 
+            // ترتيب الغرف: الغرفة رقم 1 في المقدمة
             filtered.sort((a, b) => {
                 const aNum = parseInt(a.id);
                 const bNum = parseInt(b.id);
@@ -3661,6 +3676,7 @@
                 return aNum - bNum;
             });
 
+            // تطبيق الفلتر
             if (currentFilter === 'all') {
                 // لا شيء
             } else if (currentFilter === 'vip') {
@@ -3673,6 +3689,7 @@
                 filtered = filtered.filter(room => getRoomTag(room) === currentFilter);
             }
 
+            // تطبيق البحث
             if (currentSearch) {
                 const search = currentSearch.toLowerCase();
                 filtered = filtered.filter(room =>
@@ -3774,7 +3791,7 @@
         }
 
         // ============================================================
-        // 🎯 JOIN ROOM - تم إصلاح المشكلة
+        // 🎯 JOIN ROOM
         // ============================================================
         async function joinRoom(roomId) {
             if (!requireLogin('joinRoom')) return;
@@ -3788,26 +3805,15 @@
                     return;
                 }
 
-                // التحقق من كلمة المرور
                 if (room.hasPassword && room.password) {
                     showPasswordPrompt(roomId, room);
                     return;
                 }
 
-                // الانتقال إلى صفحة الغرفة الصوتية
-                const roomUrl = `voice-room.html?room=${roomId}`;
-                console.log('🔄 جاري الانتقال إلى:', roomUrl);
-                
-                // محاولة فتح الصفحة مع التحقق من وجودها
-                try {
-                    window.location.href = roomUrl;
-                } catch (navError) {
-                    console.error('❌ خطأ في التنقل:', navError);
-                    showToast('❌ حدث خطأ في الانتقال إلى الغرفة', 'error');
-                }
+                window.location.href = `voice-room.html?room=${roomId}`;
 
             } catch (error) {
-                console.error('❌ Error joining room:', error);
+                console.error('Error joining room:', error);
                 showToast('❌ حدث خطأ في الدخول إلى الغرفة', 'error');
             }
         }
@@ -5013,6 +5019,9 @@
                             </div>
                         `;
             }
+
+            // التحقق من وجود غرفة مصغرة
+            checkMinimizedRoom();
 
             startBannerSlider();
 
