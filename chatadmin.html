@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👑 لوحة إدارة الغرف - VipChat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>👑 لوحة إدارة الغرف - VipChat Admin</title>
     <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -36,6 +36,10 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             flex-wrap: wrap;
             gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
         .logo {
@@ -55,25 +59,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
-        }
-
-        .btn-back {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            transition: 0.3s;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-back:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
+            flex-wrap: wrap;
         }
 
         .admin-badge {
@@ -85,9 +71,29 @@
             font-size: 0.8rem;
         }
 
+        .btn-back {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
         main {
             flex: 1;
-            padding: 30px 5%;
+            padding: 20px 5% 30px;
         }
 
         .admin-header {
@@ -110,6 +116,32 @@
             color: #ffd700;
         }
 
+        .admin-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .admin-stats .stat-card {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            min-width: 80px;
+        }
+
+        .admin-stats .stat-card .number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .admin-stats .stat-card .label {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
         .admin-tabs {
             display: flex;
             gap: 10px;
@@ -126,6 +158,7 @@
             font-weight: 600;
             transition: all 0.3s ease;
             color: #aaa;
+            font-size: 0.9rem;
         }
 
         .admin-tabs button:hover {
@@ -145,6 +178,47 @@
             padding: 2px 10px;
             border-radius: 10px;
             margin-right: 5px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn-add-room {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add-room:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-refresh {
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-refresh:hover {
+            background: rgba(255,255,255,0.1);
         }
 
         .requests-grid {
@@ -202,6 +276,7 @@
         .status-badge.pending { background: #f59e0b; color: #1a1a2e; }
         .status-badge.approved { background: #10b981; color: white; }
         .status-badge.rejected { background: #ef4444; color: white; }
+        .status-badge.deleted { background: #6b7280; color: white; }
 
         .request-card .room-name {
             font-size: 1.2rem;
@@ -210,6 +285,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .request-card .room-name .vip-badge {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a1a2e;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: bold;
         }
 
         .request-card .room-name .lock-icon {
@@ -222,6 +307,10 @@
             font-size: 0.9rem;
             line-height: 1.5;
             margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .request-card .room-features {
@@ -258,6 +347,12 @@
             color: #10b981;
         }
 
+        .request-card .room-features .feature.vip-feature {
+            color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(255,215,0,0.05);
+        }
+
         .request-card .creator-info {
             display: flex;
             align-items: center;
@@ -283,6 +378,7 @@
 
         .request-card .creator-info .details {
             flex: 1;
+            min-width: 0;
         }
 
         .request-card .creator-info .details .name {
@@ -309,7 +405,7 @@
 
         .request-card .card-actions button {
             flex: 1;
-            min-width: 70px;
+            min-width: 60px;
             padding: 8px 12px;
             border: none;
             border-radius: 8px;
@@ -317,6 +413,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .request-card .card-actions button:hover {
@@ -329,10 +429,12 @@
         .btn-reject:hover { background: #dc2626; }
         .btn-view { background: #3b82f6; color: white; }
         .btn-view:hover { background: #2563eb; }
-        .btn-delete { background: #dc2626; color: white; }
-        .btn-delete:hover { background: #b91c1c; }
+        .btn-delete { background: #ef4444; color: white; }
+        .btn-delete:hover { background: #dc2626; }
         .btn-edit { background: #8b5cf6; color: white; }
         .btn-edit:hover { background: #7c3aed; }
+        .btn-vip { background: #ffd700; color: #1a1a2e; }
+        .btn-vip:hover { background: #f59e0b; }
 
         .request-card .card-date {
             font-size: 0.75rem;
@@ -356,6 +458,11 @@
         .empty-state h3 {
             color: #888;
             margin-bottom: 5px;
+        }
+
+        .empty-state p {
+            color: #666;
+            font-size: 0.9rem;
         }
 
         /* ===== MODAL ===== */
@@ -387,7 +494,7 @@
         .modal-content {
             background: #1a1a2e;
             border-radius: 20px;
-            padding: 35px;
+            padding: 30px;
             width: 100%;
             max-width: 550px;
             max-height: 90vh;
@@ -403,6 +510,7 @@
             gap: 10px;
             border-bottom: 2px solid rgba(255,215,0,0.2);
             padding-bottom: 15px;
+            font-size: 1.2rem;
         }
 
         .modal-content .info-row {
@@ -410,6 +518,8 @@
             justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .modal-content .info-row .label {
@@ -419,6 +529,7 @@
         .modal-content .info-row .value {
             color: #eee;
             font-weight: 500;
+            word-break: break-all;
         }
 
         .modal-content .info-row .value .password-display {
@@ -443,6 +554,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            font-size: 0.95rem;
         }
 
         .modal-actions .btn-close {
@@ -483,27 +595,7 @@
         .toast.info { background: #3b82f6; }
         .toast.warning { background: #f59e0b; }
 
-        /* ===== زر إضافة غرفة ===== */
-        .btn-add-room {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-add-room:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
-        }
-
-        /* ===== مودال إضافة غرفة ===== */
+        /* ===== FORM ===== */
         .form-group {
             margin-bottom: 15px;
         }
@@ -584,6 +676,33 @@
             box-shadow: none;
         }
 
+        .form-group small {
+            color: #666;
+            font-size: 0.75rem;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .form-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #8b5cf6;
+            cursor: pointer;
+        }
+
+        .form-check label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .requests-grid {
                 grid-template-columns: 1fr;
@@ -604,8 +723,35 @@
             }
 
             .request-card .card-actions button {
+                min-width: 50px;
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+
+            .admin-stats {
+                justify-content: center;
+            }
+
+            .admin-stats .stat-card {
                 min-width: 60px;
-                font-size: 0.75rem;
+                padding: 8px 15px;
+            }
+
+            .admin-stats .stat-card .number {
+                font-size: 1.2rem;
+            }
+
+            header {
+                padding: 0.8rem 4%;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
             }
         }
 
@@ -621,7 +767,28 @@
                 align-items: stretch;
             }
 
+            .admin-tabs button {
+                text-align: center;
+            }
+
             .request-card .card-actions {
+                flex-direction: column;
+            }
+
+            .request-card .card-actions button {
+                min-width: 100%;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar button {
+                justify-content: center;
+            }
+
+            .modal-actions {
                 flex-direction: column;
             }
         }
@@ -648,14 +815,29 @@
     <main>
         <div class="admin-header">
             <h1><i class="fas fa-user-shield"></i> لوحة إدارة الغرف</h1>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <button class="btn-add-room" onclick="showAddRoomModal()">
-                    <i class="fas fa-plus"></i> إضافة غرفة جديدة
-                </button>
-                <button onclick="loadRequests(currentTab)" style="padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; cursor: pointer;">
-                    <i class="fas fa-sync-alt"></i> تحديث
-                </button>
+            <div class="admin-stats" id="adminStats">
+                <div class="stat-card">
+                    <div class="number" id="totalRooms">0</div>
+                    <div class="label">إجمالي الغرف</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="pendingRooms">0</div>
+                    <div class="label">قيد الانتظار</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="vipRooms">0</div>
+                    <div class="label">غرف VIP</div>
+                </div>
             </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn-add-room" onclick="showAddRoomModal()">
+                <i class="fas fa-plus"></i> إضافة غرفة جديدة
+            </button>
+            <button class="btn-refresh" onclick="loadRequests(currentTab)">
+                <i class="fas fa-sync-alt"></i> تحديث
+            </button>
         </div>
 
         <div class="admin-tabs">
@@ -665,9 +847,14 @@
             </button>
             <button onclick="switchTab('approved', this)">
                 <i class="fas fa-check-circle"></i> تمت الموافقة
+                <span class="count" id="approvedCount">0</span>
             </button>
             <button onclick="switchTab('rejected', this)">
                 <i class="fas fa-times-circle"></i> مرفوضة
+                <span class="count" id="rejectedCount">0</span>
+            </button>
+            <button onclick="switchTab('all', this)">
+                <i class="fas fa-list"></i> الكل
             </button>
         </div>
 
@@ -696,17 +883,16 @@
     <div id="editRoomModal" class="modal">
         <div class="modal-content">
             <h2><i class="fas fa-edit"></i> تعديل الغرفة</h2>
-            <input type="hidden" id="editRoomId">
             <input type="hidden" id="editOriginalRoomId">
             
             <div class="form-group">
                 <label>🔑 معرف الغرفة</label>
                 <input type="text" id="editRoomIdInput" placeholder="أدخل معرف الغرفة الجديد">
-                <small style="color: #666; font-size: 0.75rem;">تغيير المعرف سيؤثر على رابط الغرفة</small>
+                <small>تغيير المعرف سيؤثر على رابط الغرفة</small>
             </div>
 
             <div class="form-group">
-                <label>📛 اسم الغرفة</label>
+                <label>📛 اسم الغرفة *</label>
                 <input type="text" id="editRoomName" placeholder="اسم الغرفة">
             </div>
 
@@ -731,6 +917,16 @@
             </div>
 
             <div class="form-group">
+                <label>🏷️ تصنيف الغرفة</label>
+                <select id="editRoomTag">
+                    <option value="all">عامة</option>
+                    <option value="vip">👑 VIP</option>
+                    <option value="special">⭐ مميزة</option>
+                    <option value="private">🔒 خاصة</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label>🔒 حالة الغرفة</label>
                 <select id="editRoomPrivacy">
                     <option value="public">🌐 عامة (بدون كلمة مرور)</option>
@@ -746,7 +942,7 @@
                         <i class="fas fa-eye" id="editPasswordIcon"></i>
                     </button>
                 </div>
-                <small style="color: #666; font-size: 0.75rem;">اترك فارغاً للحفاظ على كلمة المرور الحالية</small>
+                <small>اترك فارغاً للحفاظ على كلمة المرور الحالية</small>
             </div>
 
             <div class="modal-actions">
@@ -765,7 +961,7 @@
             <div class="form-group">
                 <label>🔑 معرف الغرفة *</label>
                 <input type="text" id="newRoomId" placeholder="مثال: room123" required>
-                <small style="color: #666; font-size: 0.75rem;">يجب أن يكون معرف فريد</small>
+                <small>يجب أن يكون معرف فريد</small>
             </div>
             <div class="form-group">
                 <label>📛 اسم الغرفة *</label>
@@ -787,6 +983,15 @@
                     <option value="8">8 مقاعد</option>
                     <option value="9">9 مقاعد</option>
                     <option value="10" selected>10 مقاعد</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🏷️ تصنيف الغرفة</label>
+                <select id="newRoomTag">
+                    <option value="all">عامة</option>
+                    <option value="vip">👑 VIP</option>
+                    <option value="special">⭐ مميزة</option>
+                    <option value="private">🔒 خاصة</option>
                 </select>
             </div>
             <div class="form-group">
@@ -816,7 +1021,7 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG - نفس قاعدة بيانات stvipclub
+        // 🔥 FIREBASE CONFIG
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -831,7 +1036,6 @@
 
         let database;
         let currentTab = 'pending';
-        let currentEditingRoom = null;
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
@@ -842,8 +1046,7 @@
             }
             firebase.initializeApp(firebaseConfig);
             database = firebase.database();
-            console.log('✅ Firebase connected to:', firebaseConfig.projectId);
-            console.log('📁 قاعدة البيانات:', firebaseConfig.databaseURL);
+            console.log('✅ Firebase connected to stvipclub');
         } catch (error) {
             console.error('❌ Firebase error:', error);
             showToast('❌ فشل الاتصال بقاعدة البيانات', 'error');
@@ -860,7 +1063,7 @@
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
                         <h3 style="color: #ef4444;">❌ لا يوجد اتصال بقاعدة البيانات</h3>
-                        <p style="color: #666;">تأكد من اتصالك بالإنترنت</p>
+                        <p>تأكد من اتصالك بالإنترنت</p>
                         <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
                             <i class="fas fa-sync-alt"></i> إعادة المحاولة
                         </button>
@@ -870,42 +1073,61 @@
             }
 
             try {
-                const snapshot = await database.ref('room_requests').once('value');
+                const [requestsSnapshot, roomsSnapshot] = await Promise.all([
+                    database.ref('room_requests').once('value'),
+                    database.ref('rooms').once('value')
+                ]);
+
                 let allRequests = [];
                 let pendingCount = 0;
+                let approvedCount = 0;
+                let rejectedCount = 0;
+                let totalRooms = 0;
+                let vipRooms = 0;
 
-                if (snapshot.exists()) {
-                    const requests = snapshot.val();
+                const roomsMap = {};
+                if (roomsSnapshot.exists()) {
+                    const roomsData = roomsSnapshot.val();
+                    for (const roomId in roomsData) {
+                        const room = roomsData[roomId];
+                        roomsMap[roomId] = room;
+                        totalRooms++;
+                        if (room.vip) vipRooms++;
+                    }
+                }
+
+                if (requestsSnapshot.exists()) {
+                    const requests = requestsSnapshot.val();
                     for (const roomId in requests) {
                         const req = requests[roomId];
                         req._roomId = roomId;
                         allRequests.push(req);
                         if (req.status === 'pending') pendingCount++;
+                        else if (req.status === 'approved') approvedCount++;
+                        else if (req.status === 'rejected') rejectedCount++;
                     }
                 }
 
-                const roomsSnapshot = await database.ref('rooms').once('value');
-                const roomsMap = {};
-                if (roomsSnapshot.exists()) {
-                    const roomsData = roomsSnapshot.val();
-                    for (const roomId in roomsData) {
-                        roomsMap[roomId] = roomsData[roomId];
-                    }
-                }
-
+                // تحديث الإحصائيات
                 document.getElementById('pendingCount').textContent = pendingCount;
+                document.getElementById('approvedCount').textContent = approvedCount;
+                document.getElementById('rejectedCount').textContent = rejectedCount;
+                document.getElementById('totalRooms').textContent = totalRooms;
+                document.getElementById('pendingRooms').textContent = pendingCount;
+                document.getElementById('vipRooms').textContent = vipRooms;
 
                 let filtered = [];
-                
+
                 if (status === 'pending') {
                     filtered = allRequests.filter(req => req.status === 'pending');
                 } else if (status === 'approved') {
                     const approvedRequests = allRequests.filter(req => req.status === 'approved');
                     filtered = approvedRequests.filter(req => roomsMap[req._roomId]);
+                    // إضافة الغرف المباشرة
                     for (const roomId in roomsMap) {
                         const room = roomsMap[roomId];
                         const existsInRequests = allRequests.some(req => req._roomId === roomId);
-                        if (!existsInRequests && room.status !== 'rejected') {
+                        if (!existsInRequests && room.status !== 'rejected' && room.status !== 'deleted') {
                             filtered.push({
                                 _roomId: roomId,
                                 name: room.name || 'غرفة صوتية',
@@ -919,12 +1141,41 @@
                                 hasPassword: room.hasPassword || false,
                                 password: room.password || '',
                                 background: room.background || 'default',
-                                overlayImage: room.overlayImage || 'none'
+                                overlayImage: room.overlayImage || 'none',
+                                vip: room.vip || false,
+                                tag: room.tag || 'all'
                             });
                         }
                     }
                 } else if (status === 'rejected') {
                     filtered = allRequests.filter(req => req.status === 'rejected');
+                } else {
+                    // الكل
+                    filtered = allRequests;
+                    // إضافة الغرف المباشرة
+                    for (const roomId in roomsMap) {
+                        const room = roomsMap[roomId];
+                        const existsInRequests = allRequests.some(req => req._roomId === roomId);
+                        if (!existsInRequests && room.status !== 'rejected' && room.status !== 'deleted') {
+                            filtered.push({
+                                _roomId: roomId,
+                                name: room.name || 'غرفة صوتية',
+                                description: room.description || '',
+                                creatorId: room.creatorId || 'admin',
+                                creatorName: room.creatorName || 'الأدمن',
+                                status: 'approved',
+                                createdAt: room.createdAt || new Date().toISOString(),
+                                isDirect: true,
+                                maxSlots: room.maxSlots || 10,
+                                hasPassword: room.hasPassword || false,
+                                password: room.password || '',
+                                background: room.background || 'default',
+                                overlayImage: room.overlayImage || 'none',
+                                vip: room.vip || false,
+                                tag: room.tag || 'all'
+                            });
+                        }
+                    }
                 }
 
                 filtered.sort((a, b) => {
@@ -935,13 +1186,14 @@
                     const statusText = {
                         'pending': 'قيد الانتظار',
                         'approved': 'تمت الموافقة',
-                        'rejected': 'مرفوضة'
+                        'rejected': 'مرفوضة',
+                        'all': ''
                     };
                     container.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-check-circle"></i>
                             <h3>لا توجد طلبات ${statusText[status] || ''}</h3>
-                            <p style="color: #666;">جميع الطلبات ${statusText[status] ? statusText[status].toLowerCase() : ''}</p>
+                            <p>جميع الطلبات ${statusText[status] ? statusText[status].toLowerCase() : ''}</p>
                         </div>
                     `;
                     return;
@@ -959,6 +1211,7 @@
                     const hasPassword = req.hasPassword || (req.password && req.password.length > 0);
                     const passwordDisplay = hasPassword ? '🔒 محمية' : '🔓 عامة';
                     const maxSlots = req.maxSlots || 10;
+                    const isVip = req.vip === true || req.tag === 'vip';
 
                     html += `
                         <div class="request-card">
@@ -969,6 +1222,7 @@
                             <div class="room-name">
                                 ${req.name || 'غرفة بدون اسم'} 
                                 ${isDirect ? '✨' : ''}
+                                ${isVip ? '<span class="vip-badge">👑 VIP</span>' : ''}
                                 ${hasPassword ? '<span class="lock-icon"><i class="fas fa-lock"></i></span>' : ''}
                             </div>
                             <div class="room-desc">${req.description || 'لا يوجد وصف'}</div>
@@ -978,13 +1232,14 @@
                                 <span class="feature ${hasPassword ? 'has-password' : 'no-password'}">
                                     <i class="fas ${hasPassword ? 'fa-lock' : 'fa-unlock'}"></i> ${passwordDisplay}
                                 </span>
+                                ${isVip ? '<span class="feature vip-feature"><i class="fas fa-crown"></i> VIP</span>' : ''}
+                                ${req.tag && req.tag !== 'all' && req.tag !== 'vip' ? `<span class="feature">🏷️ ${req.tag}</span>` : ''}
                                 ${req.background && req.background !== 'default' ? `
-                                    <span class="feature"><i class="fas fa-image"></i> خلفية مخصصة</span>
+                                    <span class="feature"><i class="fas fa-image"></i> خلفية</span>
                                 ` : ''}
                                 ${req.overlayImage && req.overlayImage !== 'none' ? `
-                                    <span class="feature"><i class="fas fa-layer-group"></i> صورة علوية</span>
+                                    <span class="feature"><i class="fas fa-layer-group"></i> صورة</span>
                                 ` : ''}
-                                ${req.vip ? `<span class="feature" style="color:#ffd700;"><i class="fas fa-crown"></i> VIP</span>` : ''}
                             </div>
                             
                             <div class="creator-info">
@@ -1014,6 +1269,11 @@
                                     <button class="btn-delete" onclick="deleteRoom('${req._roomId}')">
                                         <i class="fas fa-trash"></i> حذف
                                     </button>
+                                    ${!isVip ? `
+                                        <button class="btn-vip" onclick="makeVip('${req._roomId}')">
+                                            <i class="fas fa-crown"></i> VIP
+                                        </button>
+                                    ` : ''}
                                 ` : ''}
                                 ${req.status === 'rejected' ? `
                                     <button class="btn-view" onclick="viewCreator('${req._roomId}')">
@@ -1035,7 +1295,7 @@
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
                         <h3 style="color: #ef4444;">خطأ في تحميل الطلبات</h3>
-                        <p style="color: #666;">${error.message}</p>
+                        <p>${error.message}</p>
                         <button onclick="location.reload()" style="margin-top:15px; padding:10px 25px; background:#ffd700; border:none; border-radius:8px; color:#1a1a2e; font-weight:bold; cursor:pointer;">
                             <i class="fas fa-sync-alt"></i> إعادة المحاولة
                         </button>
@@ -1053,7 +1313,7 @@
             document.querySelectorAll('.admin-tabs button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            button.classList.add('active');
+            if (button) button.classList.add('active');
 
             loadRequests(tab);
         }
@@ -1076,10 +1336,10 @@
                 const roomData = {
                     roomId: roomId,
                     name: request.name,
-                    description: request.description,
-                    creatorId: request.creatorId,
-                    creatorName: request.creatorName,
-                    createdAt: request.createdAt,
+                    description: request.description || '',
+                    creatorId: request.creatorId || 'admin',
+                    creatorName: request.creatorName || 'الأدمن',
+                    createdAt: request.createdAt || new Date().toISOString(),
                     status: 'approved',
                     members: 0,
                     isActive: true,
@@ -1095,7 +1355,7 @@
                 await database.ref('rooms/' + roomId).set(roomData);
                 await database.ref('room_requests/' + roomId + '/status').set('approved');
 
-                showToast(`✅ تمت الموافقة على الغرفة ${request.name}`, 'success');
+                showToast(`✅ تمت الموافقة على الغرفة "${request.name}"`, 'success');
                 loadRequests(currentTab);
 
             } catch (error) {
@@ -1109,7 +1369,7 @@
 
             try {
                 await database.ref('room_requests/' + roomId + '/status').set('rejected');
-                showToast(`❌ تم رفض الغرفة`, 'error');
+                showToast(`❌ تم رفض الغرفة ${roomId}`, 'error');
                 loadRequests(currentTab);
 
             } catch (error) {
@@ -1134,12 +1394,37 @@
             }
         }
 
+        async function makeVip(roomId) {
+            if (!confirm(`👑 هل تريد جعل الغرفة ${roomId} VIP؟`)) return;
+
+            try {
+                await database.ref('rooms/' + roomId).update({
+                    vip: true,
+                    tag: 'vip'
+                });
+
+                const reqSnapshot = await database.ref('room_requests/' + roomId).once('value');
+                if (reqSnapshot.exists()) {
+                    await database.ref('room_requests/' + roomId).update({
+                        vip: true,
+                        tag: 'vip'
+                    });
+                }
+
+                showToast(`👑 تم جعل الغرفة VIP!`, 'success');
+                loadRequests(currentTab);
+
+            } catch (error) {
+                console.error('Error making VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
         // ============================================================
         // ✏️ EDIT ROOM FUNCTIONS
         // ============================================================
         async function openEditModal(roomId) {
             try {
-                // جلب بيانات الغرفة من rooms
                 const roomSnapshot = await database.ref('rooms/' + roomId).once('value');
                 const room = roomSnapshot.val();
 
@@ -1148,15 +1433,13 @@
                     return;
                 }
 
-                currentEditingRoom = roomId;
                 document.getElementById('editOriginalRoomId').value = roomId;
-                document.getElementById('editRoomId').value = roomId;
                 document.getElementById('editRoomIdInput').value = roomId;
                 document.getElementById('editRoomName').value = room.name || '';
                 document.getElementById('editRoomDesc').value = room.description || '';
                 document.getElementById('editRoomMaxSlots').value = room.maxSlots || 10;
+                document.getElementById('editRoomTag').value = room.tag || 'all';
                 
-                // تحديد حالة الخصوصية
                 const privacySelect = document.getElementById('editRoomPrivacy');
                 if (room.hasPassword && room.password) {
                     privacySelect.value = 'private';
@@ -1201,7 +1484,6 @@
             }
         }
 
-        // تغيير حالة الخصوصية
         document.addEventListener('DOMContentLoaded', function() {
             const privacySelect = document.getElementById('editRoomPrivacy');
             if (privacySelect) {
@@ -1223,6 +1505,7 @@
             const name = document.getElementById('editRoomName').value.trim();
             const description = document.getElementById('editRoomDesc').value.trim();
             const maxSlots = parseInt(document.getElementById('editRoomMaxSlots').value);
+            const tag = document.getElementById('editRoomTag').value;
             const privacy = document.getElementById('editRoomPrivacy').value;
             const newPassword = document.getElementById('editRoomPassword').value.trim();
 
@@ -1232,7 +1515,6 @@
             }
 
             try {
-                // جلب البيانات الحالية
                 const roomSnapshot = await database.ref('rooms/' + originalRoomId).once('value');
                 const room = roomSnapshot.val();
 
@@ -1243,21 +1525,16 @@
 
                 // التحقق من تغيير المعرف
                 if (originalRoomId !== newRoomId) {
-                    // التحقق من عدم وجود غرفة بنفس المعرف الجديد
                     const checkSnapshot = await database.ref('rooms/' + newRoomId).once('value');
                     if (checkSnapshot.exists()) {
                         showToast('⚠️ الغرفة بالمعرف الجديد موجودة بالفعل', 'warning');
                         return;
                     }
 
-                    // نسخ البيانات إلى المعرف الجديد
                     const newRoomData = { ...room, roomId: newRoomId };
                     await database.ref('rooms/' + newRoomId).set(newRoomData);
-                    
-                    // حذف الغرفة القديمة
                     await database.ref('rooms/' + originalRoomId).remove();
                     
-                    // تحديث room_requests
                     const reqSnapshot = await database.ref('room_requests/' + originalRoomId).once('value');
                     if (reqSnapshot.exists()) {
                         const reqData = reqSnapshot.val();
@@ -1266,14 +1543,14 @@
                     }
                 }
 
-                // تحديث البيانات
                 const updateData = {
                     name: name,
                     description: description,
-                    maxSlots: maxSlots
+                    maxSlots: maxSlots,
+                    tag: tag,
+                    vip: tag === 'vip'
                 };
 
-                // معالجة كلمة المرور
                 if (privacy === 'public') {
                     updateData.hasPassword = false;
                     updateData.password = '';
@@ -1282,7 +1559,6 @@
                         updateData.hasPassword = true;
                         updateData.password = btoa(newPassword);
                     } else {
-                        // الحفاظ على كلمة المرور الحالية إذا لم يتم إدخال جديدة
                         const currentRoom = await database.ref('rooms/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).once('value');
                         const currentData = currentRoom.val();
                         updateData.hasPassword = currentData.hasPassword || false;
@@ -1290,15 +1566,17 @@
                     }
                 }
 
-                await database.ref('rooms/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).update(updateData);
+                const targetId = originalRoomId !== newRoomId ? newRoomId : originalRoomId;
+                await database.ref('rooms/' + targetId).update(updateData);
 
-                // تحديث room_requests
-                const reqSnapshot = await database.ref('room_requests/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).once('value');
+                const reqSnapshot = await database.ref('room_requests/' + targetId).once('value');
                 if (reqSnapshot.exists()) {
-                    await database.ref('room_requests/' + (originalRoomId !== newRoomId ? newRoomId : originalRoomId)).update({
+                    await database.ref('room_requests/' + targetId).update({
                         name: name,
                         description: description,
                         maxSlots: maxSlots,
+                        tag: tag,
+                        vip: tag === 'vip',
                         hasPassword: updateData.hasPassword,
                         password: updateData.password
                     });
@@ -1372,7 +1650,9 @@
                             hasPassword: room.hasPassword || false,
                             password: room.password || '',
                             background: room.background || 'default',
-                            overlayImage: room.overlayImage || 'none'
+                            overlayImage: room.overlayImage || 'none',
+                            vip: room.vip || false,
+                            tag: room.tag || 'all'
                         };
                     }
                 }
@@ -1413,6 +1693,10 @@
                         <div class="info-row">
                             <span class="label">🪑 عدد المقاعد</span>
                             <span class="value">${request.maxSlots || 10}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">🏷️ التصنيف</span>
+                            <span class="value">${request.vip ? '👑 VIP' : request.tag || 'عامة'}</span>
                         </div>
                         <div class="info-row">
                             <span class="label">🔑 كلمة المرور</span>
@@ -1463,6 +1747,7 @@
             document.getElementById('newRoomDesc').value = '';
             document.getElementById('newRoomPassword').value = '';
             document.getElementById('newRoomMaxSlots').value = '10';
+            document.getElementById('newRoomTag').value = 'all';
         }
 
         async function addRoomDirectly() {
@@ -1471,6 +1756,7 @@
             const desc = document.getElementById('newRoomDesc').value.trim();
             const creator = document.getElementById('newRoomCreator').value;
             const maxSlots = parseInt(document.getElementById('newRoomMaxSlots').value);
+            const tag = document.getElementById('newRoomTag').value;
             const password = document.getElementById('newRoomPassword').value.trim();
 
             if (!roomId || !name) {
@@ -1485,6 +1771,7 @@
                     return;
                 }
 
+                const isVip = tag === 'vip';
                 const roomData = {
                     roomId: roomId,
                     name: name,
@@ -1500,8 +1787,8 @@
                     password: password ? btoa(password) : '',
                     background: 'default',
                     overlayImage: 'none',
-                    vip: false,
-                    tag: 'all'
+                    vip: isVip,
+                    tag: tag
                 };
 
                 await database.ref('rooms/' + roomId).set(roomData);
@@ -1518,7 +1805,9 @@
                     hasPassword: !!password,
                     password: password ? btoa(password) : '',
                     background: 'default',
-                    overlayImage: 'none'
+                    overlayImage: 'none',
+                    vip: isVip,
+                    tag: tag
                 });
 
                 showToast(`✅ تم إنشاء الغرفة "${name}" بنجاح!`, 'success');
