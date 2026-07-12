@@ -34,7 +34,7 @@
             backdrop-filter: blur(15px);
             padding: 0.6rem 4%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             border-bottom: 2px solid rgba(255,215,0,0.15);
             position: sticky;
@@ -46,9 +46,8 @@
             box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
 
-        .logo-section { display: flex; align-items: center; gap: 10px; }
-        .logo { font-size: 1.1rem; font-weight: bold; color: #ffd700; display: flex; align-items: center; gap: 6px; cursor: pointer; text-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        .logo i { font-size: 1.1rem; }
+        /* ===== إخفاء شعار VipChat والتاج ===== */
+        .logo-section { display: none !important; }
 
         /* ===== مربع معلومات الغرفة ===== */
         .room-info-box {
@@ -278,14 +277,41 @@
             margin: 0 auto;
         }
 
+        /* ===== إخفاء التاج ===== */
+        .seat-circle .crown-icon { display: none !important; }
+
+        /* ===== ألوان المقاعد الفارغة بتدرج جذاب ===== */
         .seat-circle.empty {
-            border-color: #444;
-            background: rgba(255,255,255,0.02);
+            border-color: transparent;
+            background: linear-gradient(145deg, rgba(139,92,246,0.12), rgba(99,102,241,0.08));
+            backdrop-filter: blur(4px);
+            box-shadow: 0 0 30px rgba(139,92,246,0.05), inset 0 0 30px rgba(139,92,246,0.02);
+            animation: glowPulse 3s ease-in-out infinite;
         }
+
+        .seat-circle.empty .seat-avatar {
+            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.08)) !important;
+            border: 2px solid rgba(139,92,246,0.15) !important;
+            color: rgba(139,92,246,0.4) !important;
+            box-shadow: 0 0 20px rgba(139,92,246,0.05) !important;
+        }
+
         .seat-circle.empty:hover {
-            border-color: #8b5cf6;
-            background: rgba(139,92,246,0.1);
+            border-color: rgba(139,92,246,0.3);
+            background: linear-gradient(145deg, rgba(139,92,246,0.2), rgba(99,102,241,0.15));
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 50px rgba(139,92,246,0.1), inset 0 0 50px rgba(139,92,246,0.05);
         }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.03), inset 0 0 20px rgba(139,92,246,0.02); }
+            50% { box-shadow: 0 0 40px rgba(139,92,246,0.08), inset 0 0 40px rgba(139,92,246,0.04); }
+        }
+
+        .seat-circle.empty .seat-avatar i {
+            color: rgba(139,92,246,0.3);
+        }
+
         .seat-circle.occupied {
             border-color: #8b5cf6;
             background: rgba(139,92,246,0.1);
@@ -345,20 +371,6 @@
             border: 2px dashed rgba(255,255,255,0.02);
             color: #444;
             box-shadow: none;
-        }
-
-        .seat-circle .crown-icon {
-            position: absolute;
-            top: -12px;
-            right: -8px;
-            font-size: 1.2rem;
-            filter: drop-shadow(0 0 15px rgba(255,215,0,0.2));
-            animation: crown-float 2.5s ease-in-out infinite;
-            z-index: 3;
-        }
-        @keyframes crown-float {
-            0%, 100% { transform: rotate(-10deg) scale(1); }
-            50% { transform: rotate(10deg) scale(1.1); }
         }
 
         .seat-circle .sound-waves {
@@ -473,11 +485,12 @@
 
         .seat-number {
             font-size: 0.55rem;
-            color: #555;
+            color: rgba(139,92,246,0.5);
             margin-top: 8px;
             text-align: center;
             font-weight: 500;
             min-height: 20px;
+            transition: 0.3s;
         }
         .seat-wrapper.occupied .seat-number { display: none; }
 
@@ -1859,9 +1872,9 @@
         }
 
         @media (max-width: 850px) {
-            .seats-area { min-height: 380px; max-height: 500px; padding: 15px 12px; }
-            .seats-container { gap: 30px; }
-            .seats-row { gap: 30px !important; }
+            .seats-area { min-height: 380px; max-height: 500px; padding: 15px 12px; overflow: visible !important; }
+            .seats-container { gap: 30px; overflow: visible !important; }
+            .seats-row { gap: 30px !important; overflow: visible !important; }
             .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 35px !important; }
             .seat-circle { width: 70px !important; height: 70px !important; }
             .seat-circle .seat-avatar { width: 30px !important; height: 30px !important; font-size: 0.65rem !important; }
@@ -1874,18 +1887,91 @@
 
         @media (max-width: 600px) {
             .main-layout { padding: 8px; gap: 10px; }
-            .seats-area { min-height: 340px; max-height: 440px; border-radius: 16px; padding: 15px 8px; }
-            .seats-container { gap: 25px; }
-            .seats-row { gap: 20px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 25px !important; }
-            .seat-circle { width: 60px !important; height: 60px !important; }
-            .seat-circle .seat-avatar { width: 26px !important; height: 26px !important; font-size: 0.55rem !important; }
-            .seat-container { width: 100px; height: 100px; }
-            .seat-frame { width: 100px; height: 100px; }
-            .seat-username { font-size: 0.5rem; max-width: 70px; margin-top: 5px !important; min-height: 14px; }
-            .seat-number { font-size: 0.4rem; margin-top: 5px; min-height: 14px; }
-            .seats-area .seats-title { font-size: 0.7rem; top: 8px; right: 10px; }
-            .chat-area { height: 220px; min-height: 160px; max-height: 260px; border-radius: 14px; }
+            .seats-area { 
+                min-height: 420px; 
+                max-height: 560px; 
+                padding: 15px 8px; 
+                overflow: visible !important; 
+            }
+            .seats-container { 
+                gap: 22px; 
+                padding: 10px 0; 
+                overflow: visible !important; 
+            }
+            .seats-row { 
+                gap: 12px !important; 
+                flex-wrap: nowrap !important; 
+                overflow: visible !important; 
+                width: 100%; 
+                justify-content: center; 
+            }
+            .seats-row.row-1 { 
+                max-width: 120px; 
+                margin: 0 auto; 
+                gap: 0 !important; 
+            }
+            .seats-row.row-2 { 
+                max-width: 100%; 
+                gap: 12px !important; 
+                justify-content: center; 
+            }
+            .seats-row.row-3 { 
+                max-width: 100%; 
+                gap: 12px !important; 
+                justify-content: center; 
+            }
+            .seats-row.row-4 { 
+                max-width: 100%; 
+                gap: 12px !important; 
+                justify-content: center; 
+            }
+            .seat-wrapper { 
+                min-width: 60px; 
+                flex-shrink: 0; 
+            }
+            .seat-container { 
+                width: 90px !important; 
+                height: 90px !important; 
+                flex-shrink: 0; 
+            }
+            .seat-circle { 
+                width: 55px !important; 
+                height: 55px !important; 
+                flex-shrink: 0; 
+            }
+            .seat-circle .seat-avatar { 
+                width: 24px !important; 
+                height: 24px !important; 
+                font-size: 0.5rem !important; 
+            }
+            .seat-frame { 
+                width: 90px !important; 
+                height: 90px !important; 
+            }
+            .seat-username { 
+                font-size: 0.45rem; 
+                max-width: 55px; 
+                margin-top: 4px !important; 
+                min-height: 14px; 
+            }
+            .seat-number { 
+                font-size: 0.4rem; 
+                margin-top: 4px; 
+                min-height: 14px; 
+                color: rgba(139,92,246,0.4); 
+            }
+            .seats-row.row-4 .seat-wrapper:nth-child(3) {
+                margin-left: 0;
+            }
+            .seat-circle .crown-icon { display: none !important; }
+            .seat-circle .mic-indicator { font-size: 0.4rem; padding: 2px; bottom: -1px; right: -1px; }
+            .seats-area .seats-title { font-size: 0.65rem; top: 8px; right: 10px; }
+            .chat-area { 
+                height: 220px; 
+                min-height: 160px; 
+                max-height: 260px; 
+                border-radius: 14px; 
+            }
             .chat-header { padding: 6px 10px; min-height: 34px; }
             .chat-header h3 { font-size: 0.7rem; }
             .chat-messages { padding: 6px 8px; gap: 3px; }
@@ -1918,7 +2004,6 @@
             .gift-options-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
             .user-item { padding: 6px 8px; }
             .user-item .user-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
-            .seats-area .seats-title { font-size: 0.65rem; top: 8px; right: 10px; }
             #usersListContainer { width: 95%; padding: 14px; }
             #usersList { max-height: 280px; }
             .navbar { padding: 0.3rem 2%; min-height: 50px; }
@@ -1929,24 +2014,105 @@
             .room-info-box .room-id { font-size: 0.55rem; }
             .room-info-box .room-owner { font-size: 0.6rem; }
             .room-info-box .member-count { font-size: 0.6rem; }
+            .logo-section { display: none !important; }
         }
 
         @media (max-width: 400px) {
-            .seats-area { min-height: 280px; max-height: 380px; padding: 12px 6px; }
-            .seats-container { gap: 18px; }
-            .seats-row { gap: 15px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 18px !important; }
-            .seat-circle { width: 52px !important; height: 52px !important; }
-            .seat-circle .seat-avatar { width: 22px !important; height: 22px !important; font-size: 0.45rem !important; }
-            .seat-container { width: 90px; height: 90px; }
-            .seat-frame { width: 90px; height: 90px; }
-            .seat-username { font-size: 0.45rem; max-width: 60px; margin-top: 4px !important; min-height: 12px; }
-            .seat-number { font-size: 0.35rem; margin-top: 4px; min-height: 12px; }
-            .seat-circle .crown-icon { font-size: 0.9rem; top: -8px; right: -5px; }
-            .seat-circle .mic-indicator { font-size: 0.4rem; padding: 2px; bottom: -1px; right: -1px; }
-            .chat-area { height: 160px; min-height: 140px; max-height: 200px; }
-            .chat-messages .message .message-bg { padding: 6px 8px; min-height: 28px; min-width: 40px; }
-            .chat-messages .message .message-bg .msg-text { font-size: 0.65rem; line-height: 1.4; }
+            .seats-area { 
+                min-height: 380px; 
+                max-height: 500px; 
+                padding: 12px 4px; 
+                overflow: visible !important; 
+            }
+            .seats-container { 
+                gap: 18px; 
+                padding: 8px 0; 
+                overflow: visible !important; 
+            }
+            .seats-row { 
+                gap: 8px !important; 
+                flex-wrap: nowrap !important; 
+                overflow: visible !important; 
+                width: 100%; 
+                justify-content: center; 
+            }
+            .seats-row.row-1 { 
+                max-width: 90px; 
+                margin: 0 auto; 
+                gap: 0 !important; 
+            }
+            .seats-row.row-2 { 
+                max-width: 100%; 
+                gap: 8px !important; 
+                justify-content: center; 
+            }
+            .seats-row.row-3 { 
+                max-width: 100%; 
+                gap: 8px !important; 
+                justify-content: center; 
+            }
+            .seats-row.row-4 { 
+                max-width: 100%; 
+                gap: 8px !important; 
+                justify-content: center; 
+            }
+            .seat-wrapper { 
+                min-width: 48px; 
+                flex-shrink: 0; 
+            }
+            .seat-container { 
+                width: 72px !important; 
+                height: 72px !important; 
+                flex-shrink: 0; 
+            }
+            .seat-circle { 
+                width: 44px !important; 
+                height: 44px !important; 
+                flex-shrink: 0; 
+            }
+            .seat-circle .seat-avatar { 
+                width: 20px !important; 
+                height: 20px !important; 
+                font-size: 0.4rem !important; 
+                border-width: 1.5px !important; 
+            }
+            .seat-frame { 
+                width: 72px !important; 
+                height: 72px !important; 
+            }
+            .seat-username { 
+                font-size: 0.4rem; 
+                max-width: 44px; 
+                margin-top: 3px !important; 
+                min-height: 12px; 
+            }
+            .seat-number { 
+                font-size: 0.35rem; 
+                margin-top: 3px; 
+                min-height: 12px; 
+                color: rgba(139,92,246,0.35); 
+            }
+            .seat-circle .crown-icon { display: none !important; }
+            .seat-circle .mic-indicator { 
+                font-size: 0.35rem; 
+                padding: 1.5px; 
+                bottom: -1px; 
+                right: -1px; 
+            }
+            .chat-area { 
+                height: 160px; 
+                min-height: 140px; 
+                max-height: 200px; 
+            }
+            .chat-messages .message .message-bg { 
+                padding: 6px 8px; 
+                min-height: 28px; 
+                min-width: 40px; 
+            }
+            .chat-messages .message .message-bg .msg-text { 
+                font-size: 0.65rem; 
+                line-height: 1.4; 
+            }
         }
     </style>
 </head>
@@ -1954,11 +2120,8 @@
 
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar">
-    <div class="logo-section">
-        <div class="logo" onclick="window.location.href='chat.html'">
-            <i class="fas fa-crown"></i> VipChat
-        </div>
-    </div>
+    <!-- ===== تم إخفاء شعار VipChat ===== -->
+    <div style="display:none;"></div>
 
     <!-- ===== مربع معلومات الغرفة مع الأيقونات تحته ===== -->
     <div class="room-info-box">
@@ -2829,7 +2992,7 @@ async function renderSeats(seats) {
                         ${frameHTML}
                         <div class="${seatClass}" ${clickHandler} style="${isOccupied ? `border-color:${isSpeaking ? '#ffd700' : isMuted ? '#ef4444' : userColor}40;` : ''}">
                             ${isOccupied ? `
-                                ${isSeatCreator ? `<div class="crown-icon">👑</div>` : ''}
+                                ${isSeatCreator ? `<div class="crown-icon" style="display:none !important;">👑</div>` : ''}
                                 <div class="seat-avatar" style="background:${isSeatCreator ? 'linear-gradient(135deg, #ffd700, #f59e0b)' : userColor} !important;${isSeatCreator ? 'color:#1a1a2e;' : ''}">
                                     ${userAvatar ? `<img src="${userAvatar}" alt="${displayName}">` : avatarLetter}
                                 </div>
