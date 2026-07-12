@@ -205,7 +205,7 @@
 
         .seats-row.row-1 { justify-content: center; padding: 0; gap: 0 !important; }
         .seats-row.row-1 .seat-wrapper { margin: 0 auto; }
-        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { justify-content: center; gap: 100px !important; }
+        .seats-row.row-2, .seats-row.row-3, .seats-row.row-4, .seats-row.row-5, .seats-row.row-6 { justify-content: center; gap: 100px !important; }
 
         .seat-wrapper {
             display: flex;
@@ -1953,7 +1953,7 @@
             .chat-area { width: 100%; max-width: 100%; height: 350px; min-height: 300px; max-height: 400px; }
             .seats-area { min-height: 400px; max-height: 550px; }
             .seats-row { gap: 70px !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 80px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4, .seats-row.row-5, .seats-row.row-6 { gap: 80px !important; }
             .seat-container { width: 170px; height: 170px; }
             .luxury-frame { width: 170px; height: 170px; }
             .seat-circle { width: 95px !important; height: 95px !important; }
@@ -1972,7 +1972,7 @@
             .seats-area { min-height: 380px; max-height: 500px; padding: 15px 12px; overflow: visible !important; }
             .seats-container { gap: 35px; overflow: visible !important; }
             .seats-row { gap: 50px !important; overflow: visible !important; }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { gap: 60px !important; }
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4, .seats-row.row-5, .seats-row.row-6 { gap: 60px !important; }
             .seat-container { width: 150px; height: 150px; }
             .luxury-frame { width: 150px; height: 150px; }
             .seat-circle { width: 85px !important; height: 85px !important; }
@@ -2010,7 +2010,7 @@
                 margin: 0 auto; 
                 gap: 0 !important; 
             }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { 
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4, .seats-row.row-5, .seats-row.row-6 { 
                 max-width: 100%; 
                 gap: 35px !important; 
                 justify-content: center; 
@@ -2110,7 +2110,7 @@
                 margin: 0 auto; 
                 gap: 0 !important; 
             }
-            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4 { 
+            .seats-row.row-2, .seats-row.row-3, .seats-row.row-4, .seats-row.row-5, .seats-row.row-6 { 
                 max-width: 100%; 
                 gap: 22px !important; 
                 justify-content: center; 
@@ -2543,12 +2543,8 @@ const GIFT_TYPES = [
     { id: 'lion', name: '🦁 أسد', emoji: '🦁', price: 3000 }
 ];
 
-const SEATS_LAYOUT = [
-    { row: 0, seats: 1 },
-    { row: 1, seats: 3 },
-    { row: 2, seats: 3 },
-    { row: 3, seats: 3 }
-];
+// ===== SEATS LAYOUT - سيتم تحديثه ديناميكياً =====
+let SEATS_LAYOUT = [];
 
 // ============================================================
 // 📋 VARIABLES
@@ -2743,6 +2739,33 @@ function getRoomIdFromURL() {
     return params.get('room');
 }
 
+function generateSeatsLayout(maxSlots) {
+    // إعادة تعيين SEATS_LAYOUT بناءً على العدد المطلوب
+    const newLayout = [];
+    let remaining = maxSlots;
+    let rowIndex = 0;
+    
+    // الصف الأول: مقعد واحد (المالك)
+    newLayout.push({ row: rowIndex, seats: 1 });
+    remaining--;
+    rowIndex++;
+    
+    // توزيع المقاعد المتبقية على الصفوف (بحد أقصى 4 مقاعد لكل صف)
+    while (remaining > 0) {
+        const seatsInRow = Math.min(remaining, 4);
+        newLayout.push({ row: rowIndex, seats: seatsInRow });
+        remaining -= seatsInRow;
+        rowIndex++;
+    }
+    
+    // تحديث SEATS_LAYOUT
+    SEATS_LAYOUT.length = 0;
+    newLayout.forEach(row => SEATS_LAYOUT.push(row));
+    
+    console.log(`✅ تم إنشاء تخطيط المقاعد: ${maxSlots} مقعد`, SEATS_LAYOUT);
+    return SEATS_LAYOUT;
+}
+
 function initRoom() {
     if (roomInitialized) return;
     roomInitialized = true;
@@ -2778,8 +2801,13 @@ async function loadRoomData() {
                         creatorName: requestData.creatorName || 'المالك',
                         createdAt: requestData.createdAt || new Date().toISOString(),
                         status: 'approved',
+                        maxSlots: requestData.maxSlots || 10,
                         members: 0,
-                        isActive: true
+                        isActive: true,
+                        hasPassword: requestData.hasPassword || false,
+                        password: requestData.password || '',
+                        background: requestData.background || 'default',
+                        overlayImage: requestData.overlayImage || 'none'
                     });
                     roomSnapshot = await database.ref('rooms/' + roomId).once('value');
                 } else {
@@ -2804,6 +2832,10 @@ async function loadRoomData() {
         console.log('✅ تم تحميل بيانات الغرفة:', roomData);
         
         document.getElementById('roomNameDisplay').textContent = roomData.name || '🎙️ غرفة صوتية';
+        
+        // ===== إنشاء تخطيط المقاعد بناءً على العدد المحدد =====
+        const maxSlots = roomData.maxSlots || 10;
+        generateSeatsLayout(maxSlots);
         
         const creatorId = roomData.creatorId;
         const creatorName = roomData.creatorName || 'غير معروف';
@@ -2943,6 +2975,9 @@ async function renderSeats(seats) {
     const container = document.getElementById('seatsContainer');
     let html = '', occupied = 0, globalIndex = 0;
     
+    // حساب إجمالي المقاعد من SEATS_LAYOUT
+    const totalSeats = SEATS_LAYOUT.reduce((sum, row) => sum + row.seats, 0);
+    
     const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
     
     const seatsWithFrames = {};
@@ -3080,7 +3115,7 @@ async function renderSeats(seats) {
     });
     
     container.innerHTML = html;
-    document.getElementById('seatsCount').textContent = `(${occupied}/${globalIndex})`;
+    document.getElementById('seatsCount').textContent = `(${occupied}/${totalSeats})`;
     document.getElementById('memberCount').textContent = occupied;
     document.getElementById('usersBadge').textContent = occupied;
     document.getElementById('chatMemberCount').textContent = occupied;
@@ -3112,6 +3147,14 @@ function listenSeats() {
 
 async function joinSeat(seatIndex) {
     if (!database || !roomId || !currentUser?.numericId) return;
+    
+    // ===== التحقق من أن المقعد ضمن النطاق المسموح =====
+    const totalSeats = SEATS_LAYOUT.reduce((sum, row) => sum + row.seats, 0);
+    if (seatIndex >= totalSeats) {
+        showToast('⚠️ هذا المقعد غير متاح', 'warning');
+        return;
+    }
+    
     const seats = (await database.ref('rooms/' + roomId + '/seats').once('value')).val() || {};
     for (const key in seats) if (seats[key].userId == currentUser.numericId) {
         showToast('⚠️ أنت بالفعل في مقعد', 'warning');
@@ -3760,34 +3803,27 @@ function displayMessage(msg) {
     const styleImage = msg.styleImage || null;
     const styleName = msg.styleName || null;
     
-    // بناء خلفية الرسالة مع أسلوب الكتابة إن وجد
     let bgStyle = '';
     let overlayHTML = '';
     let badgeHTML = '';
     let extraClass = '';
     
-    // التحقق من وجود أسلوب كتابة للرسالة
     if (styleImage) {
         bgStyle = `background-image: url('${styleImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
         overlayHTML = `<div class="style-overlay"></div>`;
-        
-        // إضافة اسم الأسلوب كـ badge
         if (styleName) {
             badgeHTML = `<span class="style-badge">✨ ${styleName}</span>`;
         }
     }
     
-    // إذا كانت رسالة خاصة بي وأسلوب الكتابة مفعل
     if (isOwn && activeChatStyle && activeChatStyle.image && !styleImage) {
         bgStyle = `background-image: url('${activeChatStyle.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
         overlayHTML = `<div class="style-overlay"></div>`;
-        
         if (activeChatStyle.name) {
             badgeHTML = `<span class="style-badge">✨ ${activeChatStyle.name}</span>`;
         }
     }
     
-    // إذا لم يكن هناك أسلوب كتابة، استخدم الخلفية الافتراضية
     if (!bgStyle) {
         extraClass = 'no-style';
         if (isOwn) {
