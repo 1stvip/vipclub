@@ -2,15 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🛡️ لوحة تحكم الأدمن - VipChat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>👑 لوحة التحكم - المشرف</title>
+    <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     
     <style>
-        /* ===== نفس الستايلات السابقة مع تحسينات ===== */
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -26,19 +29,20 @@
         }
 
         .admin-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
+        /* ===== HEADER ===== */
         .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            padding: 20px 25px;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             border-radius: 16px;
             margin-bottom: 25px;
-            border: 1px solid #333;
+            border: 1px solid rgba(255,255,255,0.05);
             flex-wrap: wrap;
             gap: 15px;
         }
@@ -76,25 +80,14 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
-        .admin-header .back-btn.backup {
-            background: #8b5cf6;
-        }
-        .admin-header .back-btn.backup:hover {
-            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
-        }
-        .admin-header .back-btn.chat {
-            background: #10b981;
-        }
-        .admin-header .back-btn.chat:hover {
-            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
-        }
-        .admin-header .back-btn.home {
-            background: #3b82f6;
-        }
-        .admin-header .back-btn.home:hover {
-            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
-        }
+        .admin-header .back-btn.backup { background: #8b5cf6; }
+        .admin-header .back-btn.backup:hover { box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4); }
+        .admin-header .back-btn.chat { background: #10b981; }
+        .admin-header .back-btn.chat:hover { box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); }
+        .admin-header .back-btn.home { background: #3b82f6; }
+        .admin-header .back-btn.home:hover { box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4); }
 
+        /* ===== TABS ===== */
         .admin-tabs {
             display: flex;
             gap: 10px;
@@ -130,6 +123,7 @@
             display: block;
         }
 
+        /* ===== SEARCH ===== */
         .search-section {
             background: #111827;
             border-radius: 16px;
@@ -176,14 +170,10 @@
             box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
         }
 
-        .search-section button.btn-reset {
-            background: #10b981;
-        }
+        .search-section button.btn-reset { background: #10b981; }
+        .search-section button.btn-reset:hover { box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); }
 
-        .search-section button.btn-reset:hover {
-            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
-        }
-
+        /* ===== RESULTS ===== */
         .results-container {
             background: #111827;
             border-radius: 16px;
@@ -204,6 +194,7 @@
             color: #333;
         }
 
+        /* ===== USER CARD ===== */
         .user-card {
             background: #0f172a;
             border-radius: 12px;
@@ -296,15 +287,8 @@
             font-weight: bold;
         }
 
-        .user-card .user-status.active {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-        }
-
-        .user-card .user-status.banned {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
+        .user-card .user-status.active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .user-card .user-status.banned { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
 
         .user-card .user-actions {
             display: flex;
@@ -324,52 +308,18 @@
             color: white;
         }
 
-        .user-card .user-actions .btn-edit {
-            background: #8b5cf6;
-        }
+        .user-card .user-actions .btn-edit { background: #8b5cf6; }
+        .user-card .user-actions .btn-edit:hover { background: #7c3aed; transform: translateY(-2px); }
+        .user-card .user-actions .btn-ban { background: #ef4444; }
+        .user-card .user-actions .btn-ban:hover { background: #dc2626; transform: translateY(-2px); }
+        .user-card .user-actions .btn-unban { background: #10b981; }
+        .user-card .user-actions .btn-unban:hover { background: #059669; transform: translateY(-2px); }
+        .user-card .user-actions .btn-view { background: #3b82f6; }
+        .user-card .user-actions .btn-view:hover { background: #2563eb; transform: translateY(-2px); }
+        .user-card .user-actions .btn-gift { background: #f59e0b; }
+        .user-card .user-actions .btn-gift:hover { background: #d97706; transform: translateY(-2px); }
 
-        .user-card .user-actions .btn-edit:hover {
-            background: #7c3aed;
-            transform: translateY(-2px);
-        }
-
-        .user-card .user-actions .btn-ban {
-            background: #ef4444;
-        }
-
-        .user-card .user-actions .btn-ban:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-        }
-
-        .user-card .user-actions .btn-unban {
-            background: #10b981;
-        }
-
-        .user-card .user-actions .btn-unban:hover {
-            background: #059669;
-            transform: translateY(-2px);
-        }
-
-        .user-card .user-actions .btn-view {
-            background: #3b82f6;
-        }
-
-        .user-card .user-actions .btn-view:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-        }
-
-        .user-card .user-actions .btn-gift {
-            background: #f59e0b;
-        }
-
-        .user-card .user-actions .btn-gift:hover {
-            background: #d97706;
-            transform: translateY(-2px);
-        }
-
-        /* ===== User Detail View ===== */
+        /* ===== USER DETAIL VIEW ===== */
         .user-detail-view {
             background: #0f172a;
             border-radius: 12px;
@@ -387,15 +337,8 @@
             gap: 5px;
         }
 
-        .user-detail-view .detail-row .label {
-            color: #888;
-            font-size: 0.85rem;
-        }
-
-        .user-detail-view .detail-row .value {
-            color: #fff;
-            font-weight: 500;
-        }
+        .user-detail-view .detail-row .label { color: #888; font-size: 0.85rem; }
+        .user-detail-view .detail-row .value { color: #fff; font-weight: 500; }
 
         .user-detail-view .detail-row .value .edit-input {
             background: #0f172a;
@@ -424,9 +367,7 @@
             margin-right: 5px;
         }
 
-        .user-detail-view .detail-row .value .save-btn:hover {
-            background: #059669;
-        }
+        .user-detail-view .detail-row .value .save-btn:hover { background: #059669; }
 
         .user-detail-view .gifts-list {
             margin-top: 15px;
@@ -452,20 +393,9 @@
             min-width: 150px;
         }
 
-        .user-detail-view .gifts-list .gift-item-admin .gift-info .sender {
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .user-detail-view .gifts-list .gift-item-admin .gift-info .sender-id {
-            color: #666;
-            font-size: 0.7rem;
-        }
-
-        .user-detail-view .gifts-list .gift-item-admin .gift-info .details {
-            color: #888;
-            font-size: 0.8rem;
-        }
+        .user-detail-view .gifts-list .gift-item-admin .gift-info .sender { color: #fff; font-weight: bold; }
+        .user-detail-view .gifts-list .gift-item-admin .gift-info .sender-id { color: #666; font-size: 0.7rem; }
+        .user-detail-view .gifts-list .gift-item-admin .gift-info .details { color: #888; font-size: 0.8rem; }
 
         .user-detail-view .gifts-list .gift-item-admin .gift-actions {
             display: flex;
@@ -482,13 +412,80 @@
             color: white;
         }
 
-        .user-detail-view .gifts-list .gift-item-admin .gift-actions .btn-delete-gift {
-            background: #ef4444;
+        .user-detail-view .gifts-list .gift-item-admin .gift-actions .btn-delete-gift { background: #ef4444; }
+        .user-detail-view .gifts-list .gift-item-admin .gift-actions .btn-delete-gift:hover { background: #dc2626; }
+
+        .user-detail-view .recent-visitors-list {
+            margin-top: 15px;
+            border-top: 1px solid #1e293b;
+            padding-top: 15px;
         }
 
-        .user-detail-view .gifts-list .gift-item-admin .gift-actions .btn-delete-gift:hover {
-            background: #dc2626;
+        .user-detail-view .recent-visitors-list .visitor-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255,255,255,0.03);
         }
+
+        .user-detail-view .recent-visitors-list .visitor-item .visitor-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .user-detail-view .recent-visitors-list .visitor-item .visitor-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-detail-view .recent-visitors-list .visitor-item .visitor-info {
+            flex: 1;
+        }
+
+        .user-detail-view .recent-visitors-list .visitor-item .visitor-info .visitor-name { color: #fff; font-weight: 500; }
+        .user-detail-view .recent-visitors-list .visitor-item .visitor-info .visitor-time { color: #666; font-size: 0.7rem; }
+
+        .user-detail-view .change-avatar-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
+
+        .user-detail-view .change-avatar-btn:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        .user-detail-view .close-detail-btn {
+            padding: 8px 16px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+
+        .user-detail-view .close-detail-btn:hover { background: #444; }
 
         .user-detail-view .posts-grid {
             display: grid;
@@ -530,38 +527,7 @@
             transform: scale(1.1);
         }
 
-        .user-detail-view .change-avatar-btn {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 6px 12px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: 0.3s;
-        }
-
-        .user-detail-view .change-avatar-btn:hover {
-            background: #7c3aed;
-            transform: translateY(-2px);
-        }
-
-        .user-detail-view .close-detail-btn {
-            padding: 8px 16px;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: 0.3s;
-        }
-
-        .user-detail-view .close-detail-btn:hover {
-            background: #444;
-        }
-
-        /* ===== Report Card ===== */
+        /* ===== REPORT CARD ===== */
         .report-card {
             background: #0f172a;
             border-radius: 12px;
@@ -583,38 +549,12 @@
             gap: 10px;
         }
 
-        .report-card .report-id {
-            color: #ffd700;
-            font-weight: bold;
-            font-family: monospace;
-        }
-
-        .report-card .report-status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        .report-card .report-status.pending {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .report-card .report-status.investigating {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .report-card .report-status.resolved {
-            background: #10b981;
-            color: white;
-        }
-
-        .report-card .report-status.closed {
-            background: #6b7280;
-            color: white;
-        }
+        .report-card .report-id { color: #ffd700; font-weight: bold; font-family: monospace; }
+        .report-card .report-status { padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .report-card .report-status.pending { background: #f59e0b; color: white; }
+        .report-card .report-status.investigating { background: #3b82f6; color: white; }
+        .report-card .report-status.resolved { background: #10b981; color: white; }
+        .report-card .report-status.closed { background: #6b7280; color: white; }
 
         .report-card .report-details {
             margin: 10px 0;
@@ -630,16 +570,8 @@
             flex-wrap: wrap;
         }
 
-        .report-card .report-details .detail-row .label {
-            color: #888;
-            font-size: 0.8rem;
-            min-width: 100px;
-        }
-
-        .report-card .report-details .detail-row .value {
-            color: #ddd;
-            font-size: 0.85rem;
-        }
+        .report-card .report-details .detail-row .label { color: #888; font-size: 0.8rem; min-width: 100px; }
+        .report-card .report-details .detail-row .value { color: #ddd; font-size: 0.85rem; }
 
         .report-card .report-actions {
             display: flex;
@@ -659,39 +591,16 @@
             color: white;
         }
 
-        .report-card .report-actions .btn-investigate {
-            background: #3b82f6;
-        }
+        .report-card .report-actions .btn-investigate { background: #3b82f6; }
+        .report-card .report-actions .btn-investigate:hover { background: #2563eb; }
+        .report-card .report-actions .btn-resolve { background: #10b981; }
+        .report-card .report-actions .btn-resolve:hover { background: #059669; }
+        .report-card .report-actions .btn-close { background: #6b7280; }
+        .report-card .report-actions .btn-close:hover { background: #4b5563; }
+        .report-card .report-actions .btn-delete { background: #ef4444; }
+        .report-card .report-actions .btn-delete:hover { background: #dc2626; }
 
-        .report-card .report-actions .btn-investigate:hover {
-            background: #2563eb;
-        }
-
-        .report-card .report-actions .btn-resolve {
-            background: #10b981;
-        }
-
-        .report-card .report-actions .btn-resolve:hover {
-            background: #059669;
-        }
-
-        .report-card .report-actions .btn-close {
-            background: #6b7280;
-        }
-
-        .report-card .report-actions .btn-close:hover {
-            background: #4b5563;
-        }
-
-        .report-card .report-actions .btn-delete {
-            background: #ef4444;
-        }
-
-        .report-card .report-actions .btn-delete:hover {
-            background: #dc2626;
-        }
-
-        /* ===== Cancelled Gift Card ===== */
+        /* ===== CANCELLED GIFT CARD ===== */
         .cancelled-gift-card {
             background: #0f172a;
             border-radius: 12px;
@@ -712,25 +621,11 @@
             gap: 8px;
         }
 
-        .cancelled-gift-card .gift-info .gift-sender {
-            color: #fff;
-            font-weight: bold;
-        }
+        .cancelled-gift-card .gift-info .gift-sender { color: #fff; font-weight: bold; }
+        .cancelled-gift-card .gift-info .gift-receiver { color: #60a5fa; }
+        .cancelled-gift-card .gift-info .gift-value { color: #f59e0b; font-weight: bold; }
 
-        .cancelled-gift-card .gift-info .gift-receiver {
-            color: #60a5fa;
-        }
-
-        .cancelled-gift-card .gift-info .gift-value {
-            color: #f59e0b;
-            font-weight: bold;
-        }
-
-        .cancelled-gift-card .gift-details {
-            color: #888;
-            font-size: 0.8rem;
-            margin-top: 5px;
-        }
+        .cancelled-gift-card .gift-details { color: #888; font-size: 0.8rem; margin-top: 5px; }
 
         .cancelled-gift-card .cancellation-reason {
             margin-top: 8px;
@@ -742,7 +637,7 @@
             font-size: 0.85rem;
         }
 
-        /* ===== Modals ===== */
+        /* ===== MODALS ===== */
         .modal {
             display: none;
             position: fixed;
@@ -758,9 +653,7 @@
             backdrop-filter: blur(8px);
         }
 
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
 
         .modal-content {
             background: #1a1a2e;
@@ -830,39 +723,16 @@
             color: white;
         }
 
-        .modal-actions .btn-confirm {
-            background: #8b5cf6;
-        }
+        .modal-actions .btn-confirm { background: #8b5cf6; }
+        .modal-actions .btn-confirm:hover { background: #7c3aed; }
+        .modal-actions .btn-confirm-danger { background: #ef4444; }
+        .modal-actions .btn-confirm-danger:hover { background: #dc2626; }
+        .modal-actions .btn-confirm-success { background: #10b981; }
+        .modal-actions .btn-confirm-success:hover { background: #059669; }
+        .modal-actions .btn-cancel { background: #333; }
+        .modal-actions .btn-cancel:hover { background: #444; }
 
-        .modal-actions .btn-confirm:hover {
-            background: #7c3aed;
-        }
-
-        .modal-actions .btn-confirm-danger {
-            background: #ef4444;
-        }
-
-        .modal-actions .btn-confirm-danger:hover {
-            background: #dc2626;
-        }
-
-        .modal-actions .btn-confirm-success {
-            background: #10b981;
-        }
-
-        .modal-actions .btn-confirm-success:hover {
-            background: #059669;
-        }
-
-        .modal-actions .btn-cancel {
-            background: #333;
-        }
-
-        .modal-actions .btn-cancel:hover {
-            background: #444;
-        }
-
-        /* ===== Empty State ===== */
+        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -875,7 +745,7 @@
             margin-bottom: 15px;
         }
 
-        /* ===== Toast ===== */
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             top: 20px;
@@ -899,11 +769,42 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* ===== Responsive ===== */
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stats-grid .stat-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 1px solid #1e293b;
+            text-align: center;
+        }
+
+        .stats-grid .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stats-grid .stat-card .stat-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .stats-grid .stat-card .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .admin-header h1 {
-                font-size: 1.2rem;
-            }
+            .admin-header h1 { font-size: 1.2rem; }
 
             .admin-tabs {
                 width: 100%;
@@ -916,9 +817,7 @@
                 padding: 8px 12px;
             }
 
-            .admin-header .header-actions {
-                width: 100%;
-            }
+            .admin-header .header-actions { width: 100%; }
 
             .admin-header .back-btn {
                 flex: 1;
@@ -928,18 +827,10 @@
                 padding: 8px 12px;
             }
 
-            .search-section .search-row {
-                flex-direction: column;
-            }
+            .search-section .search-row { flex-direction: column; }
+            .search-section input { min-width: unset; }
 
-            .search-section input {
-                min-width: unset;
-            }
-
-            .user-card .user-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            .user-card .user-header { flex-direction: column; align-items: flex-start; }
 
             .user-card .user-actions {
                 flex-direction: column;
@@ -951,18 +842,14 @@
                 text-align: center;
             }
 
-            .modal-content {
-                padding: 20px;
-            }
+            .modal-content { padding: 20px; }
 
             .user-detail-view .detail-row {
                 flex-direction: column;
                 align-items: flex-start;
             }
 
-            .user-detail-view .detail-row .value .edit-input {
-                max-width: 100%;
-            }
+            .user-detail-view .detail-row .value .edit-input { max-width: 100%; }
 
             .user-detail-view .gifts-list .gift-item-admin {
                 flex-direction: column;
@@ -987,6 +874,16 @@
             .cancelled-gift-card .gift-info {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1018,6 +915,30 @@
                 <a href="index.html" class="back-btn home">
                     <i class="fas fa-home"></i> الرئيسية
                 </a>
+            </div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">إجمالي المستخدمين</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-number" id="totalReports">0</div>
+                <div class="stat-label">إجمالي البلاغات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎁</div>
+                <div class="stat-number" id="totalGifts">0</div>
+                <div class="stat-label">إجمالي الهدايا الملغاة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👁️</div>
+                <div class="stat-number" id="totalVisits">0</div>
+                <div class="stat-label">إجمالي الزيارات</div>
             </div>
         </div>
 
@@ -1168,7 +1089,7 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG - SAME AS backup.html AND chat.html
+        // 🔥 FIREBASE CONFIG
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -1186,6 +1107,9 @@
         let selectedGiftIndex = null;
         let currentResults = [];
 
+        // ============================================================
+        // 🔥 INIT FIREBASE
+        // ============================================================
         try {
             if (firebase.apps.length > 0) {
                 firebase.app().delete();
@@ -1196,6 +1120,47 @@
             console.log('✅ Firebase connected to stvipclub');
         } catch (error) {
             console.error('❌ Firebase error:', error);
+        }
+
+        // ============================================================
+        // 📊 UPDATE STATS
+        // ============================================================
+        async function updateStats() {
+            try {
+                // Total Users
+                const usersSnapshot = await database.ref('users').once('value');
+                const totalUsers = usersSnapshot.exists() ? Object.keys(usersSnapshot.val()).length : 0;
+                document.getElementById('totalUsers').textContent = totalUsers;
+
+                // Total Reports (from admin_notifications)
+                const reportsSnapshot = await database.ref('admin_notifications').once('value');
+                let totalReports = 0;
+                if (reportsSnapshot.exists()) {
+                    const data = reportsSnapshot.val();
+                    for (const key in data) {
+                        if (data[key].type === 'user_report') totalReports++;
+                    }
+                }
+                document.getElementById('totalReports').textContent = totalReports;
+
+                // Total Cancelled Gifts
+                const cancelledSnapshot = await database.ref('cancelled_gifts').once('value');
+                const totalCancelled = cancelledSnapshot.exists() ? Object.keys(cancelledSnapshot.val()).length : 0;
+                document.getElementById('totalGifts').textContent = totalCancelled;
+
+                // Total Visits (sum of all user visits)
+                let totalVisits = 0;
+                if (usersSnapshot.exists()) {
+                    const users = usersSnapshot.val();
+                    for (const key in users) {
+                        totalVisits += users[key].visits || 0;
+                    }
+                }
+                document.getElementById('totalVisits').textContent = totalVisits;
+
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
         }
 
         // ============================================================
@@ -1273,6 +1238,9 @@
                 }
 
                 currentResults = results;
+
+                // تحديث الإحصائيات
+                await updateStats();
 
                 if (results.length === 0) {
                     container.innerHTML = `
@@ -1361,6 +1329,9 @@
 
                 const gifts = user.giftsList || [];
                 const totalGifts = gifts.reduce((sum, g) => sum + (g.value || 0), 0);
+                
+                // Recent visitors
+                const recentVisitors = user.recentVisitors || [];
 
                 const detailDiv = document.getElementById('detail_' + userId);
                 detailDiv.innerHTML = `
@@ -1426,7 +1397,7 @@
                             <span class="value" style="color:#60a5fa;">
                                 <span id="edit_usd_${userId}">${user.balanceUSD || 0}</span>
                                 <input class="edit-input" id="edit_usd_input_${userId}" value="${user.balanceUSD || 0}" style="display:none;">
-                                <button class="save-btn" onclick="editField('${userId}', 'balanceUSD', 'edit_usd_${userId}', 'edit_usd_input_${userId}')">تعديل</button>
+                                <button class="save-btn" onclick="editField('${userId}', 'balanceUSD', 'edit_egp_${userId}', 'edit_usd_input_${userId}')">تعديل</button>
                             </span>
                         </div>
                         <div class="detail-row">
@@ -1439,6 +1410,24 @@
                                 <span class="value" style="color:#ef4444;">${user.banReason}</span>
                             </div>
                         ` : ''}
+
+                        <!-- Recent Visitors -->
+                        <div class="recent-visitors-list">
+                            <h4 style="color:#60a5fa; margin-bottom:10px;">👁️ آخر الزوار (${recentVisitors.length})</h4>
+                            ${recentVisitors.length === 0 ? '<div style="color:#666; text-align:center;">لا يوجد زوار</div>' : 
+                                recentVisitors.slice(-10).reverse().map(visitor => `
+                                    <div class="visitor-item">
+                                        <div class="visitor-avatar">
+                                            ${visitor.avatar ? `<img src="${visitor.avatar}" alt="">` : visitor.name ? visitor.name.charAt(0).toUpperCase() : '👤'}
+                                        </div>
+                                        <div class="visitor-info">
+                                            <div class="visitor-name">${visitor.name || 'غير معروف'}</div>
+                                            <div class="visitor-time">🆔 ${visitor.numericId || '---'} | 📅 ${visitor.time || '---'}</div>
+                                        </div>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
 
                         <!-- سجل الهدايا -->
                         <div class="gifts-list">
@@ -1863,13 +1852,13 @@
         }
 
         // ============================================================
-        // 📋 LOAD REPORTS
+        // 📋 LOAD REPORTS (من admin_notifications)
         // ============================================================
         async function loadReports() {
             const container = document.getElementById('reportsContainer');
 
             try {
-                const snapshot = await database.ref('reports').once('value');
+                const snapshot = await database.ref('admin_notifications').once('value');
 
                 if (!snapshot.exists()) {
                     container.innerHTML = `
@@ -1882,14 +1871,34 @@
                 }
 
                 const data = snapshot.val();
-                const reports = Object.entries(data).map(([key, value]) => ({ id: key, ...value })).reverse();
+                const reports = Object.entries(data)
+                    .filter(([key, value]) => value.type === 'user_report')
+                    .map(([key, value]) => ({ id: key, ...value }))
+                    .reverse();
 
-                container.innerHTML = reports.map(report => `
+                if (reports.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-flag"></i>
+                            <p>لا توجد بلاغات</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = reports.map(report => {
+                    // تحديد الحالة من البيانات أو تعيين افتراضي
+                    const status = report.status || 'قيد المراجعة';
+                    const statusClass = status === 'قيد المراجعة' ? 'pending' : 
+                                       status === 'قيد التحقيق' ? 'investigating' : 
+                                       status === 'تم الحل' ? 'resolved' : 'closed';
+                    
+                    return `
                     <div class="report-card">
                         <div class="report-header">
                             <span class="report-id">📋 بلاغ #${report.id.slice(0, 8)}</span>
-                            <span class="report-status ${report.status === 'قيد المراجعة' ? 'pending' : report.status === 'قيد التحقيق' ? 'investigating' : report.status === 'تم الحل' ? 'resolved' : 'closed'}">
-                                ${report.status || 'قيد المراجعة'}
+                            <span class="report-status ${statusClass}">
+                                ${status}
                             </span>
                         </div>
                         <div class="report-details">
@@ -1898,8 +1907,12 @@
                                 <span class="value">${report.reporterName || 'غير معروف'} (🆔 ${report.reporterId || '---'})</span>
                             </div>
                             <div class="detail-row">
+                                <span class="label">👤 المبلغ عنه:</span>
+                                <span class="value">${report.reportedUserName || 'غير معروف'} (🆔 ${report.reportedUserId || '---'})</span>
+                            </div>
+                            <div class="detail-row">
                                 <span class="label">📌 النوع:</span>
-                                <span class="value">${report.type || 'غير محدد'}</span>
+                                <span class="value">${report.reportType || 'غير محدد'}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">📝 الوصف:</span>
@@ -1907,7 +1920,7 @@
                             </div>
                             <div class="detail-row">
                                 <span class="label">📅 التاريخ:</span>
-                                <span class="value">${report.reportedAt ? new Date(report.reportedAt).toLocaleString('ar-EG') : '---'}</span>
+                                <span class="value">${report.date || new Date(report.timestamp).toLocaleString('ar-EG') || '---'}</span>
                             </div>
                         </div>
                         <div class="report-actions">
@@ -1925,7 +1938,10 @@
                             </button>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
+
+                // تحديث إحصائيات البلاغات
+                document.getElementById('totalReports').textContent = reports.length;
 
             } catch (error) {
                 console.error('Error loading reports:', error);
@@ -1939,11 +1955,11 @@
         }
 
         // ============================================================
-        // 📝 UPDATE REPORT STATUS
+        // 📝 UPDATE REPORT STATUS (في admin_notifications)
         // ============================================================
         async function updateReportStatus(reportId, status) {
             try {
-                await database.ref('reports/' + reportId).update({
+                await database.ref('admin_notifications/' + reportId).update({
                     status: status,
                     updatedAt: new Date().toISOString()
                 });
@@ -1962,7 +1978,7 @@
             if (!confirm('⚠️ هل أنت متأكد من حذف هذا البلاغ نهائياً؟')) return;
 
             try {
-                await database.ref('reports/' + reportId).remove();
+                await database.ref('admin_notifications/' + reportId).remove();
                 showToast('✅ تم حذف البلاغ', 'success');
                 loadReports();
             } catch (error) {
@@ -1991,28 +2007,31 @@
                 }
 
                 const data = snapshot.val();
-                const gifts = Object.values(data).reverse();
+                const gifts = Object.entries(data).map(([key, value]) => ({ id: key, ...value })).reverse();
 
                 container.innerHTML = gifts.map(g => `
                     <div class="cancelled-gift-card">
                         <div class="gift-info">
                             <div>
-                                <span class="gift-sender">${g.gift.senderName || 'غير معروف'}</span>
+                                <span class="gift-sender">${g.gift?.senderName || 'غير معروف'}</span>
                                 <span style="color:#666; font-size:0.8rem;">→</span>
                                 <span class="gift-receiver">${g.userName || 'مستخدم'}</span>
                                 <span style="color:#666; font-size:0.7rem;">🆔 ${g.userNumericId || '---'}</span>
                             </div>
-                            <span class="gift-value">💰 ${g.gift.value || 0}</span>
+                            <span class="gift-value">💰 ${g.gift?.value || 0}</span>
                         </div>
                         <div class="gift-details">
                             📅 الإلغاء: ${g.cancelledDate || new Date().toLocaleString('ar-EG')}
-                            ${g.gift.reason ? ` | 📝 سبب الإرسال: ${g.gift.reason}` : ''}
+                            ${g.gift?.reason ? ` | 📝 سبب الإرسال: ${g.gift.reason}` : ''}
                         </div>
                         <div class="cancellation-reason">
                             ❌ سبب الإلغاء: ${g.cancellationReason || 'غير محدد'}
                         </div>
                     </div>
                 `).join('');
+
+                // تحديث إحصائيات الهدايا الملغاة
+                document.getElementById('totalGifts').textContent = gifts.length;
 
             } catch (error) {
                 console.error('Error loading cancelled gifts:', error);
@@ -2067,7 +2086,6 @@
         // 🔔 TOAST
         // ============================================================
         function showToast(message, type = 'info') {
-            // Remove existing toasts
             document.querySelectorAll('.toast').forEach(t => t.remove());
             
             const toast = document.createElement('div');
@@ -2088,9 +2106,22 @@
         // ============================================================
         window.onload = function() {
             console.log('🛡️ Admin Panel loaded - Connected to stvipclub');
+            updateStats();
             adminSearch();
             loadReports();
             loadCancelledGifts();
+
+            // تحديث تلقائي كل 30 ثانية
+            setInterval(() => {
+                updateStats();
+                // فقط إذا كان التاب المفتوح هو البلاغات
+                if (document.getElementById('tabReportsContent').classList.contains('active')) {
+                    loadReports();
+                }
+                if (document.getElementById('tabCancelledContent').classList.contains('active')) {
+                    loadCancelledGifts();
+                }
+            }, 30000);
         };
     </script>
 </body>
