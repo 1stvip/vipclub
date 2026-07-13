@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images//videoslogo/vip.png">
+    <title>إعدادات الحساب - VipClub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --success: #10b981;
+            --danger: #ef4444; 
+            --dark: #1e293b; 
+            --bg: #f1f5f9; 
+            --light-red: #ff5f5f; 
+        }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--dark); 
+            padding-bottom: 50px; 
+            direction: rtl; 
+        }
+        
+        .header { 
+            background: #fff; 
+            padding: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
+        
+        .back-btn { 
+            text-decoration: none; 
+            color: var(--dark); 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+        }
+        
+        .container { 
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 0 15px; 
+        }
+
+        .settings-card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        }
+        
+        .card-title { 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            color: var(--primary); 
+        }
+
+        .form-group { 
+            margin-bottom: 18px; 
+            text-align: right; 
+        }
+        
+        label { 
+            display: block; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            color: #475569; 
+        }
+        
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-family: inherit; 
+            font-size: 0.9rem; 
+            text-align: right; 
+        }
+        
+        textarea { 
+            resize: vertical; 
+            min-height: 80px; 
+        }
+        
+        input:disabled { 
+            background: #f8f9fa; 
+            color: #94a3b8; 
+            cursor: not-allowed; 
+            border: 1px dashed #cbd5e1; 
+        }
+        
+        .row { 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+        }
+        
+        .row .form-group { 
+            flex: 1; 
+            min-width: 140px; 
+        }
+
+        .helper-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .helper-text-red {
+            font-size: 0.85rem;
+            color: var(--light-red);
+            font-weight: 600;
+        }
+
+        .info-icon {
+            color: var(--light-red);
+            cursor: pointer;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        .info-icon:hover::after {
+            content: "وفقاً لسياسة الموقع يحق لكل مستخدم تغيير اسمه المستعار مرة واحدة فقط كل 3 شهور (90 يوم)";
+            position: absolute;
+            bottom: 125%;
+            right: 50%;
+            transform: translateX(50%);
+            background: #334155;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            white-space: normal;
+            width: 220px;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin-top: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            text-decoration: none; 
+            box-sizing: border-box; 
+        }
+        
+        .btn-save { 
+            background: var(--primary); 
+            color: white; 
+        }
+        
+        .btn-chat { 
+            background: #1e293b; 
+            color: white; 
+            margin-top: 40px; 
+        }
+        
+        .btn-delete { 
+            background: #fee2e2; 
+            color: var(--danger); 
+            margin-top: 10px; 
+            border: 1px solid #fecaca; 
+        }
+
+        #customAlert { 
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            padding: 15px 30px; 
+            border-radius: 12px; 
+            color: white; 
+            display: none; 
+            z-index: 9999; 
+            font-weight: bold; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            animation: slideIn 0.3s ease-out; 
+        }
+        
+        @keyframes slideIn { 
+            from { top: -50px; opacity: 0; } 
+            to { top: 20px; opacity: 1; } 
+        }
+
+        .join-date-box {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 10px;
+            border-right: 4px solid var(--success);
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .balance-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .balance-value {
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+<body>
+
+<div id="customAlert"></div>
+
+<div class="header">
+    <a href="home.html" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+    <h2 style="margin:0; font-size: 1.2rem;">إعدادات الحساب</h2>
+</div>
+
+<div class="container">
+    <!-- عرض الأرصدة -->
+    <div class="balance-display">
+        <div class="balance-item">
+            <span><i class="fas fa-money-bill-wave"></i> الرصيد (EGP)</span>
+            <span class="balance-value" id="balanceEGP">0.00</span>
+        </div>
+        <div class="balance-item">
+            <span><i class="fas fa-dollar-sign"></i> الرصيد (USD)</span>
+            <span class="balance-value" id="balanceUSD">0.00</span>
+        </div>
+    </div>
+
+    <div class="settings-card">
+        <div class="card-title"><i class="fas fa-user-shield"></i> الأمان والبيانات الشخصية</div>
+        
+        <div class="join-date-box">
+            <i class="fas fa-calendar-alt"></i> عضو منذ: <span id="display_join_date" style="font-weight: bold; color: var(--dark);">---</span>
+        </div>
+
+        <div class="form-group">
+            <label>معرف المستخدم</label>
+            <input type="text" id="user_id" disabled>
+        </div>
+
+        <div class="form-group">
+            <label>اسم المستخدم</label>
+            <input type="text" id="username" disabled>
+        </div>
+
+        <div class="form-group">
+            <label>الاسم المستعار (Nickname)</label>
+            <input type="text" id="edit_nickname" placeholder="أدخل اسمك المستعار الجديد">
+            <div class="helper-container">
+                <span id="nickname_hint" class="helper-text-red">يسمح بالتغيير مرة كل 90 يوم.</span>
+                <div class="info-icon"><i class="fas fa-question-circle"></i></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label>البريد الإلكتروني الأساسي</label>
+                <input type="email" id="edit_email">
+            </div>
+            <div class="form-group">
+                <label>بريد إلكتروني إضافي</label>
+                <input type="email" id="edit_email2">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label>رقم الهاتف الأساسي</label>
+                <input type="text" id="edit_phone">
+            </div>
+            <div class="form-group">
+                <label>رقم هاتف إضافي</label>
+                <input type="text" id="edit_phone2">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label>الجنس</label>
+                <select id="edit_gender">
+                    <option value="">تحديد...</option>
+                    <option value="ذكر">ذكر</option>
+                    <option value="أنثى">أنثى</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>العمر</label>
+                <input type="number" id="edit_age">
+            </div>
+            <div class="form-group">
+                <label>الدولة / المنطقة</label>
+                <input type="text" id="edit_country">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>نبذة مختصرة عنك</label>
+            <textarea id="edit_bio"></textarea>
+        </div>
+
+        <button class="btn btn-save" onclick="saveSettings()">
+            <i class="fas fa-save"></i> حفظ التعديلات
+        </button>
+    </div>
+
+    <a href="chatwithadmin2.html" class="btn btn-chat">
+        <i class="fas fa-headset"></i> الدعم الفني والمحادثة المباشرة
+    </a>
+
+    <button class="btn btn-delete" onclick="deleteAccount()">
+        <i class="fas fa-user-slash"></i> حذف الحساب نهائياً
+    </button>
+</div>
+
+<script>
+// 🔥 إعدادات Firebase - مشروع stvipclub الجديد
+const firebaseConfig = {
+    apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+    authDomain: "stvipclub.firebaseapp.com",
+    databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+    projectId: "stvipclub",
+    storageBucket: "stvipclub.firebasestorage.app",
+    messagingSenderId: "526607326044",
+    appId: "1:526607326044:web:6af53db123ae02c7193f99",
+    measurementId: "G-QZQMQCH9N9"
+};
+
+// تهيئة Firebase
+let database;
+let currentUser = null;
+let userFirebaseKey = null;
+
+// تهيئة Firebase - محسنة للتأكد من عدم وجود نسخة قديمة
+async function initializeFirebase() {
+    try {
+        // حذف أي نسخة قديمة من Firebase
+        if (firebase.apps.length > 0) {
+            console.log('🔄 جاري حذف Firebase القديم...');
+            await firebase.app().delete();
+        }
+        
+        // تهيئة Firebase من جديد بالمشروع الصحيح
+        firebase.initializeApp(firebaseConfig);
+        database = firebase.database();
+        
+        console.log("✅ Firebase initialized in settings with project:", firebaseConfig.projectId);
+        
+        // اختبار الاتصال بكتابة بسيطة
+        await database.ref('connection_test').set({
+            timestamp: new Date().toISOString(),
+            message: 'اتصال ناجح من صفحة الإعدادات'
+        });
+        
+        // تحميل بيانات المستخدم
+        await loadUserData();
+        
+    } catch (error) {
+        console.error("❌ Firebase error:", error);
+        showMsg("خطأ في الاتصال بقاعدة البيانات", "error");
+    }
+}
+
+// دالة لعرض الرسائل
+function showMsg(text, type) {
+    let alertBox = document.getElementById('customAlert');
+    alertBox.innerText = text;
+    alertBox.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
+    alertBox.style.display = 'block';
+    setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+}
+
+// تحميل بيانات المستخدم من Firebase - مصححة
+async function loadUserData() {
+    try {
+        // جلب المستخدم من localStorage (يجب أن يكون مسجلاً من صفحة الدخول)
+        const sessionUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!sessionUser) {
+            window.location.replace('Login.html');
+            return;
+        }
+
+        // 🔧 التصحيح: نستخدم numericId مباشرة من sessionUser
+        const numericId = sessionUser.numericId || sessionUser.id;
+        
+        if (!numericId) {
+            showMsg("بيانات الجلسة غير صالحة، يرجى تسجيل الدخول مرة أخرى", "error");
+            setTimeout(() => window.location.replace('Login.html'), 2000);
+            return;
+        }
+
+        console.log("🔍 جارٍ البحث عن مستخدم برقم ID:", numericId);
+        
+        // البحث عن المستخدم في Firebase باستخدام numericId
+        const snapshot = await database.ref('users').orderByChild('numericId').equalTo(parseInt(numericId)).once('value');
+        
+        if (!snapshot.exists()) {
+            console.warn("⚠️ لم يتم العثور على المستخدم باستخدام numericId:", numericId);
+            
+            // محاولة البحث باستخدام firebaseKey إذا كان موجوداً
+            if (sessionUser.firebaseKey) {
+                console.log("🔄 جاري المحاولة باستخدام firebaseKey:", sessionUser.firebaseKey);
+                const userSnapshot = await database.ref('users/' + sessionUser.firebaseKey).once('value');
+                if (userSnapshot.exists()) {
+                    currentUser = userSnapshot.val();
+                    userFirebaseKey = sessionUser.firebaseKey;
+                    console.log("✅ تم العثور على المستخدم باستخدام firebaseKey");
+                } else {
+                    showMsg("لم يتم العثور على حسابك في قاعدة البيانات", "error");
+                    setTimeout(() => window.location.replace('Login.html'), 3000);
+                    return;
+                }
+            } else {
+                showMsg("لم يتم العثور على حسابك في قاعدة البيانات", "error");
+                setTimeout(() => window.location.replace('Login.html'), 3000);
+                return;
+            }
+        } else {
+            // المستخدم موجود بالبحث التقليدي
+            const usersData = snapshot.val();
+            
+            // الحصول على بيانات المستخدم والمفتاح
+            for (const key in usersData) {
+                currentUser = usersData[key];
+                userFirebaseKey = key;
+                break;
+            }
+
+            if (!currentUser) {
+                showMsg("بيانات المستخدم غير موجودة", "error");
+                return;
+            }
+        }
+
+        // 🔧 تأكد من أن currentUser تم تعيينه
+        if (!currentUser) {
+            showMsg("فشل تحميل بيانات المستخدم", "error");
+            return;
+        }
+        
+        // تعبئة البيانات في الحقول
+        document.getElementById('user_id').value = currentUser.numericId || numericId || "غير متوفر";
+        document.getElementById('username').value = currentUser.username || sessionUser.username || "غير معروف";
+        document.getElementById('edit_nickname').value = currentUser.nickname || currentUser.username || "";
+        document.getElementById('edit_email').value = currentUser.email || "";
+        document.getElementById('edit_email2').value = currentUser.email2 || "";
+        document.getElementById('edit_phone').value = currentUser.phone || "";
+        document.getElementById('edit_phone2').value = currentUser.phone2 || "";
+        document.getElementById('edit_gender').value = currentUser.gender || "";
+        document.getElementById('edit_age').value = currentUser.age || "";
+        document.getElementById('edit_country').value = currentUser.country || "";
+        document.getElementById('edit_bio').value = currentUser.bio || "";
+        
+        // 🔧 معالجة الأرصدة بشكل آمن
+        const balanceEGP = parseFloat(currentUser.balanceEGP) || 0;
+        const balanceUSD = parseFloat(currentUser.balanceUSD) || 0;
+        document.getElementById('balanceEGP').textContent = balanceEGP.toFixed(2);
+        document.getElementById('balanceUSD').textContent = balanceUSD.toFixed(2);
+
+        // عرض تاريخ إنشاء الحساب
+        if(currentUser.createdAt) {
+            const date = new Date(currentUser.createdAt);
+            document.getElementById('display_join_date').innerText = date.toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } else {
+            document.getElementById('display_join_date').innerText = "تاريخ غير مسجل";
+        }
+
+        // فحص صلاحية تغيير الاسم (90 يوم)
+        if (currentUser.lastNicknameChange) {
+            let daysPassed = (Date.now() - new Date(currentUser.lastNicknameChange).getTime()) / (1000 * 60 * 60 * 24);
+            if (daysPassed < 90) {
+                document.getElementById('edit_nickname').disabled = true;
+                document.getElementById('nickname_hint').innerText = `باقي ${Math.ceil(90 - daysPassed)} يوم لتغيير الاسم.`;
+            } else {
+                document.getElementById('nickname_hint').innerText = "يمكنك تغيير اسمك الآن.";
+                document.getElementById('nickname_hint').style.color = "var(--success)";
+            }
+        }
+
+        // 🔧 تحديث بيانات المستخدم في localStorage لتكون متوافقة
+        const updatedSessionUser = {
+            id: currentUser.numericId, // 🔴 مهم: نحفظ numericId في id
+            numericId: currentUser.numericId,
+            username: currentUser.username,
+            nickname: currentUser.nickname,
+            email: currentUser.email,
+            phone: currentUser.phone,
+            firebaseKey: userFirebaseKey,
+            balanceEGP: currentUser.balanceEGP || 0,
+            balanceUSD: currentUser.balanceUSD || 0,
+            isBanned: currentUser.isBanned || false,
+            createdAt: currentUser.createdAt || new Date().toISOString()
+        };
+        
+        localStorage.setItem('currentUser', JSON.stringify(updatedSessionUser));
+
+        // تفعيل تحديثات الأرصدة في الوقت الحقيقي
+        listenForBalanceUpdates();
+
+    } catch (error) {
+        console.error("❌ Error loading user data:", error);
+        showMsg("خطأ في تحميل البيانات: " + error.message, "error");
+        
+        // 🔧 إعادة التوجيه إلى صفحة الدخول في حالة وجود خطأ
+        setTimeout(() => {
+            window.location.replace('Login.html');
+        }, 3000);
+    }
+}
+
+// حفظ التعديلات في Firebase
+async function saveSettings() {
+    if (!currentUser || !userFirebaseKey) {
+        showMsg("لم يتم تحميل بيانات المستخدم", "error");
+        return;
+    }
+
+    const newNickname = document.getElementById('edit_nickname').value.trim();
+    const newEmail = document.getElementById('edit_email').value.trim();
+    const newPhone = document.getElementById('edit_phone').value.trim();
+
+    if (!newNickname || !newEmail || !newPhone) {
+        showMsg("الحقول الأساسية مطلوبة", "error");
+        return;
+    }
+
+    try {
+        // التحقق من تكرار الاسم المستعار
+        if (newNickname.toLowerCase() !== (currentUser.nickname || currentUser.username || "").toLowerCase()) {
+            const nicknameSnapshot = await database.ref('users').orderByChild('nickname').equalTo(newNickname).once('value');
+            if (nicknameSnapshot.exists()) {
+                // التحقق أن الاسم ليس لنفس المستخدم
+                let isSameUser = false;
+                nicknameSnapshot.forEach((childSnapshot) => {
+                    if (childSnapshot.key !== userFirebaseKey) {
+                        isSameUser = true;
+                    }
+                });
+                if (isSameUser) {
+                    showMsg("هذا الاسم المستعار مستخدم بالفعل!", "error");
+                    return;
+                }
+            }
+        }
+
+        // التحقق من تكرار البريد الإلكتروني
+        if (newEmail !== currentUser.email) {
+            const emailSnapshot = await database.ref('users').orderByChild('email').equalTo(newEmail).once('value');
+            if (emailSnapshot.exists()) {
+                let isSameUser = false;
+                emailSnapshot.forEach((childSnapshot) => {
+                    if (childSnapshot.key !== userFirebaseKey) {
+                        isSameUser = true;
+                    }
+                });
+                if (isSameUser) {
+                    showMsg("هذا البريد الإلكتروني مسجل لحساب آخر!", "error");
+                    return;
+                }
+            }
+        }
+
+        // التحقق من تكرار رقم الهاتف
+        if (newPhone !== currentUser.phone) {
+            const phoneSnapshot = await database.ref('users').orderByChild('phone').equalTo(newPhone).once('value');
+            if (phoneSnapshot.exists()) {
+                let isSameUser = false;
+                phoneSnapshot.forEach((childSnapshot) => {
+                    if (childSnapshot.key !== userFirebaseKey) {
+                        isSameUser = true;
+                    }
+                });
+                if (isSameUser) {
+                    showMsg("هذا الرقم مستخدم بالفعل!", "error");
+                    return;
+                }
+            }
+        }
+
+        // تحضير البيانات للتحديث
+        const updates = {
+            nickname: newNickname,
+            email: newEmail,
+            email2: document.getElementById('edit_email2').value.trim(),
+            phone: newPhone,
+            phone2: document.getElementById('edit_phone2').value.trim(),
+            gender: document.getElementById('edit_gender').value,
+            age: document.getElementById('edit_age').value,
+            country: document.getElementById('edit_country').value,
+            bio: document.getElementById('edit_bio').value,
+            updatedAt: new Date().toISOString()
+        };
+
+        // إذا تم تغيير الاسم المستعار، تحديث تاريخ التغيير
+        if (newNickname !== (currentUser.nickname || currentUser.username)) {
+            updates.lastNicknameChange = new Date().toISOString();
+        }
+
+        // تحديث البيانات في Firebase
+        await database.ref('users/' + userFirebaseKey).update(updates);
+
+        // تحديث البيانات المحلية
+        currentUser = { ...currentUser, ...updates };
+        
+        // 🔧 تحديث localStorage بشكل متوافق
+        const sessionUser = JSON.parse(localStorage.getItem('currentUser'));
+        sessionUser.nickname = newNickname;
+        sessionUser.email = newEmail;
+        sessionUser.phone = newPhone;
+        sessionUser.numericId = currentUser.numericId || sessionUser.numericId;
+        localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+
+        showMsg("تم تحديث بياناتك بنجاح", "success");
+        
+        // إعادة تحميل البيانات بعد ثانية
+        setTimeout(() => {
+            loadUserData();
+        }, 1000);
+
+    } catch (error) {
+        console.error("❌ Error saving settings:", error);
+        showMsg("خطأ في حفظ البيانات: " + error.message, "error");
+    }
+}
+
+// حذف الحساب
+async function deleteAccount() {
+    if (!confirm("هل أنت متأكد من حذف الحساب نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.")) {
+        return;
+    }
+
+    const password = prompt("أدخل كلمة المرور للتأكيد:");
+    if (!password) return;
+
+    try {
+        // التحقق من كلمة المرور
+        if (password !== currentUser.password) {
+            alert("كلمة المرور خاطئة");
+            return;
+        }
+
+        // نقل الحساب إلى جدول المحذوفين المؤقتين
+        await database.ref('deleted_users').push({
+            ...currentUser,
+            deletedAt: new Date().toISOString(),
+            deletedBy: 'user',
+            deletedFrom: 'settings_page',
+            reason: 'حذف من قبل المستخدم'
+        });
+
+        // حذف الحساب من المستخدمين النشطين
+        await database.ref('users/' + userFirebaseKey).remove();
+
+        // مسح بيانات المستخدم من localStorage
+        localStorage.removeItem('currentUser');
+        
+        showMsg("تم حذف حسابك بنجاح", "success");
+        
+        // الانتقال إلى صفحة الدخول بعد ثانيتين
+        setTimeout(() => {
+            window.location.replace('Login.html');
+        }, 2000);
+
+    } catch (error) {
+        console.error("❌ Error deleting account:", error);
+        showMsg("خطأ في حذف الحساب: " + error.message, "error");
+    }
+}
+
+// التهيئة عند تحميل الصفحة
+window.onload = function() {
+    initializeFirebase();
+};
+
+// الاستماع لتحديثات الأرصدة في الوقت الحقيقي
+function listenForBalanceUpdates() {
+    if (!database || !userFirebaseKey) return;
+    
+    database.ref('users/' + userFirebaseKey + '/balanceEGP').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const value = parseFloat(snapshot.val()) || 0;
+            document.getElementById('balanceEGP').textContent = value.toFixed(2);
+        }
+    });
+    
+    database.ref('users/' + userFirebaseKey + '/balanceUSD').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const value = parseFloat(snapshot.val()) || 0;
+            document.getElementById('balanceUSD').textContent = value.toFixed(2);
+        }
+    });
+}
+
+// 🔧 دالة مساعدة للتحقق من القيم
+function validateUserData(data) {
+    if (!data) return false;
+    
+    // التحقق من وجود الحقول الأساسية
+    if (!data.username || !data.email) {
+        console.warn("⚠️ Missing required fields in user data");
+        return false;
+    }
+    
+    return true;
+}
+
+// 🔧 إضافة وظيفة للتعامل مع الأخطاء بشكل عام
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('Global error:', msg, 'at', url, ':', lineNo);
+    return false;
+};
+</script>
+
+</body>
+
+</html>
+
