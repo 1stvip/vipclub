@@ -138,7 +138,7 @@
         /* ===== USERS GRID ===== */
         .users-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
@@ -184,7 +184,7 @@
         /* ===== STATS ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -195,12 +195,12 @@
             border: 1px solid rgba(255,255,255,0.06);
             text-align: center;
         }
-        .stat-card .stat-number { font-size: 2rem; font-weight: bold; color: #ffd700; }
-        .stat-card .stat-label { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+        .stat-card .stat-number { font-size: 1.8rem; font-weight: bold; color: #ffd700; }
+        .stat-card .stat-label { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
 
         /* ===== LOGS TABLE ===== */
         .logs-container {
-            max-height: 550px;
+            max-height: 600px;
             overflow-y: auto;
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.05);
@@ -212,12 +212,12 @@
         .logs-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 700px;
+            font-size: 0.8rem;
+            min-width: 800px;
         }
         .logs-table th {
             background: rgba(255,255,255,0.05);
-            padding: 12px 10px;
+            padding: 10px 8px;
             text-align: center;
             border-bottom: 2px solid #334155;
             color: #ffd700;
@@ -227,10 +227,11 @@
             backdrop-filter: blur(10px);
         }
         .logs-table td {
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.03);
             color: #cbd5e1;
+            vertical-align: middle;
         }
         .logs-table tr:hover td { background: rgba(255,255,255,0.02); }
         .logs-table .status-active { color: #10b981; }
@@ -239,13 +240,39 @@
         .logs-table .badge-type {
             padding: 2px 10px;
             border-radius: 12px;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: bold;
+            display: inline-block;
         }
         .logs-table .badge-frame { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
         .logs-table .badge-chat { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         .logs-table .badge-vip { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
         .logs-table .badge-gift { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .logs-table .badge-purchase { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .logs-table .user-avatar-small {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+        }
+        .logs-table .user-avatar-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logs-table .user-avatar-small .placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+            font-weight: bold;
+        }
 
         /* ===== GIFT MODAL ===== */
         .modal-overlay {
@@ -257,7 +284,7 @@
 
         .modal {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 480px; max-width: 95%; max-height: 90vh; overflow-y: auto;
+            width: 520px; max-width: 95%; max-height: 90vh; overflow-y: auto;
             z-index: 10001; padding: 25px;
             display: none; flex-direction: column;
             background: #1e293b; border-radius: 28px;
@@ -277,6 +304,18 @@
             font-size: 0.9rem;
         }
         .modal .form-group select option { background: #1a1a2e; }
+        
+        .modal .duration-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .modal .duration-group input {
+            flex: 2;
+        }
+        .modal .duration-group select {
+            flex: 1;
+        }
 
         .modal .action-btn {
             width: 100%; padding: 12px; border-radius: 14px;
@@ -289,6 +328,43 @@
         .modal .btn-success:hover { background: #059669; transform: translateY(-2px); }
         .modal .btn-secondary { background: #1e293b; color: white; border: 1px solid #334155; }
         .modal .btn-secondary:hover { background: #334155; transform: translateY(-2px); }
+
+        /* ===== VIEW USER ITEMS MODAL ===== */
+        .items-modal .items-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .items-modal .items-grid .item-category {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .items-modal .items-grid .item-category h4 {
+            color: #ffd700;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .items-modal .items-grid .item-category .item-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .items-modal .items-grid .item-category .item-entry .item-name {
+            color: #fff;
+        }
+        .items-modal .items-grid .item-category .item-entry .item-status {
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+        .items-modal .items-grid .item-category .item-entry .item-status.active { color: #10b981; }
+        .items-modal .items-grid .item-category .item-entry .item-status.expired { color: #ef4444; }
+        .items-modal .items-grid .item-category .item-entry .item-status.owned { color: #ffd700; }
 
         /* ===== TOAST ===== */
         .toast {
@@ -319,8 +395,9 @@
             .users-grid { grid-template-columns: 1fr 1fr; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .modal { width: 95%; }
-            .logs-table { font-size: 0.7rem; min-width: 500px; }
-            .logs-table th, .logs-table td { padding: 6px 4px; }
+            .logs-table { font-size: 0.65rem; min-width: 600px; }
+            .logs-table th, .logs-table td { padding: 4px 3px; }
+            .items-modal .items-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
             .users-grid { grid-template-columns: 1fr; }
@@ -328,7 +405,8 @@
             .header .logo { font-size: 1.2rem; }
             .tabs .tab-btn { padding: 8px 12px; font-size: 0.75rem; }
             .search-box input { min-width: 120px; }
-            .logs-table { font-size: 0.6rem; min-width: 400px; }
+            .logs-table { font-size: 0.55rem; min-width: 500px; }
+            .modal .duration-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -357,7 +435,7 @@
                 <i class="fas fa-users"></i> المستخدمين
             </button>
             <button class="tab-btn" onclick="switchTab('logs')" id="tabLogs">
-                <i class="fas fa-history"></i> سجل شامل
+                <i class="fas fa-history"></i> السجل الشامل
             </button>
             <button class="tab-btn" onclick="switchTab('stats')" id="tabStats">
                 <i class="fas fa-chart-bar"></i> إحصائيات
@@ -373,22 +451,22 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="statFrames">0</div>
-                    <div class="stat-label">🖼️ أطارات المقاعد المشتراة</div>
+                    <div class="stat-label">🖼️ أطارات مشتراة</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="statChatStyles">0</div>
-                    <div class="stat-label">✍️ أشكال الكتابة المشتراة</div>
+                    <div class="stat-label">✍️ أشكال كتابة مشتراة</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="statVIP">0</div>
-                    <div class="stat-label">👑 دخلات VIP مفعلة</div>
+                    <div class="stat-label">👑 VIP مفعل</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="statGifts">0</div>
                     <div class="stat-label">🎁 أطارات مهداة</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="statTotalPurchases">0</div>
+                    <div class="stat-number" id="statPurchases">0</div>
                     <div class="stat-label">💰 إجمالي المشتريات</div>
                 </div>
             </div>
@@ -452,8 +530,15 @@
         </div>
         
         <div class="form-group">
-            <label>⏱️ مدة التفعيل (أيام):</label>
-            <input type="number" id="giftDuration" value="30" min="1" max="365">
+            <label>⏱️ مدة التفعيل:</label>
+            <div class="duration-group">
+                <input type="number" id="giftDuration" value="30" min="1" max="365" step="1">
+                <select id="giftDurationUnit">
+                    <option value="minutes">دقائق</option>
+                    <option value="hours">ساعات</option>
+                    <option value="days" selected>أيام</option>
+                </select>
+            </div>
         </div>
         
         <div class="form-group">
@@ -465,6 +550,27 @@
             <i class="fas fa-gift"></i> تأكيد الإهداء
         </button>
         <button class="action-btn btn-secondary" onclick="closeModal()">إلغاء</button>
+    </div>
+
+    <!-- ===== VIEW USER ITEMS MODAL ===== -->
+    <div id="viewItemsModal" class="modal items-modal">
+        <h3>📦 مقتنيات المستخدم</h3>
+        <p style="font-size:0.85rem;">مقتنيات <span id="viewUserName" style="color:#ffd700;">---</span></p>
+        <div class="items-grid" id="itemsGrid">
+            <div class="item-category">
+                <h4>🖼️ أطارات المقاعد</h4>
+                <div id="itemsFrames">لا توجد أطارات</div>
+            </div>
+            <div class="item-category">
+                <h4>✍️ أشكال الكتابة</h4>
+                <div id="itemsChatStyles">لا توجد أشكال</div>
+            </div>
+            <div class="item-category" style="grid-column:1/-1;">
+                <h4>👑 دخلات VIP</h4>
+                <div id="itemsVIP">لا توجد دخلات VIP</div>
+            </div>
+        </div>
+        <button class="action-btn btn-secondary" onclick="closeViewItemsModal()">إغلاق</button>
     </div>
 
     <script>
@@ -483,13 +589,16 @@
         };
 
         // ============================================================
-        // 📋 DATA DEFINITIONS - مطابقة مع vipsystem.html
+        // 📋 DATA DEFINITIONS - الأطارات الجديدة مضافة
         // ============================================================
         const FRAMES = [
-            { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, isSpecial: true },
-            { id: 'frame2', name: 'إطار فاخر 2', price: 50 },
-            { id: 'frame3', name: 'إطار فاخر 3', price: 100 },
-            { id: 'frame4', name: 'إطار فاخر 4', price: 150 }
+            { id: 'frame1', name: '🎁 إطار خاص (هدية)', price: 0, isSpecial: true },
+            { id: 'frame2', name: '⚔️ إطار المحارب', price: 50 },
+            { id: 'frame3', name: '👑 إطار VIP', price: 100 },
+            { id: 'frame4', name: '👸 إطار الملكة', price: 150 },
+            // ===== الأطارات الجديدة =====
+            { id: 'frame5', name: '👑 إطار الملك', price: 200 },
+            { id: 'frame6', name: '⭐ إطار النخبة', price: 250 }
         ];
 
         const CHAT_STYLES = [
@@ -596,7 +705,7 @@
                                 <i class="fas fa-gift"></i> إهداء
                             </button>
                             <button class="btn-gift" style="background: linear-gradient(135deg, #3b82f6, #2563eb);" onclick="viewUserItems('${user.numericId}')">
-                                <i class="fas fa-eye"></i> عرض
+                                <i class="fas fa-eye"></i> عرض المقتنيات
                             </button>
                         </div>
                     </div>
@@ -629,6 +738,112 @@
         }
 
         // ============================================================
+        // 👁️ VIEW USER ITEMS - عرض مفصل ومقتنيات الشخص
+        // ============================================================
+        async function viewUserItems(userId) {
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+                
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+                const user = userData[userKey];
+                
+                document.getElementById('viewUserName').textContent = user.nickname || user.username || 'مستخدم';
+                
+                // عرض الأطارات
+                const framesDiv = document.getElementById('itemsFrames');
+                const frames = user.frames || {};
+                const activeFrame = user.activeFrame || null;
+                
+                if (Object.keys(frames).length === 0) {
+                    framesDiv.innerHTML = '<div style="color:#666; text-align:center; padding:5px;">❌ لا توجد أطارات</div>';
+                } else {
+                    framesDiv.innerHTML = Object.keys(frames).map(id => {
+                        const frame = frames[id];
+                        const name = FRAMES.find(f => f.id == id)?.name || id;
+                        const isActive = id === activeFrame;
+                        const isExpired = frame.expiresAt && new Date(frame.expiresAt) < new Date();
+                        let status = isActive ? '✅ مفعل' : isExpired ? '⏳ منتهي' : '📦 مملوك';
+                        let statusClass = isActive ? 'active' : isExpired ? 'expired' : 'owned';
+                        const expiry = frame.expiresAt ? new Date(frame.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد';
+                        return `
+                            <div class="item-entry">
+                                <span class="item-name">${name}</span>
+                                <span class="item-status ${statusClass}">${status} (${expiry})</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                // عرض أشكال الكتابة
+                const chatDiv = document.getElementById('itemsChatStyles');
+                const chatStyles = user.chatStyles || {};
+                const activeChat = user.activeChatStyle || null;
+                
+                if (Object.keys(chatStyles).length === 0) {
+                    chatDiv.innerHTML = '<div style="color:#666; text-align:center; padding:5px;">❌ لا توجد أشكال كتابة</div>';
+                } else {
+                    chatDiv.innerHTML = Object.keys(chatStyles).map(id => {
+                        const style = chatStyles[id];
+                        const name = CHAT_STYLES.find(s => s.id == id)?.name || id;
+                        const isActive = id === activeChat;
+                        const isExpired = style.expiresAt && new Date(style.expiresAt) < new Date();
+                        let status = isActive ? '✅ مفعل' : isExpired ? '⏳ منتهي' : '📦 مملوك';
+                        let statusClass = isActive ? 'active' : isExpired ? 'expired' : 'owned';
+                        const expiry = style.expiresAt ? new Date(style.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد';
+                        return `
+                            <div class="item-entry">
+                                <span class="item-name">${name}</span>
+                                <span class="item-status ${statusClass}">${status} (${expiry})</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                // عرض VIP
+                const vipDiv = document.getElementById('itemsVIP');
+                const vip = user.vip || {};
+                
+                if (!vip.active) {
+                    vipDiv.innerHTML = '<div style="color:#666; text-align:center; padding:5px;">❌ لا توجد دخلات VIP</div>';
+                } else {
+                    const vipName = VIP_LEVELS.find(v => v.id == vip.active)?.name || `VIP ${vip.active}`;
+                    const isExpired = vip.expiresAt && new Date(vip.expiresAt) < new Date();
+                    const expiry = vip.expiresAt ? new Date(vip.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد';
+                    const isGifted = vip.giftedBy === 'admin';
+                    vipDiv.innerHTML = `
+                        <div class="item-entry">
+                            <span class="item-name">${vipName} ${isGifted ? '🎁' : ''}</span>
+                            <span class="item-status ${isExpired ? 'expired' : 'active'}">
+                                ${isExpired ? '⏳ منتهي' : '✅ مفعل'} (${expiry})
+                            </span>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('viewItemsModal').classList.add('active');
+                document.getElementById('viewItemsModal').style.display = 'flex';
+                document.getElementById('screenOverlay').classList.add('active');
+                
+            } catch(e) {
+                console.error('Error viewing user items:', e);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        function closeViewItemsModal() {
+            document.getElementById('viewItemsModal').classList.remove('active');
+            document.getElementById('viewItemsModal').style.display = 'none';
+            document.getElementById('screenOverlay').classList.remove('active');
+        }
+
+        // ============================================================
         // 🎁 GIFT MODAL
         // ============================================================
         function openGiftModal(userId, userName) {
@@ -637,6 +852,7 @@
             
             updateGiftOptions();
             document.getElementById('giftDuration').value = 30;
+            document.getElementById('giftDurationUnit').value = 'days';
             document.getElementById('giftNote').value = '';
             
             document.getElementById('giftModal').classList.add('active');
@@ -686,7 +902,8 @@
             
             const type = document.getElementById('giftTypeSelect').value;
             const itemId = document.getElementById('giftItemSelect').value;
-            const duration = parseInt(document.getElementById('giftDuration').value) || 30;
+            const durationValue = parseFloat(document.getElementById('giftDuration').value) || 1;
+            const durationUnit = document.getElementById('giftDurationUnit').value;
             const note = document.getElementById('giftNote').value.trim() || 'هدية من الإدارة';
             
             if (!itemId) {
@@ -694,8 +911,23 @@
                 return;
             }
             
-            if (duration < 1 || duration > 365) {
-                showToast('⚠️ المدة بين 1 و 365 يوم', 'warning');
+            // تحويل المدة إلى أيام للتخزين
+            let durationDays = durationValue;
+            if (durationUnit === 'minutes') {
+                durationDays = durationValue / (24 * 60);
+            } else if (durationUnit === 'hours') {
+                durationDays = durationValue / 24;
+            }
+            // إذا كانت أيام تبقى كما هي
+            
+            if (durationDays < 0.001 || durationDays > 365) {
+                showToast('⚠️ المدة بين دقيقة و 365 يوم', 'warning');
+                return;
+            }
+            
+            // عرض رسالة تأكيد مع المدة المختارة
+            const unitLabel = durationUnit === 'minutes' ? 'دقائق' : durationUnit === 'hours' ? 'ساعات' : 'أيام';
+            if (!confirm(`تأكيد إهداء "${document.getElementById('giftItemSelect').selectedOptions[0]?.text}" لـ ${giftTargetUser.name} لمدة ${durationValue} ${unitLabel}؟`)) {
                 return;
             }
             
@@ -714,7 +946,16 @@
                 
                 const now = new Date();
                 const expiresAt = new Date(now);
-                expiresAt.setDate(expiresAt.getDate() + duration);
+                // إضافة المدة بالميلي ثانية
+                let durationMs = durationValue;
+                if (durationUnit === 'minutes') {
+                    durationMs = durationValue * 60 * 1000;
+                } else if (durationUnit === 'hours') {
+                    durationMs = durationValue * 60 * 60 * 1000;
+                } else {
+                    durationMs = durationValue * 24 * 60 * 60 * 1000;
+                }
+                expiresAt.setTime(expiresAt.getTime() + durationMs);
                 
                 let itemName = '';
                 let updateData = {};
@@ -730,7 +971,8 @@
                         expiresAt: expiresAt.toISOString(),
                         giftedBy: 'admin',
                         note: note,
-                        duration: duration
+                        duration: durationValue,
+                        durationUnit: durationUnit
                     };
                     updateData.frames = frames;
                     updateData.activeFrame = itemId;
@@ -745,7 +987,8 @@
                         expiresAt: expiresAt.toISOString(),
                         giftedBy: 'admin',
                         note: note,
-                        duration: duration
+                        duration: durationValue,
+                        durationUnit: durationUnit
                     };
                     updateData.chatStyles = chatStyles;
                     updateData.activeChatStyle = itemId;
@@ -759,7 +1002,8 @@
                         activatedAt: now.toISOString(),
                         giftedBy: 'admin',
                         note: note,
-                        duration: duration,
+                        duration: durationValue,
+                        durationUnit: durationUnit,
                         amount: vip?.price || 0
                     };
                     updateData.vip = vipData;
@@ -775,7 +1019,8 @@
                     type: logType,
                     itemId: itemId,
                     itemName: itemName,
-                    duration: duration,
+                    duration: durationValue,
+                    durationUnit: durationUnit,
                     note: note,
                     startDate: now.toISOString(),
                     expiryDate: expiresAt.toISOString(),
@@ -786,7 +1031,7 @@
                 // إشعار للمستخدم
                 const notification = {
                     id: Date.now(),
-                    text: `🎁 تم إهداؤك ${itemName} من الإدارة! مدة ${duration} يوم.${note ? ` (${note})` : ''}`,
+                    text: `🎁 تم إهداؤك ${itemName} من الإدارة! مدة ${durationValue} ${durationUnit === 'minutes' ? 'دقيقة' : durationUnit === 'hours' ? 'ساعة' : 'يوم'}${durationValue > 1 ? 's' : ''}.${note ? ` (${note})` : ''}`,
                     read: false,
                     date: new Date().toLocaleString('ar-EG'),
                     type: 'gift_received',
@@ -794,7 +1039,7 @@
                 };
                 await database.ref('users/' + userKey + '/notifications').push(notification);
                 
-                showToast(`✅ تم الإهداء بنجاح لـ ${giftTargetUser.name}`, 'success');
+                showToast(`✅ تم الإهداء بنجاح لـ ${giftTargetUser.name} (${durationValue} ${durationUnit === 'minutes' ? 'دقيقة' : durationUnit === 'hours' ? 'ساعة' : 'يوم'})`, 'success');
                 closeModal();
                 await loadAllData();
                 
@@ -805,78 +1050,7 @@
         }
 
         // ============================================================
-        // 👁️ VIEW USER ITEMS
-        // ============================================================
-        async function viewUserItems(userId) {
-            try {
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(userId)).once('value');
-                
-                if (!snapshot.exists()) {
-                    showToast('❌ المستخدم غير موجود', 'error');
-                    return;
-                }
-                
-                const userData = snapshot.val();
-                const userKey = Object.keys(userData)[0];
-                const user = userData[userKey];
-                
-                let message = `📦 محتويات المستخدم ${user.nickname || user.username}:\n\n`;
-                
-                // الأطارات
-                const frames = user.frames || {};
-                const activeFrame = user.activeFrame || null;
-                message += `🖼️ أطارات المقاعد:\n`;
-                if (Object.keys(frames).length === 0) {
-                    message += `   ❌ لا يوجد\n`;
-                } else {
-                    for (const id in frames) {
-                        const frame = frames[id];
-                        const name = FRAMES.find(f => f.id == id)?.name || id;
-                        const isActive = id === activeFrame;
-                        const expires = frame.expiresAt ? new Date(frame.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد';
-                        message += `   ${isActive ? '✅' : '📦'} ${name}\n`;
-                        message += `      📅 ينتهي: ${expires}\n`;
-                    }
-                }
-                
-                // أشكال الكتابة
-                const chatStyles = user.chatStyles || {};
-                const activeChat = user.activeChatStyle || null;
-                message += `\n✍️ أشكال الكتابة:\n`;
-                if (Object.keys(chatStyles).length === 0) {
-                    message += `   ❌ لا يوجد\n`;
-                } else {
-                    for (const id in chatStyles) {
-                        const style = chatStyles[id];
-                        const name = CHAT_STYLES.find(s => s.id == id)?.name || id;
-                        const isActive = id === activeChat;
-                        const expires = style.expiresAt ? new Date(style.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد';
-                        message += `   ${isActive ? '✅' : '📦'} ${name}\n`;
-                        message += `      📅 ينتهي: ${expires}\n`;
-                    }
-                }
-                
-                // VIP
-                const vip = user.vip || {};
-                if (vip.active) {
-                    const vipName = VIP_LEVELS.find(v => v.id == vip.active)?.name || `VIP ${vip.active}`;
-                    const expires = vip.expiresAt ? new Date(vip.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد';
-                    message += `\n👑 الدخلة المميزة:\n`;
-                    message += `   ✅ ${vipName}\n`;
-                    message += `      📅 ينتهي: ${expires}\n`;
-                }
-                
-                alert(message);
-                
-            } catch(e) {
-                console.error('Error viewing user items:', e);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        // ============================================================
-        // 📊 LOAD LOGS
+        // 📊 LOAD LOGS - السجل الشامل للمشتريات من vipsystem.html
         // ============================================================
         async function loadLogs() {
             try {
@@ -913,16 +1087,18 @@
                 let typeLabel = '';
                 let typeClass = '';
                 let typeIcon = '';
+                const isGift = log.type?.includes('gift');
+                const isPurchase = log.type?.includes('purchase');
                 
-                if (log.type === 'frame_gift' || log.type === 'frame_purchase') {
+                if (log.type === 'frame_gift' || log.type === 'frame_purchase' || log.type === 'frame') {
                     typeLabel = '🖼️ إطار';
                     typeClass = 'badge-frame';
                     typeIcon = '🖼️';
-                } else if (log.type === 'chatstyle_gift' || log.type === 'chatstyle_purchase') {
+                } else if (log.type === 'chatstyle_gift' || log.type === 'chatstyle_purchase' || log.type === 'chatstyle') {
                     typeLabel = '✍️ كتابة';
                     typeClass = 'badge-chat';
                     typeIcon = '✍️';
-                } else if (log.type === 'vip_gift' || log.type === 'vip_purchase') {
+                } else if (log.type === 'vip_gift' || log.type === 'vip_purchase' || log.type === 'vip') {
                     typeLabel = '👑 VIP';
                     typeClass = 'badge-vip';
                     typeIcon = '👑';
@@ -932,21 +1108,29 @@
                     typeIcon = '🎁';
                 }
                 
-                const isGift = log.type?.includes('gift');
+                const durationLabel = log.durationUnit ? `${log.duration} ${log.durationUnit === 'minutes' ? 'دقيقة' : log.durationUnit === 'hours' ? 'ساعة' : 'يوم'}` : `${log.duration || '---'} يوم`;
+                const priceDisplay = log.price ? `${log.price} ج.م` : (isGift ? '🎁 هدية' : '---');
+                const statusLabel = isExpired ? '⏳ منتهي' : '✅ مفعل';
+                const statusClass = isExpired ? 'status-expired' : 'status-active';
                 
                 return `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${log.username || 'مستخدم'}</td>
+                        <td>
+                            ${log.username || 'مستخدم'}
+                            ${isGift ? ' 🎁' : ''}
+                            ${isPurchase ? ' 🛒' : ''}
+                        </td>
                         <td style="font-family:monospace;">${log.userId || '---'}</td>
                         <td><span class="badge-type ${typeClass}">${typeIcon} ${typeLabel}</span></td>
                         <td>${log.itemName || log.itemId || '---'}</td>
-                        <td>${isGift ? '🎁 هدية' : (log.duration ? log.duration + ' ج.م' : '---')}</td>
+                        <td>${priceDisplay}</td>
                         <td>${log.startDate ? new Date(log.startDate).toLocaleDateString('ar-EG') : '---'}</td>
                         <td>${log.expiryDate ? new Date(log.expiryDate).toLocaleDateString('ar-EG') : '---'}</td>
-                        <td class="${isExpired ? 'status-expired' : 'status-active'}">
-                            ${isExpired ? '⏳ منتهي' : '✅ مفعل'}
+                        <td class="${statusClass}">
+                            ${statusLabel}
                             ${isGift ? ' 🎁' : ''}
+                            ${isPurchase ? ' 🛒' : ''}
                         </td>
                     </tr>
                 `;
@@ -977,7 +1161,7 @@
                     if (user.vip && user.vip.active && new Date(user.vip.expiresAt) > new Date()) totalVIP++;
                 }
                 
-                // عدد الهدايا من السجل
+                // عدد الهدايا والمشتريات من السجل
                 const logsSnap = await database.ref('adminLogs').once('value');
                 const logs = logsSnap.val() || {};
                 for (const key in logs) {
@@ -990,7 +1174,7 @@
                 document.getElementById('statChatStyles').textContent = totalChatStyles;
                 document.getElementById('statVIP').textContent = totalVIP;
                 document.getElementById('statGifts').textContent = totalGifts;
-                document.getElementById('statTotalPurchases').textContent = totalPurchases;
+                document.getElementById('statPurchases').textContent = totalPurchases;
                 
             } catch(e) {
                 console.error('Error loading stats:', e);
@@ -1040,6 +1224,14 @@
         // ============================================================
         window.onload = function() {
             init();
+            
+            // تحديث تلقائي كل 30 ثانية
+            setInterval(() => {
+                loadStats();
+                if (document.getElementById('tabContentLogs').classList.contains('active')) {
+                    loadLogs();
+                }
+            }, 30000);
         };
     </script>
 </body>
