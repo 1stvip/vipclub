@@ -283,6 +283,16 @@
             color: #1a1a2e;
         }
 
+        .vip-card .vip-badge.king {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+        }
+
+        .vip-card .vip-badge.elite {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
+
         .vip-card .vip-video-container {
             width: 100%;
             border-radius: 16px;
@@ -874,12 +884,12 @@
         let currentFirebaseUserId = null;
 
         // ============================================================
-        // 📋 FRAMES & VIP DATA
+        // 📋 FRAMES & VIP DATA (تم إضافة الأطارات الجديدة)
         // ============================================================
         const FRAMES = [
             {
                 id: 'frame1',
-                name: 'إطار خاص (هدية)',
+                name: '🎁 إطار خاص (هدية)',
                 price: 0,
                 duration: 30,
                 embedUrl: 'images/vipsystem/manager.mp4',
@@ -890,7 +900,7 @@
             },
             {
                 id: 'frame2',
-                name: 'إطار فاخر 2',
+                name: '⚔️ إطار المحارب',
                 price: 50,
                 duration: 30,
                 embedUrl: 'images/vipsystem/warrior.mp4',
@@ -900,7 +910,7 @@
             },
             {
                 id: 'frame3',
-                name: 'إطار فاخر 3',
+                name: '👑 إطار VIP',
                 price: 100,
                 duration: 30,
                 embedUrl: 'images/vipsystem/vip.mp4',
@@ -910,13 +920,38 @@
             },
             {
                 id: 'frame4',
-                name: 'إطار فاخر 4',
+                name: '👸 إطار الملكة',
                 price: 150,
                 duration: 30,
                 embedUrl: 'images/vipsystem/queen.mp4',
                 height: 438,
                 isVideo: true,
                 isSpecial: false
+            },
+            // ===== الأطارات الجديدة =====
+            {
+                id: 'frame5',
+                name: '👑 إطار الملك',
+                price: 200,
+                duration: 45,
+                embedUrl: 'images/vipsystem/king.mp4',
+                height: 445,
+                isVideo: true,
+                isSpecial: false,
+                badgeClass: 'king',
+                badgeText: '👑 ملكي'
+            },
+            {
+                id: 'frame6',
+                name: '⭐ إطار النخبة',
+                price: 250,
+                duration: 45,
+                embedUrl: 'images/vipsystem/Elite.mp4',
+                height: 445,
+                isVideo: true,
+                isSpecial: false,
+                badgeClass: 'elite',
+                badgeText: '⭐ نخبة'
             }
         ];
 
@@ -1369,6 +1404,20 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
+                // ===== تسجيل العملية في سجل المشتريات =====
+                await logPurchaseToAdmin({
+                    type: 'vip',
+                    itemName: `VIP ${level} - ${vipConfig.title}`,
+                    itemId: `vip${level}`,
+                    price: useUSD ? costUSD : costEGP,
+                    currency: useUSD ? 'USD' : 'EGP',
+                    userId: user.numericId,
+                    userName: user.nickname || user.username,
+                    userFirebaseKey: currentFirebaseUserId,
+                    duration: vipConfig.duration,
+                    expiresAt: expiresAt.toISOString()
+                });
+
                 const notification = {
                     id: Date.now(),
                     text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
@@ -1464,7 +1513,7 @@
         }
 
         // ============================================================
-        // 🖼️ FRAMES SYSTEM
+        // 🖼️ FRAMES SYSTEM (مع الأطارات الجديدة)
         // ============================================================
         function renderFrames(user) {
             const grid = document.getElementById('framesGrid');
@@ -1499,6 +1548,20 @@
                 }
 
                 const canAfford = user ? (user.balanceEGP >= frame.price) : false;
+
+                // تحديد نوع البادج
+                let badgeClass = 'vip-badge';
+                let badgeText = '🖼️ إطار';
+                
+                if (frame.isSpecial) {
+                    badgeClass += ' special';
+                    badgeText = '🎁 خاص';
+                } else if (frame.badgeClass) {
+                    badgeClass += ' ' + frame.badgeClass;
+                    badgeText = frame.badgeText || '🖼️ إطار';
+                } else {
+                    badgeClass += ' owned';
+                }
 
                 let actionsHTML = '';
 
@@ -1557,7 +1620,7 @@
 
                 return `
                     <div class="vip-card">
-                        <span class="vip-badge ${frame.isSpecial ? 'special' : ''}">${frame.isSpecial ? '🎁 خاص' : '🖼️ إطار'}</span>
+                        <span class="${badgeClass}">${badgeText}</span>
                         <div class="vip-video-container">
                             ${previewHTML}
                             <div class="video-overlay">
@@ -1566,7 +1629,10 @@
                         </div>
                         <div class="vip-title">${frame.name}</div>
                         <div class="vip-description">
-                            ${frame.isSpecial ? '🎁 هذا الإطار خاص ولا يمكن شراؤه، يمكن فقط إهداؤه من الإدارة.' : 'إطار مميز للغرف الصوتية يعرض عند جلوسك على المقعد.'}
+                            ${frame.isSpecial ? '🎁 هذا الإطار خاص ولا يمكن شراؤه، يمكن فقط إهداؤه من الإدارة.' : 
+                            frame.id === 'frame5' ? '👑 إطار الملك - أظهر هيبتك ومكانتك كملك في الغرف الصوتية.' :
+                            frame.id === 'frame6' ? '⭐ إطار النخبة - انضم إلى نخبة المستخدمين المميزين.' :
+                            'إطار مميز للغرف الصوتية يعرض عند جلوسك على المقعد.'}
                         </div>
                         <div class="vip-requirements">
                             <div class="req-item">
@@ -1644,6 +1710,20 @@
 
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                // ===== تسجيل العملية في سجل المشتريات =====
+                await logPurchaseToAdmin({
+                    type: 'frame',
+                    itemName: name,
+                    itemId: frameId,
+                    price: price,
+                    currency: 'EGP',
+                    userId: user.numericId,
+                    userName: user.nickname || user.username,
+                    userFirebaseKey: currentFirebaseUserId,
+                    duration: 30,
+                    expiresAt: expiresAt.toISOString()
+                });
 
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
                 await ensureUserData();
@@ -1855,6 +1935,20 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
+                // ===== تسجيل العملية في سجل المشتريات =====
+                await logPurchaseToAdmin({
+                    type: 'chatstyle',
+                    itemName: name,
+                    itemId: styleId,
+                    price: price,
+                    currency: 'EGP',
+                    userId: user.numericId,
+                    userName: user.nickname || user.username,
+                    userFirebaseKey: currentFirebaseUserId,
+                    duration: 30,
+                    expiresAt: expiresAt.toISOString()
+                });
+
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
                 await ensureUserData();
 
@@ -1929,6 +2023,27 @@
             } catch (error) {
                 console.error('Error deactivating chat style:', error);
                 showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 📝 LOG PURCHASE TO ADMIN
+        // ============================================================
+        async function logPurchaseToAdmin(data) {
+            try {
+                if (!database) return;
+                
+                const purchaseLog = {
+                    ...data,
+                    purchaseDate: new Date().toISOString(),
+                    purchaseDateLocal: new Date().toLocaleString('ar-EG'),
+                    timestamp: new Date().getTime()
+                };
+
+                await database.ref('admin_purchases').push(purchaseLog);
+                console.log('✅ تم تسجيل العملية في سجل المشتريات:', purchaseLog);
+            } catch (error) {
+                console.error('❌ خطأ في تسجيل العملية:', error);
             }
         }
 
