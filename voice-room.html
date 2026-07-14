@@ -2683,7 +2683,6 @@ async function getUserFrameFromFirebase(userId) {
         const expiresAt = frameData.expiresAt ? new Date(frameData.expiresAt) : null;
         if (expiresAt && expiresAt < new Date()) return null;
         
-        // البحث في جميع الأطارات بما فيها الجديدة
         return FRAMES.find(f => f.id === activeFrame) || null;
     } catch(e) { console.error('Error getting user frame:', e); return null; }
 }
@@ -4183,6 +4182,20 @@ async function confirmSendGift() {
         });
         
         await database.ref('users/' + rKey + '/notifications').push({
+            // ===== إشعار للإدارة =====
+await database.ref('admin_notifications').push({
+    type: 'gift_received',
+    userId: receiverId,
+    userName: rUser.nickname || rUser.username,
+    senderId: user.numericId,
+    senderName: user.nickname || user.username,
+    giftName: selectedGift.name,
+    giftEmoji: selectedGift.emoji,
+    giftPrice: selectedGift.price,
+    timestamp: new Date().toISOString(),
+    date: new Date().toLocaleString('ar-EG'),
+    read: false
+});
             id: Date.now(),
             text: `🎁 تلقيت ${selectedGift.emoji} ${selectedGift.name} من ${user.nickname || user.username}! 💰 ${selectedGift.price} ج.م`,
             read: false,
