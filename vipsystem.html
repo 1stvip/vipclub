@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     
     <style>
+        /* نفس الستايلات السابقة - تم حذفها للاختصار، ستضع الستايلات كاملة */
         * {
             margin: 0;
             padding: 0;
@@ -32,7 +33,6 @@
             margin: 0 auto;
         }
 
-        /* ===== TABS ===== */
         .tabs {
             display: flex;
             gap: 10px;
@@ -73,7 +73,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== HEADER ===== */
         .header {
             display: flex;
             justify-content: space-between;
@@ -143,7 +142,6 @@
             box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
         }
 
-        /* ===== USER INFO ===== */
         .user-info {
             background: rgba(255,255,255,0.05);
             border-radius: 16px;
@@ -214,7 +212,6 @@
             color: #94a3b8;
         }
 
-        /* ===== VIP CARDS ===== */
         .vip-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -488,7 +485,6 @@
             background: #dc2626;
         }
 
-        /* ===== CHAT STYLES FRAMES ===== */
         .chatstyles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -660,7 +656,6 @@
             background: #dc2626;
         }
 
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             top: 20px;
@@ -685,7 +680,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .vip-grid { grid-template-columns: 1fr; }
             .chatstyles-grid { grid-template-columns: 1fr; }
@@ -866,7 +860,7 @@
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG - stvipclub (نفس قاعدة البيانات)
+        // 🔥 FIREBASE CONFIG - stvipclub
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -884,7 +878,7 @@
         let currentFirebaseUserId = null;
 
         // ============================================================
-        // 📋 FRAMES & VIP DATA (تم إضافة الأطارات الجديدة)
+        // 📋 FRAMES & VIP DATA
         // ============================================================
         const FRAMES = [
             {
@@ -928,7 +922,6 @@
                 isVideo: true,
                 isSpecial: false
             },
-            // ===== الأطارات الجديدة =====
             {
                 id: 'frame5',
                 name: '👑 إطار الملك',
@@ -1404,18 +1397,20 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
-                // ===== تسجيل العملية في سجل المشتريات =====
+                // ===== تسجيل العملية في سجل المشتريات (adminLogs) =====
                 await logPurchaseToAdmin({
-                    type: 'vip',
+                    type: 'vip_purchase',
                     itemName: `VIP ${level} - ${vipConfig.title}`,
                     itemId: `vip${level}`,
                     price: useUSD ? costUSD : costEGP,
                     currency: useUSD ? 'USD' : 'EGP',
                     userId: user.numericId,
-                    userName: user.nickname || user.username,
+                    username: user.nickname || user.username,
                     userFirebaseKey: currentFirebaseUserId,
                     duration: vipConfig.duration,
-                    expiresAt: expiresAt.toISOString()
+                    startDate: now.toISOString(),
+                    expiryDate: expiresAt.toISOString(),
+                    note: `شراء VIP ${level}`
                 });
 
                 const notification = {
@@ -1513,7 +1508,7 @@
         }
 
         // ============================================================
-        // 🖼️ FRAMES SYSTEM (مع الأطارات الجديدة)
+        // 🖼️ FRAMES SYSTEM
         // ============================================================
         function renderFrames(user) {
             const grid = document.getElementById('framesGrid');
@@ -1549,7 +1544,6 @@
 
                 const canAfford = user ? (user.balanceEGP >= frame.price) : false;
 
-                // تحديد نوع البادج
                 let badgeClass = 'vip-badge';
                 let badgeText = '🖼️ إطار';
                 
@@ -1711,18 +1705,20 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
-                // ===== تسجيل العملية في سجل المشتريات =====
+                // ===== تسجيل العملية في سجل المشتريات (adminLogs) =====
                 await logPurchaseToAdmin({
-                    type: 'frame',
+                    type: 'frame_purchase',
                     itemName: name,
                     itemId: frameId,
                     price: price,
                     currency: 'EGP',
                     userId: user.numericId,
-                    userName: user.nickname || user.username,
+                    username: user.nickname || user.username,
                     userFirebaseKey: currentFirebaseUserId,
                     duration: 30,
-                    expiresAt: expiresAt.toISOString()
+                    startDate: now.toISOString(),
+                    expiryDate: expiresAt.toISOString(),
+                    note: `شراء إطار ${name}`
                 });
 
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
@@ -1935,18 +1931,20 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
-                // ===== تسجيل العملية في سجل المشتريات =====
+                // ===== تسجيل العملية في سجل المشتريات (adminLogs) =====
                 await logPurchaseToAdmin({
-                    type: 'chatstyle',
+                    type: 'chatstyle_purchase',
                     itemName: name,
                     itemId: styleId,
                     price: price,
                     currency: 'EGP',
                     userId: user.numericId,
-                    userName: user.nickname || user.username,
+                    username: user.nickname || user.username,
                     userFirebaseKey: currentFirebaseUserId,
                     duration: 30,
-                    expiresAt: expiresAt.toISOString()
+                    startDate: now.toISOString(),
+                    expiryDate: expiresAt.toISOString(),
+                    note: `شراء أسلوب كتابة ${name}`
                 });
 
                 showToast(`✅ تم شراء "${name}" بنجاح!`, 'success');
@@ -2027,21 +2025,31 @@
         }
 
         // ============================================================
-        // 📝 LOG PURCHASE TO ADMIN
+        // 📝 LOG PURCHASE TO ADMIN (adminLogs)
         // ============================================================
         async function logPurchaseToAdmin(data) {
             try {
                 if (!database) return;
                 
                 const purchaseLog = {
-                    ...data,
-                    purchaseDate: new Date().toISOString(),
-                    purchaseDateLocal: new Date().toLocaleString('ar-EG'),
-                    timestamp: new Date().getTime()
+                    type: data.type || 'purchase',
+                    itemName: data.itemName || 'غير معروف',
+                    itemId: data.itemId || '---',
+                    price: data.price || 0,
+                    currency: data.currency || 'EGP',
+                    userId: data.userId || '---',
+                    username: data.username || 'مستخدم',
+                    userFirebaseKey: data.userFirebaseKey || '',
+                    duration: data.duration || 0,
+                    startDate: data.startDate || new Date().toISOString(),
+                    expiryDate: data.expiryDate || new Date().toISOString(),
+                    note: data.note || '',
+                    timestamp: new Date().toISOString(),
+                    timestampMs: new Date().getTime()
                 };
 
-                await database.ref('admin_purchases').push(purchaseLog);
-                console.log('✅ تم تسجيل العملية في سجل المشتريات:', purchaseLog);
+                await database.ref('adminLogs').push(purchaseLog);
+                console.log('✅ تم تسجيل العملية في adminLogs:', purchaseLog);
             } catch (error) {
                 console.error('❌ خطأ في تسجيل العملية:', error);
             }
