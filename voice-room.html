@@ -229,7 +229,7 @@
             flex-shrink: 0;
         }
 
-        /* ===== الإطار الفاخر ===== */
+        /* ===== الإطار الفاخر - بدون دائرة ذهبية ===== */
         .luxury-frame {
             position: absolute;
             top: 50%;
@@ -2514,16 +2514,13 @@ const firebaseConfig = {
 };
 
 // ============================================================
-// 📋 DATA - تم إضافة الأطارات الجديدة (frame5 و frame6)
+// 📋 DATA
 // ============================================================
 const FRAMES = [
     { id: 'frame1', name: 'إطار خاص (هدية)', price: 0, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true, isSpecial: true },
-    { id: 'frame2', name: '⚔️ إطار المحارب', price: 50, duration: 30, embedUrl: 'images/vipsystem/warrior.mp4', isVideo: true, isSpecial: false },
-    { id: 'frame3', name: '👑 إطار VIP', price: 100, duration: 30, embedUrl: 'images/vipsystem/vip.mp4', isVideo: true, isSpecial: false },
-    { id: 'frame4', name: '👸 إطار الملكة', price: 150, duration: 30, embedUrl: 'images/vipsystem/queen.mp4', isVideo: true, isSpecial: false },
-    // ===== الأطارات الجديدة =====
-    { id: 'frame5', name: '👑 إطار الملك', price: 200, duration: 45, embedUrl: 'images/vipsystem/king.mp4', isVideo: true, isSpecial: false },
-    { id: 'frame6', name: '⭐ إطار النخبة', price: 250, duration: 45, embedUrl: 'images/vipsystem/Elite.mp4', isVideo: true, isSpecial: false }
+    { id: 'frame2', name: 'إطار فاخر 2', price: 50, duration: 30, embedUrl: 'images/vipsystem/warrior.mp4', isVideo: true, isSpecial: false },
+    { id: 'frame3', name: 'إطار فاخر 3', price: 100, duration: 30, embedUrl: 'images/vipsystem/vip.mp4', isVideo: true, isSpecial: false },
+    { id: 'frame4', name: 'إطار فاخر 4', price: 150, duration: 30, embedUrl: 'images/vipsystem/queen.mp4', isVideo: true, isSpecial: false }
 ];
 
 const CHAT_STYLES = [
@@ -2661,7 +2658,7 @@ async function initializeFirebase() {
 }
 
 // ============================================================
-// 🖼️ GET USER FRAME - مع دعم الأطارات الجديدة
+// 🖼️ GET USER FRAME
 // ============================================================
 async function getUserFrameFromFirebase(userId) {
     try {
@@ -2940,7 +2937,7 @@ function skipVIPEntrance() {
 }
 
 // ============================================================
-// 💺 SEATS FUNCTIONS - مع دعم الأطارات الجديدة
+// 💺 SEATS FUNCTIONS
 // ============================================================
 async function renderSeats(seats) {
     const container = document.getElementById('seatsContainer');
@@ -3013,12 +3010,11 @@ async function renderSeats(seats) {
             
             const wrapperClass = hasFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
             
-            // ===== عرض الإطار مع دعم الأطارات الجديدة =====
             let frameHTML = '';
             if (hasFrame && frameConfig) {
                 frameHTML = `
                     <div class="luxury-frame active">
-                        ${frameConfig.isVideo ? `<video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; border-radius:50%;"><source src="${frameConfig.embedUrl}" type="video/mp4"></video>` : `<div class="fallback">${frameConfig.name}</div>`}
+                        ${frameConfig.isVideo ? `<video autoplay loop muted playsinline><source src="${frameConfig.embedUrl}" type="video/mp4"></video>` : `<div class="fallback">${frameConfig.name}</div>`}
                     </div>
                 `;
             } else {
@@ -3764,27 +3760,34 @@ function displayMessage(msg) {
     const styleImage = msg.styleImage || null;
     const styleName = msg.styleName || null;
     
+    // بناء خلفية الرسالة مع أسلوب الكتابة إن وجد
     let bgStyle = '';
     let overlayHTML = '';
     let badgeHTML = '';
     let extraClass = '';
     
+    // التحقق من وجود أسلوب كتابة للرسالة
     if (styleImage) {
         bgStyle = `background-image: url('${styleImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
         overlayHTML = `<div class="style-overlay"></div>`;
+        
+        // إضافة اسم الأسلوب كـ badge
         if (styleName) {
             badgeHTML = `<span class="style-badge">✨ ${styleName}</span>`;
         }
     }
     
+    // إذا كانت رسالة خاصة بي وأسلوب الكتابة مفعل
     if (isOwn && activeChatStyle && activeChatStyle.image && !styleImage) {
         bgStyle = `background-image: url('${activeChatStyle.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
         overlayHTML = `<div class="style-overlay"></div>`;
+        
         if (activeChatStyle.name) {
             badgeHTML = `<span class="style-badge">✨ ${activeChatStyle.name}</span>`;
         }
     }
     
+    // إذا لم يكن هناك أسلوب كتابة، استخدم الخلفية الافتراضية
     if (!bgStyle) {
         extraClass = 'no-style';
         if (isOwn) {
@@ -4182,20 +4185,6 @@ async function confirmSendGift() {
         });
         
         await database.ref('users/' + rKey + '/notifications').push({
-            // ===== إشعار للإدارة =====
-await database.ref('admin_notifications').push({
-    type: 'gift_received',
-    userId: receiverId,
-    userName: rUser.nickname || rUser.username,
-    senderId: user.numericId,
-    senderName: user.nickname || user.username,
-    giftName: selectedGift.name,
-    giftEmoji: selectedGift.emoji,
-    giftPrice: selectedGift.price,
-    timestamp: new Date().toISOString(),
-    date: new Date().toLocaleString('ar-EG'),
-    read: false
-});
             id: Date.now(),
             text: `🎁 تلقيت ${selectedGift.emoji} ${selectedGift.name} من ${user.nickname || user.username}! 💰 ${selectedGift.price} ج.م`,
             read: false,
