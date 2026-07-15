@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     
     <style>
+        /* نفس الستايلات السابقة - تم حذفها للاختصار، ستضع الستايلات كاملة */
         * {
             margin: 0;
             padding: 0;
@@ -249,24 +250,45 @@
             z-index: 2;
         }
 
-        .vip-card .vip-badge.vip1 { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .vip-card .vip-badge.vip2 { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .vip-card .vip-badge.vip3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
-        .vip-card .vip-badge.vip4 { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
-        .vip-card .vip-badge.vip5 { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-        .vip-card .vip-badge.vip6 { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; }
-        .vip-card .vip-badge.vip7 { background: linear-gradient(135deg, #f472b6, #ec4899); color: white; }
-        .vip-card .vip-badge.vip8 { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; }
-        .vip-card .vip-badge.vip9 { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; }
-        .vip-card .vip-badge.vip10 { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a1a2e; }
-        .vip-card .vip-badge.owned { background: #10b981; color: white; }
-        .vip-card .vip-badge.expired { background: #6b7280; color: white; }
-        .vip-card .vip-badge.active { background: #3b82f6; color: white; }
-        .vip-card .vip-badge.special { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; }
-        .vip-card .vip-badge.king { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
-        .vip-card .vip-badge.elite { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
-        .vip-card .vip-badge.legend { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a1a2e; }
-        .vip-card .vip-badge.support { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .vip-card .vip-badge.vip1 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .vip-card .vip-badge.vip2 {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .vip-card .vip-badge.owned {
+            background: #10b981;
+            color: white;
+        }
+
+        .vip-card .vip-badge.expired {
+            background: #6b7280;
+            color: white;
+        }
+
+        .vip-card .vip-badge.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .vip-card .vip-badge.special {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a1a2e;
+        }
+
+        .vip-card .vip-badge.king {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+        }
+
+        .vip-card .vip-badge.elite {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
 
         .vip-card .vip-video-container {
             width: 100%;
@@ -747,7 +769,77 @@
         <!-- VIP Tab -->
         <div class="tab-content active" id="tabContentVip">
             <div class="vip-grid" id="vipGrid">
-                <!-- سيتم إنشاء بطاقات VIP بواسطة JavaScript -->
+                <!-- VIP 1 Card -->
+                <div class="vip-card" id="vip1Card">
+                    <span class="vip-badge vip1" id="vip1Badge">VIP 1</span>
+                    <div class="vip-video-container">
+                        <video id="vip1Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/car.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="vip-title">🚗 VIP 1 - السيارة الرياضية</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض سيارة رياضية فاخرة عند دخولك الغرفة.
+                        تميز نفسك بأناقة وسرعة!
+                    </div>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip1Requirement">1000 ج.م أو 20 دولار</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">30 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip1Status">غير مفعل</span>
+                        </div>
+                    </div>
+                    <div class="vip-status-text" id="vip1StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions" id="vip1Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
+                    </div>
+                </div>
+
+                <!-- VIP 2 Card -->
+                <div class="vip-card" id="vip2Card">
+                    <span class="vip-badge vip2" id="vip2Badge">VIP 2</span>
+                    <div class="vip-video-container">
+                        <video id="vip2Video" autoplay loop muted playsinline>
+                            <source src="images/vipsystem/lion.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="vip-title">🦁 VIP 2 - هيبة الأسد</div>
+                    <div class="vip-description">
+                        دخلة مميزة للغرف الصوتية تعرض هيبة وقوة الأسد عند دخولك الغرفة.
+                        أظهر قوتك وهيبتك!
+                    </div>
+                    <div class="vip-requirements">
+                        <div class="req-item">
+                            <span class="req-label">💰 المطلوب للتفعيل</span>
+                            <span class="req-value" id="vip2Requirement">2500 ج.م</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">⏱️ مدة التفعيل</span>
+                            <span class="req-value">60 يوم</span>
+                        </div>
+                        <div class="req-item">
+                            <span class="req-label">📊 حالتك الحالية</span>
+                            <span class="req-value" id="vip2Status">غير مفعل</span>
+                        </div>
+                    </div>
+                    <div class="vip-status-text" id="vip2StatusText">🔒 غير متاح</div>
+                    <div class="vip-actions" id="vip2Actions">
+                        <!-- سيتم إنشاء الأزرار بواسطة JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -786,114 +878,7 @@
         let currentFirebaseUserId = null;
 
         // ============================================================
-        // 📋 VIP DATA - الأسعار والمدة الجديدة
-        // ============================================================
-        const VIP_CONFIG = {
-            1: {
-                level: 1,
-                name: 'VIP 1',
-                emoji: '🚗',
-                title: 'السيارة الرياضية',
-                video: 'images/vipsystem/car.mp4',
-                duration: 30,
-                price: 500,
-                frame: 'vip1.mp4'
-            },
-            2: {
-                level: 2,
-                name: 'VIP 2',
-                emoji: '🦁',
-                title: 'هيبة الأسد',
-                video: 'images/vipsystem/lion.mp4',
-                duration: 30,
-                price: 700,
-                frame: 'vip2.mp4'
-            },
-            3: {
-                level: 3,
-                name: 'VIP 3',
-                emoji: '👑',
-                title: 'التاج الملكي',
-                video: 'images/vipsystem/vip3.mp4',
-                duration: 45,
-                price: 1000,
-                frame: 'vip3.mp4'
-            },
-            4: {
-                level: 4,
-                name: 'VIP 4',
-                emoji: '💎',
-                title: 'الألماس',
-                video: 'images/vipsystem/vip4.mp4',
-                duration: 60,
-                price: 1300,
-                frame: 'vip4.mp4'
-            },
-            5: {
-                level: 5,
-                name: 'VIP 5',
-                emoji: '⭐',
-                title: 'النجمة الذهبية',
-                video: 'images/vipsystem/vip5.mp4',
-                duration: 90,
-                price: 1600,
-                frame: 'vip5.mp4'
-            },
-            6: {
-                level: 6,
-                name: 'VIP 6',
-                emoji: '🔥',
-                title: 'النار الذهبية',
-                video: 'images/vipsystem/vip6.mp4',
-                duration: 120,
-                price: 1900,
-                frame: 'vip6.mp4',
-                proFrame: 'vip6pro.mp4'
-            },
-            7: {
-                level: 7,
-                name: 'VIP 7',
-                emoji: '🌙',
-                title: 'القمر الذهبي',
-                video: 'images/vipsystem/vip7.mp4',
-                duration: 150,
-                price: 2200,
-                frame: 'vip7.mp4'
-            },
-            8: {
-                level: 8,
-                name: 'VIP 8',
-                emoji: '☀️',
-                title: 'الشمس الذهبية',
-                video: 'images/vipsystem/vip8.mp4',
-                duration: 180,
-                price: 2500,
-                frame: 'vip8.mp4'
-            },
-            9: {
-                level: 9,
-                name: 'VIP 9',
-                emoji: '🌌',
-                title: 'المجرة',
-                video: 'images/vipsystem/vip9.mp4',
-                duration: 200,
-                price: 2800,
-                frame: 'vip9.mp4'
-            },
-            10: {
-                level: 10,
-                name: 'VIP 10',
-                emoji: '👑',
-                title: 'ملك الملوك',
-                video: 'images/vipsystem/vip10.mp4',
-                duration: 365,
-                price: 3000,
-                frame: 'vip10.mp4'
-            }
-        };
-
-        // ============================================================
-        // 📋 FRAMES DATA
+        // 📋 FRAMES & VIP DATA
         // ============================================================
         const FRAMES = [
             {
@@ -902,9 +887,10 @@
                 price: 0,
                 duration: 30,
                 embedUrl: 'images/vipsystem/manager.mp4',
+                height: 405,
                 isVideo: true,
                 isSpecial: true,
-                specialLabel: '🎁 إطار هدية'
+                specialLabel: '🎁 أطار أصدار خاص'
             },
             {
                 id: 'frame2',
@@ -912,6 +898,7 @@
                 price: 50,
                 duration: 30,
                 embedUrl: 'images/vipsystem/warrior.mp4',
+                height: 445,
                 isVideo: true,
                 isSpecial: false
             },
@@ -921,6 +908,7 @@
                 price: 100,
                 duration: 30,
                 embedUrl: 'images/vipsystem/vip.mp4',
+                height: 445,
                 isVideo: true,
                 isSpecial: false
             },
@@ -930,6 +918,7 @@
                 price: 150,
                 duration: 30,
                 embedUrl: 'images/vipsystem/queen.mp4',
+                height: 438,
                 isVideo: true,
                 isSpecial: false
             },
@@ -939,6 +928,7 @@
                 price: 200,
                 duration: 45,
                 embedUrl: 'images/vipsystem/king.mp4',
+                height: 445,
                 isVideo: true,
                 isSpecial: false,
                 badgeClass: 'king',
@@ -950,52 +940,13 @@
                 price: 250,
                 duration: 45,
                 embedUrl: 'images/vipsystem/Elite.mp4',
+                height: 445,
                 isVideo: true,
                 isSpecial: false,
                 badgeClass: 'elite',
                 badgeText: '⭐ نخبة'
-            },
-            {
-                id: 'frame7',
-                name: '⚡ إطار الأسطورة',
-                price: 300,
-                duration: 45,
-                embedUrl: 'images/vipsystem/legend.mp4',
-                isVideo: true,
-                isSpecial: false,
-                badgeClass: 'legend',
-                badgeText: '⚡ أسطورة'
-            },
-            {
-                id: 'frame8',
-                name: '🛡️ إطار الدعم الفني',
-                price: 0,
-                duration: 30,
-                embedUrl: 'images/vipsystem/support.mp4',
-                isVideo: true,
-                isSpecial: true,
-                specialLabel: '🛡️ دعم فني - هدية',
-                badgeClass: 'support',
-                badgeText: '🛡️ دعم فني'
             }
         ];
-
-        // ============================================================
-        // 🖼️ VIP FRAMES - أطارات الدخلات المميزة
-        // ============================================================
-        const VIP_FRAMES = {
-            1: 'vip1.mp4',
-            2: 'vip2.mp4',
-            3: 'vip3.mp4',
-            4: 'vip4.mp4',
-            5: 'vip5.mp4',
-            6: 'vip6.mp4',
-            6pro: 'vip6pro.mp4',
-            7: 'vip7.mp4',
-            8: 'vip8.mp4',
-            9: 'vip9.mp4',
-            10: 'vip10.mp4'
-        };
 
         const CHAT_STYLES = [
             {
@@ -1015,6 +966,27 @@
                 description: 'أسلوب كتابة أنيق وجذاب'
             }
         ];
+
+        const VIP_CONFIG = {
+            1: {
+                level: 1,
+                name: 'VIP 1',
+                emoji: '🚗',
+                title: 'السيارة الرياضية',
+                video: 'images/vipsystem/car.mp4',
+                duration: 30,
+                requirements: { EGP: 1000, USD: 20 }
+            },
+            2: {
+                level: 2,
+                name: 'VIP 2',
+                emoji: '🦁',
+                title: 'هيبة الأسد',
+                video: 'images/vipsystem/lion.mp4',
+                duration: 60,
+                requirements: { EGP: 2500, USD: null }
+            }
+        };
 
         // ============================================================
         // 🚀 INITIALIZE FIREBASE
@@ -1058,9 +1030,7 @@
                 frames: userData.frames || {},
                 activeFrame: userData.activeFrame || null,
                 chatStyles: userData.chatStyles || {},
-                activeChatStyle: userData.activeChatStyle || null,
-                activeVIPFrame: userData.activeVIPFrame || null,
-                activeVIPProFrame: userData.activeVIPProFrame || null
+                activeChatStyle: userData.activeChatStyle || null
             };
             localStorage.setItem('currentUser', JSON.stringify(userToStore));
             currentUser = userToStore;
@@ -1153,17 +1123,41 @@
                 document.getElementById('vipLevel').textContent = 'VIP 0';
                 document.getElementById('vipStatus').textContent = 'غير مفعل';
                 
-                renderVIPCards(null);
-                renderFrames(null);
-                renderChatStyles(null);
+                const vipGrid = document.getElementById('vipGrid');
+                if (vipGrid) {
+                    vipGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                            <div style="font-size: 80px; margin-bottom: 20px;">👋</div>
+                            <h2 style="color: #ffd700; margin-bottom: 15px;">مرحباً بك في نظام VIP</h2>
+                            <p style="color: #94a3b8; font-size: 1.1rem; max-width: 500px; margin: 0 auto 30px;">
+                                يرجى <a href="login4.html" style="color: #8b5cf6; text-decoration: none; font-weight: bold;">تسجيل الدخول</a> 
+                                لعرض محتوى VIP الخاص بك وشراء الدخلات المميزة والأطارات.
+                            </p>
+                            <a href="login4.html" class="back-btn login-btn" style="font-size: 1.2rem; padding: 15px 40px; text-decoration: none;">
+                                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول الآن
+                            </a>
+                        </div>
+                    `;
+                }
+                
+                for (let level = 1; level <= 2; level++) {
+                    const actionsEl = document.getElementById(`vip${level}Actions`);
+                    if (actionsEl) {
+                        actionsEl.innerHTML = `
+                            <button class="btn-buy disabled" disabled style="width: 100%;">
+                                🔒 يرجى تسجيل الدخول
+                            </button>
+                        `;
+                    }
+                }
+                
                 return null;
             }
 
             updateUI(user);
-            renderVIPCards(user);
+            renderVIPActions(user);
             renderFrames(user);
             renderChatStyles(user);
-            handleVIPFrames(user);
             
             return user;
         }
@@ -1192,7 +1186,7 @@
 
             if (activeVIP && !isExpired) {
                 const vipConfig = VIP_CONFIG[activeVIP];
-                vipLevelEl.textContent = `${vipConfig.emoji} ${vipConfig.name}`;
+                vipLevelEl.textContent = `${vipConfig.emoji} VIP ${activeVIP}`;
                 vipStatusEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
                 vipStatusEl.style.color = '#3b82f6';
             } else if (activeVIP && isExpired) {
@@ -1207,64 +1201,82 @@
         }
 
         // ============================================================
-        // 🎴 RENDER VIP CARDS
+        // 📊 VIP SYSTEM
         // ============================================================
-        function renderVIPCards(user) {
-            const grid = document.getElementById('vipGrid');
-            if (!grid) return;
-
-            grid.innerHTML = Object.keys(VIP_CONFIG).map(level => {
-                const config = VIP_CONFIG[level];
-                const vipData = user ? (user.vip || { active: null, expiresAt: null }) : { active: null, expiresAt: null };
-                const isActive = vipData.active === parseInt(level);
+        function renderVIPActions(user) {
+            if (!user) return;
+            
+            for (let level = 1; level <= 2; level++) {
+                const vipConfig = VIP_CONFIG[level];
+                const vipData = user.vip || { active: null, expiresAt: null };
+                const isActive = vipData.active === level;
                 const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
                 const now = new Date();
                 const isExpired = expiresAt && expiresAt < now;
                 const isCurrentlyActive = isActive && !isExpired;
-                const isOwned = user && user.vipPurchased && user.vipPurchased[level] === true;
+                const isOwned = user.vipPurchased && user.vipPurchased[level] === true;
 
-                let badgeClass = `vip${level}`;
-                let badgeText = config.name;
+                const actionsEl = document.getElementById(`vip${level}Actions`);
+                const badgeEl = document.getElementById(`vip${level}Badge`);
+                const statusEl = document.getElementById(`vip${level}Status`);
+                const statusTextEl = document.getElementById(`vip${level}StatusText`);
+
+                if (!actionsEl) continue;
 
                 if (isCurrentlyActive) {
-                    badgeText = '✅ مفعل';
-                    badgeClass = 'active';
+                    badgeEl.textContent = '✅ مفعل';
+                    badgeEl.className = 'vip-badge active';
                 } else if (isOwned && isExpired) {
-                    badgeText = '⏳ منتهي';
-                    badgeClass = 'expired';
+                    badgeEl.textContent = '⏳ منتهي';
+                    badgeEl.className = 'vip-badge expired';
                 } else if (isOwned) {
-                    badgeText = '📦 مملوك';
-                    badgeClass = 'owned';
+                    badgeEl.textContent = '📦 مملوك';
+                    badgeEl.className = 'vip-badge owned';
+                } else {
+                    badgeEl.textContent = `VIP ${level}`;
+                    badgeEl.className = `vip-badge vip${level}`;
                 }
 
-                let statusText = 'غير متاح';
-                let statusClass = 'locked';
+                let canAfford = false;
+                let affordMessage = '';
                 
-                if (isCurrentlyActive) {
-                    statusText = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
-                    statusClass = 'active';
-                } else if (isOwned && isExpired) {
-                    statusText = '⏳ صلاحية منتهية - قم بالشراء مجدداً';
-                    statusClass = 'locked';
-                } else if (isOwned) {
-                    statusText = '📦 تم شراؤه - قم بالتفعيل';
-                    statusClass = 'owned';
+                if (vipConfig.requirements.EGP && user.balanceEGP >= vipConfig.requirements.EGP) {
+                    canAfford = true;
+                    affordMessage = `✅ رصيدك كافي (${user.balanceEGP} ج.م)`;
+                } else if (vipConfig.requirements.USD && user.balanceUSD >= vipConfig.requirements.USD) {
+                    canAfford = true;
+                    affordMessage = `✅ رصيدك كافي (${user.balanceUSD} دولار)`;
                 } else {
-                    const canAfford = user ? user.balanceEGP >= config.price : false;
-                    statusText = canAfford ? `🔓 متاح للشراء (${config.price} ج.م)` : `🔒 غير متاح - تحتاج ${config.price} ج.م`;
-                    statusClass = canAfford ? 'active' : 'locked';
+                    const neededEGP = vipConfig.requirements.EGP || 0;
+                    const neededUSD = vipConfig.requirements.USD || 0;
+                    affordMessage = `❌ رصيد غير كافٍ (مطلوب ${neededEGP} ج.م أو ${neededUSD} دولار)`;
+                }
+
+                if (isCurrentlyActive) {
+                    statusEl.textContent = '✅ مفعل';
+                    statusEl.style.color = '#3b82f6';
+                    statusTextEl.textContent = `✅ مفعل حتى ${expiresAt.toLocaleDateString('ar-EG')}`;
+                    statusTextEl.className = 'vip-status-text active';
+                } else if (isOwned && isExpired) {
+                    statusEl.textContent = '⏳ منتهي';
+                    statusEl.style.color = '#ef4444';
+                    statusTextEl.textContent = '⏳ صلاحية منتهية - قم بالشراء مجدداً';
+                    statusTextEl.className = 'vip-status-text locked';
+                } else if (isOwned) {
+                    statusEl.textContent = '📦 مملوك';
+                    statusEl.style.color = '#ffd700';
+                    statusTextEl.textContent = '📦 تم شراؤه - قم بالتفعيل';
+                    statusTextEl.className = 'vip-status-text owned';
+                } else {
+                    statusEl.textContent = canAfford ? '🔓 متاح' : '🔒 غير متاح';
+                    statusEl.style.color = canAfford ? '#10b981' : '#ef4444';
+                    statusTextEl.textContent = canAfford ? '🔓 متاح للشراء' : affordMessage;
+                    statusTextEl.className = canAfford ? 'vip-status-text active' : 'vip-status-text locked';
                 }
 
                 let actionsHTML = '';
-                const canAfford = user ? user.balanceEGP >= config.price : false;
 
-                if (!user) {
-                    actionsHTML = `
-                        <button class="btn-buy disabled" disabled style="width: 100%;">
-                            🔒 يرجى تسجيل الدخول
-                        </button>
-                    `;
-                } else if (isCurrentlyActive) {
+                if (isCurrentlyActive) {
                     actionsHTML = `
                         <button class="btn-deactivate active" onclick="deactivateVIP(${level})">
                             <i class="fas fa-times"></i> إلغاء التفعيل
@@ -1279,7 +1291,7 @@
                 } else if (isOwned && isExpired) {
                     actionsHTML = `
                         <button class="btn-buy" onclick="buyVIP(${level})">
-                            <i class="fas fa-sync"></i> شراء مجدد (${config.price} ج.م)
+                            <i class="fas fa-sync"></i> شراء مجدد (${vipConfig.requirements.EGP || vipConfig.requirements.USD} ${vipConfig.requirements.EGP ? 'ج.م' : 'دولار'})
                         </button>
                     `;
                 } else {
@@ -1291,52 +1303,212 @@
                     `;
                 }
 
-                return `
-                    <div class="vip-card" id="vip${level}Card">
-                        <span class="vip-badge ${badgeClass}" id="vip${level}Badge">${badgeText}</span>
-                        <div class="vip-video-container">
-                            <video autoplay loop muted playsinline>
-                                <source src="${config.video}" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
-                        </div>
-                        <div class="vip-title">${config.emoji} ${config.name} - ${config.title}</div>
-                        <div class="vip-description">
-                            دخلة مميزة للغرف الصوتية تعرض ${config.title} عند دخولك الغرفة.
-                            ${config.level >= 6 ? '🔥 يشمل إطاراً خاصاً للمقاعد وإطاراً للملف الشخصي!' : ''}
-                            ${config.level === 10 ? '👑 أعلى مستوى VIP مع مدة صلاحية سنة كاملة!' : ''}
-                        </div>
-                        <div class="vip-requirements">
-                            <div class="req-item">
-                                <span class="req-label">💰 السعر</span>
-                                <span class="req-value">${config.price} ج.م</span>
-                            </div>
-                            <div class="req-item">
-                                <span class="req-label">⏱️ مدة التفعيل</span>
-                                <span class="req-value">${config.duration} يوم</span>
-                            </div>
-                            <div class="req-item">
-                                <span class="req-label">🎬 الإطار المرفق</span>
-                                <span class="req-value">${config.frame} ${config.proFrame ? 'و ' + config.proFrame + ' (برو)' : ''}</span>
-                            </div>
-                            <div class="req-item">
-                                <span class="req-label">📊 حالتك الحالية</span>
-                                <span class="req-value" id="vip${level}Status">${isCurrentlyActive ? '✅ مفعل' : isOwned ? '📦 مملوك' : 'غير مفعل'}</span>
-                            </div>
-                        </div>
-                        <div class="vip-status-text ${statusClass}" id="vip${level}StatusText">${statusText}</div>
-                        <div class="vip-actions" id="vip${level}Actions">
-                            ${actionsHTML}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                actionsEl.innerHTML = actionsHTML;
+
+                const reqEl = document.getElementById(`vip${level}Requirement`);
+                if (reqEl) {
+                    if (vipConfig.requirements.EGP && vipConfig.requirements.USD) {
+                        reqEl.textContent = `${vipConfig.requirements.EGP} ج.م أو ${vipConfig.requirements.USD} دولار`;
+                    } else if (vipConfig.requirements.EGP) {
+                        reqEl.textContent = `${vipConfig.requirements.EGP} ج.م`;
+                    } else if (vipConfig.requirements.USD) {
+                        reqEl.textContent = `${vipConfig.requirements.USD} دولار`;
+                    }
+                }
+            }
         }
 
         // ============================================================
-        // 🖼️ RENDER FRAMES
+        // 🎯 VIP ACTIONS
+        // ============================================================
+        async function buyVIP(level) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            const vipConfig = VIP_CONFIG[level];
+            if (!vipConfig) {
+                showToast('❌ مستوى VIP غير صحيح', 'error');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const currentVIP = user.vip || { active: null, expiresAt: null };
+                if (currentVIP.active === level) {
+                    const expiresAt = currentVIP.expiresAt ? new Date(currentVIP.expiresAt) : null;
+                    if (expiresAt && expiresAt > new Date()) {
+                        showToast(`⚠️ VIP ${level} مفعل بالفعل`, 'warning');
+                        return;
+                    }
+                }
+
+                let costEGP = vipConfig.requirements.EGP || 0;
+                let costUSD = vipConfig.requirements.USD || 0;
+                let useUSD = false;
+
+                if (costUSD > 0 && user.balanceUSD >= costUSD) {
+                    useUSD = true;
+                } else if (costEGP > 0 && user.balanceEGP >= costEGP) {
+                    useUSD = false;
+                } else {
+                    showToast(`❌ رصيد غير كافٍ (مطلوب ${costEGP} ج.م أو ${costUSD} دولار)`, 'error');
+                    return;
+                }
+
+                if (!confirm(`تأكيد شراء VIP ${level} (${vipConfig.title}) مقابل ${useUSD ? costUSD + ' دولار' : costEGP + ' ج.م'}؟`)) return;
+
+                const newBalance = useUSD ? 
+                    (user.balanceUSD || 0) - costUSD : 
+                    (user.balanceEGP || 0) - costEGP;
+
+                const updateData = {};
+                if (useUSD) {
+                    updateData.balanceUSD = newBalance;
+                } else {
+                    updateData.balanceEGP = newBalance;
+                }
+
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
+
+                const vipPurchased = user.vipPurchased || {};
+                vipPurchased[level] = true;
+
+                updateData['vip/active'] = level;
+                updateData['vip/expiresAt'] = expiresAt.toISOString();
+                updateData['vip/activatedAt'] = now.toISOString();
+                updateData['vip/activatedWith'] = useUSD ? 'USD' : 'EGP';
+                updateData['vip/amount'] = useUSD ? costUSD : costEGP;
+                updateData.vipPurchased = vipPurchased;
+                updateData.updatedAt = now.toISOString();
+
+                await database.ref('users/' + currentFirebaseUserId).update(updateData);
+
+                const updatedUser = { ...user, ...updateData };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                // ===== تسجيل العملية في سجل المشتريات (adminLogs) =====
+                await logPurchaseToAdmin({
+                    type: 'vip_purchase',
+                    itemName: `VIP ${level} - ${vipConfig.title}`,
+                    itemId: `vip${level}`,
+                    price: useUSD ? costUSD : costEGP,
+                    currency: useUSD ? 'USD' : 'EGP',
+                    userId: user.numericId,
+                    username: user.nickname || user.username,
+                    userFirebaseKey: currentFirebaseUserId,
+                    duration: vipConfig.duration,
+                    startDate: now.toISOString(),
+                    expiryDate: expiresAt.toISOString(),
+                    note: `شراء VIP ${level}`
+                });
+
+                const notification = {
+                    id: Date.now(),
+                    text: `👑 تم شراء VIP ${level} (${vipConfig.title}) بنجاح! صلاحية ${vipConfig.duration} يوم.`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'vip_purchased',
+                    createdAt: now.toISOString()
+                };
+                await database.ref('users/' + currentFirebaseUserId + '/notifications').push(notification);
+
+                showToast(`✅ تم شراء VIP ${level} بنجاح!`, 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error buying VIP:', error);
+                showToast('❌ حدث خطأ في الشراء', 'error');
+            }
+        }
+
+        async function activateOwnedVIP(level) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+
+                if (!user) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    return;
+                }
+
+                const vipPurchased = user.vipPurchased || {};
+
+                if (!vipPurchased[level]) {
+                    showToast('⚠️ هذا الـ VIP غير مملوك', 'warning');
+                    return;
+                }
+
+                const vipConfig = VIP_CONFIG[level];
+                const now = new Date();
+                const expiresAt = new Date(now);
+                expiresAt.setDate(expiresAt.getDate() + vipConfig.duration);
+
+                await database.ref('users/' + currentFirebaseUserId + '/vip').update({
+                    active: level,
+                    expiresAt: expiresAt.toISOString(),
+                    activatedAt: now.toISOString()
+                });
+
+                const updatedUser = { ...user };
+                updatedUser.vip = { active: level, expiresAt: expiresAt.toISOString(), activatedAt: now.toISOString() };
+                saveUserToStorage(updatedUser, currentFirebaseUserId);
+
+                showToast(`✅ تم تفعيل VIP ${level} بنجاح!`, 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error activating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        async function deactivateVIP(level) {
+            if (!currentUser || !currentFirebaseUserId) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+
+            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل VIP ${level}؟`)) return;
+
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/vip').update({
+                    active: null,
+                    deactivatedAt: new Date().toISOString()
+                });
+
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                const user = snapshot.val();
+                if (user) {
+                    saveUserToStorage(user, currentFirebaseUserId);
+                }
+
+                showToast('✅ تم إلغاء تفعيل VIP', 'success');
+                await ensureUserData();
+
+            } catch (error) {
+                console.error('Error deactivating VIP:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ FRAMES SYSTEM
         // ============================================================
         function renderFrames(user) {
             const grid = document.getElementById('framesGrid');
@@ -1377,7 +1549,7 @@
                 
                 if (frame.isSpecial) {
                     badgeClass += ' special';
-                    badgeText = frame.specialLabel || '🎁 خاص';
+                    badgeText = '🎁 خاص';
                 } else if (frame.badgeClass) {
                     badgeClass += ' ' + frame.badgeClass;
                     badgeText = frame.badgeText || '🖼️ إطار';
@@ -1435,7 +1607,9 @@
                         </video>
                     `;
                 } else {
-                    previewHTML = `<iframe src="${frame.embedUrl}" frameborder="0" scrolling="no"></iframe>`;
+                    previewHTML = `
+                        <iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>
+                    `;
                 }
 
                 return `
@@ -1452,7 +1626,6 @@
                             ${frame.isSpecial ? '🎁 هذا الإطار خاص ولا يمكن شراؤه، يمكن فقط إهداؤه من الإدارة.' : 
                             frame.id === 'frame5' ? '👑 إطار الملك - أظهر هيبتك ومكانتك كملك في الغرف الصوتية.' :
                             frame.id === 'frame6' ? '⭐ إطار النخبة - انضم إلى نخبة المستخدمين المميزين.' :
-                            frame.id === 'frame7' ? '⚡ إطار الأسطورة - كن أسطورة في الغرف الصوتية.' :
                             'إطار مميز للغرف الصوتية يعرض عند جلوسك على المقعد.'}
                         </div>
                         <div class="vip-requirements">
@@ -1480,375 +1653,6 @@
             }).join('');
         }
 
-        // ============================================================
-        // 💬 RENDER CHAT STYLES
-        // ============================================================
-        function renderChatStyles(user) {
-            const grid = document.getElementById('chatStylesGrid');
-            if (!grid) return;
-            
-            const userChatStyles = user ? (user.chatStyles || {}) : {};
-            const activeChatStyle = user ? (user.activeChatStyle || null) : null;
-
-            grid.innerHTML = CHAT_STYLES.map(style => {
-                const styleData = userChatStyles[style.id] || null;
-                const isOwned = styleData && styleData.owned === true;
-                const isActive = activeChatStyle === style.id;
-                const expiresAt = styleData?.expiresAt ? new Date(styleData.expiresAt) : null;
-                const isExpired = expiresAt && expiresAt < new Date();
-                const isValid = isOwned && !isExpired;
-
-                let statusText = 'غير مملوك';
-                let statusClass = 'inactive';
-                
-                if (isActive && isValid) {
-                    statusText = '✅ مفعل حالياً';
-                    statusClass = 'active';
-                } else if (isValid) {
-                    statusText = '📦 مملوك';
-                    statusClass = 'owned';
-                } else if (isOwned && isExpired) {
-                    statusText = '⏳ منتهي الصلاحية';
-                    statusClass = 'expired';
-                }
-
-                const canAfford = user ? (user.balanceEGP >= style.price) : false;
-
-                let actionsHTML = '';
-
-                if (!user) {
-                    actionsHTML = `
-                        <button class="btn-buy disabled" disabled style="width: 100%;">
-                            🔒 يرجى تسجيل الدخول
-                        </button>
-                    `;
-                } else if (isActive) {
-                    actionsHTML = `
-                        <button class="btn-deactivate active" onclick="deactivateChatStyle('${style.id}')">
-                            <i class="fas fa-times"></i> إلغاء التفعيل
-                        </button>
-                    `;
-                } else if (isValid) {
-                    actionsHTML = `
-                        <button class="btn-activate" onclick="activateChatStyle('${style.id}')">
-                            <i class="fas fa-play"></i> تفعيل
-                        </button>
-                    `;
-                } else if (isOwned && isExpired) {
-                    actionsHTML = `
-                        <button class="btn-buy" onclick="buyChatStyle('${style.id}', ${style.price}, '${style.name}')">
-                            <i class="fas fa-sync"></i> شراء مجدد (${style.price} ج.م)
-                        </button>
-                    `;
-                } else {
-                    actionsHTML = `
-                        <button class="btn-buy ${!canAfford ? 'disabled' : ''}" 
-                            onclick="buyChatStyle('${style.id}', ${style.price}, '${style.name}')"
-                            ${!canAfford ? 'disabled' : ''}>
-                            ${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}
-                        </button>
-                    `;
-                }
-
-                return `
-                    <div class="chatstyle-card">
-                        <div class="style-preview">
-                            <img src="${style.image}" alt="${style.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23333%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2216%22%3E${style.name}%3C/text%3E%3C/svg%3E'">
-                        </div>
-                        <div class="style-name">✍️ ${style.name}</div>
-                        <div class="style-price">💰 ${style.price} ج.م</div>
-                        <div class="style-duration">⏱️ مدة التفعيل: ${style.duration} يوم</div>
-                        <div class="style-status ${statusClass}">${statusText}</div>
-                        <div class="style-actions">
-                            ${actionsHTML}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // ============================================================
-        // 🎯 VIP ACTIONS
-        // ============================================================
-        async function buyVIP(level) {
-            if (!currentUser || !currentFirebaseUserId) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            const config = VIP_CONFIG[level];
-            if (!config) {
-                showToast('❌ مستوى VIP غير صحيح', 'error');
-                return;
-            }
-
-            try {
-                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
-                const user = snapshot.val();
-
-                if (!user) {
-                    showToast('❌ المستخدم غير موجود', 'error');
-                    return;
-                }
-
-                const currentVIP = user.vip || { active: null, expiresAt: null };
-                if (currentVIP.active === level) {
-                    const expiresAt = currentVIP.expiresAt ? new Date(currentVIP.expiresAt) : null;
-                    if (expiresAt && expiresAt > new Date()) {
-                        showToast(`⚠️ ${config.name} مفعل بالفعل`, 'warning');
-                        return;
-                    }
-                }
-
-                if (user.balanceEGP < config.price) {
-                    showToast(`❌ رصيد غير كافٍ (مطلوب ${config.price} ج.م)`, 'error');
-                    return;
-                }
-
-                if (!confirm(`تأكيد شراء ${config.name} (${config.title}) مقابل ${config.price} ج.م؟`)) return;
-
-                const newBalance = (user.balanceEGP || 0) - config.price;
-                const now = new Date();
-                const expiresAt = new Date(now);
-                expiresAt.setDate(expiresAt.getDate() + config.duration);
-
-                const vipPurchased = user.vipPurchased || {};
-                vipPurchased[level] = true;
-
-                const updateData = {
-                    balanceEGP: newBalance,
-                    'vip/active': level,
-                    'vip/expiresAt': expiresAt.toISOString(),
-                    'vip/activatedAt': now.toISOString(),
-                    'vip/amount': config.price,
-                    vipPurchased: vipPurchased,
-                    updatedAt: now.toISOString()
-                };
-
-                // تفعيل الإطار المرتبط بـ VIP تلقائياً
-                if (config.frame) {
-                    const frames = user.frames || {};
-                    const frameId = `vipframe_${level}`;
-                    frames[frameId] = {
-                        owned: true,
-                        purchasedAt: now.toISOString(),
-                        expiresAt: expiresAt.toISOString(),
-                        type: 'vipframe',
-                        vipLevel: level,
-                        videoUrl: config.frame
-                    };
-                    updateData.frames = frames;
-                    updateData.activeFrame = frameId;
-                }
-
-                // إذا كان VIP 6، أضف الإطار البرو
-                if (level === 6 && config.proFrame) {
-                    const frames = user.frames || {};
-                    const proFrameId = `vipframe_6pro`;
-                    frames[proFrameId] = {
-                        owned: true,
-                        purchasedAt: now.toISOString(),
-                        expiresAt: expiresAt.toISOString(),
-                        type: 'vipframe',
-                        vipLevel: 6,
-                        videoUrl: config.proFrame,
-                        isPro: true
-                    };
-                    updateData.frames = frames;
-                    updateData.activeVIPProFrame = proFrameId;
-                }
-
-                await database.ref('users/' + currentFirebaseUserId).update(updateData);
-
-                const updatedUser = { ...user, ...updateData };
-                saveUserToStorage(updatedUser, currentFirebaseUserId);
-
-                // تسجيل العملية
-                await logPurchaseToAdmin({
-                    type: 'vip_purchase',
-                    itemName: `${config.name} - ${config.title}`,
-                    itemId: `vip${level}`,
-                    price: config.price,
-                    currency: 'EGP',
-                    userId: user.numericId,
-                    username: user.nickname || user.username,
-                    userFirebaseKey: currentFirebaseUserId,
-                    duration: config.duration,
-                    startDate: now.toISOString(),
-                    expiryDate: expiresAt.toISOString(),
-                    note: `شراء ${config.name}`
-                });
-
-                const notification = {
-                    id: Date.now(),
-                    text: `👑 تم شراء ${config.name} (${config.title}) بنجاح! صلاحية ${config.duration} يوم. ${level === 6 ? '🔥 تم تفعيل إطارين خاصين!' : ''}`,
-                    read: false,
-                    date: new Date().toLocaleString('ar-EG'),
-                    type: 'vip_purchased',
-                    createdAt: now.toISOString()
-                };
-                await database.ref('users/' + currentFirebaseUserId + '/notifications').push(notification);
-
-                showToast(`✅ تم شراء ${config.name} بنجاح!`, 'success');
-                await ensureUserData();
-
-            } catch (error) {
-                console.error('Error buying VIP:', error);
-                showToast('❌ حدث خطأ في الشراء', 'error');
-            }
-        }
-
-        async function activateOwnedVIP(level) {
-            if (!currentUser || !currentFirebaseUserId) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            try {
-                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
-                const user = snapshot.val();
-
-                if (!user) {
-                    showToast('❌ المستخدم غير موجود', 'error');
-                    return;
-                }
-
-                const vipPurchased = user.vipPurchased || {};
-                if (!vipPurchased[level]) {
-                    showToast('⚠️ هذا الـ VIP غير مملوك', 'warning');
-                    return;
-                }
-
-                const config = VIP_CONFIG[level];
-                const now = new Date();
-                const expiresAt = new Date(now);
-                expiresAt.setDate(expiresAt.getDate() + config.duration);
-
-                const updateData = {
-                    'vip/active': level,
-                    'vip/expiresAt': expiresAt.toISOString(),
-                    'vip/activatedAt': now.toISOString()
-                };
-
-                // تفعيل الإطار المرتبط
-                if (config.frame) {
-                    const frameId = `vipframe_${level}`;
-                    updateData.activeFrame = frameId;
-                }
-
-                if (level === 6 && config.proFrame) {
-                    updateData.activeVIPProFrame = `vipframe_6pro`;
-                }
-
-                await database.ref('users/' + currentFirebaseUserId).update(updateData);
-
-                const updatedUser = { ...user, ...updateData };
-                saveUserToStorage(updatedUser, currentFirebaseUserId);
-
-                showToast(`✅ تم تفعيل ${config.name} بنجاح!`, 'success');
-                await ensureUserData();
-
-            } catch (error) {
-                console.error('Error activating VIP:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        async function deactivateVIP(level) {
-            if (!currentUser || !currentFirebaseUserId) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-
-            if (!confirm(`⚠️ هل أنت متأكد من إلغاء تفعيل ${VIP_CONFIG[level].name}؟`)) return;
-
-            try {
-                await database.ref('users/' + currentFirebaseUserId + '/vip').update({
-                    active: null,
-                    deactivatedAt: new Date().toISOString()
-                });
-
-                // إلغاء تفعيل الإطارات المرتبطة
-                await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(null);
-                if (level === 6) {
-                    await database.ref('users/' + currentFirebaseUserId + '/activeVIPProFrame').set(null);
-                }
-
-                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
-                const user = snapshot.val();
-                if (user) {
-                    saveUserToStorage(user, currentFirebaseUserId);
-                }
-
-                showToast('✅ تم إلغاء التفعيل', 'success');
-                await ensureUserData();
-
-            } catch (error) {
-                console.error('Error deactivating VIP:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        // ============================================================
-        // 🖼️ VIP FRAMES HANDLER - التعامل مع أطارات الدخلات
-        // ============================================================
-        function handleVIPFrames(user) {
-            if (!user) return;
-            
-            const vipData = user.vip || { active: null, expiresAt: null };
-            const activeVIP = vipData.active;
-            const expiresAt = vipData.expiresAt ? new Date(vipData.expiresAt) : null;
-            const isExpired = expiresAt && expiresAt < new Date();
-            const isActive = activeVIP && !isExpired;
-
-            // إذا كان VIP مفعل، قم بتفعيل الإطار المناسب
-            if (isActive && activeVIP >= 1 && activeVIP <= 10) {
-                const config = VIP_CONFIG[activeVIP];
-                if (config && config.frame) {
-                    const frameId = `vipframe_${activeVIP}`;
-                    
-                    // تأكد من أن الإطار موجود في frames
-                    const frames = user.frames || {};
-                    if (!frames[frameId]) {
-                        // إذا لم يكن موجوداً، أضفه
-                        const now = new Date();
-                        frames[frameId] = {
-                            owned: true,
-                            purchasedAt: now.toISOString(),
-                            expiresAt: expiresAt.toISOString(),
-                            type: 'vipframe',
-                            vipLevel: activeVIP,
-                            videoUrl: config.frame
-                        };
-                        database.ref('users/' + currentFirebaseUserId + '/frames').set(frames);
-                        database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(frameId);
-                    }
-                    
-                    // VIP 6 برو
-                    if (activeVIP === 6 && config.proFrame) {
-                        const proFrameId = `vipframe_6pro`;
-                        if (!frames[proFrameId]) {
-                            const now = new Date();
-                            frames[proFrameId] = {
-                                owned: true,
-                                purchasedAt: now.toISOString(),
-                                expiresAt: expiresAt.toISOString(),
-                                type: 'vipframe',
-                                vipLevel: 6,
-                                videoUrl: config.proFrame,
-                                isPro: true
-                            };
-                            database.ref('users/' + currentFirebaseUserId + '/frames').set(frames);
-                            database.ref('users/' + currentFirebaseUserId + '/activeVIPProFrame').set(proFrameId);
-                        }
-                    }
-                }
-            }
-        }
-
-        // ============================================================
-        // 📝 FRAME ACTIONS
-        // ============================================================
         async function buyFrame(frameId, price, name) {
             if (!currentUser || !currentFirebaseUserId) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
@@ -1901,6 +1705,7 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
+                // ===== تسجيل العملية في سجل المشتريات (adminLogs) =====
                 await logPurchaseToAdmin({
                     type: 'frame_purchase',
                     itemName: name,
@@ -1994,8 +1799,92 @@
         }
 
         // ============================================================
-        // 💬 CHAT STYLE ACTIONS
+        // 💬 CHAT STYLES SYSTEM
         // ============================================================
+        function renderChatStyles(user) {
+            const grid = document.getElementById('chatStylesGrid');
+            if (!grid) return;
+            
+            const userChatStyles = user ? (user.chatStyles || {}) : {};
+            const activeChatStyle = user ? (user.activeChatStyle || null) : null;
+
+            grid.innerHTML = CHAT_STYLES.map(style => {
+                const styleData = userChatStyles[style.id] || null;
+                const isOwned = styleData && styleData.owned === true;
+                const isActive = activeChatStyle === style.id;
+                const expiresAt = styleData?.expiresAt ? new Date(styleData.expiresAt) : null;
+                const isExpired = expiresAt && expiresAt < new Date();
+                const isValid = isOwned && !isExpired;
+
+                let statusText = 'غير مملوك';
+                let statusClass = 'inactive';
+                
+                if (isActive && isValid) {
+                    statusText = '✅ مفعل حالياً';
+                    statusClass = 'active';
+                } else if (isValid) {
+                    statusText = '📦 مملوك';
+                    statusClass = 'owned';
+                } else if (isOwned && isExpired) {
+                    statusText = '⏳ منتهي الصلاحية';
+                    statusClass = 'expired';
+                }
+
+                const canAfford = user ? (user.balanceEGP >= style.price) : false;
+
+                let actionsHTML = '';
+
+                if (!user) {
+                    actionsHTML = `
+                        <button class="btn-buy disabled" disabled style="width: 100%;">
+                            🔒 يرجى تسجيل الدخول
+                        </button>
+                    `;
+                } else if (isActive) {
+                    actionsHTML = `
+                        <button class="btn-deactivate active" onclick="deactivateChatStyle('${style.id}')">
+                            <i class="fas fa-times"></i> إلغاء التفعيل
+                        </button>
+                    `;
+                } else if (isValid) {
+                    actionsHTML = `
+                        <button class="btn-activate" onclick="activateChatStyle('${style.id}')">
+                            <i class="fas fa-play"></i> تفعيل
+                        </button>
+                    `;
+                } else if (isOwned && isExpired) {
+                    actionsHTML = `
+                        <button class="btn-buy" onclick="buyChatStyle('${style.id}', ${style.price}, '${style.name}')">
+                            <i class="fas fa-sync"></i> شراء مجدد (${style.price} ج.م)
+                        </button>
+                    `;
+                } else {
+                    actionsHTML = `
+                        <button class="btn-buy ${!canAfford ? 'disabled' : ''}" 
+                            onclick="buyChatStyle('${style.id}', ${style.price}, '${style.name}')"
+                            ${!canAfford ? 'disabled' : ''}>
+                            ${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}
+                        </button>
+                    `;
+                }
+
+                return `
+                    <div class="chatstyle-card">
+                        <div class="style-preview">
+                            <img src="${style.image}" alt="${style.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23333%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2216%22%3E${style.name}%3C/text%3E%3C/svg%3E'">
+                        </div>
+                        <div class="style-name">✍️ ${style.name}</div>
+                        <div class="style-price">💰 ${style.price} ج.م</div>
+                        <div class="style-duration">⏱️ مدة التفعيل: ${style.duration} يوم</div>
+                        <div class="style-status ${statusClass}">${statusText}</div>
+                        <div class="style-actions">
+                            ${actionsHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         async function buyChatStyle(styleId, price, name) {
             if (!currentUser || !currentFirebaseUserId) {
                 showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
@@ -2042,6 +1931,7 @@
                 const updatedUser = { ...user, ...updateData };
                 saveUserToStorage(updatedUser, currentFirebaseUserId);
 
+                // ===== تسجيل العملية في سجل المشتريات (adminLogs) =====
                 await logPurchaseToAdmin({
                     type: 'chatstyle_purchase',
                     itemName: name,
@@ -2135,7 +2025,7 @@
         }
 
         // ============================================================
-        // 📝 LOG PURCHASE TO ADMIN
+        // 📝 LOG PURCHASE TO ADMIN (adminLogs)
         // ============================================================
         async function logPurchaseToAdmin(data) {
             try {
@@ -2188,8 +2078,6 @@
                 renderFrames(currentUser);
             } else if (tab === 'chatstyles') {
                 renderChatStyles(currentUser);
-            } else if (tab === 'vip') {
-                renderVIPCards(currentUser);
             }
         }
 
