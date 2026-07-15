@@ -46,10 +46,8 @@
             box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
 
-        /* ===== إخفاء شعار VipChat والتاج ===== */
         .logo-section { display: none !important; }
 
-        /* ===== مربع معلومات الغرفة ===== */
         .room-info-box {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.08);
@@ -66,7 +64,6 @@
         .room-info-box .room-owner { color: #ffd700; font-size: 0.75rem; }
         .room-info-box .room-members { color: #94a3b8; font-size: 0.75rem; }
 
-        /* ===== مربع الأيقونات ===== */
         .icons-box {
             display: flex;
             align-items: center;
@@ -229,7 +226,7 @@
             flex-shrink: 0;
         }
 
-        /* ===== الإطار الفاخر - بدون دائرة ذهبية ===== */
+        /* ===== الإطار الفاخر ===== */
         .luxury-frame {
             position: absolute;
             top: 50%;
@@ -571,7 +568,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== خلفية الرسالة مع صورة أسلوب الكتابة ===== */
         .message {
             padding: 0 !important;
             max-width: 85%;
@@ -1964,7 +1960,6 @@
             #vipEntrance .vip-video-container { width: 85%; max-width: 500px; }
             #vipEntrance .vip-title { font-size: 1.5rem; padding: 8px 20px; white-space: normal; }
             
-            /* تحسينات الشات للشاشات المتوسطة */
             .chat-area { 
                 height: 320px; 
                 min-height: 280px; 
@@ -2004,7 +1999,6 @@
             .seat-number { font-size: 0.5rem; margin-top: 6px; min-height: 16px; }
             .chat-area { height: 300px; min-height: 260px; max-height: 350px; }
             
-            /* تحسينات الشات للشاشات الصغيرة */
             .chat-area { 
                 height: 280px; 
                 min-height: 240px; 
@@ -2133,7 +2127,6 @@
             .seat-circle .mic-indicator { font-size: 0.5rem; padding: 2px; bottom: -2px; right: -2px; }
             .seats-area .seats-title { font-size: 0.65rem; top: 8px; right: 10px; }
             
-            /* تحسينات الشات للشاشات الصغيرة جداً */
             .chat-area { 
                 height: 260px; 
                 min-height: 220px; 
@@ -2294,7 +2287,6 @@
                 right: -1px; 
             }
             
-            /* تحسينات الشات للشاشات الصغيرة جداً (اقل من 400px) */
             .chat-area { 
                 height: 200px; 
                 min-height: 180px; 
@@ -2415,7 +2407,6 @@
         </button>
     </div>
 </nav>
-
 <!-- ===== VIP ENTRANCE ===== -->
 <div id="vipEntrance">
     <div class="vip-video-container">
@@ -2694,6 +2685,7 @@
         </div>
     </div>
 </div>
+
 <script>
 // ============================================================
 // 🔥 FIREBASE CONFIG
@@ -2710,49 +2702,55 @@ const firebaseConfig = {
 };
 
 // ============================================================
-// 📋 DATA - الأطارات الجديدة (Frame 5 و Frame 6)
+// 📋 DATA - VIP الموسع (VIP 1 إلى VIP 10) + الأطارات الجديدة
 // ============================================================
+
+// VIP_CONFIG الموسع - 10 مستويات VIP
+const VIP_CONFIG = {
+    1: { level: 1, name: 'VIP 1', emoji: '🚗', title: 'VIP 1 - السيارة الرياضية', video: 'images/vipsystem/car.mp4', duration: 30, price: 500 },
+    2: { level: 2, name: 'VIP 2', emoji: '🦁', title: 'VIP 2 - هيبة الأسد', video: 'images/vipsystem/lion.mp4', duration: 30, price: 700 },
+    3: { level: 3, name: 'VIP 3', emoji: '🔥', title: 'VIP 3 - النار', video: 'images/vipsystem/vip3.mp4', duration: 45, price: 1000 },
+    4: { level: 4, name: 'VIP 4', emoji: '⚡', title: 'VIP 4 - البرق', video: 'images/vipsystem/vip4.mp4', duration: 60, price: 1300 },
+    5: { level: 5, name: 'VIP 5', emoji: '🌟', title: 'VIP 5 - النجم', video: 'images/vipsystem/vip5.mp4', duration: 90, price: 1600 },
+    6: { level: 6, name: 'VIP 6', emoji: '💎', title: 'VIP 6 - الألماس', video: 'images/vipsystem/vip6.mp4', duration: 120, price: 1900 },
+    7: { level: 7, name: 'VIP 7', emoji: '👑', title: 'VIP 7 - الملك', video: 'images/vipsystem/vip7.mp4', duration: 150, price: 2200 },
+    8: { level: 8, name: 'VIP 8', emoji: '🐉', title: 'VIP 8 - التنين', video: 'images/vipsystem/vip8.mp4', duration: 180, price: 2500 },
+    9: { level: 9, name: 'VIP 9', emoji: '🦅', title: 'VIP 9 - النسر', video: 'images/vipsystem/vip9.mp4', duration: 200, price: 2800 },
+    10: { level: 10, name: 'VIP 10', emoji: '🌌', title: 'VIP 10 - المجرة', video: 'images/vipsystem/vip10.mp4', duration: 365, price: 3000 }
+};
+
+// أطارات المقتنيات - كل خطة VIP تعطي إطاراً خاصاً بها
+// VIP 6 يعطي إطارين: vip6.mp4 و vip6pro.mp4
+const COLLECTIBLES = [
+    { id: 'collect_vip1', name: 'إطار VIP 1', video: 'images/vipsystem/vip1.mp4', source: 'VIP 1' },
+    { id: 'collect_vip2', name: 'إطار VIP 2', video: 'images/vipsystem/vip2.mp4', source: 'VIP 2' },
+    { id: 'collect_vip3', name: 'إطار VIP 3', video: 'images/vipsystem/vip3.mp4', source: 'VIP 3' },
+    { id: 'collect_vip4', name: 'إطار VIP 4', video: 'images/vipsystem/vip4.mp4', source: 'VIP 4' },
+    { id: 'collect_vip5', name: 'إطار VIP 5', video: 'images/vipsystem/vip5.mp4', source: 'VIP 5' },
+    { id: 'collect_vip6', name: 'إطار VIP 6', video: 'images/vipsystem/vip6.mp4', source: 'VIP 6' },
+    { id: 'collect_vip6pro', name: 'إطار VIP 6 Pro', video: 'images/vipsystem/vip6pro.mp4', source: 'VIP 6' },
+    { id: 'collect_vip7', name: 'إطار VIP 7', video: 'images/vipsystem/vip7.mp4', source: 'VIP 7' },
+    { id: 'collect_vip8', name: 'إطار VIP 8', video: 'images/vipsystem/vip8.mp4', source: 'VIP 8' },
+    { id: 'collect_vip9', name: 'إطار VIP 9', video: 'images/vipsystem/vip9.mp4', source: 'VIP 9' },
+    { id: 'collect_vip10', name: 'إطار VIP 10', video: 'images/vipsystem/vip10.mp4', source: 'VIP 10' }
+];
+
+// أطارات المقاعد - مع إضافة الإطارات الجديدة (support.mp4, legend.mp4)
 const FRAMES = [
     { id: 'frame1', name: '🎁 إطار خاص (هدية)', price: 0, duration: 30, embedUrl: 'images/vipsystem/manager.mp4', isVideo: true, isSpecial: true },
+    { id: 'frame_support', name: '🛡️ إطار الدعم', price: 0, duration: 30, embedUrl: 'images/vipsystem/support.mp4', isVideo: true, isSpecial: true, specialLabel: '🎁 هدية الإدارة' },
+    { id: 'frame_legend', name: '⚡ إطار الأسطورة', price: 200, duration: 45, embedUrl: 'images/vipsystem/legend.mp4', isVideo: true, isSpecial: false },
     { id: 'frame2', name: '⚔️ إطار المحارب', price: 50, duration: 30, embedUrl: 'images/vipsystem/warrior.mp4', isVideo: true, isSpecial: false },
     { id: 'frame3', name: '👑 إطار VIP', price: 100, duration: 30, embedUrl: 'images/vipsystem/vip.mp4', isVideo: true, isSpecial: false },
     { id: 'frame4', name: '👸 إطار الملكة', price: 150, duration: 30, embedUrl: 'images/vipsystem/queen.mp4', isVideo: true, isSpecial: false },
-    // الأطارات الجديدة
-    {
-        id: 'frame5',
-        name: '👑 إطار الملك',
-        price: 200,
-        duration: 45,
-        embedUrl: 'images/vipsystem/king.mp4',
-        height: 445,
-        isVideo: true,
-        isSpecial: false,
-        badgeClass: 'king',
-        badgeText: '👑 ملكي'
-    },
-    {
-        id: 'frame6',
-        name: '⭐ إطار النخبة',
-        price: 250,
-        duration: 45,
-        embedUrl: 'images/vipsystem/Elite.mp4',
-        height: 445,
-        isVideo: true,
-        isSpecial: false,
-        badgeClass: 'elite',
-        badgeText: '⭐ نخبة'
-    }
+    { id: 'frame5', name: '👑 إطار الملك', price: 200, duration: 45, embedUrl: 'images/vipsystem/king.mp4', isVideo: true, isSpecial: false, badgeClass: 'king', badgeText: '👑 ملكي' },
+    { id: 'frame6', name: '⭐ إطار النخبة', price: 250, duration: 45, embedUrl: 'images/vipsystem/Elite.mp4', isVideo: true, isSpecial: false, badgeClass: 'elite', badgeText: '⭐ نخبة' }
 ];
 
 const CHAT_STYLES = [
     { id: 'chatstyle1', name: 'أسلوب كتابة 1', price: 50, duration: 30, image: 'images/vipsystem/chatstyles/chat1style.png', description: 'أسلوب كتابة مميز للدردشة' },
     { id: 'chatstyle2', name: 'أسلوب كتابة 2', price: 20, duration: 30, image: 'images/vipsystem/chatstyles/chat2style.png', description: 'أسلوب كتابة أنيق وجذاب' }
 ];
-
-const VIP_CONFIG = {
-    1: { level: 1, name: 'VIP 1', emoji: '🚗', title: 'VIP 1 - السيارة الرياضية', video: 'images/vipsystem/car.mp4', duration: 30, requirements: { EGP: 1000, USD: 20 } },
-    2: { level: 2, name: 'VIP 2', emoji: '🦁', title: 'VIP 2 - هيبة الأسد', video: 'images/vipsystem/lion.mp4', duration: 60, requirements: { EGP: 2500, USD: null } }
-};
 
 const GIFT_TYPES = [
     { id: 'rose', name: '🌹 وردة', emoji: '🌹', price: 10 },
@@ -2804,7 +2802,6 @@ let vipQueue = [];
 let viewingUserId = null;
 let hasLiked = false;
 let activeChatStyle = null;
-
 // ============================================================
 // 👤 USER FUNCTIONS
 // ============================================================
@@ -2901,9 +2898,35 @@ async function getUserFrameFromFirebase(userId) {
         const expiresAt = frameData.expiresAt ? new Date(frameData.expiresAt) : null;
         if (expiresAt && expiresAt < new Date()) return null;
         
-        // البحث في FRAMES بما فيها الأطارات الجديدة
         return FRAMES.find(f => f.id === activeFrame) || null;
     } catch(e) { console.error('Error getting user frame:', e); return null; }
+}
+
+// ============================================================
+// 🎁 GET USER COLLECTIBLE (أطارات المقتنيات)
+// ============================================================
+async function getUserCollectibleFromFirebase(userId) {
+    try {
+        const snapshot = await database.ref('users')
+            .orderByChild('numericId')
+            .equalTo(parseInt(userId))
+            .once('value');
+        if (!snapshot.exists()) return null;
+        const userData = snapshot.val();
+        const userKey = Object.keys(userData)[0];
+        const user = userData[userKey];
+        
+        const activeCollectible = user.activeCollectible || null;
+        const collectibles = user.collectibles || {};
+        
+        if (!activeCollectible) return null;
+        const collectibleData = collectibles[activeCollectible];
+        if (!collectibleData || !collectibleData.owned) return null;
+        const expiresAt = collectibleData.expiresAt ? new Date(collectibleData.expiresAt) : null;
+        if (expiresAt && expiresAt < new Date()) return null;
+        
+        return COLLECTIBLES.find(c => c.id === activeCollectible) || null;
+    } catch(e) { console.error('Error getting user collectible:', e); return null; }
 }
 
 // ============================================================
@@ -3159,7 +3182,7 @@ function skipVIPEntrance() {
 }
 
 // ============================================================
-// 💺 SEATS FUNCTIONS - مع دعم الأطارات الجديدة
+// 💺 SEATS FUNCTIONS - مع دعم الأطارات الجديدة والمقتنيات
 // ============================================================
 async function renderSeats(seats) {
     const container = document.getElementById('seatsContainer');
@@ -3168,12 +3191,19 @@ async function renderSeats(seats) {
     const colors = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#f6d365','#a18cd1','#fbc2eb','#a6c1ee','#fddb92'];
     
     const seatsWithFrames = {};
+    const seatsWithCollectibles = {};
+    
     for (const index in seats) {
         const seat = seats[index];
         if (seat && seat.userId) {
             const frame = await getUserFrameFromFirebase(seat.userId);
             if (frame) {
                 seatsWithFrames[index] = frame.id;
+            }
+            // نتحقق من المقتنيات أيضاً (يمكن عرض إطار المقتنيات كإطار إضافي)
+            const collectible = await getUserCollectibleFromFirebase(seat.userId);
+            if (collectible) {
+                seatsWithCollectibles[index] = collectible.id;
             }
         }
     }
@@ -3215,8 +3245,18 @@ async function renderSeats(seats) {
             const displayName = seat ? seat.username : '';
             const avatarLetter = seat ? seat.username.charAt(0).toUpperCase() : '+';
             const userAvatar = seat?.avatar ? seat.avatar : null;
+            
+            // نعرض إطار المقعد إذا موجود
             const hasFrame = seatsWithFrames[index] ? true : false;
             const frameConfig = hasFrame ? FRAMES.find(f => f.id === seatsWithFrames[index]) : null;
+            
+            // نعرض إطار المقتنيات إذا موجود (يمكن عرضه كإطار ثانوي أو استبدال)
+            const hasCollectible = seatsWithCollectibles[index] ? true : false;
+            const collectibleConfig = hasCollectible ? COLLECTIBLES.find(c => c.id === seatsWithCollectibles[index]) : null;
+            
+            // نعرض إطار المقتنيات بدلاً من إطار المقاعد إذا كان موجوداً (الأولوية للمقتنيات)
+            const displayFrame = hasCollectible ? collectibleConfig : hasFrame ? frameConfig : null;
+            const hasDisplayFrame = displayFrame !== null;
             
             let seatClass = 'seat-circle';
             if (!isOccupied) seatClass += ' empty';
@@ -3225,18 +3265,19 @@ async function renderSeats(seats) {
                 if (isSeatCreator) seatClass += ' owner-seat';
                 if (isSpeaking) seatClass += ' speaking';
             }
-            if (hasFrame) seatClass += ' has-frame';
+            if (hasDisplayFrame) seatClass += ' has-frame';
             
             let clickHandler = isOccupied ? `onclick="openProfilePopup('${index}')"` :
                 (!isOwnerSeat || isOwner) ? `onclick="joinSeat(${index})"` : '';
             
-            const wrapperClass = hasFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
+            const wrapperClass = hasDisplayFrame ? 'seat-wrapper has-frame' : 'seat-wrapper';
             
             let frameHTML = '';
-            if (hasFrame && frameConfig) {
+            if (hasDisplayFrame && displayFrame) {
+                const videoSrc = displayFrame.video || displayFrame.embedUrl || '';
                 frameHTML = `
                     <div class="luxury-frame active">
-                        ${frameConfig.isVideo ? `<video autoplay loop muted playsinline><source src="${frameConfig.embedUrl}" type="video/mp4"></video>` : `<div class="fallback">${frameConfig.name}</div>`}
+                        <video autoplay loop muted playsinline><source src="${videoSrc}" type="video/mp4"></video>
                     </div>
                 `;
             } else {
@@ -3395,6 +3436,43 @@ async function leaveSeat() {
         document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">الميكروفون مكتوم</span>';
         showToast('✅ تم مغادرة المقعد', 'success');
     } catch(error) { showToast('❌ حدث خطأ', 'error'); }
+}
+
+// ============================================================
+// 🎁 منح أطارات المقتنيات تلقائياً عند شراء VIP
+// ============================================================
+async function grantCollectiblesForVIP(level, user, startDate, expiryDate) {
+    try {
+        const collectiblesToGrant = COLLECTIBLES.filter(c => {
+            if (level === 6) return c.source === 'VIP 6'; // يعطي vip6 و vip6pro
+            return c.source === `VIP ${level}`;
+        });
+        if (collectiblesToGrant.length === 0) return;
+
+        const userCollectibles = user.collectibles || {};
+        let updated = false;
+        collectiblesToGrant.forEach(c => {
+            if (!userCollectibles[c.id]) {
+                userCollectibles[c.id] = { 
+                    owned: true, 
+                    purchasedAt: startDate.toISOString(), 
+                    expiresAt: expiryDate.toISOString() 
+                };
+                updated = true;
+            }
+        });
+        if (updated) {
+            await database.ref('users/' + currentFirebaseUserId + '/collectibles').set(userCollectibles);
+            // تحديث user الحالي
+            const snap = await database.ref('users/' + currentFirebaseUserId).once('value');
+            const fresh = snap.val();
+            if (fresh) { 
+                saveUserToStorage(fresh, currentFirebaseUserId); 
+                currentUser = fresh;
+            }
+            showToast(`🎁 تم منح أطارات المقتنيات الخاصة بـ VIP ${level}`, 'success');
+        }
+    } catch(e) { console.error('خطأ في منح المقتنيات:', e); }
 }
 
 // ============================================================
@@ -3578,17 +3656,14 @@ async function recordProfileVisit(targetUserId) {
         const userKey = Object.keys(userData)[0];
         const user = userData[userKey];
         
-        // التحقق من الزيارة اليومية
         const today = new Date().toISOString().split('T')[0];
         const todayVisits = user.todayVisits || {};
         
-        // إذا زار اليوم بالفعل، لا تحسب زيارة جديدة
         if (todayVisits[currentUser.numericId] === today) {
             console.log('👁️ تمت الزيارة اليوم بالفعل');
             return;
         }
         
-        // تسجيل الزيارة اليومية
         todayVisits[currentUser.numericId] = today;
         
         const recentVisitors = user.recentVisitors || [];
@@ -3655,7 +3730,6 @@ async function sendProfileLike(targetUserId) {
         const todayLikes = user.todayLikes || {};
         const today = new Date().toISOString().split('T')[0];
         
-        // التحقق من الإعجاب اليومي
         if (likedBy.includes(currentUser.numericId) || todayLikes[currentUser.numericId] === today) {
             showToast('⚠️ لقد أعجبت بهذا المستخدم اليوم', 'warning');
             return;
@@ -4128,8 +4202,7 @@ function setupChatScroll() {
         }
     });
 }
-
-// ============================================================
+    // ============================================================
 // 🎨 CHAT STYLES MODAL
 // ============================================================
 async function openChatStylesModal() {
