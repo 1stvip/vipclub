@@ -423,6 +423,16 @@
         .collectible-card .collectible-actions .btn-deactivate.active:hover { background: #dc2626; }
         .collectible-card .collectible-actions .btn-disabled { background: #6b7280; color: #ccc; cursor: not-allowed; }
         .collectible-card .collectible-actions .btn-disabled:hover { transform: none; box-shadow: none; }
+        /* ===== تحذير إطار مقاعد مفعل ===== */
+        .frame-active-warning {
+            font-size: 0.65rem;
+            color: #f59e0b;
+            margin-bottom: 8px;
+            padding: 4px 10px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -462,9 +472,7 @@
 
     <!-- ===== VIP TAB ===== -->
     <div class="tab-content active" id="tabContentVip">
-        <div class="vip-grid" id="vipGrid">
-            <!-- VIP 1 .. VIP 10 سيتم إنشاؤهم عبر JS -->
-        </div>
+        <div class="vip-grid" id="vipGrid"></div>
     </div>
 
     <!-- ===== FRAMES TAB ===== -->
@@ -477,7 +485,7 @@
         <div class="chatstyles-grid" id="chatStylesGrid"></div>
     </div>
 
-    <!-- ===== COLLECTIBLES TAB (جديد) ===== -->
+    <!-- ===== COLLECTIBLES TAB ===== -->
     <div class="tab-content" id="tabContentCollectibles">
         <div class="collectibles-grid" id="collectiblesGrid"></div>
     </div>
@@ -485,7 +493,7 @@
 
 <script>
     // ============================================================
-    // 🔥 FIREBASE CONFIG - stvipclub
+    // 🔥 FIREBASE CONFIG
     // ============================================================
     const firebaseConfig = {
         apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -518,10 +526,10 @@
         10: { level:10, name:'VIP 10', emoji:'🌌', title:'المجرة', video:'images/vipsystem/vip10.mp4', duration:365, reqEGP:3000, reqUSD:null }
     };
 
-    // أطارات المقاعد (الثابتة)
+    // أطارات المقاعد
     const FRAMES = [
         { id:'frame1', name:'🎁 إطار خاص (هدية)', price:0, duration:30, embedUrl:'images/vipsystem/manager.mp4', isVideo:true, isSpecial:true, specialLabel:'🎁 أطار أصدار خاص' },
-        { id:'frame_support', name:'🛡️ إطار الدعم', price:0, duration:30, embedUrl:'images/vipsystem/support.mp4', isVideo:true, isSpecial:true, specialLabel:'🎁 هدية الإدارة' }, // الثاني
+        { id:'frame_support', name:'🛡️ إطار الدعم', price:0, duration:30, embedUrl:'images/vipsystem/support.mp4', isVideo:true, isSpecial:true, specialLabel:'🎁 هدية الإدارة' },
         { id:'frame_legend', name:'⚡ إطار الأسطورة', price:200, duration:45, embedUrl:'images/vipsystem/legend.mp4', isVideo:true, isSpecial:false },
         { id:'frame2', name:'⚔️ إطار المحارب', price:50, duration:30, embedUrl:'images/vipsystem/warrior.mp4', isVideo:true, isSpecial:false },
         { id:'frame3', name:'👑 إطار VIP', price:100, duration:30, embedUrl:'images/vipsystem/vip.mp4', isVideo:true, isSpecial:false },
@@ -537,7 +545,6 @@
     ];
 
     // ===== COLLECTIBLES (أطارات المقتنيات) =====
-    // كل خطة VIP تعطي إطاراً خاصاً بها + VIP6 يعطي إطارين (vip6 و vip6pro)
     const COLLECTIBLES = [
         { id:'collect_vip1', name:'إطار VIP 1', video:'images/vipsystem/vip1.mp4', source:'VIP 1' },
         { id:'collect_vip2', name:'إطار VIP 2', video:'images/vipsystem/vip2.mp4', source:'VIP 2' },
@@ -585,7 +592,8 @@
             activeFrame: userData.activeFrame || null,
             chatStyles: userData.chatStyles || {},
             activeChatStyle: userData.activeChatStyle || null,
-            collectibles: userData.collectibles || {} // { collect_id: { owned:true, expiresAt:.. } }
+            collectibles: userData.collectibles || {},
+            activeCollectible: userData.activeCollectible || null
         };
         localStorage.setItem('currentUser', JSON.stringify(u));
         currentUser = u;
@@ -761,10 +769,8 @@
             const updatedUser = { ...user, ...updateData };
             saveUserToStorage(updatedUser, currentFirebaseUserId);
 
-            // تسجيل
             await logPurchaseToAdmin({ type:'vip_purchase', itemName:`VIP ${level}`, itemId:`vip${level}`, price:cfg.reqEGP, currency:'EGP', userId:user.numericId, username:user.nickname||user.username, userFirebaseKey:currentFirebaseUserId, duration:cfg.duration, startDate:now.toISOString(), expiryDate:expiresAt.toISOString(), note:`شراء VIP ${level}` });
 
-            // منح الإطار الخاص بالمقتنيات تلقائياً
             await grantCollectiblesForVIP(level, user, now, expiresAt);
 
             showToast(`✅ تم شراء VIP ${level} بنجاح!`, 'success');
@@ -810,7 +816,7 @@
     async function grantCollectiblesForVIP(level, user, startDate, expiryDate) {
         try {
             const collectiblesToGrant = COLLECTIBLES.filter(c => {
-                if (level === 6) return c.source === 'VIP 6'; // يعطي vip6 و vip6pro
+                if (level === 6) return c.source === 'VIP 6';
                 return c.source === `VIP ${level}`;
             });
             if (collectiblesToGrant.length === 0) return;
@@ -825,7 +831,6 @@
             });
             if (updated) {
                 await database.ref('users/' + currentFirebaseUserId + '/collectibles').set(userCollectibles);
-                // تحديث user الحالي
                 const snap = await database.ref('users/' + currentFirebaseUserId).once('value');
                 const fresh = snap.val();
                 if (fresh) { saveUserToStorage(fresh, currentFirebaseUserId); }
@@ -842,6 +847,7 @@
         if (!grid) return;
         const userFrames = user ? (user.frames || {}) : {};
         const activeFrame = user ? (user.activeFrame || null) : null;
+        const activeCollectible = user ? (user.activeCollectible || null) : null;
 
         grid.innerHTML = FRAMES.map(frame => {
             const frameData = userFrames[frame.id] || null;
@@ -850,6 +856,9 @@
             const expiresAt = frameData?.expiresAt ? new Date(frameData.expiresAt) : null;
             const isExpired = expiresAt && expiresAt < new Date();
             const isValid = isOwned && !isExpired;
+            
+            // تحقق إذا كان إطار مقتنيات مفعل (يمنع تفعيل إطار مقاعد)
+            const hasActiveCollectible = activeCollectible !== null;
 
             let statusText = 'غير مملوك', statusClass = 'inactive';
             if (isActive && isValid) { statusText = '✅ مفعل حالياً'; statusClass = 'active'; }
@@ -865,12 +874,29 @@
             else { badgeClass += ' owned'; }
 
             let actionsHTML = '';
-            if (!user) { actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%;">🔒 يرجى تسجيل الدخول</button>`; }
-            else if (frame.isSpecial) { actionsHTML = `<button class="btn-buy disabled" disabled style="background:#ffd700;color:#1a1a2e;cursor:default;">🎁 لا يمكن الشراء</button>`; }
-            else if (isActive) { actionsHTML = `<button class="btn-deactivate active" onclick="deactivateFrame('${frame.id}')"><i class="fas fa-times"></i> إلغاء التفعيل</button>`; }
-            else if (isValid) { actionsHTML = `<button class="btn-activate" onclick="activateFrame('${frame.id}')"><i class="fas fa-play"></i> تفعيل</button>`; }
-            else if (isOwned && isExpired) { actionsHTML = `<button class="btn-buy" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')"><i class="fas fa-sync"></i> شراء مجدد (${frame.price} ج.م)</button>`; }
-            else { actionsHTML = `<button class="btn-buy ${!canAfford?'disabled':''}" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')" ${!canAfford?'disabled':''}>${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}</button>`; }
+            
+            // إذا كان هناك إطار مقتنيات مفعل، نعرض رسالة ولا نسمح بتفعيل إطار مقاعد
+            if (hasActiveCollectible && !isActive) {
+                actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%; background:#f59e0b; color:#1a1a2e;">⚠️ إطار مقتنيات مفعل حالياً</button>`;
+            } else if (!user) {
+                actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%;">🔒 يرجى تسجيل الدخول</button>`;
+            } else if (frame.isSpecial) {
+                actionsHTML = `<button class="btn-buy disabled" disabled style="background:#ffd700;color:#1a1a2e;cursor:default;">🎁 لا يمكن الشراء</button>`;
+            } else if (isActive) {
+                actionsHTML = `<button class="btn-deactivate active" onclick="deactivateFrame('${frame.id}')"><i class="fas fa-times"></i> إلغاء التفعيل</button>`;
+            } else if (isValid) {
+                actionsHTML = `<button class="btn-activate" onclick="activateFrame('${frame.id}')"><i class="fas fa-play"></i> تفعيل</button>`;
+            } else if (isOwned && isExpired) {
+                actionsHTML = `<button class="btn-buy" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')"><i class="fas fa-sync"></i> شراء مجدد (${frame.price} ج.م)</button>`;
+            } else {
+                actionsHTML = `<button class="btn-buy ${!canAfford?'disabled':''}" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')" ${!canAfford?'disabled':''}>${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}</button>`;
+            }
+
+            // إضافة تحذير إذا كان هناك إطار مقتنيات مفعل
+            let warningHTML = '';
+            if (hasActiveCollectible && !isActive) {
+                warningHTML = `<div class="frame-active-warning">⚠️ إطار مقتنيات مفعل حالياً. قم بإلغائه أولاً لتفعيل هذا الإطار.</div>`;
+            }
 
             let previewHTML = frame.isVideo ?
                 `<video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:12px;"><source src="${frame.embedUrl}" type="video/mp4"></video>` :
@@ -887,6 +913,7 @@
                         <div class="req-item"><span class="req-label">⏱️ مدة التفعيل</span><span class="req-value">${frame.duration} يوم</span></div>
                         <div class="req-item"><span class="req-label">📊 حالتك</span><span class="req-value" style="color:${isActive?'#3b82f6':isValid?'#ffd700':isOwned&&isExpired?'#ef4444':'#94a3b8'}">${isActive?'✅ مفعل':isValid?'📦 مملوك':isOwned&&isExpired?'⏳ منتهي':'غير مملوك'}</span></div>
                     </div>
+                    ${warningHTML}
                     <div class="vip-status-text ${statusClass}">${statusText}</div>
                     <div class="vip-actions">${actionsHTML}</div>
                 </div>
@@ -918,25 +945,42 @@
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
+    // ===== MODIFIED: activateFrame - إلغاء تفعيل المقتنيات تلقائياً =====
     async function activateFrame(frameId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         try {
             const snap = await database.ref('users/' + currentFirebaseUserId).once('value');
             const user = snap.val();
             if (!user) { showToast('❌ المستخدم غير موجود', 'error'); return; }
+            
+            // التحقق من وجود إطار مقتنيات مفعل
+            const activeCollectible = user.activeCollectible || null;
+            if (activeCollectible) {
+                if (!confirm(`⚠️ يوجد إطار مقتنيات مفعل حالياً (${activeCollectible}). سيتم إلغاء تفعيله تلقائياً. هل تريد المتابعة؟`)) {
+                    return;
+                }
+                // إلغاء تفعيل إطار المقتنيات
+                await database.ref('users/' + currentFirebaseUserId + '/activeCollectible').set(null);
+            }
+            
             const frames = user.frames || {};
             const frame = frames[frameId];
             if (!frame || !frame.owned) { showToast('⚠️ هذا الإطار غير مملوك', 'warning'); return; }
             const exp = frame.expiresAt ? new Date(frame.expiresAt) : null;
             if (exp && exp < new Date()) { showToast('⏳ صلاحية منتهية', 'warning'); return; }
+            
             await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(frameId);
-            const updatedUser = { ...user, activeFrame: frameId };
+            const updatedUser = { ...user, activeFrame: frameId, activeCollectible: null };
             saveUserToStorage(updatedUser, currentFirebaseUserId);
-            showToast('✅ تم تفعيل الإطار', 'success');
+            
+            showToast('✅ تم تفعيل إطار المقاعد (تم إلغاء تفعيل إطار المقتنيات)', 'success');
             await ensureUserData();
+            renderFrames(currentUser);
+            renderCollectibles(currentUser);
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
+    // ===== MODIFIED: deactivateFrame =====
     async function deactivateFrame(frameId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         if (!confirm('⚠️ إلغاء تفعيل هذا الإطار؟')) return;
@@ -944,9 +988,12 @@
             await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(null);
             const snap = await database.ref('users/' + currentFirebaseUserId).once('value');
             const user = snap.val();
-            if (user) saveUserToStorage(user, currentFirebaseUserId);
-            showToast('✅ تم إلغاء التفعيل', 'success');
+            if (user) {
+                saveUserToStorage({ ...user, activeFrame: null }, currentFirebaseUserId);
+            }
+            showToast('✅ تم إلغاء تفعيل إطار المقاعد', 'success');
             await ensureUserData();
+            renderFrames(currentUser);
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
@@ -1054,9 +1101,8 @@
         const grid = document.getElementById('collectiblesGrid');
         if (!grid) return;
         const userCollectibles = user ? (user.collectibles || {}) : {};
-        // نحدد active collectible (لكل مستخدم يمكنه تفعيل إطار مقتنيات واحد فقط؟ حسب الطلب: يمكن تفعيل وإلغاء)
-        // سنخزن activeCollectible في user
         const activeCollectible = user ? (user.activeCollectible || null) : null;
+        const activeFrame = user ? (user.activeFrame || null) : null;
 
         grid.innerHTML = COLLECTIBLES.map(c => {
             const data = userCollectibles[c.id] || null;
@@ -1065,6 +1111,9 @@
             const expiresAt = data?.expiresAt ? new Date(data.expiresAt) : null;
             const isExpired = expiresAt && expiresAt < new Date();
             const isValid = isOwned && !isExpired;
+            
+            // تحقق إذا كان هناك إطار مقاعد مفعل
+            const hasActiveFrame = activeFrame !== null;
 
             let statusText = '🔒 مقفل', statusClass = 'locked';
             if (isActive && isValid) { statusText = '✅ مفعل حالياً'; statusClass = 'active'; }
@@ -1072,12 +1121,20 @@
             else if (isOwned && isExpired) { statusText = '⏳ منتهي'; statusClass = 'locked'; }
 
             let actionsHTML = '';
+            let warningHTML = '';
+
+            if (hasActiveFrame && !isActive && isOwned) {
+                warningHTML = `<div class="frame-active-warning">⚠️ إطار مقاعد مفعل حالياً. قم بإلغائه أولاً لتفعيل هذا الإطار.</div>`;
+            }
+
             if (!user) {
                 actionsHTML = `<button class="btn-disabled" disabled>🔒 يرجى تسجيل الدخول</button>`;
             } else if (!isValid) {
                 actionsHTML = `<button class="btn-disabled" disabled>${isOwned && isExpired ? '⏳ منتهي' : '🔒 مقفل'}</button>`;
             } else if (isActive) {
                 actionsHTML = `<button class="btn-deactivate active" onclick="deactivateCollectible('${c.id}')"><i class="fas fa-times"></i> إلغاء التفعيل</button>`;
+            } else if (hasActiveFrame) {
+                actionsHTML = `<button class="btn-disabled" disabled>⚠️ إطار مقاعد مفعل</button>`;
             } else {
                 actionsHTML = `<button class="btn-activate" onclick="activateCollectible('${c.id}')"><i class="fas fa-play"></i> تفعيل</button>`;
             }
@@ -1089,6 +1146,7 @@
                     </div>
                     <div class="collectible-name">${c.name}</div>
                     <div class="collectible-source">📌 مصدر: ${c.source}</div>
+                    ${warningHTML}
                     <div class="collectible-status ${statusClass}">${statusText}</div>
                     <div class="collectible-actions">${actionsHTML}</div>
                 </div>
@@ -1096,27 +1154,42 @@
         }).join('');
     }
 
-    // تفعيل / إلغاء تفعيل المقتنيات
+    // ===== MODIFIED: activateCollectible - إلغاء تفعيل إطار المقاعد تلقائياً =====
     async function activateCollectible(collectId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         try {
             const snap = await database.ref('users/' + currentFirebaseUserId).once('value');
             const user = snap.val();
             if (!user) { showToast('❌ المستخدم غير موجود', 'error'); return; }
+            
+            // التحقق من وجود إطار مقاعد مفعل
+            const activeFrame = user.activeFrame || null;
+            if (activeFrame) {
+                if (!confirm(`⚠️ يوجد إطار مقاعد مفعل حالياً (${activeFrame}). سيتم إلغاء تفعيله تلقائياً. هل تريد المتابعة؟`)) {
+                    return;
+                }
+                // إلغاء تفعيل إطار المقاعد
+                await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(null);
+            }
+            
             const collectibles = user.collectibles || {};
             const data = collectibles[collectId];
             if (!data || !data.owned) { showToast('⚠️ هذا الإطار غير مملوك', 'warning'); return; }
             const exp = data.expiresAt ? new Date(data.expiresAt) : null;
             if (exp && exp < new Date()) { showToast('⏳ صلاحية منتهية', 'warning'); return; }
-            // تفعيل
+            
             await database.ref('users/' + currentFirebaseUserId + '/activeCollectible').set(collectId);
-            const updatedUser = { ...user, activeCollectible: collectId };
+            const updatedUser = { ...user, activeCollectible: collectId, activeFrame: null };
             saveUserToStorage(updatedUser, currentFirebaseUserId);
-            showToast('✅ تم تفعيل إطار المقتنيات', 'success');
+            
+            showToast('✅ تم تفعيل إطار المقتنيات (تم إلغاء تفعيل إطار المقاعد)', 'success');
             await ensureUserData();
+            renderCollectibles(currentUser);
+            renderFrames(currentUser);
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
+    // ===== MODIFIED: deactivateCollectible =====
     async function deactivateCollectible(collectId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         if (!confirm('⚠️ إلغاء تفعيل هذا الإطار؟')) return;
@@ -1124,9 +1197,13 @@
             await database.ref('users/' + currentFirebaseUserId + '/activeCollectible').set(null);
             const snap = await database.ref('users/' + currentFirebaseUserId).once('value');
             const user = snap.val();
-            if (user) saveUserToStorage(user, currentFirebaseUserId);
-            showToast('✅ تم إلغاء التفعيل', 'success');
+            if (user) {
+                saveUserToStorage({ ...user, activeCollectible: null }, currentFirebaseUserId);
+            }
+            showToast('✅ تم إلغاء تفعيل إطار المقتنيات', 'success');
             await ensureUserData();
+            renderCollectibles(currentUser);
+            renderFrames(currentUser);
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
@@ -1185,7 +1262,6 @@
             document.getElementById('userId').textContent = '🆔 ---';
             document.getElementById('vipLevel').textContent = 'VIP 0';
             document.getElementById('vipStatus').textContent = 'غير مفعل';
-            // عرض رسالة في الVIP Grid
             document.getElementById('vipGrid').innerHTML = `
                 <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
                     <div style="font-size:80px;margin-bottom:20px;">👋</div>
