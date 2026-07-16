@@ -13,7 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     
     <style>
-        /* ===== RESET & BASE - نفس الكود الأصلي ===== */
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -204,7 +204,8 @@
         .vip-card .vip-badge.special { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; }
         .vip-card .vip-badge.king { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
         .vip-card .vip-badge.elite { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
-        /* video container */
+        
+        /* ===== VIDEO CONTAINER مع صورة مصغرة ===== */
         .vip-card .vip-video-container {
             width: 100%;
             border-radius: 16px;
@@ -215,21 +216,54 @@
             aspect-ratio: 9/16;
             min-height: 350px;
             flex-shrink: 0;
+            cursor: pointer;
         }
         .vip-card .vip-video-container video {
             width: 100%; height: 100%;
             object-fit: cover;
             background: #0a0a1a;
+            display: none; /* مخفي حتى يتم الضغط */
+        }
+        .vip-card .vip-video-container video.playing {
+            display: block;
+        }
+        .vip-card .vip-video-container .video-thumbnail {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+        }
+        .vip-card .vip-video-container .video-thumbnail.hidden {
+            display: none;
+        }
+        .vip-card .vip-video-container .video-play-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            font-size: 4rem;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        .vip-card .vip-video-container:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.1);
+            color: #ffd700;
         }
         .vip-card .vip-video-container .video-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.2);
             display: flex; align-items: center; justify-content: center;
             font-size: 3rem; color: white;
             opacity: 0; transition: 0.3s; pointer-events: none;
+            z-index: 3;
         }
         .vip-card .vip-video-container:hover .video-overlay { opacity: 1; }
+        
         .vip-card .vip-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; color: #ffd700; }
         .vip-card .vip-description { color: #94a3b8; font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px; flex-grow: 1; }
         .vip-card .vip-requirements {
@@ -363,6 +397,7 @@
             .chatstyle-card { min-height: 350px; }
             .header .back-btn { padding: 8px 15px; font-size: 0.8rem; }
             .header { padding: 15px; }
+            .vip-card .vip-video-container .video-play-btn { font-size: 3rem; }
         }
         @media (max-width: 480px) {
             body { padding: 8px; }
@@ -376,6 +411,7 @@
             .header .logo { font-size: 1.1rem; }
             .header .back-btn { padding: 6px 12px; font-size: 0.7rem; }
             .tabs .tab-btn { padding: 8px 12px; font-size: 0.7rem; }
+            .vip-card .vip-video-container .video-play-btn { font-size: 2.5rem; }
         }
         /* ===== جمعية المقتنيات (new section) ===== */
         .collectibles-grid {
@@ -410,10 +446,42 @@
             aspect-ratio: 1/1;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            cursor: pointer;
         }
         .collectible-card .collectible-video video {
             width: 100%; height: 100%;
             object-fit: cover;
+            display: none;
+        }
+        .collectible-card .collectible-video video.playing {
+            display: block;
+        }
+        .collectible-card .collectible-video .collectible-thumbnail {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+        }
+        .collectible-card .collectible-video .collectible-thumbnail.hidden {
+            display: none;
+        }
+        .collectible-card .collectible-video .video-play-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            font-size: 4rem;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        .collectible-card .collectible-video:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.1);
+            color: #ffd700;
         }
         .collectible-card .collectible-name { font-size: 1.2rem; font-weight: bold; color: #ffd700; margin-bottom: 5px; }
         .collectible-card .collectible-source { font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px; }
@@ -528,28 +596,28 @@
     // 📋 DATA: VIP 1..10 + FRAMES + CHAT STYLES + COLLECTIBLES
     // ============================================================
     const VIP_CONFIG = {
-        1: { level:1, name:'VIP 1', emoji:'🚗', title:'السيارة الرياضية', video:'images/vipsystem/car.mp4', duration:30, reqEGP:500, reqUSD:null },
-        2: { level:2, name:'VIP 2', emoji:'🦁', title:'هيبة الأسد', video:'images/vipsystem/lion.mp4', duration:30, reqEGP:700, reqUSD:null },
-        3: { level:3, name:'VIP 3', emoji:'🔥', title:'النار', video:'images/vipsystem/vip3.mp4', duration:45, reqEGP:1000, reqUSD:null },
-        4: { level:4, name:'VIP 4', emoji:'⚡', title:'البرق', video:'images/vipsystem/vip4.mp4', duration:60, reqEGP:1300, reqUSD:null },
-        5: { level:5, name:'VIP 5', emoji:'🌟', title:'النجم', video:'images/vipsystem/vip5.mp4', duration:90, reqEGP:1600, reqUSD:null },
-        6: { level:6, name:'VIP 6', emoji:'💎', title:'الألماس', video:'images/vipsystem/vip6.mp4', duration:120, reqEGP:1900, reqUSD:null },
-        7: { level:7, name:'VIP 7', emoji:'👑', title:'الملك', video:'images/vipsystem/vip7.mp4', duration:150, reqEGP:2200, reqUSD:null },
-        8: { level:8, name:'VIP 8', emoji:'🐉', title:'التنين', video:'images/vipsystem/vip8.mp4', duration:180, reqEGP:2500, reqUSD:null },
-        9: { level:9, name:'VIP 9', emoji:'🦅', title:'النسر', video:'images/vipsystem/vip9.mp4', duration:200, reqEGP:2800, reqUSD:null },
-        10: { level:10, name:'VIP 10', emoji:'🌌', title:'المجرة', video:'images/vipsystem/vip10.mp4', duration:365, reqEGP:3000, reqUSD:null }
+        1: { level:1, name:'VIP 1', emoji:'🚗', title:'السيارة الرياضية', video:'images/vipsystem/car.mp4', thumbnail:'images/vipsystem/car.png', duration:30, reqEGP:500, reqUSD:null },
+        2: { level:2, name:'VIP 2', emoji:'🦁', title:'هيبة الأسد', video:'images/vipsystem/lion.mp4', thumbnail:'images/vipsystem/lion.png', duration:30, reqEGP:700, reqUSD:null },
+        3: { level:3, name:'VIP 3', emoji:'🔥', title:'النار', video:'images/vipsystem/vip3.mp4', thumbnail:'images/vipsystem/vip3.jpg', duration:45, reqEGP:1000, reqUSD:null },
+        4: { level:4, name:'VIP 4', emoji:'⚡', title:'البرق', video:'images/vipsystem/vip4.mp4', thumbnail:'images/vipsystem/vip4.jpg', duration:60, reqEGP:1300, reqUSD:null },
+        5: { level:5, name:'VIP 5', emoji:'🌟', title:'النجم', video:'images/vipsystem/vip5.mp4', thumbnail:'images/vipsystem/vip5.jpg', duration:90, reqEGP:1600, reqUSD:null },
+        6: { level:6, name:'VIP 6', emoji:'💎', title:'الألماس', video:'images/vipsystem/vip6.mp4', thumbnail:'images/vipsystem/vip6.jpg', duration:120, reqEGP:1900, reqUSD:null },
+        7: { level:7, name:'VIP 7', emoji:'👑', title:'الملك', video:'images/vipsystem/vip7.mp4', thumbnail:'images/vipsystem/vip7.jpg', duration:150, reqEGP:2200, reqUSD:null },
+        8: { level:8, name:'VIP 8', emoji:'🐉', title:'التنين', video:'images/vipsystem/vip8.mp4', thumbnail:'images/vipsystem/vip8.jpg', duration:180, reqEGP:2500, reqUSD:null },
+        9: { level:9, name:'VIP 9', emoji:'🦅', title:'النسر', video:'images/vipsystem/vip9.mp4', thumbnail:'images/vipsystem/vip9.jpg', duration:200, reqEGP:2800, reqUSD:null },
+        10: { level:10, name:'VIP 10', emoji:'🌌', title:'المجرة', video:'images/vipsystem/vip10.mp4', thumbnail:'images/vipsystem/vip10.jpg', duration:365, reqEGP:3000, reqUSD:null }
     };
 
     // أطارات المقاعد
     const FRAMES = [
-        { id:'frame1', name:'🎁 إطار خاص (هدية)', price:0, duration:30, embedUrl:'images/vipsystem/manager.mp4', isVideo:true, isSpecial:true, specialLabel:'🎁 أطار أصدار خاص' },
-        { id:'frame_support', name:'🛡️ إطار الدعم', price:0, duration:30, embedUrl:'images/vipsystem/support.mp4', isVideo:true, isSpecial:true, specialLabel:'🎁 هدية الإدارة' },
-        { id:'frame_legend', name:'⚡ إطار الأسطورة', price:200, duration:45, embedUrl:'images/vipsystem/legend.mp4', isVideo:true, isSpecial:false },
-        { id:'frame2', name:'⚔️ إطار المحارب', price:50, duration:30, embedUrl:'images/vipsystem/warrior.mp4', isVideo:true, isSpecial:false },
-        { id:'frame3', name:'👑 إطار VIP', price:100, duration:30, embedUrl:'images/vipsystem/vip.mp4', isVideo:true, isSpecial:false },
-        { id:'frame4', name:'👸 إطار الملكة', price:150, duration:30, embedUrl:'images/vipsystem/queen.mp4', isVideo:true, isSpecial:false },
-        { id:'frame5', name:'👑 إطار الملك', price:200, duration:45, embedUrl:'images/vipsystem/king.mp4', isVideo:true, isSpecial:false, badgeClass:'king', badgeText:'👑 ملكي' },
-        { id:'frame6', name:'⭐ إطار النخبة', price:250, duration:45, embedUrl:'images/vipsystem/Elite.mp4', isVideo:true, isSpecial:false, badgeClass:'elite', badgeText:'⭐ نخبة' }
+        { id:'frame1', name:'🎁 إطار خاص (هدية)', price:0, duration:30, embedUrl:'images/vipsystem/manager.mp4', thumbnail:'images/vipsystem/manager.jpg', isVideo:true, isSpecial:true, specialLabel:'🎁 أطار أصدار خاص' },
+        { id:'frame_support', name:'🛡️ إطار الدعم', price:0, duration:30, embedUrl:'images/vipsystem/support.mp4', thumbnail:'images/vipsystem/support.jpg', isVideo:true, isSpecial:true, specialLabel:'🎁 هدية الإدارة' },
+        { id:'frame_legend', name:'⚡ إطار الأسطورة', price:200, duration:45, embedUrl:'images/vipsystem/legend.mp4', thumbnail:'images/vipsystem/legend.jpg', isVideo:true, isSpecial:false },
+        { id:'frame2', name:'⚔️ إطار المحارب', price:50, duration:30, embedUrl:'images/vipsystem/warrior.mp4', thumbnail:'images/vipsystem/warrior.jpg', isVideo:true, isSpecial:false },
+        { id:'frame3', name:'👑 إطار VIP', price:100, duration:30, embedUrl:'images/vipsystem/vip.mp4', thumbnail:'images/vipsystem/vip.jpg', isVideo:true, isSpecial:false },
+        { id:'frame4', name:'👸 إطار الملكة', price:150, duration:30, embedUrl:'images/vipsystem/queen.mp4', thumbnail:'images/vipsystem/queen.jpg', isVideo:true, isSpecial:false },
+        { id:'frame5', name:'👑 إطار الملك', price:200, duration:45, embedUrl:'images/vipsystem/king.mp4', thumbnail:'images/vipsystem/king.jpg', isVideo:true, isSpecial:false, badgeClass:'king', badgeText:'👑 ملكي' },
+        { id:'frame6', name:'⭐ إطار النخبة', price:250, duration:45, embedUrl:'images/vipsystem/Elite.mp4', thumbnail:'images/vipsystem/Elite.jpg', isVideo:true, isSpecial:false, badgeClass:'elite', badgeText:'⭐ نخبة' }
     ];
 
     // أشكال الكتابة
@@ -560,17 +628,17 @@
 
     // ===== COLLECTIBLES (أطارات المقتنيات) =====
     const COLLECTIBLES = [
-        { id:'collect_vip1', name:'إطار VIP 1', video:'images/vipsystem/vip1.mp4', source:'VIP 1' },
-        { id:'collect_vip2', name:'إطار VIP 2', video:'images/vipsystem/vip2.mp4', source:'VIP 2' },
-        { id:'collect_vip3', name:'إطار VIP 3', video:'images/vipsystem/vip3.mp4', source:'VIP 3' },
-        { id:'collect_vip4', name:'إطار VIP 4', video:'images/vipsystem/vip4.mp4', source:'VIP 4' },
-        { id:'collect_vip5', name:'إطار VIP 5', video:'images/vipsystem/vip5.mp4', source:'VIP 5' },
-        { id:'collect_vip6', name:'إطار VIP 6', video:'images/vipsystem/vip6.mp4', source:'VIP 6' },
-        { id:'collect_vip6pro', name:'إطار VIP 6 Pro', video:'images/vipsystem/vip6pro.mp4', source:'VIP 6' },
-        { id:'collect_vip7', name:'إطار VIP 7', video:'images/vipsystem/vip7.mp4', source:'VIP 7' },
-        { id:'collect_vip8', name:'إطار VIP 8', video:'images/vipsystem/vip8.mp4', source:'VIP 8' },
-        { id:'collect_vip9', name:'إطار VIP 9', video:'images/vipsystem/vip9.mp4', source:'VIP 9' },
-        { id:'collect_vip10', name:'إطار VIP 10', video:'images/vipsystem/vip10.mp4', source:'VIP 10' }
+        { id:'collect_vip1', name:'إطار VIP 1', video:'images/vipsystem/vip1.mp4', thumbnail:'images/vipsystem/vip1.jpg', source:'VIP 1' },
+        { id:'collect_vip2', name:'إطار VIP 2', video:'images/vipsystem/vip2.mp4', thumbnail:'images/vipsystem/vip2.jpg', source:'VIP 2' },
+        { id:'collect_vip3', name:'إطار VIP 3', video:'images/vipsystem/vip3.mp4', thumbnail:'images/vipsystem/vip3.jpg', source:'VIP 3' },
+        { id:'collect_vip4', name:'إطار VIP 4', video:'images/vipsystem/vip4.mp4', thumbnail:'images/vipsystem/vip4.jpg', source:'VIP 4' },
+        { id:'collect_vip5', name:'إطار VIP 5', video:'images/vipsystem/vip5.mp4', thumbnail:'images/vipsystem/vip5.jpg', source:'VIP 5' },
+        { id:'collect_vip6', name:'إطار VIP 6', video:'images/vipsystem/vip6.mp4', thumbnail:'images/vipsystem/vip6.jpg', source:'VIP 6' },
+        { id:'collect_vip6pro', name:'إطار VIP 6 Pro', video:'images/vipsystem/vip6pro.mp4', thumbnail:'images/vipsystem/vip6pro.jpg', source:'VIP 6' },
+        { id:'collect_vip7', name:'إطار VIP 7', video:'images/vipsystem/vip7.mp4', thumbnail:'images/vipsystem/vip7.jpg', source:'VIP 7' },
+        { id:'collect_vip8', name:'إطار VIP 8', video:'images/vipsystem/vip8.mp4', thumbnail:'images/vipsystem/vip8.jpg', source:'VIP 8' },
+        { id:'collect_vip9', name:'إطار VIP 9', video:'images/vipsystem/vip9.mp4', thumbnail:'images/vipsystem/vip9.jpg', source:'VIP 9' },
+        { id:'collect_vip10', name:'إطار VIP 10', video:'images/vipsystem/vip10.mp4', thumbnail:'images/vipsystem/vip10.jpg', source:'VIP 10' }
     ];
 
     // ============================================================
@@ -679,47 +747,51 @@
     }
 
     // ============================================================
-    // 🎬 LAZY LOAD VIDEOS (تحسين الأداء - لا يتم حذف أي كود أساسي)
+    // 🎬 تشغيل الفيديو عند الضغط على الصورة
     // ============================================================
-    function initLazyVideos() {
-        if (!('IntersectionObserver' in window)) return;
-        const videos = document.querySelectorAll('.vip-video-container video, .collectible-video video');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const video = entry.target;
-                    if (video.dataset.src) {
-                        video.src = video.dataset.src;
-                        video.load();
-                    }
-                    video.play().catch(() => {});
-                    observer.unobserve(video);
-                }
-            });
-        }, { rootMargin: '50px', threshold: 0.1 });
+    function playVideoOnClick(container) {
+        const video = container.querySelector('video');
+        const thumbnail = container.querySelector('.video-thumbnail') || container.querySelector('.collectible-thumbnail');
+        const playBtn = container.querySelector('.video-play-btn');
         
-        videos.forEach(v => {
-            // حفظ المصدر في data-src وإزالة src مؤقتاً
-            if (v.querySelector('source')) {
-                const source = v.querySelector('source');
-                if (source.src && !source.dataset.src) {
-                    source.dataset.src = source.src;
-                    source.src = '';
-                }
+        if (!video) return;
+        
+        container.addEventListener('click', function(e) {
+            // منع التشغيل إذا تم الضغط على زر أو رابط داخل البطاقة
+            if (e.target.closest('button') || e.target.closest('a')) return;
+            
+            if (video.classList.contains('playing')) {
+                // إذا كان الفيديو يعمل، نوقفه ونعرض الصورة
+                video.pause();
+                video.classList.remove('playing');
+                if (thumbnail) thumbnail.classList.remove('hidden');
+                if (playBtn) playBtn.style.display = 'block';
+                video.currentTime = 0;
+            } else {
+                // تشغيل الفيديو
+                video.classList.add('playing');
+                if (thumbnail) thumbnail.classList.add('hidden');
+                if (playBtn) playBtn.style.display = 'none';
+                video.play().catch(() => {});
             }
-            observer.observe(v);
+        });
+        
+        // عند انتهاء الفيديو نعود للصورة
+        video.addEventListener('ended', function() {
+            video.classList.remove('playing');
+            if (thumbnail) thumbnail.classList.remove('hidden');
+            if (playBtn) playBtn.style.display = 'block';
         });
     }
 
     // ============================================================
-    // 📊 VIP SYSTEM (VIP 1..10) - نفس الكود الأصلي مع تحسينات الأداء
+    // 📊 VIP SYSTEM (VIP 1..10)
     // ============================================================
     function renderVIPGrid(user) {
         const grid = document.getElementById('vipGrid');
         if (!grid) return;
         let html = '';
-        // على الموبايل نعرض 5 فقط ثم الباقي عند التمرير (تحسين الأداء)
-        const levels = isMobile ? [1,2,3,4,5,6,7,8,9,10] : [1,2,3,4,5,6,7,8,9,10];
+        const levels = [1,2,3,4,5,6,7,8,9,10];
         for (let level of levels) {
             const cfg = VIP_CONFIG[level];
             const vipData = user?.vip || { active: null, expiresAt: null };
@@ -762,14 +834,15 @@
                 actionsHTML = `<button class="btn-buy ${!canAfford?'disabled':''}" onclick="buyVIP(${level})" ${!canAfford?'disabled':''}>${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}</button>`;
             }
 
-            // استخدام data-src للتحميل البطيء للفيديو
             html += `
                 <div class="vip-card">
                     <span class="${badgeClass}">${badgeText}</span>
-                    <div class="vip-video-container">
-                        <video autoplay loop muted playsinline preload="none" poster="">
-                            <source data-src="${cfg.video}" type="video/mp4">
+                    <div class="vip-video-container" data-video>
+                        <img class="video-thumbnail" src="${cfg.thumbnail}" alt="${cfg.name}" loading="lazy">
+                        <video preload="none" muted playsinline>
+                            <source src="${cfg.video}" type="video/mp4">
                         </video>
+                        <div class="video-play-btn"><i class="fas fa-play-circle"></i></div>
                         <div class="video-overlay"><i class="fas fa-play-circle"></i></div>
                     </div>
                     <div class="vip-title">${cfg.emoji} ${cfg.name} - ${cfg.title}</div>
@@ -785,11 +858,16 @@
             `;
         }
         grid.innerHTML = html;
-        // تهيئة التحميل البطيء بعد العرض
-        setTimeout(initLazyVideos, 500);
+        
+        // تفعيل خاصية الضغط على الفيديو
+        setTimeout(() => {
+            document.querySelectorAll('.vip-video-container[data-video]').forEach(container => {
+                playVideoOnClick(container);
+            });
+        }, 300);
     }
 
-    // ===== VIP ACTIONS ===== (جميع الدوال كما هي دون تغيير)
+    // ===== VIP ACTIONS =====
     async function buyVIP(level) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning'); return; }
         const cfg = VIP_CONFIG[level];
@@ -894,7 +972,7 @@
     }
 
     // ============================================================
-    // 🖼️ FRAMES SYSTEM (المقاعد) - نفس الكود الأصلي مع تحسينات
+    // 🖼️ FRAMES SYSTEM
     // ============================================================
     function renderFrames(user) {
         const grid = document.getElementById('framesGrid');
@@ -949,14 +1027,22 @@
                 warningHTML = `<div class="frame-active-warning">⚠️ إطار مقتنيات مفعل حالياً. قم بإلغائه أولاً لتفعيل هذا الإطار.</div>`;
             }
 
-            let previewHTML = frame.isVideo ?
-                `<video autoplay loop muted playsinline preload="none" style="width:100%;height:100%;object-fit:cover;border-radius:12px;"><source data-src="${frame.embedUrl}" type="video/mp4"></video>` :
-                `<iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>`;
+            // استخدام الصورة المصغرة مع إمكانية التشغيل عند الضغط
+            let previewHTML = `
+                <div class="vip-video-container" data-video>
+                    <img class="video-thumbnail" src="${frame.thumbnail || frame.embedUrl.replace('.mp4', '.jpg')}" alt="${frame.name}" loading="lazy">
+                    <video preload="none" muted playsinline>
+                        <source src="${frame.embedUrl}" type="video/mp4">
+                    </video>
+                    <div class="video-play-btn"><i class="fas fa-play-circle"></i></div>
+                    <div class="video-overlay"><i class="fas fa-play-circle"></i></div>
+                </div>
+            `;
 
             return `
                 <div class="vip-card">
                     <span class="${badgeClass}">${badgeText}</span>
-                    <div class="vip-video-container">${previewHTML}<div class="video-overlay"><i class="fas fa-play-circle"></i></div></div>
+                    ${previewHTML}
                     <div class="vip-title">${frame.name}</div>
                     <div class="vip-description">${frame.isSpecial ? '🎁 هذا الإطار خاص ولا يمكن شراؤه' : frame.id==='frame_legend'?'⚡ إطار الأسطورة - أظهر قوتك':frame.id==='frame_support'?'🛡️ إطار الدعم - هدية من الإدارة':'إطار مميز للغرف الصوتية'}</div>
                     <div class="vip-requirements">
@@ -970,9 +1056,15 @@
                 </div>
             `;
         }).join('');
-        setTimeout(initLazyVideos, 300);
+        
+        setTimeout(() => {
+            document.querySelectorAll('#framesGrid .vip-video-container[data-video]').forEach(container => {
+                playVideoOnClick(container);
+            });
+        }, 300);
     }
 
+    // ===== FRAMES ACTIONS =====
     async function buyFrame(frameId, price, name) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         const frame = FRAMES.find(f => f.id === frameId);
@@ -1046,7 +1138,7 @@
     }
 
     // ============================================================
-    // 💬 CHAT STYLES - نفس الكود الأصلي
+    // 💬 CHAT STYLES
     // ============================================================
     function renderChatStyles(user) {
         const grid = document.getElementById('chatStylesGrid');
@@ -1143,7 +1235,7 @@
     }
 
     // ============================================================
-    // 🎁 COLLECTIBLES (أطارات المقتنيات) - نفس الكود الأصلي مع تحسينات
+    // 🎁 COLLECTIBLES
     // ============================================================
     function renderCollectibles(user) {
         const grid = document.getElementById('collectiblesGrid');
@@ -1188,8 +1280,12 @@
 
             return `
                 <div class="collectible-card">
-                    <div class="collectible-video">
-                        <video autoplay loop muted playsinline preload="none"><source data-src="${c.video}" type="video/mp4"></video>
+                    <div class="collectible-video" data-video>
+                        <img class="collectible-thumbnail" src="${c.thumbnail || c.video.replace('.mp4', '.jpg')}" alt="${c.name}" loading="lazy">
+                        <video preload="none" muted playsinline>
+                            <source src="${c.video}" type="video/mp4">
+                        </video>
+                        <div class="video-play-btn"><i class="fas fa-play-circle"></i></div>
                     </div>
                     <div class="collectible-name">${c.name}</div>
                     <div class="collectible-source">📌 مصدر: ${c.source}</div>
@@ -1199,7 +1295,12 @@
                 </div>
             `;
         }).join('');
-        setTimeout(initLazyVideos, 300);
+        
+        setTimeout(() => {
+            document.querySelectorAll('#collectiblesGrid .collectible-video[data-video]').forEach(container => {
+                playVideoOnClick(container);
+            });
+        }, 300);
     }
 
     async function activateCollectible(collectId) {
@@ -1334,7 +1435,6 @@
         ensureUserData().then(() => console.log('👑 VIP System loaded'));
         const stored = getStoredUser();
         updateLoginButtons(!!stored);
-        // تحديث حالة الموبايل عند تغيير حجم الشاشة
         window.addEventListener('resize', () => { isMobile = window.innerWidth <= 768; });
     };
 </script>
