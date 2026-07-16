@@ -197,7 +197,7 @@
         .vip-card .vip-badge.special { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; }
         .vip-card .vip-badge.king { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
         .vip-card .vip-badge.elite { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
-        /* video container - now with thumbnail */
+        /* video container */
         .vip-card .vip-video-container {
             width: 100%;
             border-radius: 16px;
@@ -221,15 +221,17 @@
         }
         .vip-card .vip-video-container .video-thumbnail {
             width: 100%; height: 100%;
-            object-fit: cover;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #1a1a3e, #2a2a5e);
             color: #ffd700;
-            font-size: 4rem;
+            gap: 10px;
+            position: relative;
         }
         .vip-card .vip-video-container .video-thumbnail .play-icon {
+            font-size: 4rem;
             opacity: 0.8;
             transition: 0.3s;
             text-shadow: 0 0 30px rgba(255,215,0,0.3);
@@ -239,16 +241,15 @@
             transform: scale(1.1);
         }
         .vip-card .vip-video-container .video-thumbnail .video-label {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: #94a3b8;
-            background: rgba(0,0,0,0.6);
-            padding: 4px 12px;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 16px;
             border-radius: 20px;
             white-space: nowrap;
+        }
+        .vip-card .vip-video-container .video-thumbnail .emoji-icon {
+            font-size: 3rem;
         }
         .vip-card .vip-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; color: #ffd700; }
         .vip-card .vip-description { color: #94a3b8; font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px; flex-grow: 1; }
@@ -391,7 +392,7 @@
             .chatstyle-card { padding: 18px; min-height: 300px; }
             .chatstyle-card .style-preview { max-width: 180px; }
         }
-        /* ===== جمعية المقتنيات (new section) ===== */
+        /* ===== جمعية المقتنيات ===== */
         .collectibles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -438,13 +439,15 @@
         .collectible-card .collectible-video .video-thumbnail {
             width: 100%; height: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #1a1a3e, #2a2a5e);
             color: #ffd700;
-            font-size: 3rem;
+            gap: 8px;
         }
         .collectible-card .collectible-video .video-thumbnail .play-icon {
+            font-size: 3rem;
             opacity: 0.7;
             transition: 0.3s;
         }
@@ -473,7 +476,7 @@
         .collectible-card .collectible-actions .btn-deactivate.active:hover { background: #dc2626; }
         .collectible-card .collectible-actions .btn-disabled { background: #6b7280; color: #ccc; cursor: not-allowed; }
         .collectible-card .collectible-actions .btn-disabled:hover { transform: none; box-shadow: none; }
-        /* ===== تحذير إطار مقاعد مفعل ===== */
+        /* ===== تحذير ===== */
         .frame-active-warning {
             font-size: 0.65rem;
             color: #f59e0b;
@@ -559,10 +562,10 @@
     let database;
     let currentUser = null;
     let currentFirebaseUserId = null;
-    let activeVideoElement = null; // track currently playing video
+    let activeVideoElement = null;
 
     // ============================================================
-    // 📋 DATA: VIP 1..10 + FRAMES + CHAT STYLES + COLLECTIBLES
+    // 📋 DATA
     // ============================================================
     const VIP_CONFIG = {
         1: { level:1, name:'VIP 1', emoji:'🚗', title:'السيارة الرياضية', video:'images/vipsystem/car.mp4', duration:30, reqEGP:500, reqUSD:null },
@@ -577,7 +580,6 @@
         10: { level:10, name:'VIP 10', emoji:'🌌', title:'المجرة', video:'images/vipsystem/vip10.mp4', duration:365, reqEGP:3000, reqUSD:null }
     };
 
-    // أطارات المقاعد
     const FRAMES = [
         { id:'frame1', name:'🎁 إطار خاص (هدية)', price:0, duration:30, embedUrl:'images/vipsystem/manager.mp4', isVideo:true, isSpecial:true, specialLabel:'🎁 أطار أصدار خاص' },
         { id:'frame_support', name:'🛡️ إطار الدعم', price:0, duration:30, embedUrl:'images/vipsystem/support.mp4', isVideo:true, isSpecial:true, specialLabel:'🎁 هدية الإدارة' },
@@ -589,13 +591,11 @@
         { id:'frame6', name:'⭐ إطار النخبة', price:250, duration:45, embedUrl:'images/vipsystem/Elite.mp4', isVideo:true, isSpecial:false, badgeClass:'elite', badgeText:'⭐ نخبة' }
     ];
 
-    // أشكال الكتابة
     const CHAT_STYLES = [
         { id:'chatstyle1', name:'أسلوب كتابة 1', price:50, duration:30, image:'images/vipsystem/chatstyles/chat1style.png' },
         { id:'chatstyle2', name:'أسلوب كتابة 2', price:20, duration:30, image:'images/vipsystem/chatstyles/chat2style.png' }
     ];
 
-    // ===== COLLECTIBLES (أطارات المقتنيات) =====
     const COLLECTIBLES = [
         { id:'collect_vip1', name:'إطار VIP 1', video:'images/vipsystem/vip1.mp4', source:'VIP 1' },
         { id:'collect_vip2', name:'إطار VIP 2', video:'images/vipsystem/vip2.mp4', source:'VIP 2' },
@@ -719,19 +719,16 @@
     // 🎬 VIDEO PLAYER CONTROLLER
     // ============================================================
     function playVideo(videoElement, container) {
-        // Stop any currently playing video
         if (activeVideoElement && activeVideoElement !== videoElement) {
             activeVideoElement.pause();
             activeVideoElement.currentTime = 0;
             activeVideoElement.classList.remove('active-video');
-            // Show thumbnail for the stopped video
             const oldContainer = activeVideoElement.closest('.vip-video-container') || activeVideoElement.closest('.collectible-video');
             if (oldContainer) {
                 const thumbnail = oldContainer.querySelector('.video-thumbnail');
                 if (thumbnail) thumbnail.style.display = 'flex';
             }
         }
-        // Toggle current video
         if (videoElement.classList.contains('active-video')) {
             videoElement.pause();
             videoElement.currentTime = 0;
@@ -748,20 +745,19 @@
             const thumbnail = container.querySelector('.video-thumbnail');
             if (thumbnail) thumbnail.style.display = 'none';
         }
-        videoElement.play().catch(() => {});
+        videoElement.play().catch(e => console.log('Play error:', e));
         activeVideoElement = videoElement;
     }
 
     function setupVideoClick(container, videoElement) {
         container.addEventListener('click', function(e) {
-            // Don't trigger if click is on a button inside
             if (e.target.closest('button')) return;
             playVideo(videoElement, container);
         });
     }
 
     // ============================================================
-    // 📊 VIP SYSTEM (VIP 1..10)
+    // 📊 VIP SYSTEM
     // ============================================================
     function renderVIPGrid(user) {
         const grid = document.getElementById('vipGrid');
@@ -813,9 +809,10 @@
                 <div class="vip-card">
                     <span class="${badgeClass}">${badgeText}</span>
                     <div class="vip-video-container" data-video="${cfg.video}">
-                        <div class="video-thumbnail" style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="video-thumbnail">
+                            <div class="emoji-icon">${cfg.emoji}</div>
                             <i class="fas fa-play-circle play-icon"></i>
-                            <span style="font-size:0.8rem;color:#94a3b8;">اضغط للتشغيل</span>
+                            <span class="video-label">اضغط لتشغيل الفيديو</span>
                         </div>
                         <video muted playsinline style="display:none;"><source src="${cfg.video}" type="video/mp4"></video>
                     </div>
@@ -833,7 +830,6 @@
         }
         grid.innerHTML = html;
 
-        // Setup video click handlers
         document.querySelectorAll('#vipGrid .vip-video-container').forEach(container => {
             const video = container.querySelector('video');
             if (video) setupVideoClick(container, video);
@@ -916,7 +912,7 @@
     }
 
     // ============================================================
-    // 🎁 منح أطارات المقتنيات تلقائياً عند شراء VIP
+    // 🎁 منح أطارات المقتنيات
     // ============================================================
     async function grantCollectiblesForVIP(level, user, startDate, expiryDate) {
         try {
@@ -945,7 +941,7 @@
     }
 
     // ============================================================
-    // 🖼️ FRAMES SYSTEM (المقاعد)
+    // 🖼️ FRAMES SYSTEM
     // ============================================================
     function renderFrames(user) {
         const grid = document.getElementById('framesGrid');
@@ -1000,11 +996,12 @@
                 actionsHTML = `<button class="btn-buy ${!canAfford?'disabled':''}" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')" ${!canAfford?'disabled':''}>${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}</button>`;
             }
 
-            let previewHTML = `
+            const previewHTML = `
                 <div class="vip-video-container" data-video="${frame.embedUrl}">
-                    <div class="video-thumbnail" style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="video-thumbnail">
+                        <i class="fas fa-video" style="font-size:2.5rem;opacity:0.6;"></i>
                         <i class="fas fa-play-circle play-icon"></i>
-                        <span style="font-size:0.7rem;color:#94a3b8;">اضغط للتشغيل</span>
+                        <span class="video-label">اضغط لتشغيل الفيديو</span>
                     </div>
                     <video muted playsinline style="display:none;"><source src="${frame.embedUrl}" type="video/mp4"></video>
                 </div>
@@ -1204,7 +1201,7 @@
     }
 
     // ============================================================
-    // 🎁 COLLECTIBLES (أطارات المقتنيات)
+    // 🎁 COLLECTIBLES
     // ============================================================
     function renderCollectibles(user) {
         const grid = document.getElementById('collectiblesGrid');
@@ -1250,7 +1247,8 @@
             return `
                 <div class="collectible-card">
                     <div class="collectible-video" data-video="${c.video}">
-                        <div class="video-thumbnail" style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="video-thumbnail">
+                            <i class="fas fa-gem" style="font-size:2.5rem;opacity:0.6;"></i>
                             <i class="fas fa-play-circle play-icon"></i>
                             <span style="font-size:0.6rem;color:#94a3b8;">اضغط للتشغيل</span>
                         </div>
