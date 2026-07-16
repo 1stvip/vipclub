@@ -150,7 +150,7 @@
         /* ===== VIP GRID (cards) ===== */
         .vip-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
             margin-top: 20px;
         }
@@ -164,7 +164,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 580px;
+            min-height: 500px;
         }
         .vip-card:hover {
             transform: translateY(-8px);
@@ -197,7 +197,7 @@
         .vip-card .vip-badge.special { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; }
         .vip-card .vip-badge.king { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
         .vip-card .vip-badge.elite { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
-        /* video container */
+        /* video container - now with thumbnail */
         .vip-card .vip-video-container {
             width: 100%;
             border-radius: 16px;
@@ -206,23 +206,50 @@
             position: relative;
             background: #0a0a1a;
             aspect-ratio: 9/16;
-            min-height: 350px;
+            min-height: 300px;
             flex-shrink: 0;
+            cursor: pointer;
         }
         .vip-card .vip-video-container video {
             width: 100%; height: 100%;
             object-fit: cover;
             background: #0a0a1a;
+            display: none;
         }
-        .vip-card .vip-video-container .video-overlay {
+        .vip-card .vip-video-container video.active-video {
+            display: block;
+        }
+        .vip-card .vip-video-container .video-thumbnail {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a3e, #2a2a5e);
+            color: #ffd700;
+            font-size: 4rem;
+        }
+        .vip-card .vip-video-container .video-thumbnail .play-icon {
+            opacity: 0.8;
+            transition: 0.3s;
+            text-shadow: 0 0 30px rgba(255,215,0,0.3);
+        }
+        .vip-card .vip-video-container:hover .video-thumbnail .play-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .vip-card .vip-video-container .video-thumbnail .video-label {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; color: white;
-            opacity: 0; transition: 0.3s; pointer-events: none;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #94a3b8;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
         }
-        .vip-card .vip-video-container:hover .video-overlay { opacity: 1; }
         .vip-card .vip-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; color: #ffd700; }
         .vip-card .vip-description { color: #94a3b8; font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px; flex-grow: 1; }
         .vip-card .vip-requirements {
@@ -264,7 +291,7 @@
         /* ===== CHAT STYLES ===== */
         .chatstyles-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             margin-top: 20px;
         }
@@ -278,7 +305,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 400px;
+            min-height: 350px;
         }
         .chatstyle-card:hover {
             transform: translateY(-8px);
@@ -286,7 +313,7 @@
             box-shadow: 0 20px 60px rgba(255,215,0,0.1);
         }
         .chatstyle-card .style-preview {
-            width: 100%; max-width: 280px;
+            width: 100%; max-width: 240px;
             border-radius: 16px;
             overflow: hidden;
             background: #0a0a1a;
@@ -349,25 +376,25 @@
             .chatstyles-grid { grid-template-columns: 1fr; }
             .user-info { flex-direction: column; align-items: flex-start; }
             .header .logo { font-size: 1.3rem; }
-            .vip-card { min-height: 500px; }
-            .vip-card .vip-video-container { min-height: 280px; }
+            .vip-card { min-height: 450px; }
+            .vip-card .vip-video-container { min-height: 240px; }
             .tabs .tab-btn { padding: 10px 15px; font-size: 0.8rem; }
-            .chatstyle-card { min-height: 350px; }
+            .chatstyle-card { min-height: 320px; }
             .header .back-btn { padding: 8px 15px; font-size: 0.8rem; }
         }
         @media (max-width: 480px) {
-            .vip-card { padding: 18px; min-height: 450px; }
+            .vip-card { padding: 18px; min-height: 400px; }
             .vip-card .vip-title { font-size: 1.1rem; }
             .vip-card .vip-actions button { font-size: 0.8rem; padding: 10px; }
-            .vip-card .vip-video-container { min-height: 220px; }
+            .vip-card .vip-video-container { min-height: 200px; }
             .user-info .user-details { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .chatstyle-card { padding: 18px; min-height: 320px; }
-            .chatstyle-card .style-preview { max-width: 200px; }
+            .chatstyle-card { padding: 18px; min-height: 300px; }
+            .chatstyle-card .style-preview { max-width: 180px; }
         }
         /* ===== جمعية المقتنيات (new section) ===== */
         .collectibles-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 30px;
             margin-top: 20px;
         }
@@ -381,7 +408,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 400px;
+            min-height: 340px;
         }
         .collectible-card:hover {
             transform: translateY(-8px);
@@ -389,7 +416,7 @@
             box-shadow: 0 20px 60px rgba(255,215,0,0.1);
         }
         .collectible-card .collectible-video {
-            width: 100%; max-width: 280px;
+            width: 100%; max-width: 240px;
             border-radius: 16px;
             overflow: hidden;
             background: #0a0a1a;
@@ -397,13 +424,36 @@
             aspect-ratio: 1/1;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            position: relative;
         }
         .collectible-card .collectible-video video {
             width: 100%; height: 100%;
             object-fit: cover;
+            display: none;
         }
-        .collectible-card .collectible-name { font-size: 1.2rem; font-weight: bold; color: #ffd700; margin-bottom: 5px; }
-        .collectible-card .collectible-source { font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px; }
+        .collectible-card .collectible-video video.active-video {
+            display: block;
+        }
+        .collectible-card .collectible-video .video-thumbnail {
+            width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a3e, #2a2a5e);
+            color: #ffd700;
+            font-size: 3rem;
+        }
+        .collectible-card .collectible-video .video-thumbnail .play-icon {
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+        .collectible-card .collectible-video:hover .video-thumbnail .play-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .collectible-card .collectible-name { font-size: 1.1rem; font-weight: bold; color: #ffd700; margin-bottom: 5px; }
+        .collectible-card .collectible-source { font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
         .collectible-card .collectible-status {
             padding: 6px 16px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; margin-bottom: 12px;
         }
@@ -509,6 +559,7 @@
     let database;
     let currentUser = null;
     let currentFirebaseUserId = null;
+    let activeVideoElement = null; // track currently playing video
 
     // ============================================================
     // 📋 DATA: VIP 1..10 + FRAMES + CHAT STYLES + COLLECTIBLES
@@ -665,6 +716,51 @@
     }
 
     // ============================================================
+    // 🎬 VIDEO PLAYER CONTROLLER
+    // ============================================================
+    function playVideo(videoElement, container) {
+        // Stop any currently playing video
+        if (activeVideoElement && activeVideoElement !== videoElement) {
+            activeVideoElement.pause();
+            activeVideoElement.currentTime = 0;
+            activeVideoElement.classList.remove('active-video');
+            // Show thumbnail for the stopped video
+            const oldContainer = activeVideoElement.closest('.vip-video-container') || activeVideoElement.closest('.collectible-video');
+            if (oldContainer) {
+                const thumbnail = oldContainer.querySelector('.video-thumbnail');
+                if (thumbnail) thumbnail.style.display = 'flex';
+            }
+        }
+        // Toggle current video
+        if (videoElement.classList.contains('active-video')) {
+            videoElement.pause();
+            videoElement.currentTime = 0;
+            videoElement.classList.remove('active-video');
+            if (container) {
+                const thumbnail = container.querySelector('.video-thumbnail');
+                if (thumbnail) thumbnail.style.display = 'flex';
+            }
+            activeVideoElement = null;
+            return;
+        }
+        videoElement.classList.add('active-video');
+        if (container) {
+            const thumbnail = container.querySelector('.video-thumbnail');
+            if (thumbnail) thumbnail.style.display = 'none';
+        }
+        videoElement.play().catch(() => {});
+        activeVideoElement = videoElement;
+    }
+
+    function setupVideoClick(container, videoElement) {
+        container.addEventListener('click', function(e) {
+            // Don't trigger if click is on a button inside
+            if (e.target.closest('button')) return;
+            playVideo(videoElement, container);
+        });
+    }
+
+    // ============================================================
     // 📊 VIP SYSTEM (VIP 1..10)
     // ============================================================
     function renderVIPGrid(user) {
@@ -716,9 +812,12 @@
             html += `
                 <div class="vip-card">
                     <span class="${badgeClass}">${badgeText}</span>
-                    <div class="vip-video-container">
-                        <video autoplay loop muted playsinline><source src="${cfg.video}" type="video/mp4"></video>
-                        <div class="video-overlay"><i class="fas fa-play-circle"></i></div>
+                    <div class="vip-video-container" data-video="${cfg.video}">
+                        <div class="video-thumbnail" style="display:flex;flex-direction:column;gap:10px;">
+                            <i class="fas fa-play-circle play-icon"></i>
+                            <span style="font-size:0.8rem;color:#94a3b8;">اضغط للتشغيل</span>
+                        </div>
+                        <video muted playsinline style="display:none;"><source src="${cfg.video}" type="video/mp4"></video>
                     </div>
                     <div class="vip-title">${cfg.emoji} ${cfg.name} - ${cfg.title}</div>
                     <div class="vip-description">دخلة مميزة للغرف الصوتية تعرض ${cfg.title} عند دخولك الغرفة.</div>
@@ -733,6 +832,12 @@
             `;
         }
         grid.innerHTML = html;
+
+        // Setup video click handlers
+        document.querySelectorAll('#vipGrid .vip-video-container').forEach(container => {
+            const video = container.querySelector('video');
+            if (video) setupVideoClick(container, video);
+        });
     }
 
     // ===== VIP ACTIONS =====
@@ -857,7 +962,6 @@
             const isExpired = expiresAt && expiresAt < new Date();
             const isValid = isOwned && !isExpired;
             
-            // تحقق إذا كان إطار مقتنيات مفعل (يمنع تفعيل إطار مقاعد)
             const hasActiveCollectible = activeCollectible !== null;
 
             let statusText = 'غير مملوك', statusClass = 'inactive';
@@ -874,38 +978,42 @@
             else { badgeClass += ' owned'; }
 
             let actionsHTML = '';
-            
-            // إذا كان هناك إطار مقتنيات مفعل، نعرض رسالة ولا نسمح بتفعيل إطار مقاعد
+            let warningHTML = '';
+
             if (hasActiveCollectible && !isActive) {
-                actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%; background:#f59e0b; color:#1a1a2e;">⚠️ إطار مقتنيات مفعل حالياً</button>`;
-            } else if (!user) {
+                warningHTML = `<div class="frame-active-warning">⚠️ إطار مقتنيات مفعل حالياً. قم بإلغائه أولاً لتفعيل هذا الإطار.</div>`;
+            }
+
+            if (!user) {
                 actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%;">🔒 يرجى تسجيل الدخول</button>`;
             } else if (frame.isSpecial) {
                 actionsHTML = `<button class="btn-buy disabled" disabled style="background:#ffd700;color:#1a1a2e;cursor:default;">🎁 لا يمكن الشراء</button>`;
             } else if (isActive) {
                 actionsHTML = `<button class="btn-deactivate active" onclick="deactivateFrame('${frame.id}')"><i class="fas fa-times"></i> إلغاء التفعيل</button>`;
-            } else if (isValid) {
+            } else if (isValid && !hasActiveCollectible) {
                 actionsHTML = `<button class="btn-activate" onclick="activateFrame('${frame.id}')"><i class="fas fa-play"></i> تفعيل</button>`;
+            } else if (isValid && hasActiveCollectible) {
+                actionsHTML = `<button class="btn-buy disabled" disabled style="background:#f59e0b;color:#1a1a2e;">⚠️ إطار مقتنيات مفعل</button>`;
             } else if (isOwned && isExpired) {
                 actionsHTML = `<button class="btn-buy" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')"><i class="fas fa-sync"></i> شراء مجدد (${frame.price} ج.م)</button>`;
             } else {
                 actionsHTML = `<button class="btn-buy ${!canAfford?'disabled':''}" onclick="buyFrame('${frame.id}', ${frame.price}, '${frame.name}')" ${!canAfford?'disabled':''}>${canAfford ? '<i class="fas fa-shopping-cart"></i> شراء' : '❌ رصيد غير كافٍ'}</button>`;
             }
 
-            // إضافة تحذير إذا كان هناك إطار مقتنيات مفعل
-            let warningHTML = '';
-            if (hasActiveCollectible && !isActive) {
-                warningHTML = `<div class="frame-active-warning">⚠️ إطار مقتنيات مفعل حالياً. قم بإلغائه أولاً لتفعيل هذا الإطار.</div>`;
-            }
-
-            let previewHTML = frame.isVideo ?
-                `<video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:12px;"><source src="${frame.embedUrl}" type="video/mp4"></video>` :
-                `<iframe src="${frame.embedUrl}" height="${frame.height}" width="345" frameborder="0" scrolling="no"></iframe>`;
+            let previewHTML = `
+                <div class="vip-video-container" data-video="${frame.embedUrl}">
+                    <div class="video-thumbnail" style="display:flex;flex-direction:column;gap:8px;">
+                        <i class="fas fa-play-circle play-icon"></i>
+                        <span style="font-size:0.7rem;color:#94a3b8;">اضغط للتشغيل</span>
+                    </div>
+                    <video muted playsinline style="display:none;"><source src="${frame.embedUrl}" type="video/mp4"></video>
+                </div>
+            `;
 
             return `
                 <div class="vip-card">
                     <span class="${badgeClass}">${badgeText}</span>
-                    <div class="vip-video-container">${previewHTML}<div class="video-overlay"><i class="fas fa-play-circle"></i></div></div>
+                    ${previewHTML}
                     <div class="vip-title">${frame.name}</div>
                     <div class="vip-description">${frame.isSpecial ? '🎁 هذا الإطار خاص ولا يمكن شراؤه' : frame.id==='frame_legend'?'⚡ إطار الأسطورة - أظهر قوتك':frame.id==='frame_support'?'🛡️ إطار الدعم - هدية من الإدارة':'إطار مميز للغرف الصوتية'}</div>
                     <div class="vip-requirements">
@@ -919,6 +1027,11 @@
                 </div>
             `;
         }).join('');
+
+        document.querySelectorAll('#framesGrid .vip-video-container').forEach(container => {
+            const video = container.querySelector('video');
+            if (video) setupVideoClick(container, video);
+        });
     }
 
     async function buyFrame(frameId, price, name) {
@@ -945,7 +1058,6 @@
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
-    // ===== MODIFIED: activateFrame - إلغاء تفعيل المقتنيات تلقائياً =====
     async function activateFrame(frameId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         try {
@@ -953,13 +1065,11 @@
             const user = snap.val();
             if (!user) { showToast('❌ المستخدم غير موجود', 'error'); return; }
             
-            // التحقق من وجود إطار مقتنيات مفعل
             const activeCollectible = user.activeCollectible || null;
             if (activeCollectible) {
                 if (!confirm(`⚠️ يوجد إطار مقتنيات مفعل حالياً (${activeCollectible}). سيتم إلغاء تفعيله تلقائياً. هل تريد المتابعة؟`)) {
                     return;
                 }
-                // إلغاء تفعيل إطار المقتنيات
                 await database.ref('users/' + currentFirebaseUserId + '/activeCollectible').set(null);
             }
             
@@ -980,7 +1090,6 @@
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
-    // ===== MODIFIED: deactivateFrame =====
     async function deactivateFrame(frameId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         if (!confirm('⚠️ إلغاء تفعيل هذا الإطار؟')) return;
@@ -1112,7 +1221,6 @@
             const isExpired = expiresAt && expiresAt < new Date();
             const isValid = isOwned && !isExpired;
             
-            // تحقق إذا كان هناك إطار مقاعد مفعل
             const hasActiveFrame = activeFrame !== null;
 
             let statusText = '🔒 مقفل', statusClass = 'locked';
@@ -1141,8 +1249,12 @@
 
             return `
                 <div class="collectible-card">
-                    <div class="collectible-video">
-                        <video autoplay loop muted playsinline><source src="${c.video}" type="video/mp4"></video>
+                    <div class="collectible-video" data-video="${c.video}">
+                        <div class="video-thumbnail" style="display:flex;flex-direction:column;gap:8px;">
+                            <i class="fas fa-play-circle play-icon"></i>
+                            <span style="font-size:0.6rem;color:#94a3b8;">اضغط للتشغيل</span>
+                        </div>
+                        <video muted playsinline style="display:none;"><source src="${c.video}" type="video/mp4"></video>
                     </div>
                     <div class="collectible-name">${c.name}</div>
                     <div class="collectible-source">📌 مصدر: ${c.source}</div>
@@ -1152,9 +1264,13 @@
                 </div>
             `;
         }).join('');
+
+        document.querySelectorAll('#collectiblesGrid .collectible-video').forEach(container => {
+            const video = container.querySelector('video');
+            if (video) setupVideoClick(container, video);
+        });
     }
 
-    // ===== MODIFIED: activateCollectible - إلغاء تفعيل إطار المقاعد تلقائياً =====
     async function activateCollectible(collectId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         try {
@@ -1162,13 +1278,11 @@
             const user = snap.val();
             if (!user) { showToast('❌ المستخدم غير موجود', 'error'); return; }
             
-            // التحقق من وجود إطار مقاعد مفعل
             const activeFrame = user.activeFrame || null;
             if (activeFrame) {
                 if (!confirm(`⚠️ يوجد إطار مقاعد مفعل حالياً (${activeFrame}). سيتم إلغاء تفعيله تلقائياً. هل تريد المتابعة؟`)) {
                     return;
                 }
-                // إلغاء تفعيل إطار المقاعد
                 await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(null);
             }
             
@@ -1189,7 +1303,6 @@
         } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
     }
 
-    // ===== MODIFIED: deactivateCollectible =====
     async function deactivateCollectible(collectId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         if (!confirm('⚠️ إلغاء تفعيل هذا الإطار؟')) return;
