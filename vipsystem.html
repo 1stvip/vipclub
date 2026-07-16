@@ -154,7 +154,8 @@
         }
         .user-info .user-vip .vip-level { font-size: 1.5rem; font-weight: bold; color: #ffd700; }
         .user-info .user-vip .vip-status { font-size: 0.8rem; color: #94a3b8; }
-        /* ===== VIP GRID (cards) ===== */
+        
+        /* ===== VIP GRID (cards) - موحد لجميع البطاقات ===== */
         .vip-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -204,8 +205,11 @@
         .vip-card .vip-badge.special { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #1a1a2e; }
         .vip-card .vip-badge.king { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
         .vip-card .vip-badge.elite { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
+        .vip-card .vip-badge.collectible { background: linear-gradient(135deg, #8b5cf6, #4c1d95); color: white; }
+        .vip-card .vip-badge.collectible-owned { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .vip-card .vip-badge.collectible-active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
         
-        /* ===== VIDEO CONTAINER ===== */
+        /* ===== VIDEO CONTAINER - موحد ===== */
         .vip-card .vip-video-container {
             width: 100%;
             border-radius: 16px;
@@ -287,6 +291,7 @@
         .vip-card .vip-status-text.special { background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid rgba(255,215,0,0.3); font-size: 1rem; }
         .vip-card .vip-status-text.inactive { background: rgba(107,114,128,0.1); color: #94a3b8; border: 1px solid rgba(107,114,128,0.2); }
         .vip-card .vip-status-text.locked { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+        .vip-card .vip-status-text.unlocked { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
         .vip-card .vip-actions { display: flex; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
         .vip-card .vip-actions button {
             flex: 1; padding: 12px 16px; border: none; border-radius: 10px;
@@ -302,6 +307,9 @@
         .vip-card .vip-actions .btn-deactivate:hover { background: rgba(239,68,68,0.2); transform: translateY(-2px); }
         .vip-card .vip-actions .btn-deactivate.active { background: #ef4444; color: white; border: none; }
         .vip-card .vip-actions .btn-deactivate.active:hover { background: #dc2626; }
+        .vip-card .vip-actions .btn-disabled { background: #6b7280; color: #ccc; cursor: not-allowed; }
+        .vip-card .vip-actions .btn-disabled:hover { transform: none; box-shadow: none; }
+        
         /* ===== CHAT STYLES ===== */
         .chatstyles-grid {
             display: grid;
@@ -368,6 +376,7 @@
         .chatstyle-card .style-actions .btn-deactivate:hover { background: rgba(239,68,68,0.2); transform: translateY(-2px); }
         .chatstyle-card .style-actions .btn-deactivate.active { background: #ef4444; color: white; border: none; }
         .chatstyle-card .style-actions .btn-deactivate.active:hover { background: #dc2626; }
+        
         /* ===== TOAST ===== */
         .toast {
             position: fixed; top: 20px; right: 20px;
@@ -384,6 +393,7 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             body { padding: 12px; }
@@ -413,97 +423,7 @@
             .tabs .tab-btn { padding: 8px 12px; font-size: 0.7rem; }
             .vip-card .vip-video-container .video-play-btn { font-size: 2.5rem; }
         }
-        /* ===== COLLECTIBLES ===== */
-        .collectibles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 20px;
-        }
-        .collectible-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 24px;
-            padding: 25px;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 400px;
-        }
-        .collectible-card:hover {
-            transform: translateY(-8px);
-            border-color: #ffd700;
-            box-shadow: 0 20px 60px rgba(255,215,0,0.1);
-        }
-        .collectible-card .collectible-video {
-            width: 100%; max-width: 280px;
-            border-radius: 16px;
-            overflow: hidden;
-            background: #0a0a1a;
-            margin-bottom: 15px;
-            aspect-ratio: 1/1;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-            cursor: pointer;
-        }
-        .collectible-card .collectible-video video {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        .collectible-card .collectible-video video.playing {
-            display: block;
-        }
-        .collectible-card .collectible-video .collectible-thumbnail {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 1;
-        }
-        .collectible-card .collectible-video .collectible-thumbnail.hidden {
-            display: none;
-        }
-        .collectible-card .collectible-video .video-play-btn {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-            font-size: 4rem;
-            color: rgba(255,255,255,0.9);
-            text-shadow: 0 0 30px rgba(0,0,0,0.8);
-            pointer-events: none;
-            transition: 0.3s;
-        }
-        .collectible-card .collectible-video:hover .video-play-btn {
-            transform: translate(-50%, -50%) scale(1.1);
-            color: #ffd700;
-        }
-        .collectible-card .collectible-name { font-size: 1.2rem; font-weight: bold; color: #ffd700; margin-bottom: 5px; }
-        .collectible-card .collectible-source { font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px; }
-        .collectible-card .collectible-status {
-            padding: 6px 16px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; margin-bottom: 12px;
-        }
-        .collectible-card .collectible-status.unlocked { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
-        .collectible-card .collectible-status.locked { background: rgba(107,114,128,0.15); color: #94a3b8; border: 1px solid rgba(107,114,128,0.2); }
-        .collectible-card .collectible-status.active { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
-        .collectible-card .collectible-actions { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; }
-        .collectible-card .collectible-actions button {
-            flex: 1; padding: 10px; border: none; border-radius: 10px;
-            cursor: pointer; font-weight: bold; transition: 0.3s; min-width: 80px; font-size: 0.85rem;
-        }
-        .collectible-card .collectible-actions .btn-activate { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-        .collectible-card .collectible-actions .btn-activate:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(16,185,129,0.4); }
-        .collectible-card .collectible-actions .btn-deactivate { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
-        .collectible-card .collectible-actions .btn-deactivate:hover { background: rgba(239,68,68,0.2); transform: translateY(-2px); }
-        .collectible-card .collectible-actions .btn-deactivate.active { background: #ef4444; color: white; border: none; }
-        .collectible-card .collectible-actions .btn-deactivate.active:hover { background: #dc2626; }
-        .collectible-card .collectible-actions .btn-disabled { background: #6b7280; color: #ccc; cursor: not-allowed; }
-        .collectible-card .collectible-actions .btn-disabled:hover { transform: none; box-shadow: none; }
+        
         /* ===== تحذير إطار مقاعد مفعل ===== */
         .frame-active-warning {
             font-size: 0.65rem;
@@ -568,7 +488,7 @@
 
     <!-- ===== COLLECTIBLES TAB ===== -->
     <div class="tab-content" id="tabContentCollectibles">
-        <div class="collectibles-grid" id="collectiblesGrid"></div>
+        <div class="vip-grid" id="collectiblesGrid"></div>
     </div>
 </div>
 
@@ -626,19 +546,19 @@
         { id:'chatstyle2', name:'أسلوب كتابة 2', price:20, duration:30, image:'images/vipsystem/chatstyles/chat2style.png' }
     ];
 
-    // ===== COLLECTIBLES (أطارات المقتنيات) مع صور مصغرة =====
+    // ===== COLLECTIBLES (أطارات المقتنيات) =====
     const COLLECTIBLES = [
-        { id:'collect_vip1', name:'إطار VIP 1', video:'images/vipsystem/vip1.mp4', thumbnail:'images/vipsystem/vip1.jpg', source:'VIP 1' },
-        { id:'collect_vip2', name:'إطار VIP 2', video:'images/vipsystem/vip2.mp4', thumbnail:'images/vipsystem/vip2.jpg', source:'VIP 2' },
-        { id:'collect_vip3', name:'إطار VIP 3', video:'images/vipsystem/vip3.mp4', thumbnail:'images/vipsystem/vip3.jpg', source:'VIP 3' },
-        { id:'collect_vip4', name:'إطار VIP 4', video:'images/vipsystem/vip4.mp4', thumbnail:'images/vipsystem/vip4.jpg', source:'VIP 4' },
-        { id:'collect_vip5', name:'إطار VIP 5', video:'images/vipsystem/vip5.mp4', thumbnail:'images/vipsystem/vip5.jpg', source:'VIP 5' },
-        { id:'collect_vip6', name:'إطار VIP 6', video:'images/vipsystem/vip6.mp4', thumbnail:'images/vipsystem/vip6.jpg', source:'VIP 6' },
-        { id:'collect_vip6pro', name:'إطار VIP 6 Pro', video:'images/vipsystem/vip6pro.mp4', thumbnail:'images/vipsystem/vip6pro.jpg', source:'VIP 6' },
-        { id:'collect_vip7', name:'إطار VIP 7', video:'images/vipsystem/vip7.mp4', thumbnail:'images/vipsystem/vip7.jpg', source:'VIP 7' },
-        { id:'collect_vip8', name:'إطار VIP 8', video:'images/vipsystem/vip8.mp4', thumbnail:'images/vipsystem/vip8.jpg', source:'VIP 8' },
-        { id:'collect_vip9', name:'إطار VIP 9', video:'images/vipsystem/vip9.mp4', thumbnail:'images/vipsystem/vip9.jpg', source:'VIP 9' },
-        { id:'collect_vip10', name:'إطار VIP 10', video:'images/vipsystem/vip10.mp4', thumbnail:'images/vipsystem/vip10.jpg', source:'VIP 10' }
+        { id:'collect_vip1', name:'VIP 1', video:'images/vipsystem/vip1.mp4', thumbnail:'images/vipsystem/vip1.jpg', source:'VIP 1' },
+        { id:'collect_vip2', name:'VIP 2', video:'images/vipsystem/vip2.mp4', thumbnail:'images/vipsystem/vip2.jpg', source:'VIP 2' },
+        { id:'collect_vip3', name:'VIP 3', video:'images/vipsystem/vip3.mp4', thumbnail:'images/vipsystem/vip3.jpg', source:'VIP 3' },
+        { id:'collect_vip4', name:'VIP 4', video:'images/vipsystem/vip4.mp4', thumbnail:'images/vipsystem/vip4.jpg', source:'VIP 4' },
+        { id:'collect_vip5', name:'VIP 5', video:'images/vipsystem/vip5.mp4', thumbnail:'images/vipsystem/vip5.jpg', source:'VIP 5' },
+        { id:'collect_vip6', name:'VIP 6', video:'images/vipsystem/vip6.mp4', thumbnail:'images/vipsystem/vip6.jpg', source:'VIP 6' },
+        { id:'collect_vip6pro', name:'VIP 6 Pro', video:'images/vipsystem/vip6pro.mp4', thumbnail:'images/vipsystem/vip6pro.jpg', source:'VIP 6' },
+        { id:'collect_vip7', name:'VIP 7', video:'images/vipsystem/vip7.mp4', thumbnail:'images/vipsystem/vip7.jpg', source:'VIP 7' },
+        { id:'collect_vip8', name:'VIP 8', video:'images/vipsystem/vip8.mp4', thumbnail:'images/vipsystem/vip8.jpg', source:'VIP 8' },
+        { id:'collect_vip9', name:'VIP 9', video:'images/vipsystem/vip9.mp4', thumbnail:'images/vipsystem/vip9.jpg', source:'VIP 9' },
+        { id:'collect_vip10', name:'VIP 10', video:'images/vipsystem/vip10.mp4', thumbnail:'images/vipsystem/vip10.jpg', source:'VIP 10' }
     ];
 
     // ============================================================
@@ -751,28 +671,24 @@
     // ============================================================
     function playVideoOnClick(container) {
         const video = container.querySelector('video');
-        const thumbnail = container.querySelector('.video-thumbnail') || container.querySelector('.collectible-thumbnail');
+        const thumbnail = container.querySelector('.video-thumbnail');
         const playBtn = container.querySelector('.video-play-btn');
         
         if (!video) return;
         
-        // إزالة أي مستمعات قديمة
         container.removeEventListener('click', videoClickHandler);
         container.addEventListener('click', videoClickHandler);
         
         function videoClickHandler(e) {
-            // منع التشغيل إذا تم الضغط على زر أو رابط داخل البطاقة
             if (e.target.closest('button') || e.target.closest('a')) return;
             
             if (video.classList.contains('playing')) {
-                // إذا كان الفيديو يعمل، نوقفه ونعرض الصورة
                 video.pause();
                 video.classList.remove('playing');
                 if (thumbnail) thumbnail.classList.remove('hidden');
                 if (playBtn) playBtn.style.display = 'block';
                 video.currentTime = 0;
             } else {
-                // تشغيل الفيديو
                 video.classList.add('playing');
                 if (thumbnail) thumbnail.classList.add('hidden');
                 if (playBtn) playBtn.style.display = 'none';
@@ -780,7 +696,6 @@
             }
         }
         
-        // عند انتهاء الفيديو نعود للصورة
         video.removeEventListener('ended', videoEndedHandler);
         video.addEventListener('ended', videoEndedHandler);
         
@@ -978,7 +893,7 @@
     }
 
     // ============================================================
-    // 🖼️ FRAMES SYSTEM
+    // 🖼️ FRAMES SYSTEM (المقاعد)
     // ============================================================
     function renderFrames(user) {
         const grid = document.getElementById('framesGrid');
@@ -1240,7 +1155,7 @@
     }
 
     // ============================================================
-    // 🎁 COLLECTIBLES - تم إصلاح الصور المصغرة
+    // 🎁 COLLECTIBLES (أطارات المقتنيات) - بنفس شكل أطارات المقاعد
     // ============================================================
     function renderCollectibles(user) {
         const grid = document.getElementById('collectiblesGrid');
@@ -1264,6 +1179,14 @@
             else if (isValid) { statusText = '🔓 مفتوح'; statusClass = 'unlocked'; }
             else if (isOwned && isExpired) { statusText = '⏳ منتهي'; statusClass = 'locked'; }
 
+            // نوع الشارة حسب الحالة
+            let badgeClass = 'vip-badge';
+            let badgeText = '🎯 مقتنى';
+            if (isActive && isValid) { badgeClass += ' collectible-active'; badgeText = '✅ مفعل'; }
+            else if (isValid) { badgeClass += ' collectible-owned'; badgeText = '📦 مملوك'; }
+            else if (isOwned && isExpired) { badgeClass += ' expired'; badgeText = '⏳ منتهي'; }
+            else { badgeClass += ' collectible'; badgeText = '🔒 مقفل'; }
+
             let actionsHTML = '';
             let warningHTML = '';
 
@@ -1272,45 +1195,53 @@
             }
 
             if (!user) {
-                actionsHTML = `<button class="btn-disabled" disabled>🔒 يرجى تسجيل الدخول</button>`;
+                actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%;">🔒 يرجى تسجيل الدخول</button>`;
             } else if (!isValid) {
-                actionsHTML = `<button class="btn-disabled" disabled>${isOwned && isExpired ? '⏳ منتهي' : '🔒 مقفل'}</button>`;
+                actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%; background:#6b7280; color:#ccc;">${isOwned && isExpired ? '⏳ منتهي' : '🔒 مقفل'}</button>`;
             } else if (isActive) {
                 actionsHTML = `<button class="btn-deactivate active" onclick="deactivateCollectible('${c.id}')"><i class="fas fa-times"></i> إلغاء التفعيل</button>`;
             } else if (hasActiveFrame) {
-                actionsHTML = `<button class="btn-disabled" disabled>⚠️ إطار مقاعد مفعل</button>`;
+                actionsHTML = `<button class="btn-buy disabled" disabled style="width:100%; background:#f59e0b; color:#1a1a2e;">⚠️ إطار مقاعد مفعل</button>`;
             } else {
                 actionsHTML = `<button class="btn-activate" onclick="activateCollectible('${c.id}')"><i class="fas fa-play"></i> تفعيل</button>`;
             }
 
-            // استخدام الصورة المصغرة الصحيحة
+            // استخدام نفس هيكل الفيديو مثل أطارات المقاعد
             const thumbnailSrc = c.thumbnail || c.video.replace('.mp4', '.jpg');
 
             return `
-                <div class="collectible-card">
-                    <div class="collectible-video" data-video>
-                        <img class="collectible-thumbnail" src="${thumbnailSrc}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'">
+                <div class="vip-card">
+                    <span class="${badgeClass}">${badgeText}</span>
+                    <div class="vip-video-container" data-video>
+                        <img class="video-thumbnail" src="${thumbnailSrc}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'">
                         <video preload="none" muted playsinline>
                             <source src="${c.video}" type="video/mp4">
                         </video>
                         <div class="video-play-btn"><i class="fas fa-play-circle"></i></div>
+                        <div class="video-overlay"><i class="fas fa-play-circle"></i></div>
                     </div>
-                    <div class="collectible-name">${c.name}</div>
-                    <div class="collectible-source">📌 مصدر: ${c.source}</div>
+                    <div class="vip-title">🎯 ${c.name}</div>
+                    <div class="vip-description">إطار مقتنى من ${c.source} - يمكنك تفعيله عند شراء الـ VIP.</div>
+                    <div class="vip-requirements">
+                        <div class="req-item"><span class="req-label">📌 المصدر</span><span class="req-value">${c.source}</span></div>
+                        <div class="req-item"><span class="req-label">📊 الحالة</span><span class="req-value" style="color:${isActive?'#3b82f6':isValid?'#10b981':'#94a3b8'}">${isActive?'✅ مفعل':isValid?'📦 مملوك':'🔒 مقفل'}</span></div>
+                        ${isValid && expiresAt ? `<div class="req-item"><span class="req-label">⏱️ ينتهي</span><span class="req-value">${expiresAt.toLocaleDateString('ar-EG')}</span></div>` : ''}
+                    </div>
                     ${warningHTML}
-                    <div class="collectible-status ${statusClass}">${statusText}</div>
-                    <div class="collectible-actions">${actionsHTML}</div>
+                    <div class="vip-status-text ${statusClass}">${statusText}</div>
+                    <div class="vip-actions">${actionsHTML}</div>
                 </div>
             `;
         }).join('');
         
         setTimeout(() => {
-            document.querySelectorAll('#collectiblesGrid .collectible-video[data-video]').forEach(container => {
+            document.querySelectorAll('#collectiblesGrid .vip-video-container[data-video]').forEach(container => {
                 playVideoOnClick(container);
             });
         }, 300);
     }
 
+    // ===== COLLECTIBLES ACTIONS =====
     async function activateCollectible(collectId) {
         if (!currentUser || !currentFirebaseUserId) { showToast('⚠️ يرجى تسجيل الدخول', 'warning'); return; }
         try {
