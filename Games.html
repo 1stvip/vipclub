@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <title>🎰 VipClub · ماكينة الحظ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -34,7 +35,7 @@
             border-bottom: 1px solid #2d3a52;
             position: sticky;
             top: 0;
-            z-index: 999;
+            z-index: 9999;
         }
         .logo { font-weight: 800; font-size: 1.5rem; color: #8b5cf6; letter-spacing: 1px; }
         .logo span { color: #facc15; }
@@ -60,6 +61,8 @@
             background: #ef4444; color: white;
             font-size: 0.7rem; padding: 2px 7px;
             border-radius: 30px;
+            min-width: 18px;
+            text-align: center;
         }
         .hidden-guest { display: none !important; }
 
@@ -83,24 +86,28 @@
             flex-wrap: wrap;
             border: 1px solid #2a3a52;
             margin-bottom: 30px;
+            gap: 10px;
         }
         .profile-card .user-info {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
         .profile-card .user-info i { font-size: 1.8rem; color: #8b5cf6; }
         .profile-card .user-info .name { font-weight: bold; }
         .profile-card .user-info .id {
-            background: #1e2a44;
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
             padding: 4px 14px;
             border-radius: 30px;
             font-family: monospace;
             font-size: 0.9rem;
+            color: white;
         }
         .profile-card .balances {
             display: flex;
             gap: 20px;
+            flex-wrap: wrap;
         }
         .profile-card .balances span { font-weight: bold; }
         .balance-egp { color: #4ade80; }
@@ -147,7 +154,7 @@
             user-select: none;
         }
         .reel.spinning {
-            animation: reelSpin 0.15s ease-in-out infinite;
+            animation: reelSpin 0.1s ease-in-out infinite;
         }
         @keyframes reelSpin {
             0% { transform: rotate(0deg) scale(1); }
@@ -327,7 +334,7 @@
             left: 20px;
             padding: 12px 18px;
             border-radius: 12px;
-            z-index: 9999;
+            z-index: 99999;
             animation: slideInLeft 0.3s ease;
             display: flex;
             align-items: center;
@@ -344,6 +351,148 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
+        /* Notifications Dropdown */
+        .notif-dropdown {
+            position: fixed;
+            top: 75px;
+            left: 20px;
+            width: 350px;
+            max-width: 90%;
+            background: #111827;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 10000;
+            border: 1px solid #334155;
+            overflow: hidden;
+            max-height: 70vh;
+        }
+        .notif-dropdown.active { display: flex !important; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notif-header {
+            padding: 15px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        #notifList {
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .notif-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #1e293b;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+        .notif-item.unread { background: rgba(139, 92, 246, 0.1); border-right: 4px solid #8b5cf6; }
+        .delete-single-notif {
+            color: #ef4444;
+            cursor: pointer;
+            padding: 6px;
+            opacity: 0.6;
+            transition: 0.3s;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-single-notif:hover { opacity: 1; transform: scale(1.1); }
+
+        /* Screen Overlay */
+        #screenOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9998;
+            display: none;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: fixed;
+            top: 75px;
+            right: 20px;
+            width: 320px;
+            max-width: 90%;
+            background: #111827;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 10000;
+            border: 1px solid #334155;
+            overflow: hidden;
+            padding: 20px;
+            text-align: center;
+        }
+        .profile-dropdown.active { display: flex !important; animation: slideDown 0.3s ease-out; }
+        .profile-dropdown .user-id-numeric {
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 10px auto;
+            display: inline-block;
+            min-width: 140px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        .profile-dropdown .balance-card {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            border: 1px solid #334155;
+        }
+        .profile-dropdown .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .btn-success { background: #10b981; color: white; }
+        .btn-logout { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .action-btn:hover { transform: translateY(-2px); }
+
         /* Responsive */
         @media(max-width:600px){
             .reel { width: 80px; height: 100px; font-size: 3rem; }
@@ -351,13 +500,14 @@
             .profile-card { flex-direction: column; gap: 10px; }
             .floating-banners { width: 90%; right: 5%; top: 75px; }
             .container { padding: 10px; }
+            .profile-dropdown { right: 10px; width: 95%; }
+            .notif-dropdown { left: 10px; width: 95%; }
         }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0b1120; }
         ::-webkit-scrollbar-thumb { background: #4b5b78; border-radius: 10px; }
 
-        /* Footer */
         .footer {
             text-align: center;
             padding: 30px 20px;
@@ -369,6 +519,9 @@
 </head>
 <body>
 
+<!-- Screen Overlay -->
+<div id="screenOverlay" onclick="closeAll()"></div>
+
 <!-- Navbar -->
 <nav class="navbar">
     <div class="logo">🎰 <span>VIP</span>Club</div>
@@ -376,10 +529,10 @@
         <a href="Wallet.html" class="icon-btn auth-only hidden-guest" title="المحفظة">
             <i class="fas fa-wallet"></i>
         </a>
-        <div class="icon-btn auth-only hidden-guest" onclick="openProfile()" title="الملف الشخصي">
+        <div class="icon-btn auth-only hidden-guest" onclick="toggleProfile()" title="الملف الشخصي">
             <i class="fas fa-user-circle"></i>
         </div>
-        <div class="icon-btn auth-only hidden-guest" onclick="openNotifications()" title="الإشعارات">
+        <div class="icon-btn auth-only hidden-guest" onclick="toggleNotifications()" title="الإشعارات">
             <i class="fas fa-bell"></i>
             <span class="badge" id="notifBadge">0</span>
         </div>
@@ -392,9 +545,44 @@
 <!-- Firebase Alert -->
 <div id="firebaseAlert" class="firebase-alert" style="display: none;"></div>
 
+<!-- Profile Dropdown -->
+<div id="profileDropdown" class="profile-dropdown">
+    <i class="fas fa-user-circle" style="font-size: 3rem; color: #8b5cf6; margin: 5px auto;"></i>
+    <h4 id="p_nickname" style="margin: 5px 0;">تحميل...</h4>
+    <span style="font-size: 0.85rem; color: #94a3b8;">المعرف الخاص بك</span>
+    <div class="user-id-numeric" id="p_id">000000</div>
+    <small>
+        <i class="fas fa-copy" onclick="copyId()" style="cursor:pointer; color:#8b5cf6;" title="نسخ المعرف"></i>
+        انقر على الأيقونة لنسخ المعرف
+    </small>
+    <div class="balance-card">
+        <div class="balance-row"><span>رصيد ج.م: [EGP]</span> <span style="color:#10b981;" id="p_egp">0.00</span></div>
+        <div class="balance-row"><span>رصيد دولار: [USD]</span> <span style="color:#60a5fa;" id="p_usd">0.00</span></div>
+    </div>
+    <div style="padding: 0 10px 15px 10px;">
+        <button class="action-btn btn-success" onclick="alert('سيتم توجيهك لصفحة الإيداع')">شحن الرصيد (إيداع)</button>
+        <button class="action-btn btn-logout" onclick="logout()">تسجيل الخروج</button>
+    </div>
+</div>
+
+<!-- Notifications Dropdown -->
+<div id="notifDropdown" class="notif-dropdown">
+    <div class="notif-header">
+        <span>الإشعارات</span>
+        <span id="unreadCount" style="background:#ef4444; font-size:0.7rem; padding:2px 7px; border-radius:10px;">0</span>
+    </div>
+    <div id="notifList">
+        <div style="padding:20px; text-align:center; color:#666;">لا توجد إشعارات</div>
+    </div>
+    <div style="padding: 10px; display: flex; gap: 5px; background: #0a0f1d;">
+        <button onclick="markAllRead()" style="flex:1; font-size:0.8rem; padding:10px; background:#1e293b; color:white; border:none; border-radius:8px; cursor:pointer;">قراءة الكل</button>
+        <button onclick="deleteAllNotifs()" style="flex:1; font-size:0.8rem; padding:10px; background:#1e293b; color:white; border:none; border-radius:8px; cursor:pointer;">حذف الكل</button>
+    </div>
+</div>
+
 <div class="container">
     <!-- Profile Card -->
-    <div class="profile-card">
+    <div class="profile-card" id="profileCard">
         <div class="user-info">
             <i class="fas fa-user-circle"></i>
             <span class="name" id="pName">زائر</span>
@@ -456,7 +644,7 @@
 </footer>
 
 <script>
-    // ===== Firebase Config =====
+    // ===== Firebase Config (نفس المشروع الذي أرسلته) =====
     const firebaseConfig = {
         apiKey: "AIzaSyAVSzkDLqi1G-hpfEPqvBMmuyYRfEuaTKk",
         authDomain: "vipclub-1d04a.firebaseapp.com",
@@ -472,6 +660,7 @@
     let gameHistory = [];
     let bannerMessages = [];
     let isSpinning = false;
+    let notificationListeners = {};
 
     // ===== Symbols =====
     const SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '👑'];
@@ -487,24 +676,29 @@
         try {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
+                console.log('✅ Firebase initialized with project:', firebaseConfig.projectId);
             }
             database = firebase.database();
             auth = firebase.auth();
 
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
+                    console.log('👤 User logged in:', user.uid);
                     await loadUserData(user.uid);
                 } else {
+                    console.log('👤 No user logged in');
                     currentUser = null;
                     updateUI();
+                    updateNotifBadge(0);
                 }
             });
         } catch (error) {
-            console.error('Firebase init error:', error);
+            console.error('❌ Firebase init error:', error);
+            showAlert('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
         }
     }
 
-    // ===== Load User Data =====
+    // ===== Load User Data from Firebase =====
     async function loadUserData(uid) {
         try {
             const snapshot = await database.ref('users/' + uid).once('value');
@@ -512,25 +706,37 @@
                 currentUser = snapshot.val();
                 currentUser.uid = uid;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                console.log('✅ User loaded:', currentUser.username);
                 updateUI();
                 loadGameHistory();
                 listenNotifications();
             } else {
+                // Create new user
+                const numericId = Math.floor(100000 + Math.random() * 900000);
                 const newUser = {
+                    numericId: numericId,
                     nickname: 'لاعب',
                     username: 'player_' + Date.now(),
                     balanceEGP: 0,
                     balanceUSD: 0,
-                    numericId: Math.floor(100000 + Math.random() * 900000),
-                    createdAt: new Date().toISOString()
+                    password: '123456',
+                    email: '',
+                    phone: '',
+                    isBanned: false,
+                    banReason: '',
+                    banExpiry: '',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
                 };
                 await database.ref('users/' + uid).set(newUser);
                 currentUser = { ...newUser, uid };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                console.log('✅ New user created:', currentUser.username);
                 updateUI();
             }
         } catch (error) {
-            console.error('Load user error:', error);
+            console.error('❌ Load user error:', error);
+            showAlert('❌ خطأ في تحميل بيانات المستخدم', 'error');
         }
     }
 
@@ -557,14 +763,15 @@
             });
             localStorage.setItem('currentUser', JSON.stringify(userData));
             currentUser = userData;
+            console.log('✅ User saved to Firebase');
             return true;
         } catch (error) {
-            console.error('Save user error:', error);
+            console.error('❌ Save user error:', error);
             return false;
         }
     }
 
-    // ===== Load Game History =====
+    // ===== Load Game History from Firebase =====
     async function loadGameHistory() {
         try {
             const snapshot = await database.ref('gameHistory').once('value');
@@ -585,43 +792,185 @@
         }
     }
 
-    // ===== Notifications =====
+    // ===== Notifications System =====
     function listenNotifications() {
         if (!database || !currentUser || !currentUser.uid) return;
+        
+        // Remove old listener if exists
+        if (notificationListeners.notifications) {
+            database.ref('users/' + currentUser.uid + '/notifications').off();
+        }
+        
         const notifRef = database.ref('users/' + currentUser.uid + '/notifications');
-        notifRef.on('value', (snapshot) => {
+        notificationListeners.notifications = notifRef.on('value', (snapshot) => {
             let unread = 0;
+            let notifications = [];
+            
             if (snapshot.exists()) {
-                for (const key in snapshot.val()) {
-                    if (!snapshot.val()[key].read) unread++;
+                const data = snapshot.val();
+                for (const key in data) {
+                    const n = data[key];
+                    if (!n.read) unread++;
+                    notifications.push({ id: key, ...n });
                 }
+                // Sort by date (newest first)
+                notifications.sort((a, b) => {
+                    return (b.id || 0) - (a.id || 0);
+                });
             }
-            document.getElementById('notifBadge').textContent = unread;
+            
+            updateNotifBadge(unread);
+            renderNotifications(notifications);
         });
     }
 
-    function openNotifications() {
-        if (!isLoggedIn()) { alert('يرجى تسجيل الدخول'); return; }
-        alert('📬 الإشعارات:\n' + (gameHistory.length ? 'آخر جولة: ' + gameHistory[0].result : 'لا توجد إشعارات'));
+    function updateNotifBadge(count) {
+        document.getElementById('notifBadge').textContent = count || 0;
+        document.getElementById('unreadCount').textContent = count || 0;
     }
 
-    function openProfile() {
-        const user = getUser();
-        if (!user) { alert('يرجى تسجيل الدخول'); return; }
-        alert(`👤 ${user.nickname || user.username}\n🆔 ${String(user.numericId).padStart(6, '0')}\n💰 EGP: ${(user.balanceEGP || 0).toFixed(2)}\n💵 USD: ${(user.balanceUSD || 0).toFixed(2)}`);
+    function renderNotifications(notifications) {
+        const list = document.getElementById('notifList');
+        if (!notifications || notifications.length === 0) {
+            list.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">لا توجد إشعارات</div>';
+            return;
+        }
+        
+        list.innerHTML = '';
+        notifications.forEach(n => {
+            const div = document.createElement('div');
+            div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+            div.innerHTML = `
+                <div style="flex:1;">
+                    <div style="display:flex; gap:10px;">
+                        <i class="fas fa-${n.type === 'deposit' ? 'money-bill-wave' : n.type === 'purchase' ? 'shopping-cart' : 'info-circle'}" 
+                           style="color: ${n.type === 'deposit' ? '#6366f1' : n.type === 'purchase' ? '#f59e0b' : '#94a3b8'};"></i>
+                        <div style="flex:1;">
+                            ${n.text || 'إشعار'}<br>
+                            <small style="opacity:0.6;">${n.date || new Date().toLocaleString('ar-EG')}</small>
+                        </div>
+                    </div>
+                </div>
+                <i class="fas fa-trash-alt delete-single-notif" onclick="deleteSingleNotif('${n.id}')" title="حذف"></i>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    async function deleteSingleNotif(notifId) {
+        if (!currentUser || !currentUser.uid || !database) return;
+        try {
+            await database.ref('users/' + currentUser.uid + '/notifications/' + notifId).remove();
+            showAlert('✅ تم حذف الإشعار', 'success');
+        } catch (error) {
+            console.error('Delete notification error:', error);
+        }
+    }
+
+    async function markAllRead() {
+        if (!currentUser || !currentUser.uid || !database) return;
+        try {
+            const snapshot = await database.ref('users/' + currentUser.uid + '/notifications').once('value');
+            if (snapshot.exists()) {
+                const updates = {};
+                for (const key in snapshot.val()) {
+                    updates[key + '/read'] = true;
+                }
+                await database.ref('users/' + currentUser.uid + '/notifications').update(updates);
+                showAlert('✅ تم تعيين جميع الإشعارات كمقروءة', 'success');
+            }
+        } catch (error) {
+            console.error('Mark all read error:', error);
+        }
+    }
+
+    async function deleteAllNotifs() {
+        if (!confirm('هل تريد حذف جميع الإشعارات؟')) return;
+        if (!currentUser || !currentUser.uid || !database) return;
+        try {
+            await database.ref('users/' + currentUser.uid + '/notifications').remove();
+            showAlert('✅ تم حذف جميع الإشعارات', 'success');
+        } catch (error) {
+            console.error('Delete all error:', error);
+        }
     }
 
     // ===== UI Update =====
     function updateUI() {
         const user = getUser();
+        const isLogged = isLoggedIn();
+        
         document.getElementById('pName').textContent = user?.nickname || user?.username || 'زائر';
         document.getElementById('pId').textContent = user?.numericId ? String(user.numericId).padStart(6, '0') : '000000';
         document.getElementById('pEgp').textContent = (user?.balanceEGP || 0).toFixed(2);
         document.getElementById('pUsd').textContent = (user?.balanceUSD || 0).toFixed(2);
+        
+        // Profile dropdown
+        document.getElementById('p_nickname').textContent = user?.nickname || user?.username || 'زائر';
+        document.getElementById('p_id').textContent = user?.numericId ? String(user.numericId).padStart(6, '0') : '000000';
+        document.getElementById('p_egp').textContent = (user?.balanceEGP || 0).toFixed(2);
+        document.getElementById('p_usd').textContent = (user?.balanceUSD || 0).toFixed(2);
 
+        // Show/hide auth-only elements
         document.querySelectorAll('.auth-only').forEach(el => {
-            el.classList.toggle('hidden-guest', !isLoggedIn());
+            el.classList.toggle('hidden-guest', !isLogged);
         });
+    }
+
+    // ===== Toggle Profile =====
+    function toggleProfile() {
+        if (!isLoggedIn()) { showAlert('يرجى تسجيل الدخول أولاً', 'warning'); return; }
+        closeAll();
+        document.getElementById('profileDropdown').classList.add('active');
+        document.getElementById('screenOverlay').style.display = 'block';
+        updateUI();
+    }
+
+    // ===== Toggle Notifications =====
+    function toggleNotifications() {
+        if (!isLoggedIn()) { showAlert('يرجى تسجيل الدخول أولاً', 'warning'); return; }
+        closeAll();
+        document.getElementById('notifDropdown').classList.add('active');
+        document.getElementById('screenOverlay').style.display = 'block';
+    }
+
+    // ===== Close All =====
+    function closeAll() {
+        document.querySelectorAll('.profile-dropdown, .notif-dropdown').forEach(el => {
+            el.classList.remove('active');
+        });
+        document.getElementById('screenOverlay').style.display = 'none';
+    }
+
+    // ===== Copy ID =====
+    function copyId() {
+        const id = document.getElementById('p_id').textContent;
+        navigator.clipboard.writeText(id).then(() => {
+            showAlert('✅ تم نسخ المعرف: ' + id, 'success');
+        });
+    }
+
+    // ===== Logout =====
+    async function logout() {
+        try {
+            if (auth) await auth.signOut();
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            window.location.reload();
+        } catch (error) {
+            console.error('Logout error:', error);
+            localStorage.removeItem('currentUser');
+            window.location.reload();
+        }
+    }
+
+    // ===== Show Alert =====
+    function showAlert(message, type) {
+        const alertDiv = document.getElementById('firebaseAlert');
+        alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+        alertDiv.className = `firebase-alert firebase-${type}`;
+        alertDiv.style.display = 'flex';
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 4000);
     }
 
     // ===== Render History =====
@@ -651,15 +1000,6 @@
         container.innerHTML = bannerMessages.slice(0, 5).map(b => `
             <div class="banner-item"><i class="fas fa-trophy"></i> ${b.text}</div>
         `).join('');
-    }
-
-    // ===== Show Alert =====
-    function showAlert(message, type) {
-        const alertDiv = document.getElementById('firebaseAlert');
-        alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
-        alertDiv.className = `firebase-alert firebase-${type}`;
-        alertDiv.style.display = 'flex';
-        setTimeout(() => { alertDiv.style.display = 'none'; }, 4000);
     }
 
     // ===== SLOT MACHINE =====
@@ -725,7 +1065,7 @@
                 const delta = result.win ? result.amount - bet : -bet;
                 const newBal = bal + delta;
 
-                // Update user balance
+                // Update user balance in Firebase
                 user.balanceEGP = newBal;
                 await saveUserToFirebase(user);
 
@@ -738,8 +1078,13 @@
                     reels.forEach(r => r.classList.add('winner'));
                     resultDisplay.className = 'result-box win';
                     resultDisplay.innerHTML = `🎉 فوز! ${results.join(' ')} — ربحت ${result.amount.toFixed(2)} EGP (×${result.multiplier})`;
-                    const msg = `🎰 ${user.nickname || user.username} ربح ${result.amount.toFixed(2)} EGP في ماكينة الحظ!`;
-                    addBanner(msg);
+                    
+                    // Add banner for big wins (multiplier >= 3)
+                    if (result.multiplier >= 3) {
+                        const msg = `🎰 ${user.nickname || user.username} ربح ${result.amount.toFixed(2)} EGP في ماكينة الحظ!`;
+                        addBanner(msg);
+                    }
+                    
                     showAlert(`🎉 فوز! ربحت ${result.amount.toFixed(2)} EGP`, 'success');
                 } else {
                     resultDisplay.className = 'result-box lose';
@@ -770,9 +1115,13 @@
 
     // ===== Init =====
     function init() {
+        // Close dropdowns on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeAll();
+        });
+
         initFirebase();
         updateUI();
-        loadGameHistory();
 
         // Auto-update every 10 seconds
         setInterval(() => {
