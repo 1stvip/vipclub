@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <style>
-        /* ===== جميع الأنماط السابقة محفوظة ===== */
+        /* ===== جميع الأنماط محفوظة ===== */
         :root { 
             --primary: #8b5cf6; 
             --primary-hover: #7c3aed;
@@ -677,7 +677,6 @@
         }
         .modern-footer a { color: var(--text-dim); text-decoration: none; }
 
-        /* ===== MODALS ===== */
         #currencyModal, #topUpModal {
             display: none;
             position: fixed;
@@ -987,7 +986,6 @@
     // ============================================================
     async function loadUserData(uid) {
         try {
-            // Get user data from Firebase
             const snapshot = await database.ref('users/' + uid).once('value');
             
             if (snapshot.exists()) {
@@ -999,15 +997,10 @@
                 currentUserKey = uid;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 
-                // Load game history
                 await loadGameHistory(uid);
-                
-                // Listen for notifications
                 listenForNotifications(uid);
-                
                 updateUI();
             } else {
-                // Create new user
                 const newUser = {
                     nickname: 'لاعب',
                     username: 'player_' + Date.now(),
@@ -1056,19 +1049,30 @@
     }
 
     async function saveUserToFirebase(userData) {
-        if (!userData || !userData.uid) return false;
+        if (!userData || !userData.uid) {
+            console.error('❌ لا يوجد uid لحفظ البيانات');
+            return false;
+        }
+        
         try {
+            // حفظ البيانات في Firebase
             await database.ref('users/' + userData.uid).update({
                 balanceEGP: userData.balanceEGP || 0,
                 balanceUSD: userData.balanceUSD || 0,
                 nickname: userData.nickname || userData.username,
                 updatedAt: new Date().toISOString()
             });
+            
+            // تحديث localStorage
             localStorage.setItem('currentUser', JSON.stringify(userData));
+            
+            // تحديث المتغير العام
+            currentUser = userData;
+            
             return true;
         } catch (error) {
-            console.error('Save user error:', error);
-            showFirebaseAlert('❌ خطأ في حفظ البيانات', 'error');
+            console.error('❌ خطأ في حفظ البيانات:', error);
+            showFirebaseAlert('❌ خطأ في حفظ التحديث: ' + error.message, 'error');
             return false;
         }
     }
@@ -1077,11 +1081,13 @@
         try {
             await database.ref('users/' + uid + '/gameHistory').set(gameHistory.slice(0, 100));
             
-            // Also save to global gameStats for admin panel
+            // حفظ في gameStats للمشرف
             await database.ref('gameStats/latestGames').set(gameHistory.slice(0, 50));
             
+            return true;
         } catch (error) {
             console.error('Save history error:', error);
+            return false;
         }
     }
 
@@ -1165,7 +1171,6 @@
             document.getElementById('reel3')
         ];
 
-        // Start spinning
         reels.forEach((reel) => {
             reel.classList.add('spinning');
             let interval = setInterval(() => {
@@ -1175,17 +1180,14 @@
             reel.dataset.interval = interval;
         });
 
-        // Wait for spin
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Final results
         const results = [];
         for (let i = 0; i < 3; i++) {
             const idx = Math.floor(Math.random() * symbols.length);
             results.push(symbols[idx]);
         }
 
-        // Stop spinning
         reels.forEach((reel, index) => {
             clearInterval(parseInt(reel.dataset.interval));
             reel.classList.remove('spinning');
@@ -1207,7 +1209,6 @@
             resultText = `🎉🎊 جائزة كبرى! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×3)`;
             resultType = 'jackpot';
             reels.forEach(r => r.classList.add('jackpot-reel'));
-            // Add notification for jackpot
             await addNotification(`🎰 فاز ${user.nickname || user.username} بالجائزة الكبرى ${winAmount.toFixed(2)} ج.م!`);
         } else if (twoSame) {
             win = true;
@@ -1220,7 +1221,6 @@
                 }
             });
         } else if (Math.random() < 0.30) {
-            // Bonus
             win = true;
             winAmount = bet * 2.5;
             resultText = `🎁 بونص حظ! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×2.5)`;
@@ -1233,7 +1233,6 @@
             resultType = 'lose';
         }
 
-        // Remove effects after delay
         setTimeout(() => {
             reels.forEach(r => {
                 r.classList.remove('win-reel', 'jackpot-reel');
@@ -1244,14 +1243,13 @@
         const delta = win ? winAmount - bet : -bet;
         const newBalance = bal + delta;
         
-        // Update user object
+        // تحديث user object
         user.balanceEGP = newBalance;
-        currentUser = user;
         
-        // Save to Firebase
+        // حفظ في Firebase
         const saved = await saveUserToFirebase(user);
         if (!saved) {
-            showFirebaseAlert('❌ خطأ في حفظ التحديث', 'error');
+            showFirebaseAlert('❌ خطأ في حفظ التحديث. الرجاء المحاولة مرة أخرى.', 'error');
             isPlaying = false;
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-play"></i> لعب';
@@ -1261,7 +1259,7 @@
         // ===== SAVE HISTORY =====
         const entry = {
             bet: bet,
-            result: win ? `ربح ${winAmount.toFixed(2)}` : `خسارة ${bet}`,
+            result: win ? `ربح ${winAmount.toFixed(2)}` : `خسارة ${bet.toFixed(2)}`,
             amount: delta,
             symbols: results.join(' '),
             time: new Date().toLocaleString('ar-EG'),
@@ -1281,14 +1279,12 @@
 
         updateUI();
         
-        // Show appropriate message
         if (win) {
             showFirebaseAlert(`🎉 فوز! ربحت ${winAmount.toFixed(2)} ج.م`, 'success');
         } else {
             showFirebaseAlert(`😞 خسارة ${bet.toFixed(2)} ج.م`, 'error');
         }
 
-        // ===== RESET =====
         isPlaying = false;
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-play"></i> لعب';
@@ -1682,13 +1678,11 @@
     window.onload = async function() {
         await initializeFirebase();
         
-        // Auto-refresh every 30 seconds
         setInterval(() => {
             if (getUser()) updateUI();
         }, 30000);
     };
 
-    // Close dropdowns on ESC
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeAll();
     });
