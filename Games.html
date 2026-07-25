@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <style>
-        /* ===== جميع الأنماط من chat.html مع تعديلات بسيطة ===== */
+        /* ===== جميع الأنماط محفوظة مع تعديلات ===== */
         :root { 
             --primary: #8b5cf6; 
             --primary-hover: #7c3aed;
@@ -36,7 +36,7 @@
             overflow-x: hidden;
         }
 
-        /* ===== HEADER (مطابق لـ chat.html) ===== */
+        /* ===== HEADER ===== */
         .header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             padding: 10px 16px;
@@ -110,6 +110,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            text-decoration: none;
         }
 
         .header-right .icon-btn:hover {
@@ -132,7 +133,7 @@
             font-weight: bold;
         }
 
-        /* ===== PROFILE QUICK (مطابق لـ chat.html) ===== */
+        /* ===== PROFILE QUICK ===== */
         .profile-quick {
             background: var(--card-bg);
             border-radius: 20px;
@@ -500,7 +501,7 @@
             backdrop-filter: blur(4px); 
         }
 
-        /* ===== PROFILE DROPDOWN (مطابق لـ chat.html) ===== */
+        /* ===== PROFILE DROPDOWN ===== */
         .profile-dropdown {
             position: fixed;
             top: 65px;
@@ -573,31 +574,18 @@
             border-radius: 12px;
             padding: 10px 15px;
             margin: 8px 0 12px;
-            transition: all 0.3s ease;
-        }
-
-        .profile-dropdown .profile-bio-wrapper:hover {
-            border-color: rgba(139, 92, 246, 0.3);
         }
 
         .profile-dropdown .profile-bio {
             color: #94a3b8;
             font-size: 0.85rem;
             word-break: break-word;
-            cursor: pointer;
-            transition: 0.3s;
             min-height: 20px;
-            outline: none;
             background: transparent;
             border: none;
             width: 100%;
             color: #ddd;
             font-family: inherit;
-        }
-
-        .profile-dropdown .profile-bio:focus {
-            outline: none;
-            color: #fff;
         }
 
         .profile-dropdown .user-id-numeric {
@@ -709,6 +697,17 @@
             font-size: 0.95rem;
         }
 
+        .profile-dropdown .btn-deposit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .profile-dropdown .btn-deposit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
         .profile-dropdown .btn-logout {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
@@ -720,17 +719,7 @@
             transform: translateY(-2px);
         }
 
-        .profile-dropdown .btn-profile {
-            background: #8b5cf6;
-            color: white;
-        }
-
-        .profile-dropdown .btn-profile:hover {
-            background: #7c3aed;
-            transform: translateY(-2px);
-        }
-
-        /* ===== NOTIFICATION DROPDOWN (مطابق لـ chat.html) ===== */
+        /* ===== NOTIFICATION DROPDOWN ===== */
         .notif-dropdown {
             position: fixed;
             top: 65px;
@@ -920,7 +909,7 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
         }
 
-        /* ===== BOTTOM NAV (مطابق لـ chat.html) ===== */
+        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             background: #14142a;
             border-top: 1px solid #1e1e3a;
@@ -944,6 +933,7 @@
             border: none;
             padding: 4px 12px;
             position: relative;
+            text-decoration: none;
         }
 
         .bottom-nav .nav-item i {
@@ -984,7 +974,64 @@
         }
         .modern-footer a { color: var(--text-dim); text-decoration: none; }
 
-        /* ===== RESPONSIVE ===== */
+        /* ===== MODALS ===== */
+        #currencyModal, #topUpModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 420px;
+            max-width: 95%;
+            z-index: 10001;
+            padding: 25px;
+            background: #1a1a2e;
+            border-radius: 28px;
+            border: 1px solid #334155;
+            color: white;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+        }
+        #currencyModal select, #topUpModal select,
+        #currencyModal input, #topUpModal input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            margin-top: 8px;
+        }
+        #currencyModal .action-btn, #topUpModal .action-btn {
+            margin-top: 10px;
+        }
+
+        .copy-box {
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            border: 1px dashed var(--primary);
+        }
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        .copy-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 768px) {
             .reels-container { gap: 15px; }
             .reel { width: 80px; height: 100px; font-size: 3.2rem; }
@@ -994,6 +1041,7 @@
             .bet-controls { flex-direction: column; }
             .bet-controls input { width: 100%; }
             .profile-dropdown, .notif-dropdown { width: 340px; max-width: 92vw; right: 5px; }
+            #currencyModal, #topUpModal { width: 95%; padding: 15px; }
         }
 
         @media (max-width: 480px) {
@@ -1016,7 +1064,7 @@
 </head>
 <body>
 
-<!-- ===== HEADER (مطابق لـ chat.html) ===== -->
+<!-- ===== HEADER ===== -->
 <header class="header">
     <div class="header-left">
         <button class="icon-btn" onclick="toggleProfileDropdown()" title="الملف الشخصي">
@@ -1055,9 +1103,7 @@
         <div class="profile-name" id="p_nickname">تحميل...</div>
 
         <div class="profile-bio-wrapper">
-            <div class="profile-bio" id="p_bio">
-                لا توجد سيرة ذاتية
-            </div>
+            <div class="profile-bio" id="p_bio">لا توجد سيرة ذاتية</div>
         </div>
 
         <span class="id-label" style="font-size:0.75rem; color:#aaa; display:block;">المعرف الخاص بك</span>
@@ -1089,8 +1135,8 @@
         </div>
 
         <div class="profile-actions">
-            <button class="action-btn btn-profile" onclick="viewFullProfile()">
-                <i class="fas fa-id-card"></i> الملف الشخصي الكامل
+            <button class="action-btn btn-deposit" onclick="openCurrencySelection()">
+                <i class="fas fa-plus-circle"></i> إيداع الرصيد
             </button>
             <button class="action-btn btn-logout" onclick="logout()">تسجيل الخروج</button>
         </div>
@@ -1137,6 +1183,53 @@
 
 <!-- ===== FIREBASE ALERT ===== -->
 <div id="firebaseAlert" class="firebase-alert" style="display: none;"></div>
+
+<!-- ===== CURRENCY MODAL ===== -->
+<div id="currencyModal">
+    <h3 style="text-align:center; margin-top:0;">💰 إيداع رصيد</h3>
+    <p style="text-align:center; color:var(--text-dim);">اختر العملة:</p>
+    <button class="action-btn btn-primary" onclick="handleCurrencyChoice('EGP')">🇪🇬 إيداع بالجنيه المصري (EGP)</button>
+    <button class="action-btn btn-success" onclick="handleCurrencyChoice('USD')">🇺🇸 إيداع بالدولار (USD)</button>
+    <button class="action-btn" style="background:#334155; color:white;" onclick="closeAll()">إلغاء</button>
+</div>
+
+<!-- ===== TOP UP MODAL ===== -->
+<div id="topUpModal">
+    <h3 id="topUpTitle" style="text-align:center; margin-top:0;">شحن رصيد</h3>
+    <div style="margin:15px 0;">
+        <label style="font-weight:bold; font-size:0.85rem;">اختر طريقة الدفع:</label>
+        <select id="paymentMethod" onchange="updatePaymentDetails()">
+            <option value="vodafone">فودافون كاش</option>
+            <option value="instapay">إنستا باي</option>
+            <option value="binance">Binance Pay</option>
+        </select>
+    </div>
+    <div style="margin:15px 0;">
+        <label id="amountLabel" style="font-weight:bold; font-size:0.85rem;">المبلغ المراد إيداعه:</label>
+        <input type="number" id="topUpAmount" placeholder="أدخل المبلغ" oninput="calculateRequiredAmount()">
+    </div>
+    <div id="calculationDisplay" style="display:none; background:#0f172a; padding:12px; border-radius:10px; margin:10px 0; text-align:center;">
+        <span style="font-size:0.85rem; font-weight:bold;">المبلغ المطلوب تحويله: </span>
+        <b id="finalRequiredAmount" style="color:var(--success);">0</b>
+    </div>
+    <div id="paymentDetails" style="background:#0f172a; padding:15px; border-radius:10px; margin:10px 0;">
+        <p id="methodHint" style="font-size:0.8rem; color:var(--text-dim);">حول للرقم التالي:</p>
+        <div class="copy-box">
+            <b id="walletNumber">01022797043</b>
+            <button class="copy-btn" onclick="copyText('walletNumber')">نسخ</button>
+        </div>
+        <div id="binanceDetails" style="display:none; margin-top:10px; font-size:0.85rem; line-height:1.8;">
+            <div>المعرف: <b id="binanceID">803045359</b> <button class="copy-btn" style="padding:2px 5px;" onclick="copyText('binanceID')">نسخ</button></div>
+            <div>الاسم المستعار: <b>iMrJoe</b></div>
+        </div>
+    </div>
+    <div style="margin:15px 0;">
+        <label style="font-weight:bold; font-size:0.85rem;">ارفع إيصال التحويل:</label>
+        <input type="file" id="topUpReceipt" accept="image/*">
+    </div>
+    <button class="action-btn btn-primary" id="submitTopUpBtn" onclick="submitTopUp()">تأكيد وإرسال الإيصال</button>
+    <button class="action-btn" style="background:#334155; color:white;" onclick="closeAll()">إلغاء</button>
+</div>
 
 <!-- ===== MAIN GAME AREA ===== -->
 <div class="game-container">
@@ -1217,26 +1310,26 @@
     <span class="pulse-dot"></span>
 </button>
 
-<!-- ===== BOTTOM NAV (مطابق لـ chat.html) ===== -->
+<!-- ===== BOTTOM NAV ===== -->
 <div class="bottom-nav">
-    <button class="nav-item" id="navChat" onclick="goToChat()">
+    <a href="chat.html" class="nav-item" id="navChat">
         <i class="fas fa-comments"></i>
         <span>الدردشة</span>
-    </button>
-    <button class="nav-item active" id="navGames" onclick="goToGames()">
+    </a>
+    <a href="Games.html" class="nav-item active" id="navGames">
         <i class="fas fa-gamepad"></i>
         <span>الألعاب</span>
         <span class="nav-badge">جديد</span>
-    </button>
-    <button class="nav-item" id="navWallet" onclick="goToWallet()">
+    </a>
+    <a href="Wallet.html" class="nav-item" id="navWallet">
         <i class="fas fa-wallet"></i>
         <span>المحفظة</span>
-    </button>
+    </a>
 </div>
 
 <script>
     // ============================================================
-    // 🔥 FIREBASE CONFIG (نفس المستخدم في chat.html)
+    // 🔥 FIREBASE CONFIG
     // ============================================================
     const firebaseConfig = {
         apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -1253,10 +1346,11 @@
     // ============================================================
     let firebaseApp, database, auth;
     let currentUser = null;
-    let currentUserId = null;
     let isPlaying = false;
     let gameHistory = [];
     let isLoggedIn = false;
+    let isSubmittingTopUp = false;
+    let selectedCurrency = 'EGP';
 
     // Lottery symbols
     const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '⭐', '🎰'];
@@ -1278,7 +1372,6 @@
                     await loadUserData(user.uid);
                 } else {
                     currentUser = null;
-                    currentUserId = null;
                     isLoggedIn = false;
                     updateUI();
                 }
@@ -1291,22 +1384,27 @@
     // ============================================================
     // ===== USER DATA MANAGEMENT =====
     // ============================================================
-    function getCurrentUser() {
+    function getCurrentUserFromStorage() {
         try {
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            if (user && !user.isGuest) {
-                return user;
-            }
-            return null;
-        } catch (e) {
+            return JSON.parse(localStorage.getItem('currentUser'));
+        } catch (error) {
             return null;
         }
     }
 
-    function checkLoginStatus() {
-        const user = getCurrentUser();
-        isLoggedIn = !!(user && user.numericId);
-        return isLoggedIn;
+    function getUser() {
+        if (currentUser) return currentUser;
+        const user = getCurrentUserFromStorage();
+        if (user) {
+            currentUser = user;
+            return user;
+        }
+        return null;
+    }
+
+    function isLoggedInUser() {
+        const user = getUser();
+        return !!(user && user.uid && user.numericId);
     }
 
     async function loadUserData(uid) {
@@ -1321,7 +1419,6 @@
                     uid: uid,
                     ...userData
                 };
-                currentUserId = uid;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 isLoggedIn = true;
                 
@@ -1385,7 +1482,7 @@
     // ===== UI UPDATES =====
     // ============================================================
     function updateUI() {
-        const user = getCurrentUser();
+        const user = getUser();
         if (!user) {
             document.getElementById('qName').innerText = 'زائر';
             document.getElementById('qId').innerText = '🆔 000000';
@@ -1433,12 +1530,6 @@
         // Bio
         document.getElementById('p_bio').innerText = user.bio || 'لا توجد سيرة ذاتية';
         
-        // Badges
-        const badgesContainer = document.getElementById('p_badges');
-        if (user.badges && user.badges.length > 0) {
-            badgesContainer.innerHTML = user.badges.map(b => `<span class="badge-item">${b}</span>`).join('');
-        }
-        
         renderHistory();
     }
 
@@ -1452,7 +1543,7 @@
     async function playLottery() {
         if (isPlaying) return;
         
-        const user = getCurrentUser();
+        const user = getUser();
         if (!user || !user.uid) {
             showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
             return;
@@ -1610,7 +1701,7 @@
     // ===== NOTIFICATIONS =====
     // ============================================================
     async function loadNotifications() {
-        const user = getCurrentUser();
+        const user = getUser();
         if (!user || !user.uid) {
             document.getElementById('notifList').innerHTML = `
                 <div class="empty-notif">
@@ -1697,7 +1788,7 @@
     }
 
     async function markAllRead() {
-        const user = getCurrentUser();
+        const user = getUser();
         if (!user || !user.uid) return;
 
         try {
@@ -1729,7 +1820,7 @@
 
     async function deleteAllNotifs() {
         if (!confirm('حذف جميع الإشعارات؟')) return;
-        const user = getCurrentUser();
+        const user = getUser();
         if (!user || !user.uid) return;
 
         try {
@@ -1742,7 +1833,7 @@
     }
 
     async function addNotification(text) {
-        const user = getCurrentUser();
+        const user = getUser();
         if (!user || !user.uid) return;
         try {
             await database.ref('users/' + user.uid + '/notifications').push({
@@ -1783,7 +1874,7 @@
 
     async function clearHistory() {
         if (!confirm('مسح سجل الجولات؟')) return;
-        const user = getCurrentUser();
+        const user = getUser();
         if (!user || !user.uid) return;
         gameHistory = [];
         await saveGameHistory(user.uid);
@@ -1795,6 +1886,12 @@
     // ===== PROFILE FUNCTIONS =====
     // ============================================================
     function toggleProfileDropdown() {
+        const user = getUser();
+        if (!user) {
+            showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+            return;
+        }
+        
         const dropdown = document.getElementById('profileDropdown');
         const isOpen = dropdown.classList.contains('active');
 
@@ -1809,6 +1906,12 @@
     }
 
     function toggleNotifs() {
+        const user = getUser();
+        if (!user) {
+            showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+            return;
+        }
+        
         const dropdown = document.getElementById('notifDropdown');
         const isOpen = dropdown.classList.contains('active');
 
@@ -1837,23 +1940,163 @@
         });
     }
 
-    function viewFullProfile() {
-        const user = getCurrentUser();
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            showFirebaseAlert('✅ تم نسخ: ' + text, 'success');
+        });
+    }
+
+    // ============================================================
+    // ===== TOP UP FUNCTIONS =====
+    // ============================================================
+    function openCurrencySelection() {
+        const user = getUser();
         if (!user) {
             showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
             return;
         }
-        alert(
-            `👤 الملف الشخصي الكامل\n\n` +
-            `الاسم: ${user.nickname || user.username}\n` +
-            `🆔: ${user.numericId || '000000'}\n` +
-            `📝 السيرة: ${user.bio || 'لا توجد'}\n` +
-            `❤️ إعجابات: ${user.likes || 0}\n` +
-            `🎁 هدايا: ${user.gifts || 0}\n` +
-            `👁️ زيارات: ${user.visits || 0}\n` +
-            `💰 رصيد EGP: ${user.balanceEGP || 0}\n` +
-            `💵 رصيد USD: ${user.balanceUSD || 0}`
-        );
+        closeAll();
+        document.getElementById('currencyModal').style.display = 'block';
+        document.getElementById('screenOverlay').style.display = 'block';
+    }
+
+    function handleCurrencyChoice(currency) {
+        selectedCurrency = currency;
+        closeAll();
+        document.getElementById('topUpTitle').innerText = currency === 'EGP' ? '🇪🇬 شحن رصيد (EGP)' : '🇺🇸 شحن رصيد (USD)';
+        document.getElementById('amountLabel').innerText = currency === 'EGP' ? 'المبلغ (EGP):' : 'المبلغ (USD):';
+        
+        const methodSelect = document.getElementById('paymentMethod');
+        methodSelect.innerHTML = '';
+        if (currency === 'USD') {
+            methodSelect.innerHTML = `
+                <option value="binance">Binance Pay</option>
+                <option value="vodafone">فودافون كاش</option>
+                <option value="instapay">إنستا باي</option>
+            `;
+        } else {
+            methodSelect.innerHTML = `
+                <option value="vodafone">فودافون كاش</option>
+                <option value="instapay">إنستا باي</option>
+                <option value="binance">Binance Pay</option>
+            `;
+        }
+        updatePaymentDetails();
+        document.getElementById('topUpModal').style.display = 'block';
+        document.getElementById('screenOverlay').style.display = 'block';
+    }
+
+    function updatePaymentDetails() {
+        const method = document.getElementById('paymentMethod').value;
+        const walletBox = document.getElementById('walletNumber');
+        const binanceDetails = document.getElementById('binanceDetails');
+        const hint = document.getElementById('methodHint');
+        
+        if (method === 'binance') {
+            binanceDetails.style.display = 'block';
+            hint.innerText = 'بيانات الدفع عبر Binance Pay:';
+        } else {
+            binanceDetails.style.display = 'none';
+            hint.innerText = 'حول للرقم التالي:';
+            walletBox.innerText = '01022797043';
+        }
+        calculateRequiredAmount();
+    }
+
+    function calculateRequiredAmount() {
+        const amount = parseFloat(document.getElementById('topUpAmount').value) || 0;
+        const display = document.getElementById('calculationDisplay');
+        const finalLabel = document.getElementById('finalRequiredAmount');
+        
+        if (amount <= 0) {
+            display.style.display = 'none';
+            return;
+        }
+        display.style.display = 'block';
+        finalLabel.innerText = amount + ' ج.م';
+    }
+
+    async function submitTopUp() {
+        if (isSubmittingTopUp) {
+            showFirebaseAlert('⏳ جارٍ المعالجة...', 'warning');
+            return;
+        }
+
+        const user = getUser();
+        if (!user) {
+            showFirebaseAlert('⚠️ يرجى تسجيل الدخول', 'warning');
+            return;
+        }
+
+        const amount = document.getElementById('topUpAmount').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const fileInput = document.getElementById('topUpReceipt');
+
+        if (!amount || amount <= 0) {
+            showFirebaseAlert('⚠️ أدخل مبلغاً صحيحاً', 'error');
+            return;
+        }
+        if (fileInput.files.length === 0) {
+            showFirebaseAlert('⚠️ يرجى رفع صورة الإيصال', 'error');
+            return;
+        }
+
+        isSubmittingTopUp = true;
+        const btn = document.getElementById('submitTopUpBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الإرسال...';
+        btn.disabled = true;
+
+        try {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const orderData = {
+                        orderId: 'DEP-' + Date.now(),
+                        userId: user.numericId,
+                        username: user.username,
+                        nickname: user.nickname || user.username,
+                        product: `إيداع ${selectedCurrency}`,
+                        price: `${amount} ${selectedCurrency}`,
+                        paymentMethod: paymentMethod,
+                        receipt: e.target.result,
+                        status: 'قيد المراجعة',
+                        type: 'deposit',
+                        createdAt: new Date().toISOString(),
+                        timestamp: Date.now()
+                    };
+
+                    await database.ref('orders').push(orderData);
+
+                    await database.ref('users/' + user.uid + '/notifications').push({
+                        text: `⏳ تم استلام طلب الإيداع بقيمة ${amount} ${selectedCurrency}. جاري المراجعة.`,
+                        read: false,
+                        date: new Date().toLocaleString('ar-EG'),
+                        type: 'deposit',
+                        createdAt: new Date().toISOString()
+                    });
+
+                    showFirebaseAlert('✅ تم إرسال طلب الإيداع بنجاح', 'success');
+                    closeAll();
+
+                } catch (error) {
+                    console.error('Submit error:', error);
+                    showFirebaseAlert('❌ حدث خطأ: ' + error.message, 'error');
+                } finally {
+                    isSubmittingTopUp = false;
+                    btn.innerHTML = 'تأكيد وإرسال الإيصال';
+                    btn.disabled = false;
+                }
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+
+        } catch (error) {
+            console.error('Top-up error:', error);
+            showFirebaseAlert('❌ حدث خطأ', 'error');
+            isSubmittingTopUp = false;
+            btn.innerHTML = 'تأكيد وإرسال الإيصال';
+            btn.disabled = false;
+        }
     }
 
     // ============================================================
@@ -1879,6 +2122,8 @@
         document.getElementById('profileDropdown').classList.remove('active');
         document.getElementById('notifDropdown').classList.remove('active');
         document.getElementById('screenOverlay').style.display = 'none';
+        document.getElementById('currencyModal').style.display = 'none';
+        document.getElementById('topUpModal').style.display = 'none';
     }
 
     // ============================================================
@@ -1888,9 +2133,15 @@
         try {
             if (auth) await auth.signOut();
             localStorage.removeItem('currentUser');
+            currentUser = null;
+            isLoggedIn = false;
+            updateUI();
+            showFirebaseAlert('✅ تم تسجيل الخروج', 'success');
             window.location.reload();
         } catch (error) {
             localStorage.removeItem('currentUser');
+            currentUser = null;
+            isLoggedIn = false;
             window.location.reload();
         }
     }
@@ -1920,14 +2171,14 @@
         await initializeFirebase();
         
         // Check if user is already logged in via localStorage
-        const user = getCurrentUser();
+        const user = getCurrentUserFromStorage();
         if (user && user.uid) {
             await loadUserData(user.uid);
         }
         
         // Update UI every 30 seconds
         setInterval(() => {
-            if (getCurrentUser()) updateUI();
+            if (getUser()) updateUI();
         }, 30000);
     };
 
