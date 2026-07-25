@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <style>
-        /* ===== جميع الأنماط محفوظة مع تعديلات ===== */
+        /* ===== جميع الأنماط محفوظة ===== */
         :root { 
             --primary: #8b5cf6; 
             --primary-hover: #7c3aed;
@@ -208,10 +208,110 @@
         .game-subtitle {
             text-align: center;
             color: var(--text-dim);
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-size: 1rem;
         }
 
+        /* ===== شرح اللعبة ===== */
+        .game-info-box {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 15px 0 25px;
+            border: 1px solid #1e1e3a;
+            border-right: 4px solid #ffd700;
+        }
+        .game-info-box h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        .game-info-box p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+        .game-info-box .symbols-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            justify-content: center;
+        }
+        .game-info-box .symbol-item {
+            background: #0f1a2b;
+            padding: 8px 14px;
+            border-radius: 12px;
+            border: 1px solid #2a3a52;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .game-info-box .symbol-item span {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        .game-info-box .prize-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .game-info-box .prize-item {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        .game-info-box .prize-item .prize-icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .game-info-box .prize-item .prize-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        .game-info-box .prize-item .prize-value {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        .game-info-box .jackpot-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #0b1120;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .game-info-box .win-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .game-info-box .bonus-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* ===== LOTTERY MACHINE ===== */
         .lottery-machine {
             background: var(--card-bg);
             border-radius: 30px;
@@ -1032,6 +1132,7 @@
             transform: translateY(-2px);
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .reels-container { gap: 15px; }
             .reel { width: 80px; height: 100px; font-size: 3.2rem; }
@@ -1042,6 +1143,7 @@
             .bet-controls input { width: 100%; }
             .profile-dropdown, .notif-dropdown { width: 340px; max-width: 92vw; right: 5px; }
             #currencyModal, #topUpModal { width: 95%; padding: 15px; }
+            .game-info-box .prize-row { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
@@ -1059,6 +1161,8 @@
             }
             .bottom-nav .nav-item { font-size: 0.5rem; }
             .bottom-nav .nav-item i { font-size: 1rem; }
+            .game-info-box .symbols-row { gap: 6px; }
+            .game-info-box .symbol-item { font-size: 1rem; padding: 5px 10px; }
         }
     </style>
 </head>
@@ -1240,6 +1344,58 @@
         🎰 جرب حظك واربح جوائز رائعة!
     </div>
 
+    <!-- ===== شرح اللعبة ===== -->
+    <div class="game-info-box">
+        <h3><i class="fas fa-info-circle"></i> شرح اللعبة</h3>
+        <p>
+            🎯 <strong>الهدف:</strong> الحصول على أكبر عدد من الرموز المتطابقة على البكرات الثلاث.
+        </p>
+        
+        <div class="symbols-row">
+            <div class="symbol-item">🍒 <span>كرز</span></div>
+            <div class="symbol-item">🍋 <span>ليمون</span></div>
+            <div class="symbol-item">🍊 <span>برتقال</span></div>
+            <div class="symbol-item">🍇 <span>عنب</span></div>
+            <div class="symbol-item">🔔 <span>جرس</span></div>
+            <div class="symbol-item">💎 <span>ألماس</span></div>
+            <div class="symbol-item">7️⃣ <span>سبعة</span></div>
+            <div class="symbol-item">⭐ <span>نجمة</span></div>
+            <div class="symbol-item">🎰 <span>ماكينة</span></div>
+        </div>
+
+        <p style="margin-top: 10px;">
+            <strong>🏆 نظام الجوائز:</strong>
+        </p>
+        <div class="prize-row">
+            <div class="prize-item">
+                <span class="prize-icon">👑</span>
+                <div class="prize-label">الجائزة الكبرى</div>
+                <div class="prize-value">×3</div>
+                <div style="font-size:0.65rem; color:#94a3b8;">3 رموز متطابقة</div>
+            </div>
+            <div class="prize-item">
+                <span class="prize-icon">🎯</span>
+                <div class="prize-label">فوز متوسط</div>
+                <div class="prize-value">×1.8</div>
+                <div style="font-size:0.65rem; color:#94a3b8;">2 رموز متطابقة</div>
+            </div>
+            <div class="prize-item">
+                <span class="prize-icon">🎁</span>
+                <div class="prize-label">بونص الحظ</div>
+                <div class="prize-value">×2.5</div>
+                <div style="font-size:0.65rem; color:#94a3b8;">فرصة 30% إضافية</div>
+            </div>
+        </div>
+
+        <p style="margin-top: 10px; font-size:0.85rem; color:#94a3b8;">
+            <span class="jackpot-badge">👑 جائزة كبرى</span> عند ظهور 3 رموز متطابقة تحصل على <strong>×3</strong> من رهانك!
+            <br>
+            <span class="win-badge">🎯 فوز</span> عند ظهور رمزين متطابقين تحصل على <strong>×1.8</strong> من رهانك!
+            <br>
+            <span class="bonus-badge">🎁 بونص</span> فرصة 30% للحصول على <strong>×2.5</strong> من رهانك!
+        </p>
+    </div>
+
     <div class="lottery-machine">
         <!-- Reels -->
         <div class="reels-container">
@@ -1329,7 +1485,7 @@
 
 <script>
     // ============================================================
-    // 🔥 FIREBASE CONFIG
+    // 🔥 FIREBASE CONFIG - نفس المشروع
     // ============================================================
     const firebaseConfig = {
         apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -1348,7 +1504,6 @@
     let currentUser = null;
     let isPlaying = false;
     let gameHistory = [];
-    let isLoggedIn = false;
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
 
@@ -1372,7 +1527,6 @@
                     await loadUserData(user.uid);
                 } else {
                     currentUser = null;
-                    isLoggedIn = false;
                     updateUI();
                 }
             });
@@ -1382,7 +1536,7 @@
     }
 
     // ============================================================
-    // ===== USER DATA MANAGEMENT =====
+    // ===== USER DATA MANAGEMENT - نفس نظام chat.html =====
     // ============================================================
     function getCurrentUserFromStorage() {
         try {
@@ -1402,11 +1556,6 @@
         return null;
     }
 
-    function isLoggedInUser() {
-        const user = getUser();
-        return !!(user && user.uid && user.numericId);
-    }
-
     async function loadUserData(uid) {
         try {
             if (!database) return;
@@ -1420,7 +1569,6 @@
                     ...userData
                 };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                isLoggedIn = true;
                 
                 await loadGameHistory(uid);
                 updateUI();
@@ -1616,14 +1764,14 @@
         if (allSame) {
             win = true;
             winAmount = bet * 3.0;
-            resultText = `🎉🎊 جائزة كبرى! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×3)`;
+            resultText = `🎉🎊 جائزة كبرى! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×3) 👑`;
             resultType = 'jackpot';
             reels.forEach(r => r.classList.add('jackpot-reel'));
-            await addNotification(`🎰 فاز ${user.nickname || user.username} بالجائزة الكبرى ${winAmount.toFixed(2)} ج.م!`);
+            await addNotification(`🎰 فاز ${user.nickname || user.username} بالجائزة الكبرى ${winAmount.toFixed(2)} ج.م! 👑`);
         } else if (twoSame) {
             win = true;
             winAmount = bet * 1.8;
-            resultText = `🎉 فوز! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×1.8)`;
+            resultText = `🎉 فوز! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×1.8) 🎯`;
             resultType = 'win';
             reels.forEach(r => {
                 if (r.textContent === results[0] || r.textContent === results[1]) {
@@ -1633,7 +1781,7 @@
         } else if (Math.random() < 0.30) {
             win = true;
             winAmount = bet * 2.5;
-            resultText = `🎁 بونص حظ! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×2.5)`;
+            resultText = `🎁 بونص حظ! ${results.join(' ')} — ربحت ${winAmount.toFixed(2)} ج.م (×2.5) 🎁`;
             resultType = 'win';
             reels.forEach(r => r.classList.add('win-reel'));
         } else {
@@ -1865,7 +2013,7 @@
                     <span>${h.symbols} · ${h.time}</span>
                     <span class="${isWin ? (isJackpot ? 'jackpot-text' : 'win') : 'lose'}">
                         ${isWin ? `+${h.winAmount.toFixed(2)}` : `-${h.bet.toFixed(2)}`} ج.م
-                        ${isJackpot ? ' 🏆' : ''}
+                        ${isJackpot ? ' 👑' : ''}
                     </span>
                 </div>
             `;
@@ -1948,7 +2096,7 @@
     }
 
     // ============================================================
-    // ===== TOP UP FUNCTIONS =====
+    // ===== TOP UP FUNCTIONS - نفس الكود المرفق =====
     // ============================================================
     function openCurrencySelection() {
         const user = getUser();
@@ -2134,14 +2282,12 @@
             if (auth) await auth.signOut();
             localStorage.removeItem('currentUser');
             currentUser = null;
-            isLoggedIn = false;
             updateUI();
             showFirebaseAlert('✅ تم تسجيل الخروج', 'success');
             window.location.reload();
         } catch (error) {
             localStorage.removeItem('currentUser');
             currentUser = null;
-            isLoggedIn = false;
             window.location.reload();
         }
     }
