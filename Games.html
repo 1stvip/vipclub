@@ -709,6 +709,70 @@
             margin-top: 10px;
         }
 
+        /* Login Required Overlay */
+        .login-required-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .login-required-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .login-required-box {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #1e293b;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .login-required-box .icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        .login-required-box h2 {
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+        .login-required-box p {
+            color: var(--text-dim);
+            margin-bottom: 25px;
+        }
+        .login-required-box .btn-login {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+        .login-required-box .btn-login:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 768px) {
             .reels-container { gap: 15px; }
             .reel { width: 80px; height: 100px; font-size: 3.2rem; }
@@ -718,6 +782,7 @@
             .bet-controls { flex-direction: column; }
             .bet-controls input { width: 100%; }
             .dropdown-overlay { width: 95%; right: 2.5% !important; left: 2.5% !important; top: 75px; }
+            .login-required-box { padding: 25px; }
         }
 
         @media (max-width: 480px) {
@@ -777,6 +842,18 @@
 
 <!-- ===== FIREBASE ALERT ===== -->
 <div id="firebaseAlert" class="firebase-alert" style="display: none;"></div>
+
+<!-- ===== LOGIN REQUIRED OVERLAY ===== -->
+<div class="login-required-overlay" id="loginOverlay">
+    <div class="login-required-box">
+        <div class="icon"><i class="fas fa-lock"></i></div>
+        <h2>⚠️ تسجيل الدخول مطلوب</h2>
+        <p>يرجى تسجيل الدخول للوصول إلى لعبة ماكينة الحظ وميزات أخرى</p>
+        <button class="btn-login" onclick="redirectToLogin()">
+            <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+        </button>
+    </div>
+</div>
 
 <!-- ===== PROFILE DROPDOWN ===== -->
 <div id="profileDropdown" class="dropdown-overlay">
@@ -951,6 +1028,7 @@
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
     let isFirebaseReady = false;
+    let isUserLoggedIn = false;
 
     // Lottery symbols
     const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '⭐', '🎰'];
@@ -970,13 +1048,27 @@
 
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
+                    isUserLoggedIn = true;
+                    document.getElementById('loginOverlay').classList.remove('active');
                     await loadUserData(user.uid);
                 } else {
+                    isUserLoggedIn = false;
                     currentUser = null;
                     currentUserKey = null;
+                    // Show login overlay
+                    document.getElementById('loginOverlay').classList.add('active');
                     updateUI();
                 }
             });
+
+            // Check if user already logged in
+            const currentAuthUser = auth.currentUser;
+            if (currentAuthUser) {
+                isUserLoggedIn = true;
+                document.getElementById('loginOverlay').classList.remove('active');
+                await loadUserData(currentAuthUser.uid);
+            }
+
         } catch (error) {
             console.error('Firebase init error:', error);
             showFirebaseAlert('❌ خطأ في الاتصال بقاعدة البيانات', 'error');
@@ -988,8 +1080,8 @@
     // ============================================================
     async function loadUserData(uid) {
         try {
-            if (!database) {
-                console.error('Database not initialized');
+            if (!database || !isFirebaseReady) {
+                console.error('Database not ready');
                 return;
             }
             
@@ -1007,7 +1099,7 @@
                 await loadGameHistory(uid);
                 listenForNotifications(uid);
                 updateUI();
-                console.log('✅ User data loaded:', currentUser.nickname);
+                console.log('✅ User loaded:', currentUser.nickname);
             } else {
                 // Create new user
                 const newUser = {
@@ -1036,7 +1128,7 @@
 
     async function loadGameHistory(uid) {
         try {
-            if (!database) return;
+            if (!database || !isFirebaseReady) return;
             
             const snapshot = await database.ref('users/' + uid + '/gameHistory').once('value');
             if (snapshot.exists()) {
@@ -1065,6 +1157,20 @@
         } catch (e) {}
         
         return null;
+    }
+
+    function requireLogin() {
+        const user = getUser();
+        if (!user || !user.uid) {
+            document.getElementById('loginOverlay').classList.add('active');
+            showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+            return false;
+        }
+        return true;
+    }
+
+    function redirectToLogin() {
+        window.location.href = 'Login2.html';
     }
 
     async function saveUserToFirebase(userData) {
@@ -1176,16 +1282,14 @@
     async function playLottery() {
         if (isPlaying) return;
         
+        // التحقق من تسجيل الدخول
+        if (!requireLogin()) return;
+        
         // التأكد من أن المستخدم مسجل دخول
         const user = getUser();
-        if (!user) {
+        if (!user || !user.uid) {
             showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-            return;
-        }
-
-        // التأكد من وجود uid
-        if (!user.uid) {
-            showFirebaseAlert('⚠️ خطأ في بيانات المستخدم', 'error');
+            document.getElementById('loginOverlay').classList.add('active');
             return;
         }
 
@@ -1495,15 +1599,15 @@
     // ===== PROFILE & DROPDOWNS =====
     // ============================================================
     function handleProfileClick() {
-        const user = getUser();
-        if (!user) {
-            showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-            return;
-        }
+        if (!requireLogin()) return;
         openMenu('profileDropdown');
     }
 
     function handleSupportClick() {
+        if (!requireLogin()) {
+            document.getElementById('loginOverlay').classList.add('active');
+            return;
+        }
         window.location.href = 'support1.html';
     }
 
@@ -1537,11 +1641,7 @@
     // ===== TOP UP =====
     // ============================================================
     function openCurrencySelection() {
-        const user = getUser();
-        if (!user) {
-            showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-            return;
-        }
+        if (!requireLogin()) return;
         closeAll();
         document.getElementById('currencyModal').style.display = 'block';
         document.getElementById('screenOverlay').style.display = 'block';
@@ -1608,6 +1708,8 @@
             showFirebaseAlert('⏳ جارٍ المعالجة...', 'warning');
             return;
         }
+
+        if (!requireLogin()) return;
 
         const user = getUser();
         if (!user) {
@@ -1708,10 +1810,17 @@
         try {
             if (auth) await auth.signOut();
             localStorage.removeItem('currentUser');
-            window.location.reload();
+            currentUser = null;
+            isUserLoggedIn = false;
+            document.getElementById('loginOverlay').classList.add('active');
+            updateUI();
+            showFirebaseAlert('✅ تم تسجيل الخروج بنجاح', 'success');
         } catch (error) {
             localStorage.removeItem('currentUser');
-            window.location.reload();
+            currentUser = null;
+            isUserLoggedIn = false;
+            document.getElementById('loginOverlay').classList.add('active');
+            updateUI();
         }
     }
 
