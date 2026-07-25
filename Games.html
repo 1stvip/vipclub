@@ -950,6 +950,7 @@
     let gameHistory = [];
     let isSubmittingTopUp = false;
     let selectedCurrency = 'EGP';
+    let isFirebaseReady = false;
 
     // Lottery symbols
     const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '⭐', '🎰'];
@@ -965,6 +966,7 @@
             firebaseApp = firebase.initializeApp(firebaseConfig);
             database = firebase.database();
             auth = firebase.auth();
+            isFirebaseReady = true;
 
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
@@ -986,6 +988,11 @@
     // ============================================================
     async function loadUserData(uid) {
         try {
+            if (!database) {
+                console.error('Database not initialized');
+                return;
+            }
+            
             const snapshot = await database.ref('users/' + uid).once('value');
             
             if (snapshot.exists()) {
@@ -1000,7 +1007,9 @@
                 await loadGameHistory(uid);
                 listenForNotifications(uid);
                 updateUI();
+                console.log('✅ User data loaded:', currentUser.nickname);
             } else {
+                // Create new user
                 const newUser = {
                     nickname: 'لاعب',
                     username: 'player_' + Date.now(),
@@ -1017,6 +1026,7 @@
                 currentUserKey = uid;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 updateUI();
+                console.log('✅ New user created:', currentUser.nickname);
             }
         } catch (error) {
             console.error('Load user error:', error);
@@ -1026,6 +1036,8 @@
 
     async function loadGameHistory(uid) {
         try {
+            if (!database) return;
+            
             const snapshot = await database.ref('users/' + uid + '/gameHistory').once('value');
             if (snapshot.exists()) {
                 gameHistory = snapshot.val() || [];
@@ -1040,17 +1052,40 @@
     }
 
     function getUser() {
+        // First try to get from memory
         if (currentUser) return currentUser;
+        
+        // Then try localStorage
         try {
             const local = JSON.parse(localStorage.getItem('currentUser'));
-            if (local) return local;
+            if (local) {
+                currentUser = local;
+                return local;
+            }
         } catch (e) {}
+        
         return null;
     }
 
     async function saveUserToFirebase(userData) {
-        if (!userData || !userData.uid) {
+        // التحقق من وجود بيانات المستخدم
+        if (!userData) {
+            console.error('❌ لا توجد بيانات مستخدم للحفظ');
+            showFirebaseAlert('❌ خطأ: لا توجد بيانات مستخدم', 'error');
+            return false;
+        }
+        
+        // التحقق من وجود uid
+        if (!userData.uid) {
             console.error('❌ لا يوجد uid لحفظ البيانات');
+            showFirebaseAlert('❌ خطأ: معرف المستخدم غير موجود', 'error');
+            return false;
+        }
+        
+        // التحقق من جاهزية Firebase
+        if (!database || !isFirebaseReady) {
+            console.error('❌ Firebase غير جاهز');
+            showFirebaseAlert('❌ خطأ: قاعدة البيانات غير جاهزة', 'error');
             return false;
         }
         
@@ -1069,6 +1104,12 @@
             // تحديث المتغير العام
             currentUser = userData;
             
+            console.log('✅ تم حفظ البيانات بنجاح:', {
+                uid: userData.uid,
+                balanceEGP: userData.balanceEGP,
+                nickname: userData.nickname
+            });
+            
             return true;
         } catch (error) {
             console.error('❌ خطأ في حفظ البيانات:', error);
@@ -1079,6 +1120,8 @@
 
     async function saveGameHistory(uid) {
         try {
+            if (!database || !isFirebaseReady) return false;
+            
             await database.ref('users/' + uid + '/gameHistory').set(gameHistory.slice(0, 100));
             
             // حفظ في gameStats للمشرف
@@ -1133,9 +1176,16 @@
     async function playLottery() {
         if (isPlaying) return;
         
+        // التأكد من أن المستخدم مسجل دخول
         const user = getUser();
         if (!user) {
             showFirebaseAlert('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+            return;
+        }
+
+        // التأكد من وجود uid
+        if (!user.uid) {
+            showFirebaseAlert('⚠️ خطأ في بيانات المستخدم', 'error');
             return;
         }
 
@@ -1246,7 +1296,14 @@
         // تحديث user object
         user.balanceEGP = newBalance;
         
-        // حفظ في Firebase
+        // حفظ في Firebase مع التحقق
+        console.log('🔄 جاري حفظ التحديث...', {
+            uid: user.uid,
+            oldBalance: bal,
+            newBalance: newBalance,
+            delta: delta
+        });
+        
         const saved = await saveUserToFirebase(user);
         if (!saved) {
             showFirebaseAlert('❌ خطأ في حفظ التحديث. الرجاء المحاولة مرة أخرى.', 'error');
@@ -1294,7 +1351,7 @@
     // ===== NOTIFICATIONS =====
     // ============================================================
     function listenForNotifications(uid) {
-        if (!database) return;
+        if (!database || !isFirebaseReady) return;
         
         const notifRef = database.ref('users/' + uid + '/notifications');
         notifRef.on('value', (snapshot) => {
