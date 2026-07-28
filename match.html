@@ -11,13 +11,12 @@
     <!-- PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap');
-
+        /* ===== التصميم العام مع ألوان متناسقة ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Tajawal', 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
@@ -29,27 +28,22 @@
             overflow-x: hidden;
         }
 
-        /* ===== خلفية متحركة ===== */
-        .bg-animation {
+        /* ===== خلفية متحركة جذابة ===== */
+        .bg-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
-
-        .bg-animation .orb {
+        .bg-layer .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.15;
-            animation: floatOrb 15s ease-in-out infinite;
+            filter: blur(100px);
+            opacity: 0.12;
+            animation: floatOrb 14s ease-in-out infinite;
         }
-
-        .bg-animation .orb1 {
+        .bg-layer .orb1 {
             width: 500px;
             height: 500px;
             background: #8b5cf6;
@@ -57,16 +51,16 @@
             right: -100px;
             animation-delay: 0s;
         }
-        .bg-animation .orb2 {
+        .bg-layer .orb2 {
             width: 400px;
             height: 400px;
             background: #ffd700;
             bottom: -100px;
             left: -100px;
             animation-delay: 5s;
-            animation-duration: 20s;
+            animation-duration: 18s;
         }
-        .bg-animation .orb3 {
+        .bg-layer .orb3 {
             width: 300px;
             height: 300px;
             background: #ec4899;
@@ -74,20 +68,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             animation-delay: 10s;
-            animation-duration: 18s;
+            animation-duration: 20s;
         }
-
         @keyframes floatOrb {
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
-            33% {
-                transform: translate(50px, -50px) scale(1.1);
-            }
-            66% {
-                transform: translate(-30px, 40px) scale(0.9);
-            }
+            0%,100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(40px,-40px) scale(1.1); }
+            66% { transform: translate(-30px,30px) scale(0.9); }
         }
 
         /* ===== نجوم ===== */
@@ -98,7 +84,6 @@
             pointer-events: none;
             overflow: hidden;
         }
-
         .star {
             position: absolute;
             width: 2px;
@@ -107,131 +92,85 @@
             border-radius: 50%;
             animation: twinkle 3s ease-in-out infinite;
         }
-
         @keyframes twinkle {
-            0%,
-            100% {
-                opacity: 0.2;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.5);
-            }
+            0%,100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
         }
 
         /* ===== شريط التنقل ===== */
         .navbar {
             position: relative;
             z-index: 10;
-            background: rgba(10, 10, 30, 0.85);
+            background: rgba(10,10,30,0.85);
             backdrop-filter: blur(20px);
             padding: 0.6rem 4%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.08);
+            border-bottom: 1px solid rgba(255,215,0,0.08);
             flex-wrap: wrap;
             gap: 8px;
-            min-height: 65px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            min-height: 60px;
         }
-
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 900;
             color: #ffd700;
             text-decoration: none;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
         }
-
-        .logo i {
-            font-size: 1.6rem;
-            color: #ffd700;
-        }
-
+        .logo i { font-size: 1.5rem; }
         .logo .logo-text {
-            background: linear-gradient(135deg, #ffd700, #f59e0b, #ffd700);
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-size: 200% 200%;
-            animation: shimmer 3s ease-in-out infinite;
         }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
         .nav-icons {
             display: flex;
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
         }
-
         .nav-btn {
-            padding: 8px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03);
             color: #f8fafc;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-weight: 700;
-            backdrop-filter: blur(5px);
+            gap: 5px;
+            font-weight: 600;
         }
-
         .nav-btn:hover {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+            background: rgba(139,92,246,0.15);
+            border-color: rgba(139,92,246,0.2);
+            transform: translateY(-2px);
         }
-
-        .nav-btn.active {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.3);
-            color: #a78bfa;
-        }
-
         .nav-btn .badge {
             background: #ef4444;
             color: #fff;
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             padding: 1px 6px;
             border-radius: 50%;
-            min-width: 18px;
+            min-width: 16px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
-
         .nav-btn.logout-btn {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.1);
+            background: rgba(239,68,68,0.1);
+            border-color: rgba(239,68,68,0.1);
             color: #ef4444;
         }
-
         .nav-btn.logout-btn:hover {
             background: #ef4444;
             color: #fff;
             border-color: #ef4444;
-            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.2);
         }
 
         /* ===== المحتوى الرئيسي ===== */
@@ -242,57 +181,51 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: 20px 15px;
+            justify-content: center;
+            padding: 15px;
             max-width: 1100px;
             margin: 0 auto;
             width: 100%;
             gap: 15px;
-            min-height: calc(100vh - 65px);
-            padding-bottom: 30px;
+            min-height: calc(100vh - 60px);
+            padding-bottom: 80px;
         }
 
         /* ===== زر المطابقة الكبير ===== */
-        .match-btn-container {
+        .match-area {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 20px;
-            padding: 10px;
             width: 100%;
-            min-height: 55vh;
-            transition: all 0.6s ease;
+            transition: all 0.5s ease;
         }
-
-        .match-btn-container.hidden {
-            display: none;
-        }
+        .match-area.hidden { display: none; }
 
         .match-btn {
-            width: 300px;
-            height: 300px;
+            width: 280px;
+            height: 280px;
             border-radius: 50%;
             border: none;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: #fff;
-            font-size: 5.5rem;
+            font-size: 5rem;
             cursor: pointer;
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 80px rgba(139, 92, 246, 0.2), inset 0 -4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 0 80px rgba(139,92,246,0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             position: relative;
             overflow: hidden;
         }
-
         .match-btn::before {
             content: '';
             position: absolute;
-            inset: -4px;
+            inset: -3px;
             border-radius: 50%;
             padding: 3px;
             background: conic-gradient(from 0deg, #ffd700, #8b5cf6, #ec4899, #ffd700);
@@ -300,204 +233,103 @@
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.5s ease;
         }
-
-        .match-btn:hover::before {
-            opacity: 1;
-        }
-
+        .match-btn:hover::before { opacity: 1; }
         .match-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 120px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 120px rgba(139,92,246,0.3);
         }
-
-        .match-btn:active {
-            transform: scale(0.95);
-        }
-
+        .match-btn:active { transform: scale(0.95); }
         .match-btn .btn-icon {
-            font-size: 5rem;
+            font-size: 4.5rem;
             display: block;
             animation: floatIcon 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.1));
         }
-
         @keyframes floatIcon {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-12px);
-            }
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-
         .match-btn .btn-label {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 900;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             background: linear-gradient(135deg, #fff, #e0e7ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .match-btn .btn-sub {
-            font-size: 0.85rem;
-            opacity: 0.7;
+            font-size: 0.8rem;
+            opacity: 0.6;
             font-weight: 400;
         }
-
         .match-btn .pulse-ring {
             position: absolute;
             border-radius: 50%;
-            border: 2px solid rgba(255, 215, 0, 0.1);
+            border: 2px solid rgba(255,215,0,0.08);
             animation: pulseRing 2.5s ease-out infinite;
             pointer-events: none;
         }
-
-        .match-btn .pulse-ring:nth-child(1) {
-            width: 100%;
-            height: 100%;
-            animation-delay: 0s;
-        }
-        .match-btn .pulse-ring:nth-child(2) {
-            width: 130%;
-            height: 130%;
-            animation-delay: 0.8s;
-        }
-        .match-btn .pulse-ring:nth-child(3) {
-            width: 160%;
-            height: 160%;
-            animation-delay: 1.6s;
-        }
-
+        .match-btn .pulse-ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+        .match-btn .pulse-ring:nth-child(2) { width: 130%; height: 130%; animation-delay: 0.8s; }
+        .match-btn .pulse-ring:nth-child(3) { width: 160%; height: 160%; animation-delay: 1.6s; }
         @keyframes pulseRing {
-            0% {
-                transform: scale(0.8);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1.6);
-                opacity: 0;
-            }
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
         }
-
         .match-btn.searching {
             animation: pulseSearch 1.2s ease-in-out infinite;
             background: linear-gradient(135deg, #f59e0b, #ef4444);
         }
-
         @keyframes pulseSearch {
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 80px rgba(245, 158, 11, 0.3);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 120px rgba(245, 158, 11, 0.4);
-            }
+            0%,100% { transform: scale(1); box-shadow: 0 0 80px rgba(245,158,11,0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 120px rgba(245,158,11,0.4); }
         }
 
         /* ===== مؤقت المطابقة ===== */
         .match-timer {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 900;
             color: #ffd700;
             font-family: 'Courier New', monospace;
             text-align: center;
             display: none;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 10px 30px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 215, 0, 0.1);
+            background: rgba(0,0,0,0.4);
+            padding: 8px 25px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,215,0,0.08);
             backdrop-filter: blur(10px);
         }
+        .match-timer.active { display: block; animation: fadeUp 0.4s ease; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
+        .match-timer .timer-label { font-size: 0.7rem; color: #94a3b8; font-weight: 400; display: block; }
+        .match-timer .timer-value { font-size: 2.2rem; }
+        .match-timer .timer-value.warning { color: #ef4444; animation: blink 0.5s ease-in-out infinite; }
+        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
 
-        .match-timer.active {
-            display: block;
-            animation: fadeInUp 0.5s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .match-timer .timer-label {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            font-weight: 400;
-            display: block;
-        }
-
-        .match-timer .timer-value {
-            font-size: 2.5rem;
-        }
-
-        .match-timer .timer-value.warning {
-            color: #ef4444;
-            animation: blinkTimer 0.5s ease-in-out infinite;
-        }
-
-        @keyframes blinkTimer {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        .stop-search-btn {
+        .stop-btn {
             display: none;
             padding: 10px 28px;
-            border-radius: 14px;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(239,68,68,0.2);
+            background: rgba(239,68,68,0.08);
             color: #ef4444;
             cursor: pointer;
             font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
         }
-
-        .stop-search-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.1);
-        }
-
-        .stop-search-btn.active {
-            display: block;
-            animation: fadeInUp 0.4s ease;
-        }
+        .stop-btn:hover { background: rgba(239,68,68,0.15); transform: scale(1.05); }
+        .stop-btn.active { display: block; animation: fadeUp 0.4s ease; }
 
         .search-status {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #94a3b8;
             text-align: center;
             display: none;
         }
-
-        .search-status.active {
-            display: block;
-            animation: fadeInUp 0.4s ease;
-        }
-
-        .search-status .highlight {
-            color: #ffd700;
-            font-weight: 700;
-        }
+        .search-status.active { display: block; animation: fadeUp 0.4s ease; }
+        .search-status .highlight { color: #ffd700; font-weight: 700; }
 
         /* ===== واجهة المكالمة الصوتية ===== */
         .call-interface {
@@ -505,84 +337,49 @@
             width: 100%;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
-
-        .call-interface.active {
-            display: flex;
-            animation: fadeInUp 0.5s ease;
-        }
+        .call-interface.active { display: flex; animation: fadeUp 0.5s ease; }
 
         /* ===== صورة الشريك ===== */
-        .partner-avatar-container {
-            width: 180px;
-            height: 180px;
+        .partner-avatar {
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
             background: linear-gradient(135deg, #4f46e5, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4.5rem;
+            font-size: 4rem;
             font-weight: 900;
             color: #fff;
-            box-shadow: 0 0 80px rgba(139, 92, 246, 0.2), 0 0 150px rgba(139, 92, 246, 0.05);
-            border: 3px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 80px rgba(139,92,246,0.15);
+            border: 3px solid rgba(255,215,0,0.1);
             position: relative;
             transition: all 0.5s ease;
             flex-shrink: 0;
-            margin-top: 10px;
         }
-
-        .partner-avatar-container .status-dot {
+        .partner-avatar .dot {
             position: absolute;
-            bottom: 12px;
-            right: 12px;
-            width: 20px;
-            height: 20px;
+            bottom: 8px;
+            right: 8px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             border: 3px solid #0a0a1a;
         }
-
-        .partner-avatar-container .status-dot.online {
-            background: #10b981;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
-        }
-
-        .partner-avatar-container .status-dot.offline {
-            background: #ef4444;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
-        }
-
-        .partner-avatar-container .status-dot.searching {
-            background: #f59e0b;
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
-            animation: blink 1s ease-in-out infinite;
-        }
-
-        .partner-avatar-container.speaking {
-            animation: pulseAvatar 1.5s ease-in-out infinite;
-            border-color: rgba(255, 215, 0, 0.3);
-            box-shadow: 0 0 100px rgba(255, 215, 0, 0.1);
-        }
-
+        .partner-avatar .dot.online { background: #10b981; box-shadow: 0 0 30px rgba(16,185,129,0.3); }
+        .partner-avatar .dot.offline { background: #ef4444; box-shadow: 0 0 30px rgba(239,68,68,0.3); }
+        .partner-avatar .dot.searching { background: #f59e0b; box-shadow: 0 0 30px rgba(245,158,11,0.3); animation: blink 1s ease-in-out infinite; }
+        .partner-avatar.speaking { animation: pulseAvatar 1.5s ease-in-out infinite; border-color: rgba(255,215,0,0.2); }
         @keyframes pulseAvatar {
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 60px rgba(139, 92, 246, 0.2);
-            }
-            50% {
-                transform: scale(1.03);
-                box-shadow: 0 0 100px rgba(139, 92, 246, 0.3);
-            }
+            0%,100% { transform: scale(1); box-shadow: 0 0 60px rgba(139,92,246,0.15); }
+            50% { transform: scale(1.03); box-shadow: 0 0 100px rgba(139,92,246,0.2); }
         }
 
-        .partner-info {
-            text-align: center;
-        }
-
+        .partner-info { text-align: center; }
         .partner-info .name {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 800;
             color: #fff;
             display: flex;
@@ -590,531 +387,225 @@
             justify-content: center;
             gap: 8px;
         }
-
-        .partner-info .name .crown {
-            color: #ffd700;
-            font-size: 1.2rem;
-        }
-
-        .partner-info .status-text {
-            font-size: 0.8rem;
+        .partner-info .name .crown { color: #ffd700; font-size: 1.1rem; }
+        .partner-info .status {
+            font-size: 0.75rem;
             color: #94a3b8;
             margin-top: 2px;
         }
+        .partner-info .status.connected { color: #10b981; }
+        .partner-info .status.disconnected { color: #ef4444; }
+        .partner-info .status.searching { color: #f59e0b; animation: blink 1s ease-in-out infinite; }
 
-        .partner-info .status-text.connected {
-            color: #10b981;
-        }
-
-        .partner-info .status-text.disconnected {
-            color: #ef4444;
-        }
-
-        .partner-info .status-text.searching {
-            color: #f59e0b;
-            animation: blink 1s ease-in-out infinite;
-        }
-
-        .call-timer-display {
-            font-size: 1.8rem;
+        .call-timer {
+            font-size: 1.6rem;
             font-weight: 700;
             color: #ffd700;
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+            text-shadow: 0 0 30px rgba(255,215,0,0.05);
         }
 
         /* ===== شات المكالمة ===== */
         .call-chat {
             display: none;
             width: 100%;
-            max-width: 700px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            max-width: 650px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.04);
             overflow: hidden;
-            max-height: 220px;
+            max-height: 200px;
             flex-direction: column;
-            flex-shrink: 0;
             backdrop-filter: blur(10px);
         }
-
-        .call-chat.active {
-            display: flex;
-            animation: fadeInUp 0.4s ease;
-        }
-
+        .call-chat.active { display: flex; animation: fadeUp 0.4s ease; }
         .call-chat .chat-header {
-            padding: 8px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.75rem;
+            padding: 6px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.7rem;
             color: #94a3b8;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
         }
-
-        .call-chat .chat-header .partner-name {
-            color: #fff;
-            font-weight: 700;
-        }
-
+        .call-chat .chat-header .pname { color: #fff; font-weight: 700; }
         .call-chat .chat-messages {
             flex: 1;
-            padding: 8px 14px;
+            padding: 6px 12px;
             overflow-y: auto;
-            max-height: 130px;
-            min-height: 50px;
+            max-height: 120px;
+            min-height: 45px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
         }
-
         .call-chat .chat-messages .msg {
-            padding: 6px 12px;
+            padding: 5px 12px;
             border-radius: 10px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             max-width: 85%;
             word-wrap: break-word;
-            animation: fadeInUp 0.3s ease;
+            animation: fadeUp 0.3s ease;
         }
-
         .call-chat .chat-messages .msg.own {
-            background: rgba(139, 92, 246, 0.2);
+            background: rgba(139,92,246,0.15);
             align-self: flex-end;
             border-radius: 10px 10px 4px 10px;
-            border: 1px solid rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139,92,246,0.06);
         }
-
         .call-chat .chat-messages .msg.other {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255,255,255,0.04);
             align-self: flex-start;
             border-radius: 10px 10px 10px 4px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.02);
         }
-
-        .call-chat .chat-messages .msg .sender {
-            font-size: 0.55rem;
-            color: #94a3b8;
-            margin-bottom: 2px;
-            font-weight: 600;
-        }
-
+        .call-chat .chat-messages .msg .sender { font-size: 0.5rem; color: #94a3b8; margin-bottom: 2px; font-weight: 600; }
         .call-chat .chat-messages .msg.system {
-            text-align: center;
-            color: #666;
-            font-size: 0.65rem;
-            align-self: center;
-            background: transparent;
-            max-width: 90%;
+            text-align: center; color: #666; font-size: 0.6rem; align-self: center; background: transparent; max-width: 90%;
         }
-
         .call-chat .chat-input {
             display: flex;
             gap: 6px;
-            padding: 6px 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 5px 10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
             flex-shrink: 0;
         }
-
         .call-chat .chat-input input {
             flex: 1;
-            padding: 8px 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
             color: #fff;
             outline: none;
-            font-size: 0.8rem;
-            transition: border 0.3s ease;
+            font-size: 0.75rem;
         }
-
-        .call-chat .chat-input input:focus {
-            border-color: rgba(139, 92, 246, 0.3);
-        }
-
-        .call-chat .chat-input input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
+        .call-chat .chat-input input:focus { border-color: rgba(139,92,246,0.2); }
+        .call-chat .chat-input input::placeholder { color: rgba(255,255,255,0.2); }
         .call-chat .chat-input button {
-            padding: 8px 14px;
+            padding: 6px 12px;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: #fff;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 700;
-            font-size: 0.75rem;
+            font-weight: 600;
+            font-size: 0.7rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
         }
-
-        .call-chat .chat-input button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
-        }
-
+        .call-chat .chat-input button:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(139,92,246,0.15); }
         .call-chat .chat-input .gift-btn {
-            background: rgba(255, 215, 0, 0.1);
+            background: rgba(255,215,0,0.08);
             color: #ffd700;
-            border: 1px solid rgba(255, 215, 0, 0.1);
-            box-shadow: none;
+            border: 1px solid rgba(255,215,0,0.06);
         }
-
-        .call-chat .chat-input .gift-btn:hover {
-            background: rgba(255, 215, 0, 0.2);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.1);
-        }
+        .call-chat .chat-input .gift-btn:hover { background: rgba(255,215,0,0.15); }
 
         /* ===== أزرار التحكم ===== */
         .call-controls {
             display: none;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
             padding: 5px 0;
-            flex-shrink: 0;
         }
-
-        .call-controls.active {
-            display: flex;
-            animation: fadeInUp 0.4s ease;
-        }
-
+        .call-controls.active { display: flex; animation: fadeUp 0.4s ease; }
         .call-btn {
-            padding: 12px 22px;
-            border-radius: 14px;
+            padding: 10px 20px;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
             font-weight: 700;
-            font-size: 0.8rem;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            min-width: 85px;
-            justify-content: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .call-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-        }
-
-        .call-btn.mic-btn {
-            background: rgba(16, 185, 129, 0.12);
-            border-color: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-        }
-
-        .call-btn.mic-btn:hover {
-            background: rgba(16, 185, 129, 0.2);
-            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.1);
-        }
-
-        .call-btn.mic-btn.muted {
-            background: rgba(239, 68, 68, 0.12);
-            border-color: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-        }
-
-        .call-btn.mic-btn.muted:hover {
-            background: rgba(239, 68, 68, 0.2);
-            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.1);
-        }
-
-        .call-btn.end-call {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-
-        .call-btn.end-call:hover {
-            background: #ef4444;
-            color: #fff;
-            border-color: #ef4444;
-            box-shadow: 0 8px 40px rgba(239, 68, 68, 0.2);
-        }
-
-        .call-btn.next-btn {
-            background: rgba(139, 92, 246, 0.12);
-            border-color: rgba(139, 92, 246, 0.15);
-            color: #8b5cf6;
-        }
-
-        .call-btn.next-btn:hover {
-            background: rgba(139, 92, 246, 0.2);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.1);
-        }
-
-        .call-btn.chat-toggle-btn {
-            background: rgba(139, 92, 246, 0.08);
-            border-color: rgba(139, 92, 246, 0.08);
-            color: #a78bfa;
-        }
-
-        .call-btn.chat-toggle-btn:hover {
-            background: rgba(139, 92, 246, 0.15);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.05);
-        }
-
-        .call-btn.chat-toggle-btn.active {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: rgba(139, 92, 246, 0.15);
-        }
-
-        /* ===== إشعارات ===== */
-        .floating-notification {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: rgba(16, 185, 129, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 14px 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 50px rgba(0, 0, 0, 0.4);
-            z-index: 99999;
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            max-width: 320px;
-            min-width: 200px;
-            animation: slideInRight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .floating-notification.active {
-            display: flex;
-        }
-
-        .floating-notification .notif-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .floating-notification .notif-title {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #fff;
+            font-size: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .floating-notification .notif-close {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.3s;
-            padding: 0 4px;
-        }
-
-        .floating-notification .notif-close:hover {
+            background: rgba(255,255,255,0.03);
             color: #fff;
+            border: 1px solid rgba(255,255,255,0.04);
+            min-width: 75px;
+            justify-content: center;
         }
-
-        .floating-notification .notif-body {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.9);
+        .call-btn:hover { transform: translateY(-3px); }
+        .call-btn.mic-btn {
+            background: rgba(16,185,129,0.08);
+            border-color: rgba(16,185,129,0.1);
+            color: #10b981;
         }
-
-        .floating-notification .notif-body .gift-emoji {
-            font-size: 1.2rem;
+        .call-btn.mic-btn:hover { background: rgba(16,185,129,0.15); }
+        .call-btn.mic-btn.muted {
+            background: rgba(239,68,68,0.08);
+            border-color: rgba(239,68,68,0.1);
+            color: #ef4444;
         }
-
-        .floating-notification .notif-body .gift-name {
-            font-weight: 700;
-            color: #ffd700;
+        .call-btn.mic-btn.muted:hover { background: rgba(239,68,68,0.15); }
+        .call-btn.end-call {
+            background: rgba(239,68,68,0.1);
+            border-color: rgba(239,68,68,0.15);
+            color: #ef4444;
         }
-
-        .floating-notification .notif-body .gift-value {
-            color: #fff;
-            font-weight: 700;
+        .call-btn.end-call:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .call-btn.next-btn {
+            background: rgba(139,92,246,0.08);
+            border-color: rgba(139,92,246,0.1);
+            color: #8b5cf6;
         }
-
-        .floating-notification .notif-time {
-            font-size: 0.55rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 2px;
+        .call-btn.next-btn:hover { background: rgba(139,92,246,0.15); }
+        .call-btn.next-btn.highlight {
+            background: rgba(139,92,246,0.2);
+            border-color: rgba(139,92,246,0.25);
+            box-shadow: 0 0 40px rgba(139,92,246,0.1);
+            animation: pulseGlow 1.5s ease-in-out infinite;
         }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(60px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
+        @keyframes pulseGlow {
+            0%,100% { box-shadow: 0 0 20px rgba(139,92,246,0.05); }
+            50% { box-shadow: 0 0 50px rgba(139,92,246,0.15); }
         }
+        .call-btn.chat-toggle {
+            background: rgba(139,92,246,0.05);
+            border-color: rgba(139,92,246,0.05);
+            color: #a78bfa;
+        }
+        .call-btn.chat-toggle:hover { background: rgba(139,92,246,0.1); }
+        .call-btn.chat-toggle.active { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.1); }
 
-        /* ===== مودال الهدايا ===== */
-        #callGiftModal {
-            display: none;
+        /* ===== إشعارات ===== */
+        .gift-notif {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #1a1a2e;
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            z-index: 99998;
-            min-width: 300px;
-            max-width: 92%;
-            max-height: 90vh;
-            overflow-y: auto;
+            top: 75px;
+            right: 20px;
+            background: rgba(16,185,129,0.95);
             backdrop-filter: blur(20px);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-        }
-
-        #callGiftModal.active {
-            display: block;
-            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes popIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        #callGiftModal h3 {
-            color: #ffd700;
-            text-align: center;
-            margin-bottom: 18px;
-            font-size: 1.2rem;
-        }
-
-        #callGiftModal .gift-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        #callGiftModal .gift-grid .gift-option {
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px solid rgba(255, 255, 255, 0.06);
+            padding: 12px 18px;
             border-radius: 14px;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        #callGiftModal .gift-grid .gift-option:hover {
-            border-color: #8b5cf6;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.1);
-        }
-
-        #callGiftModal .gift-grid .gift-option.selected {
-            border-color: #ffd700;
-            background: rgba(255, 215, 0, 0.08);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
-        }
-
-        #callGiftModal .gift-grid .gift-option .emoji {
-            font-size: 2rem;
-            display: block;
-        }
-
-        #callGiftModal .gift-grid .gift-option .name {
-            font-size: 0.55rem;
-            color: #94a3b8;
-            margin-top: 2px;
-        }
-
-        #callGiftModal .gift-grid .gift-option .price {
-            font-size: 0.5rem;
-            color: #10b981;
-            font-weight: 700;
-        }
-
-        #callGiftModal .balance-display {
-            text-align: center;
-            font-size: 0.85rem;
-            color: #94a3b8;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 8px;
-            border-radius: 10px;
-        }
-
-        #callGiftModal .balance-display span {
-            color: #10b981;
-            font-weight: 700;
-        }
-
-        #callGiftModal .gift-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        #callGiftModal .gift-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.85rem;
-        }
-
-        #callGiftModal .gift-actions .btn-send {
-            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
-        }
-
-        #callGiftModal .gift-actions .btn-send:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
-        }
-
-        #callGiftModal .gift-actions .btn-close {
-            background: rgba(255, 255, 255, 0.05);
-            color: #94a3b8;
-        }
-
-        #callGiftModal .gift-actions .btn-close:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        #callGiftOverlay {
+            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            z-index: 99999;
             display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            z-index: 99997;
+            flex-direction: column;
+            gap: 3px;
+            max-width: 300px;
+            min-width: 180px;
+            animation: slideRight 0.5s cubic-bezier(0.34,1.56,0.64,1);
+            border: 1px solid rgba(255,255,255,0.05);
         }
-
-        #callGiftOverlay.active {
-            display: block;
+        .gift-notif.active { display: flex; }
+        .gift-notif .gift-emoji { font-size: 1.1rem; }
+        .gift-notif .gift-name { font-weight: 700; color: #ffd700; }
+        .gift-notif .gift-value { color: #fff; font-weight: 700; }
+        .gift-notif .time { font-size: 0.5rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        @keyframes slideRight {
+            from { opacity: 0; transform: translateX(50px) scale(0.9); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
         }
 
         /* ===== مودال طلب الإذن ===== */
         .perm-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0,0,0,0.92);
             backdrop-filter: blur(20px);
             z-index: 99999;
             display: none;
@@ -1124,258 +615,184 @@
             gap: 20px;
             padding: 30px;
         }
-
-        .perm-overlay.active {
-            display: flex;
-            animation: fadeInUp 0.5s ease;
-        }
-
-        .perm-overlay .perm-icon {
+        .perm-overlay.active { display: flex; animation: fadeUp 0.5s ease; }
+        .perm-overlay .icon {
             font-size: 4.5rem;
             animation: pulseIcon 1.5s ease-in-out infinite;
         }
-
         @keyframes pulseIcon {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.7;
-            }
+            0%,100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
         }
-
-        .perm-overlay .perm-title {
-            font-size: 1.5rem;
+        .perm-overlay .title {
+            font-size: 1.4rem;
             font-weight: 900;
             color: #ffd700;
             text-align: center;
         }
-
-        .perm-overlay .perm-desc {
-            font-size: 0.95rem;
+        .perm-overlay .desc {
+            font-size: 0.9rem;
             color: #94a3b8;
             text-align: center;
-            max-width: 400px;
+            max-width: 380px;
             line-height: 1.8;
         }
-
-        .perm-overlay .perm-desc .highlight-text {
-            color: #ffd700;
-            font-weight: 700;
-        }
-
-        .perm-overlay .perm-btn {
-            padding: 16px 50px;
+        .perm-overlay .desc .hl { color: #ffd700; font-weight: 700; }
+        .perm-overlay .btn {
+            padding: 14px 45px;
             border: none;
-            border-radius: 16px;
+            border-radius: 14px;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: #fff;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 40px rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 40px rgba(139,92,246,0.15);
         }
-
-        .perm-overlay .perm-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 60px rgba(139, 92, 246, 0.3);
-        }
-
-        .perm-overlay .perm-btn:active {
-            transform: scale(0.95);
-        }
-
-        .perm-overlay .perm-retry {
-            font-size: 0.85rem;
+        .perm-overlay .btn:hover { transform: scale(1.05); box-shadow: 0 8px 60px rgba(139,92,246,0.2); }
+        .perm-overlay .btn:active { transform: scale(0.95); }
+        .perm-overlay .retry {
+            font-size: 0.8rem;
             color: #666;
             cursor: pointer;
             transition: 0.3s;
         }
+        .perm-overlay .retry:hover { color: #94a3b8; }
 
-        .perm-overlay .perm-retry:hover {
-            color: #94a3b8;
+        /* ===== مودال الهدايا ===== */
+        #giftModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255,215,0,0.1);
+            z-index: 99998;
+            min-width: 280px;
+            max-width: 92%;
+            max-height: 90vh;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
         }
+        #giftModal.active { display: block; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes pop { from { opacity:0; transform:translate(-50%,-50%) scale(0.8); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+        #giftModal h3 { color: #ffd700; text-align: center; margin-bottom: 15px; font-size: 1.1rem; }
+        #giftModal .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px,1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        #giftModal .grid .opt {
+            background: rgba(255,255,255,0.02);
+            border: 2px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #giftModal .grid .opt:hover { border-color: #8b5cf6; transform: translateY(-2px); }
+        #giftModal .grid .opt.selected { border-color: #ffd700; background: rgba(255,215,0,0.05); }
+        #giftModal .grid .opt .emoji { font-size: 1.8rem; display: block; }
+        #giftModal .grid .opt .name { font-size: 0.5rem; color: #94a3b8; }
+        #giftModal .grid .opt .price { font-size: 0.5rem; color: #10b981; font-weight: 700; }
+        #giftModal .balance { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 12px; }
+        #giftModal .balance span { color: #10b981; font-weight: 700; }
+        #giftModal .actions { display: flex; gap: 8px; }
+        #giftModal .actions button {
+            flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 0.85rem;
+        }
+        #giftModal .actions .send { background: linear-gradient(135deg, #8b5cf6, #4f46e5); color: #fff; }
+        #giftModal .actions .send:hover { transform: scale(1.02); }
+        #giftModal .actions .close { background: rgba(255,255,255,0.04); color: #94a3b8; }
+        #giftModal .actions .close:hover { background: rgba(255,255,255,0.08); }
+        #giftOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 99997;
+        }
+        #giftOverlay.active { display: block; }
 
         /* ===== توست ===== */
         .toast {
             position: fixed;
-            top: 80px;
+            top: 75px;
             right: 20px;
-            padding: 14px 24px;
-            border-radius: 14px;
+            padding: 12px 22px;
+            border-radius: 12px;
             color: #fff;
             font-weight: 700;
             z-index: 100000;
-            box-shadow: 0 8px 50px rgba(0, 0, 0, 0.4);
-            animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-width: 340px;
-            font-size: 0.9rem;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            animation: slideRight 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            max-width: 320px;
+            font-size: 0.85rem;
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.04);
         }
+        .toast.success { background: rgba(16,185,129,0.9); }
+        .toast.error { background: rgba(239,68,68,0.9); }
+        .toast.warning { background: rgba(245,158,11,0.9); }
+        .toast.info { background: rgba(59,130,246,0.9); }
 
-        .toast.success {
-            background: rgba(16, 185, 129, 0.9);
-        }
-        .toast.error {
-            background: rgba(239, 68, 68, 0.9);
-        }
-        .toast.warning {
-            background: rgba(245, 158, 11, 0.9);
-        }
-        .toast.info {
-            background: rgba(59, 130, 246, 0.9);
-        }
-
-        /* ===== شريط التنقل السفلي ===== */
+        /* ===== شريط سفلي ===== */
         .bottom-nav {
             display: none;
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(10, 10, 30, 0.95);
+            background: rgba(10,10,30,0.95);
             backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 215, 0, 0.05);
+            border-top: 1px solid rgba(255,215,0,0.04);
             padding: 8px 10px;
             justify-content: space-around;
             z-index: 99;
-            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.3);
         }
-
         .bottom-nav .nav-btn {
-            flex: 1;
-            justify-content: center;
-            padding: 8px 0;
-            font-size: 0.65rem;
-            flex-direction: column;
-            gap: 3px;
-            border-radius: 10px;
+            flex: 1; justify-content: center; padding: 6px 0; font-size: 0.6rem; flex-direction: column; gap: 2px; border-radius: 8px;
         }
-
-        .bottom-nav .nav-btn i {
-            font-size: 1.2rem;
-        }
-
+        .bottom-nav .nav-btn i { font-size: 1.1rem; }
         @media(max-width:768px) {
-            .bottom-nav {
-                display: flex;
-            }
-            .main-container {
-                padding-bottom: 80px;
-            }
-            .match-btn {
-                width: 220px;
-                height: 220px;
-                font-size: 4rem;
-            }
-            .match-btn .btn-icon {
-                font-size: 4rem;
-            }
-            .match-btn .btn-label {
-                font-size: 1.3rem;
-            }
-            .partner-avatar-container {
-                width: 140px;
-                height: 140px;
-                font-size: 3.5rem;
-            }
-            .call-btn {
-                padding: 10px 16px;
-                font-size: 0.7rem;
-                min-width: 65px;
-            }
-            .call-chat {
-                max-height: 180px;
-            }
-            .call-chat .chat-messages {
-                max-height: 100px;
-                min-height: 40px;
-            }
-            .match-timer {
-                font-size: 1.5rem;
-                padding: 8px 20px;
-            }
-            .match-timer .timer-value {
-                font-size: 2rem;
-            }
-            .call-timer-display {
-                font-size: 1.4rem;
-            }
+            .bottom-nav { display: flex; }
+            .main-container { padding-bottom: 75px; }
+            .match-btn { width: 200px; height: 200px; font-size: 3.8rem; }
+            .match-btn .btn-icon { font-size: 3.5rem; }
+            .match-btn .btn-label { font-size: 1.2rem; }
+            .partner-avatar { width: 130px; height: 130px; font-size: 3.2rem; }
+            .call-btn { padding: 8px 14px; font-size: 0.65rem; min-width: 60px; }
+            .call-timer { font-size: 1.3rem; }
+            .match-timer { font-size: 1.4rem; padding: 6px 18px; }
+            .match-timer .timer-value { font-size: 1.8rem; }
+            .call-chat { max-height: 160px; }
+            .call-chat .chat-messages { max-height: 90px; min-height: 35px; }
         }
-
         @media(max-width:480px) {
-            .match-btn {
-                width: 180px;
-                height: 180px;
-                font-size: 3.2rem;
-            }
-            .match-btn .btn-icon {
-                font-size: 3.2rem;
-            }
-            .match-btn .btn-label {
-                font-size: 1rem;
-            }
-            .match-btn .btn-sub {
-                font-size: 0.6rem;
-            }
-            .partner-avatar-container {
-                width: 110px;
-                height: 110px;
-                font-size: 2.8rem;
-            }
-            .partner-info .name {
-                font-size: 1.1rem;
-            }
-            .call-btn {
-                padding: 8px 12px;
-                font-size: 0.6rem;
-                min-width: 50px;
-                border-radius: 10px;
-            }
-            .call-chat {
-                max-height: 150px;
-            }
-            .call-chat .chat-messages {
-                max-height: 70px;
-                min-height: 35px;
-            }
-            .call-chat .chat-input input {
-                font-size: 0.7rem;
-                padding: 6px 10px;
-            }
-            .call-chat .chat-input button {
-                padding: 6px 10px;
-                font-size: 0.65rem;
-            }
-            .match-timer {
-                font-size: 1.2rem;
-                padding: 6px 16px;
-            }
-            .match-timer .timer-value {
-                font-size: 1.5rem;
-            }
-            .call-timer-display {
-                font-size: 1.2rem;
-            }
-            #callGiftModal {
-                padding: 20px;
-                min-width: 240px;
-            }
-            #callGiftModal .gift-grid {
-                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            }
+            .match-btn { width: 160px; height: 160px; font-size: 3rem; }
+            .match-btn .btn-icon { font-size: 2.8rem; }
+            .match-btn .btn-label { font-size: 1rem; }
+            .match-btn .btn-sub { font-size: 0.6rem; }
+            .partner-avatar { width: 110px; height: 110px; font-size: 2.6rem; }
+            .partner-info .name { font-size: 1rem; }
+            .call-btn { padding: 6px 10px; font-size: 0.55rem; min-width: 45px; border-radius: 8px; }
+            .call-timer { font-size: 1.1rem; }
+            .match-timer { font-size: 1.1rem; padding: 4px 14px; }
+            .match-timer .timer-value { font-size: 1.4rem; }
+            .call-chat { max-height: 130px; }
+            .call-chat .chat-messages { max-height: 60px; min-height: 30px; }
+            #giftModal { padding: 18px; min-width: 220px; }
+            #giftModal .grid { grid-template-columns: repeat(auto-fill, minmax(55px,1fr)); }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== خلفية متحركة ===== -->
-    <div class="bg-animation">
+    <!-- ===== خلفية ===== -->
+    <div class="bg-layer">
         <div class="orb orb1"></div>
         <div class="orb orb2"></div>
         <div class="orb orb3"></div>
@@ -1401,7 +818,7 @@
             <a href="profile.html" class="nav-btn">
                 <i class="fas fa-user-circle"></i> حسابي
             </a>
-            <button class="nav-btn logout-btn" id="logoutBtn" onclick="logout()">
+            <button class="nav-btn logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
         </div>
@@ -1409,38 +826,34 @@
 
     <!-- ===== طلب الإذن ===== -->
     <div class="perm-overlay" id="permOverlay">
-        <span class="perm-icon">🎙️</span>
-        <div class="perm-title">نحتاج إلى إذنك!</div>
-        <div class="perm-desc">
-            للاستمتاع بالمكالمات الصوتية، نحتاج إلى الوصول إلى <span class="highlight-text">الميكروفون</span>.
+        <span class="icon">🎙️</span>
+        <div class="title">نحتاج إلى إذنك!</div>
+        <div class="desc">
+            للاستمتاع بالمكالمات الصوتية، نحتاج إلى الوصول إلى <span class="hl">الميكروفون</span>.
             <br>
             <small style="color:#666;">سيتم استخدامه فقط أثناء المكالمات</small>
         </div>
-        <button class="perm-btn" onclick="requestPermissions()">
+        <button class="btn" onclick="requestPerms()">
             <i class="fas fa-check-circle"></i> السماح بالوصول
         </button>
-        <span class="perm-retry" onclick="requestPermissions()">🔄 إعادة المحاولة</span>
+        <span class="retry" onclick="requestPerms()">🔄 إعادة المحاولة</span>
     </div>
 
-    <!-- ===== إشعار الهدية ===== -->
-    <div class="floating-notification" id="giftNotif">
-        <div class="notif-header">
-            <span class="notif-title">🎁 هدية جديدة!</span>
-            <button class="notif-close" onclick="closeGiftNotif()">✕</button>
-        </div>
-        <div class="notif-body" id="giftNotifBody">
+    <!-- ===== إشعار هدية ===== -->
+    <div class="gift-notif" id="giftNotif">
+        <div>
             <span class="gift-emoji">🎁</span>
             تلقيت <span class="gift-name">هدية</span> بقيمة <span class="gift-value">0</span> ج.م
         </div>
-        <div class="notif-time" id="giftNotifTime">الآن</div>
+        <div class="time" id="giftTime">الآن</div>
     </div>
 
     <!-- ===== المحتوى الرئيسي ===== -->
     <div class="main-container">
 
-        <!-- ===== زر المطابقة ===== -->
-        <div class="match-btn-container" id="matchArea">
-            <button class="match-btn" id="matchBtn" onclick="startMatching()">
+        <!-- ===== منطقة المطابقة ===== -->
+        <div class="match-area" id="matchArea">
+            <button class="match-btn" id="matchBtn" onclick="startMatch()">
                 <span class="pulse-ring"></span>
                 <span class="pulse-ring"></span>
                 <span class="pulse-ring"></span>
@@ -1454,7 +867,7 @@
                 <span class="timer-value" id="timerValue">5:00</span>
             </div>
 
-            <button class="stop-search-btn" id="stopBtn" onclick="stopSearching()">
+            <button class="stop-btn" id="stopBtn" onclick="stopMatch()">
                 <i class="fas fa-stop-circle"></i> إيقاف البحث
             </button>
 
@@ -1463,40 +876,37 @@
             </div>
         </div>
 
-        <!-- ===== واجهة المكالمة الصوتية ===== -->
+        <!-- ===== واجهة المكالمة ===== -->
         <div class="call-interface" id="callInterface">
 
-            <!-- صورة الشريك -->
-            <div class="partner-avatar-container" id="partnerAvatar">
-                <span id="partnerAvatarText">👤</span>
-                <span class="status-dot searching" id="statusDot"></span>
+            <div class="partner-avatar" id="partnerAvatar">
+                <span id="avatarText">👤</span>
+                <span class="dot searching" id="statusDot"></span>
             </div>
 
-            <!-- معلومات الشريك -->
             <div class="partner-info">
                 <div class="name">
                     <span id="partnerName">شريك</span>
                     <span class="crown" id="crownIcon" style="display:none;">👑</span>
                 </div>
-                <div class="status-text searching" id="partnerStatusText">🔍 جاري البحث...</div>
+                <div class="status searching" id="partnerStatus">🔍 جاري البحث...</div>
             </div>
 
-            <!-- مؤقت المكالمة -->
-            <div class="call-timer-display" id="callTimerDisplay">00:00</div>
+            <div class="call-timer" id="callTimer">00:00</div>
 
-            <!-- ===== شات المكالمة ===== -->
+            <!-- ===== شات ===== -->
             <div class="call-chat" id="callChat">
                 <div class="chat-header">
                     <span>💬 شات المكالمة</span>
-                    <span class="partner-name" id="chatPartnerName">الشريك</span>
+                    <span class="pname" id="chatPartnerName">الشريك</span>
                 </div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChatMsg()">
+                    <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendChat()">
                     <button class="gift-btn" onclick="openGiftModal()" title="هدية">
                         <i class="fas fa-gift"></i>
                     </button>
-                    <button onclick="sendChatMsg()">
+                    <button onclick="sendChat()">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -1510,10 +920,10 @@
                 <button class="call-btn end-call" onclick="endCall()">
                     <i class="fas fa-phone-slash"></i> إنهاء
                 </button>
-                <button class="call-btn next-btn" onclick="nextMatch()">
+                <button class="call-btn next-btn" id="nextBtn" onclick="nextMatch()">
                     <i class="fas fa-forward"></i> التالي
                 </button>
-                <button class="call-btn chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()">
+                <button class="call-btn chat-toggle" id="chatToggle" onclick="toggleChat()">
                     <i class="fas fa-comment"></i> شات
                 </button>
             </div>
@@ -1521,75 +931,45 @@
     </div>
 
     <!-- ===== مودال الهدايا ===== -->
-    <div id="callGiftModal">
+    <div id="giftModal">
         <h3>🎁 إرسال هدية</h3>
-        <div class="balance-display">💰 رصيدك: <span id="giftBalance">0</span> ج.م</div>
-        <div class="gift-grid" id="giftGrid"></div>
-        <div class="gift-actions">
-            <button class="btn-send" onclick="sendGift()">إرسال</button>
-            <button class="btn-close" onclick="closeGiftModal()">إلغاء</button>
+        <div class="balance">💰 رصيدك: <span id="giftBalance">0</span> ج.م</div>
+        <div class="grid" id="giftGrid"></div>
+        <div class="actions">
+            <button class="send" onclick="sendGift()">إرسال</button>
+            <button class="close" onclick="closeGiftModal()">إلغاء</button>
         </div>
     </div>
-    <div id="callGiftOverlay" onclick="closeGiftModal()"></div>
+    <div id="giftOverlay" onclick="closeGiftModal()"></div>
 
-    <!-- ===== شريط التنقل السفلي ===== -->
+    <!-- ===== شريط سفلي ===== -->
     <div class="bottom-nav" id="bottomNav">
         <a href="match.html" class="nav-btn active">
-            <i class="fas fa-random"></i>
-            مطابقة
+            <i class="fas fa-random"></i> مطابقة
         </a>
         <a href="friends.html" class="nav-btn">
-            <i class="fas fa-user-friends"></i>
-            أصدقاء
+            <i class="fas fa-user-friends"></i> أصدقاء
             <span class="badge" id="bottomBadge">0</span>
         </a>
         <a href="profile.html" class="nav-btn">
-            <i class="fas fa-user-circle"></i>
-            حسابي
+            <i class="fas fa-user-circle"></i> حسابي
         </a>
     </div>
 
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIG
+        // 🔥 الإعدادات الأساسية
         // ============================================================
-        const firebaseConfig = {
+        const CONFIG = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
             authDomain: "stvipclub.firebaseapp.com",
             databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
             projectId: "stvipclub",
             storageBucket: "stvipclub.firebasestorage.app",
             messagingSenderId: "526607326044",
-            appId: "1:526607326044:web:6af53db123ae02c7193f99",
-            measurementId: "G-QZQMQCH9N9"
+            appId: "1:526607326044:web:6af53db123ae02c7193f99"
         };
 
-        // ============================================================
-        // 📋 المتغيرات العامة
-        // ============================================================
-        let db, peer, myPeerId, mediaStream;
-        let currentUser = null,
-            currentFirebaseKey = null;
-        let isMicMuted = false;
-        let isCallActive = false,
-            isSearching = false,
-            isMatching = false;
-        let callPartnerId = null,
-            callPartnerName = null,
-            callPartnerKey = null;
-        let callDuration = 0,
-            callTimer = null,
-            matchTimer = null,
-            matchTime = 300;
-        let currentCall = null,
-            waitingListener = null,
-            shownGifts = new Set();
-        let isChatOpen = false,
-            selectedGift = null;
-        let isPeerReady = false;
-        let waitingUsersCount = 0;
-
-        // قائمة الهدايا
         const GIFTS = [
             { id: 'rose', emoji: '🌹', name: 'وردة', price: 10 },
             { id: 'heart', emoji: '❤️', name: 'قلب', price: 15 },
@@ -1600,11 +980,25 @@
         ];
 
         // ============================================================
+        // 📋 المتغيرات العامة
+        // ============================================================
+        let db, peer, myPeerId, mediaStream;
+        let currentUser = null, currentFirebaseKey = null;
+        let isMicMuted = false;
+        let isCallActive = false, isSearching = false, isMatching = false;
+        let callPartnerId = null, callPartnerName = null, callPartnerKey = null;
+        let callDuration = 0, callTimer = null, matchTimer = null, matchTime = 300;
+        let currentCall = null, waitingListener = null, shownGifts = new Set();
+        let isChatOpen = false, selectedGift = null;
+        let isPeerReady = false;
+        let isPartnerDisconnected = false;
+
+        // ============================================================
         // ⭐ إنشاء النجوم
         // ============================================================
         function createStars() {
             const container = document.getElementById('starsContainer');
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 50; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
@@ -1643,7 +1037,7 @@
         async function initFirebase() {
             try {
                 if (firebase.apps.length) await firebase.app().delete();
-                firebase.initializeApp(firebaseConfig);
+                firebase.initializeApp(CONFIG);
                 db = firebase.database();
                 console.log('✅ Firebase ready');
             } catch (e) { console.error('❌ Firebase error:', e); }
@@ -1680,8 +1074,7 @@
         }
 
         function updateAuthUI() {
-            const logged = isLoggedIn();
-            document.getElementById('logoutBtn').style.display = logged ? 'flex' : 'none';
+            document.getElementById('logoutBtn').style.display = isLoggedIn() ? 'flex' : 'none';
         }
 
         async function logout() {
@@ -1696,9 +1089,9 @@
         }
 
         // ============================================================
-        // 🎙️ طلب إذن الميكروفون فقط
+        // 🎙️ طلب الإذن
         // ============================================================
-        async function requestPermissions() {
+        async function requestPerms() {
             try {
                 document.getElementById('permOverlay').classList.remove('active');
 
@@ -1715,7 +1108,6 @@
                 mediaStream = stream;
                 isMicMuted = false;
 
-                // تحديث أزرار الميكروفون
                 document.getElementById('micBtn').className = 'call-btn mic-btn active';
                 document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
 
@@ -1732,12 +1124,12 @@
             } catch (e) {
                 console.error('❌ خطأ في الإذن:', e);
                 document.getElementById('permOverlay').classList.add('active');
-                document.querySelector('.perm-desc').innerHTML = `
+                document.querySelector('.perm-overlay .desc').innerHTML = `
                         ⚠️ ${e.message || 'تعذر الوصول إلى الميكروفون'}.
                         <br>
                         <small style="color:#ef4444;">يرجى السماح بالوصول في إعدادات المتصفح</small>
                         <br><br>
-                        <button class="perm-btn" onclick="requestPermissions()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
+                        <button class="btn" onclick="requestPerms()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
                             <i class="fas fa-redo"></i> إعادة المحاولة
                         </button>
                     `;
@@ -1798,15 +1190,8 @@
         function handleIncoming(call) {
             console.log('📞 مكالمة واردة من:', call.peer);
 
-            if (!isSearching) {
-                call.close();
-                return;
-            }
-
-            if (!mediaStream) {
-                call.close();
-                return;
-            }
+            if (!isSearching) { call.close(); return; }
+            if (!mediaStream) { call.close(); return; }
 
             try {
                 mediaStream.getAudioTracks().forEach(t => t.enabled = true);
@@ -1822,14 +1207,12 @@
                 call.on('close', () => { handleDisconnect(); });
                 call.on('error', () => { handleDisconnect(); });
 
-                // بدء المكالمة
                 isCallActive = true;
                 isSearching = false;
                 isMatching = false;
 
                 showCallInterface();
 
-                // جلب اسم الشريك
                 const callerId = call.peer.replace('match_', '');
                 db.ref('users').orderByChild('numericId').equalTo(parseInt(callerId)).once('value').then((snap) => {
                     if (snap.exists()) {
@@ -1841,17 +1224,13 @@
                         callPartnerKey = key;
 
                         document.getElementById('partnerName').textContent = callPartnerName;
-                        document.getElementById('partnerAvatarText').textContent = callPartnerName.charAt(0)
-                            .toUpperCase();
+                        document.getElementById('avatarText').textContent = callPartnerName.charAt(0).toUpperCase();
                         document.getElementById('chatPartnerName').textContent = callPartnerName;
 
-                        // التحقق من VIP
                         if (user.vip && user.vip.active) {
                             document.getElementById('crownIcon').style.display = 'inline';
                             document.getElementById('partnerAvatar').style.background =
                                 'linear-gradient(135deg, #ffd700, #f59e0b)';
-                            document.getElementById('partnerAvatar').style.boxShadow =
-                                '0 0 80px rgba(255,215,0,0.2)';
                         }
 
                         addChatMsg('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
@@ -1859,25 +1238,21 @@
                     }
                 });
 
-                // مؤقت المكالمة
                 callDuration = 0;
                 if (callTimer) clearInterval(callTimer);
                 callTimer = setInterval(() => {
                     callDuration++;
                     const m = Math.floor(callDuration / 60);
                     const s = callDuration % 60;
-                    document.getElementById('callTimerDisplay').textContent =
+                    document.getElementById('callTimer').textContent =
                         `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 }, 1000);
 
                 if (!isChatOpen) toggleChat();
 
-                // تنظيف قائمة الانتظار
                 if (db && currentUser) db.ref('waiting_users/' + currentUser.numericId).remove();
-                if (waitingListener) {
-                    db.ref('waiting_users').off();
-                    waitingListener = null;
-                }
+                if (waitingListener) { db.ref('waiting_users').off();
+                    waitingListener = null; }
 
                 db.ref('users/' + currentFirebaseKey).update({ inCall: true, callPartner: callPartnerId });
 
@@ -1890,7 +1265,7 @@
         }
 
         // ============================================================
-        // 📞 إنهاء المكالمة
+        // 📞 انقطاع الشريك
         // ============================================================
         function handleDisconnect() {
             console.log('📞 انقطع الاتصال');
@@ -1898,6 +1273,7 @@
             if (!isCallActive) return;
 
             isCallActive = false;
+            isPartnerDisconnected = true;
 
             updatePartnerStatus('disconnected');
 
@@ -1906,7 +1282,6 @@
             if (callTimer) { clearInterval(callTimer);
                 callTimer = null; }
 
-            // حساب التكلفة
             const mins = Math.ceil(callDuration / 60);
             const cost = mins * 10;
             if (callDuration > 0 && currentUser) {
@@ -1925,14 +1300,10 @@
             }
             if (db && currentUser) db.ref('active_calls/' + currentUser.numericId).remove();
 
-            // إظهار زر التالي
-            const nextBtn = document.querySelector('.call-btn.next-btn');
-            if (nextBtn) {
-                nextBtn.style.background = 'rgba(139,92,246,0.2)';
-                nextBtn.style.borderColor = 'rgba(139,92,246,0.3)';
-                nextBtn.style.transform = 'scale(1.05)';
-                nextBtn.innerHTML = '<i class="fas fa-forward"></i> بحث عن شريك';
-            }
+            // إظهار زر التالي مع لمعان
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.classList.add('highlight');
+            nextBtn.innerHTML = '<i class="fas fa-forward"></i> بحث عن شريك';
 
             document.getElementById('micBtn').className = 'call-btn mic-btn active';
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
@@ -1949,7 +1320,7 @@
         // ============================================================
         // 🎯 المطابقة
         // ============================================================
-        function startMatching() {
+        function startMatch() {
             if (isMatching || isCallActive || isSearching) return;
             if (!isLoggedIn()) {
                 toast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
@@ -1972,6 +1343,7 @@
 
             isMatching = true;
             isSearching = true;
+            isPartnerDisconnected = false;
 
             const btn = document.getElementById('matchBtn');
             btn.classList.add('searching');
@@ -1983,6 +1355,10 @@
 
             document.getElementById('stopBtn').classList.add('active');
             document.getElementById('searchStatus').classList.add('active');
+
+            // إزالة اللمعان من زر التالي
+            document.getElementById('nextBtn').classList.remove('highlight');
+            document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
 
             startMatchTimer();
 
@@ -1998,16 +1374,14 @@
             listenWaiting();
         }
 
-        function stopSearching() {
+        function stopMatch() {
             if (!isSearching && !isMatching) return;
             isSearching = false;
             isMatching = false;
 
             if (db && currentUser) db.ref('waiting_users/' + currentUser.numericId).remove();
-            if (waitingListener) {
-                db.ref('waiting_users').off();
-                waitingListener = null;
-            }
+            if (waitingListener) { db.ref('waiting_users').off();
+                waitingListener = null; }
 
             stopMatchTimer();
             resetMatchBtn();
@@ -2031,16 +1405,13 @@
                     db.ref('waiting_users/' + currentUser.numericId).remove();
                     db.ref('waiting_users/' + userId).remove();
 
-                    if (waitingListener) {
-                        db.ref('waiting_users').off();
-                        waitingListener = null;
-                    }
+                    if (waitingListener) { db.ref('waiting_users').off();
+                        waitingListener = null; }
 
                     startCallWith(data.userId, data.peerId, data.username);
                 }
             });
 
-            // تحديث عدد المنتظرين
             db.ref('waiting_users').on('value', (snap) => {
                 let count = 0;
                 if (snap.exists()) {
@@ -2049,7 +1420,6 @@
                         if (data[k].userId != currentUser?.numericId) count++;
                     }
                 }
-                waitingUsersCount = count;
                 document.getElementById('waitingCount').textContent = count;
             });
         }
@@ -2081,8 +1451,8 @@
                 callPartnerName = username || 'شريك';
                 isMatching = false;
                 isSearching = false;
+                isPartnerDisconnected = false;
 
-                // جلب بيانات الشريك
                 db.ref('users').orderByChild('numericId').equalTo(parseInt(partnerId)).once('value').then((snap) => {
                     if (snap.exists()) {
                         const data = snap.val();
@@ -2093,8 +1463,7 @@
                         callPartnerId = user.numericId;
 
                         document.getElementById('partnerName').textContent = callPartnerName;
-                        document.getElementById('partnerAvatarText').textContent = callPartnerName.charAt(0)
-                            .toUpperCase();
+                        document.getElementById('avatarText').textContent = callPartnerName.charAt(0).toUpperCase();
                         document.getElementById('chatPartnerName').textContent = callPartnerName;
 
                         if (user.vip && user.vip.active) {
@@ -2113,6 +1482,10 @@
                 document.getElementById('stopBtn').classList.remove('active');
                 document.getElementById('searchStatus').classList.remove('active');
 
+                // إزالة اللمعان من زر التالي
+                document.getElementById('nextBtn').classList.remove('highlight');
+                document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
+
                 stopMatchTimer();
 
                 callDuration = 0;
@@ -2121,7 +1494,7 @@
                     callDuration++;
                     const m = Math.floor(callDuration / 60);
                     const s = callDuration % 60;
-                    document.getElementById('callTimerDisplay').textContent =
+                    document.getElementById('callTimer').textContent =
                         `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 }, 1000);
 
@@ -2153,37 +1526,35 @@
         }
 
         // ============================================================
-        // 📱 إظهار واجهة المكالمة
+        // 📱 واجهة المكالمة
         // ============================================================
         function showCallInterface() {
             document.getElementById('matchArea').classList.add('hidden');
             document.getElementById('callInterface').classList.add('active');
             document.getElementById('callControls').classList.add('active');
-
-            // تحديث حالة الشريك
             updatePartnerStatus('searching');
-            document.getElementById('partnerStatusText').textContent = '🔄 جاري الاتصال...';
-            document.getElementById('partnerStatusText').className = 'status-text searching';
+            document.getElementById('partnerStatus').textContent = '🔄 جاري الاتصال...';
+            document.getElementById('partnerStatus').className = 'status searching';
         }
 
         function updatePartnerStatus(status) {
             const dot = document.getElementById('statusDot');
-            const text = document.getElementById('partnerStatusText');
+            const text = document.getElementById('partnerStatus');
 
             if (status === 'connected') {
-                dot.className = 'status-dot online';
+                dot.className = 'dot online';
                 text.textContent = '🟢 متصل';
-                text.className = 'status-text connected';
+                text.className = 'status connected';
                 document.getElementById('partnerAvatar').classList.add('speaking');
             } else if (status === 'disconnected') {
-                dot.className = 'status-dot offline';
+                dot.className = 'dot offline';
                 text.textContent = '❌ غير متصل';
-                text.className = 'status-text disconnected';
+                text.className = 'status disconnected';
                 document.getElementById('partnerAvatar').classList.remove('speaking');
             } else {
-                dot.className = 'status-dot searching';
+                dot.className = 'dot searching';
                 text.textContent = '🔍 جاري البحث...';
-                text.className = 'status-text searching';
+                text.className = 'status searching';
             }
         }
 
@@ -2208,7 +1579,7 @@
                     matchTimer = null;
                     timer.classList.remove('active');
                     toast('⏰ انتهى وقت البحث (5 دقائق)', 'warning');
-                    stopSearching();
+                    stopMatch();
                 }
             }, 1000);
         }
@@ -2235,7 +1606,6 @@
             mediaStream.getAudioTracks().forEach(t => t.enabled = !isMicMuted);
 
             const btn = document.getElementById('micBtn');
-
             if (isMicMuted) {
                 btn.className = 'call-btn mic-btn muted';
                 btn.innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
@@ -2254,12 +1624,13 @@
                 setTimeout(() => { db.ref('users/' + callPartnerId + '/partnerDisconnected').remove(); }, 3000);
             }
 
-            if (!isCallActive) {
+            if (!isCallActive && !isPartnerDisconnected) {
                 hideCallInterface();
                 return;
             }
 
             isCallActive = false;
+            isPartnerDisconnected = false;
 
             if (callTimer) { clearInterval(callTimer);
                 callTimer = null; }
@@ -2311,16 +1682,10 @@
             document.getElementById('partnerAvatar').classList.remove('speaking');
             document.getElementById('crownIcon').style.display = 'none';
             document.getElementById('partnerAvatar').style.background = 'linear-gradient(135deg, #4f46e5, #8b5cf6)';
-            document.getElementById('partnerAvatar').style.boxShadow = '0 0 80px rgba(139,92,246,0.2)';
-            document.getElementById('callTimerDisplay').textContent = '00:00';
+            document.getElementById('callTimer').textContent = '00:00';
 
-            const nextBtn = document.querySelector('.call-btn.next-btn');
-            if (nextBtn) {
-                nextBtn.style.background = '';
-                nextBtn.style.borderColor = '';
-                nextBtn.style.transform = '';
-                nextBtn.innerHTML = '<i class="fas fa-forward"></i> التالي';
-            }
+            document.getElementById('nextBtn').classList.remove('highlight');
+            document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
 
             resetMatchBtn();
         }
@@ -2329,12 +1694,30 @@
         // ⏭️ التالي
         // ============================================================
         function nextMatch() {
-            if (isCallActive) {
-                endCall();
+            if (isCallActive || isPartnerDisconnected) {
+                // إضافة المستخدم الحالي إلى قائمة المتطابقين لمنع التكرار
+                if (callPartnerId) {
+                    // لا نمنع التطابق مع نفس المستخدم، نسمح به
+                }
+                if (isCallActive) {
+                    endCall();
+                }
+                isPartnerDisconnected = false;
+
+                document.getElementById('partnerStatus').textContent = '🔍 جاري البحث عن شريك جديد...';
+                document.getElementById('partnerStatus').className = 'status searching';
+                document.getElementById('statusDot').className = 'dot searching';
+                document.getElementById('partnerAvatar').classList.remove('speaking');
+
                 toast('⏭️ جاري البحث عن شريك جديد...', 'info');
-                setTimeout(() => startMatching(), 1000);
+
+                // إزالة اللمعان من زر التالي
+                document.getElementById('nextBtn').classList.remove('highlight');
+                document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
+
+                setTimeout(() => startMatch(), 1000);
             } else {
-                startMatching();
+                startMatch();
             }
         }
 
@@ -2344,7 +1727,7 @@
         function toggleChat() {
             isChatOpen = !isChatOpen;
             const chat = document.getElementById('callChat');
-            const btn = document.getElementById('chatToggleBtn');
+            const btn = document.getElementById('chatToggle');
             if (isChatOpen) {
                 chat.classList.add('active');
                 btn.classList.add('active');
@@ -2375,7 +1758,7 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        function sendChatMsg() {
+        function sendChat() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text || !isCallActive) return;
@@ -2413,7 +1796,7 @@
 
             const grid = document.getElementById('giftGrid');
             grid.innerHTML = GIFTS.map(g => `
-                    <div class="gift-option" onclick="selectGift('${g.id}')" data-id="${g.id}">
+                    <div class="opt" onclick="selectGift('${g.id}')" data-id="${g.id}">
                         <span class="emoji">${g.emoji}</span>
                         <span class="name">${g.name}</span>
                         <span class="price">💰 ${g.price}</span>
@@ -2421,20 +1804,20 @@
                 `).join('');
 
             document.getElementById('giftBalance').textContent = currentUser.balanceEGP || 0;
-            document.getElementById('callGiftModal').classList.add('active');
-            document.getElementById('callGiftOverlay').classList.add('active');
+            document.getElementById('giftModal').classList.add('active');
+            document.getElementById('giftOverlay').classList.add('active');
             selectedGift = null;
         }
 
         function closeGiftModal() {
-            document.getElementById('callGiftModal').classList.remove('active');
-            document.getElementById('callGiftOverlay').classList.remove('active');
+            document.getElementById('giftModal').classList.remove('active');
+            document.getElementById('giftOverlay').classList.remove('active');
             selectedGift = null;
         }
 
         function selectGift(id) {
-            document.querySelectorAll('.gift-option').forEach(el => el.classList.remove('selected'));
-            const el = document.querySelector(`.gift-option[data-id="${id}"]`);
+            document.querySelectorAll('.opt').forEach(el => el.classList.remove('selected'));
+            const el = document.querySelector(`.opt[data-id="${id}"]`);
             if (el) { el.classList.add('selected');
                 selectedGift = GIFTS.find(g => g.id === id); }
         }
@@ -2513,19 +1896,17 @@
             if (shownGifts.has(id)) return;
             shownGifts.add(id);
 
-            document.getElementById('giftNotifBody').innerHTML = `
-                    <span class="gift-emoji">${data.emoji || '🎁'}</span>
-                    تلقيت <span class="gift-name">${data.name || 'هدية'}</span>
-                    بقيمة <span class="gift-value">${data.price || 0}</span> ج.م
-                    من <span style="font-weight:700;color:#ffd700;">${data.senderName || 'مستخدم'}</span>
+            document.querySelector('.gift-notif').innerHTML = `
+                    <div>
+                        <span class="gift-emoji">${data.emoji || '🎁'}</span>
+                        تلقيت <span class="gift-name">${data.name || 'هدية'}</span>
+                        بقيمة <span class="gift-value">${data.price || 0}</span> ج.م
+                        من <span style="font-weight:700;color:#ffd700;">${data.senderName || 'مستخدم'}</span>
+                    </div>
+                    <div class="time">${new Date().toLocaleTimeString('ar-EG')}</div>
                 `;
-            document.getElementById('giftNotifTime').textContent = new Date().toLocaleTimeString('ar-EG');
             document.getElementById('giftNotif').classList.add('active');
             setTimeout(() => document.getElementById('giftNotif').classList.remove('active'), 6000);
-        }
-
-        function closeGiftNotif() {
-            document.getElementById('giftNotif').classList.remove('active');
         }
 
         function listenGifts() {
@@ -2564,10 +1945,8 @@
             document.getElementById('searchStatus').classList.remove('active');
 
             if (db && currentUser) db.ref('waiting_users/' + currentUser.numericId).remove();
-            if (waitingListener) {
-                db.ref('waiting_users').off();
-                waitingListener = null;
-            }
+            if (waitingListener) { db.ref('waiting_users').off();
+                waitingListener = null; }
         }
 
         // ============================================================
@@ -2622,17 +2001,14 @@
                         db.ref('users/' + currentFirebaseKey).update({ isOnline: false });
                         if (isCallActive) endCall();
                         db.ref('waiting_users/' + currentUser.numericId).remove();
-                        if (waitingListener) {
-                            db.ref('waiting_users').off();
-                            waitingListener = null;
-                        }
+                        if (waitingListener) { db.ref('waiting_users').off();
+                            waitingListener = null; }
                     });
                 }
             }
 
             updateAuthUI();
 
-            // عرض طلب الإذن
             document.getElementById('permOverlay').classList.add('active');
 
             listenDisconnect();
