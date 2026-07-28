@@ -388,7 +388,6 @@
             right: 10px;
         }
 
-        /* ===== أزرار الكاميرا فوق الفيديو ===== */
         .video-overlay-controls {
             position: absolute;
             top: 10px;
@@ -455,7 +454,6 @@
             opacity: 1;
         }
 
-        /* ===== إظهار أزرار الكاميرا دائماً ===== */
         .video-overlay-btn {
             display: flex !important;
         }
@@ -1479,6 +1477,24 @@
                 padding-bottom: 70px;
             }
         }
+
+        /* ===== زر المطابقة مع حالة البحث ===== */
+        .match-status-text {
+            font-size: 1rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .match-status-text.active {
+            display: block;
+        }
+
+        .match-status-text .highlight {
+            color: #ffd700;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -1548,6 +1564,9 @@
                 <span class="btn-label">كوكبة</span>
                 <span class="btn-sub">اضغط للمطابقة</span>
             </button>
+            <div class="match-status-text" id="matchStatusText">
+                🔍 جاري البحث عن شريك... <span class="highlight" id="searchingUsersCount">0</span> مستخدم يبحث حالياً
+            </div>
             <button class="stop-search-btn" id="stopSearchBtn" onclick="stopSearching()">
                 <i class="fas fa-stop-circle"></i> إيقاف البحث
             </button>
@@ -1564,7 +1583,6 @@
                     <video id="localVideo" autoplay playsinline muted></video>
                     <div class="video-label">📹 أنت</div>
 
-                    <!-- أزرار الكاميرا فوق الفيديو - تظهر دائماً -->
                     <div class="video-overlay-controls">
                         <button class="video-overlay-btn active" id="localMicOverlayBtn" onclick="toggleMicOverlay()" title="ميكروفون">
                             <i class="fas fa-microphone"></i>
@@ -1694,7 +1712,7 @@
         let peer = null;
         let myPeerId = null;
         let mediaStream = null;
-        let isMicMuted = false; // الميكروفون مفتوح تلقائياً
+        let isMicMuted = false;
         let isVideoOff = false;
         let isCallActive = false;
         let callPartnerId = null;
@@ -1718,6 +1736,10 @@
         let partnerProfileData = null;
         let isPartnerDisconnected = false;
         let isPeerReady = false;
+        let waitingUsersCount = 0;
+        let currentPartnerId = null;
+        let matchedUsers = new Set();
+        let searchHistory = [];
 
         // ============================================================
         // 🍞 توست
@@ -1864,14 +1886,15 @@
         }
 
         // ============================================================
-        // 🎙️ طلب إذن المايك والكاميرا - الميكروفون مفتوح تلقائياً
+        // 🎙️ طلب إذن المايك والكاميرا - مع دعم الكاميرات الأمامية والخلفية
         // ============================================================
         async function requestMediaPermissions() {
             try {
                 const overlay = document.getElementById('permissionOverlay');
                 overlay.classList.remove('active');
 
-                const constraints = {
+                // محاولة الحصول على الكاميرا مع دعم جميع الكاميرات
+                let constraints = {
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
@@ -1885,7 +1908,24 @@
                     }
                 };
 
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                let stream;
+
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (videoError) {
+                    console.log('⚠️ محاولة بدون كاميرا:', videoError);
+                    // محاولة الحصول على الصوت فقط
+                    constraints = {
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    };
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    showToast('⚠️ تم الوصول إلى الميكروفون فقط (الكاميرا غير متاحة)', 'warning');
+                }
+
                 mediaStream = stream;
                 mediaReady = true;
                 isFrontCamera = true;
@@ -1893,25 +1933,35 @@
                 const localVideo = document.getElementById('localVideo');
                 localVideo.srcObject = stream;
 
-                // الميكروفون مفتوح تلقائياً
+                // تفعيل الصوت
                 stream.getAudioTracks().forEach(track => track.enabled = true);
                 isMicMuted = false;
 
-                // تحديث أزرار التحكم
+                // تحديث واجهة الميكروفون
                 document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn active';
                 document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
-                document.getElementById('localVideoOverlayBtn').className = 'video-overlay-btn active';
-                document.getElementById('localVideoOverlayBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
                 document.getElementById('localMuteIndicator').style.display = 'none';
-
                 document.getElementById('micBtn').className = 'call-btn mic-btn active';
                 document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
 
-                document.getElementById('localPlaceholder').style.display = 'none';
-                document.getElementById('localVideo').style.display = 'block';
-                document.getElementById('localFlipOverlayBtn').style.display = 'flex';
+                // التحقق من وجود كاميرا
+                const hasVideo = stream.getVideoTracks().length > 0;
 
-                showToast('✅ تم الوصول إلى الميكروفون والكاميرا (الميكروفون مفتوح)', 'success');
+                if (hasVideo) {
+                    document.getElementById('localVideoOverlayBtn').style.display = 'flex';
+                    document.getElementById('localFlipOverlayBtn').style.display = 'flex';
+                    document.getElementById('localVideo').style.display = 'block';
+                    document.getElementById('localPlaceholder').style.display = 'none';
+                    document.getElementById('localVideoOverlayBtn').className = 'video-overlay-btn active';
+                    document.getElementById('localVideoOverlayBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
+                    showToast('✅ تم الوصول إلى الميكروفون والكاميرا', 'success');
+                } else {
+                    document.getElementById('localVideoOverlayBtn').style.display = 'none';
+                    document.getElementById('localFlipOverlayBtn').style.display = 'none';
+                    document.getElementById('localVideo').style.display = 'none';
+                    document.getElementById('localPlaceholder').style.display = 'flex';
+                    document.getElementById('localPlaceholderName').textContent = 'الكاميرا غير متاحة';
+                }
 
                 initPeerJS();
                 listenForCallChatMessages();
@@ -1921,63 +1971,46 @@
 
                 document.getElementById('matchBtnContainer').classList.remove('hidden');
 
+                // بدء مراقبة المستخدمين المنتظرين
+                listenForWaitingUsersCount();
+
             } catch (error) {
                 console.error('❌ Media permission error:', error);
 
-                try {
-                    const audioStream = await navigator.mediaDevices.getUserMedia({
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true
-                        }
-                    });
-
-                    mediaStream = audioStream;
-                    mediaReady = true;
-
-                    const localVideo = document.getElementById('localVideo');
-                    localVideo.srcObject = audioStream;
-
-                    audioStream.getAudioTracks().forEach(track => track.enabled = true);
-                    isMicMuted = false;
-
-                    document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn active';
-                    document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
-                    document.getElementById('localVideoOverlayBtn').style.display = 'none';
-                    document.getElementById('localFlipOverlayBtn').style.display = 'none';
-                    document.getElementById('localMuteIndicator').style.display = 'none';
-                    document.getElementById('localPlaceholder').style.display = 'none';
-                    document.getElementById('localVideo').style.display = 'block';
-
-                    document.getElementById('micBtn').className = 'call-btn mic-btn active';
-                    document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
-
-                    showToast('✅ تم الوصول إلى الميكروفون (الميكروفون مفتوح، الكاميرا غير متاحة)', 'success');
-
-                    initPeerJS();
-                    listenForCallChatMessages();
-                    listenForIncomingGifts();
-                    updateFriendRequestsBadge();
-                    updateAuthUI();
-                    document.getElementById('matchBtnContainer').classList.remove('hidden');
-
-                } catch (audioError) {
-                    console.error('❌ Audio only error:', audioError);
-
-                    const overlay = document.getElementById('permissionOverlay');
-                    overlay.classList.add('active');
-                    document.querySelector('.perm-desc').innerHTML = `
-                        ⚠️ تعذر الوصول إلى الميكروفون والكاميرا.
-                        <br>
-                        <small style="color:#ef4444;">${error.message || 'يرجى السماح بالوصول في إعدادات المتصفح'}</small>
-                        <br><br>
-                        <button class="perm-btn" onclick="requestMediaPermissions()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
-                            <i class="fas fa-redo"></i> إعادة المحاولة
-                        </button>
-                    `;
-                }
+                const overlay = document.getElementById('permissionOverlay');
+                overlay.classList.add('active');
+                document.querySelector('.perm-desc').innerHTML = `
+                    ⚠️ تعذر الوصول إلى الميكروفون والكاميرا.
+                    <br>
+                    <small style="color:#ef4444;">${error.message || 'يرجى السماح بالوصول في إعدادات المتصفح'}</small>
+                    <br><br>
+                    <button class="perm-btn" onclick="requestMediaPermissions()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
+                        <i class="fas fa-redo"></i> إعادة المحاولة
+                    </button>
+                `;
             }
+        }
+
+        // ============================================================
+        // 📊 مراقبة عدد المستخدمين المنتظرين
+        // ============================================================
+        function listenForWaitingUsersCount() {
+            if (!database) return;
+
+            database.ref('waiting_users').on('value', (snapshot) => {
+                let count = 0;
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    for (const key in data) {
+                        if (data[key].userId != currentUser?.numericId) {
+                            count++;
+                        }
+                    }
+                }
+                waitingUsersCount = count;
+                document.getElementById('searchingUsersCount').textContent = count;
+                document.getElementById('matchStatusText').classList.add('active');
+            });
         }
 
         // ============================================================
@@ -2025,8 +2058,15 @@
                 showToast('⚠️ لا توجد كاميرا', 'warning');
                 return;
             }
+
+            const videoTracks = mediaStream.getVideoTracks();
+            if (videoTracks.length === 0) {
+                showToast('⚠️ لا توجد كاميرا فيديو', 'warning');
+                return;
+            }
+
             isVideoOff = !isVideoOff;
-            mediaStream.getVideoTracks().forEach(track => track.enabled = !isVideoOff);
+            videoTracks.forEach(track => track.enabled = !isVideoOff);
 
             const overlayBtn = document.getElementById('localVideoOverlayBtn');
             const localVideo = document.getElementById('localVideo');
@@ -2046,7 +2086,7 @@
         }
 
         // ============================================================
-        // 🔄 قلب الكاميرا
+        // 🔄 قلب الكاميرا (أمامية/خلفية)
         // ============================================================
         async function flipCamera() {
             if (!mediaReady || !mediaStream) {
@@ -2055,13 +2095,13 @@
             }
 
             try {
-                const videoTrack = mediaStream.getVideoTracks()[0];
-                if (!videoTrack) {
+                const videoTracks = mediaStream.getVideoTracks();
+                if (videoTracks.length === 0) {
                     showToast('⚠️ لا توجد كاميرا فيديو', 'warning');
                     return;
                 }
 
-                videoTrack.stop();
+                videoTracks.forEach(track => track.stop());
 
                 isFrontCamera = !isFrontCamera;
                 const facingMode = isFrontCamera ? 'user' : 'environment';
@@ -2078,10 +2118,27 @@
                 const newVideoStream = await navigator.mediaDevices.getUserMedia(constraints);
                 const newVideoTrack = newVideoStream.getVideoTracks()[0];
 
+                // إزالة المسارات القديمة وإضافة الجديدة
+                const oldVideoTracks = mediaStream.getVideoTracks();
+                oldVideoTracks.forEach(t => {
+                    mediaStream.removeTrack(t);
+                    t.stop();
+                });
+
                 mediaStream.addTrack(newVideoTrack);
 
                 const localVideo = document.getElementById('localVideo');
                 localVideo.srcObject = mediaStream;
+
+                // إذا كانت الكاميرا مغلقة، نفتحها تلقائياً
+                if (isVideoOff) {
+                    isVideoOff = false;
+                    newVideoTrack.enabled = true;
+                    document.getElementById('localVideoOverlayBtn').className = 'video-overlay-btn active';
+                    document.getElementById('localVideoOverlayBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
+                    document.getElementById('localVideo').style.display = 'block';
+                    document.getElementById('localPlaceholder').style.display = 'none';
+                }
 
                 if (isCallActive && currentCall) {
                     try {
@@ -2104,7 +2161,7 @@
         }
 
         // ============================================================
-        // 🔗 PeerJS
+        // 🔗 PeerJS - مع تحسين نقل الصوت
         // ============================================================
         function initPeerJS() {
             if (!mediaReady) {
@@ -2121,7 +2178,9 @@
                             { urls: 'stun:stun.l.google.com:19302' },
                             { urls: 'stun:stun1.l.google.com:19302' },
                             { urls: 'stun:stun.ekiga.net' },
-                            { urls: 'stun:stun.ideasip.com' }
+                            { urls: 'stun:stun.ideasip.com' },
+                            { urls: 'stun:stun.voipstunt.com' },
+                            { urls: 'stun:stun.voipbuster.com' }
                         ]
                     }
                 });
@@ -2131,7 +2190,8 @@
                     config: {
                         iceServers: [
                             { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:stun1.l.google.com:19302' }
+                            { urls: 'stun:stun1.l.google.com:19302' },
+                            { urls: 'stun:stun.ekiga.net' }
                         ]
                     }
                 });
@@ -2154,6 +2214,9 @@
 
             peer.on('error', (err) => {
                 console.error('Peer error:', err);
+                if (err.type === 'peer-unavailable') {
+                    showToast('⚠️ لا يمكن الاتصال بالشريك، حاول مرة أخرى', 'warning');
+                }
             });
 
             peer.on('disconnected', () => {
@@ -2185,6 +2248,9 @@
             }
 
             try {
+                // التأكد من أن الصوت مفعل
+                mediaStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+
                 call.answer(mediaStream);
                 currentCall = call;
 
@@ -2203,9 +2269,12 @@
                     document.getElementById('remotePlaceholderStatus').className = 'status-text';
 
                     isPartnerDisconnected = false;
+
+                    console.log('✅ Stream received from partner');
                 });
 
                 call.on('close', () => {
+                    console.log('📞 Call closed');
                     handlePartnerDisconnect();
                 });
 
@@ -2238,6 +2307,7 @@
                             callPartnerNumericId = user.numericId;
                             callPartnerFirebaseKey = userKey;
                             callPartnerId = callPartnerNumericId;
+                            currentPartnerId = callPartnerNumericId;
 
                             document.getElementById('remoteNameText').textContent = callPartnerName;
                             document.getElementById('chatPartnerName').textContent = callPartnerName;
@@ -2355,11 +2425,6 @@
                 database.ref('active_calls/' + currentUser.numericId).remove();
             }
 
-            callPartnerId = null;
-            callPartnerNumericId = null;
-            callPartnerName = null;
-            callPartnerFirebaseKey = null;
-
             // إعادة تعيين أزرار الميكروفون
             document.getElementById('micBtn').className = 'call-btn mic-btn active';
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
@@ -2382,10 +2447,17 @@
 
             document.getElementById('callChat').classList.remove('active');
             isCallChatOpen = false;
+
+            // إعادة تعيين المتغيرات
+            callPartnerId = null;
+            callPartnerNumericId = null;
+            callPartnerName = null;
+            callPartnerFirebaseKey = null;
+            currentPartnerId = null;
         }
 
         // ============================================================
-        // 🎯 بدء المطابقة
+        // 🎯 بدء المطابقة - مع منع التطابق مع نفس المستخدم
         // ============================================================
         function startMatching() {
             if (isMatching || isCallActive || isSearching) return;
@@ -2411,9 +2483,10 @@
                 return;
             }
 
+            // إعادة تعيين حالة الانقطاع
+            isPartnerDisconnected = false;
             isMatching = true;
             isSearching = true;
-            isPartnerDisconnected = false;
 
             const btn = document.getElementById('matchBtn');
             btn.classList.add('searching');
@@ -2424,6 +2497,7 @@
             `;
 
             document.getElementById('stopSearchBtn').classList.add('active');
+            document.getElementById('matchStatusText').classList.add('active');
 
             startMatchTimer();
 
@@ -2462,12 +2536,13 @@
             resetMatchButton();
 
             document.getElementById('stopSearchBtn').classList.remove('active');
+            document.getElementById('matchStatusText').classList.remove('active');
 
             showToast('🛑 تم إيقاف البحث', 'info');
         }
 
         // ============================================================
-        // 📡 الاستماع للمستخدمين المنتظرين
+        // 📡 الاستماع للمستخدمين المنتظرين - مع منع التطابق مع نفس المستخدم
         // ============================================================
         function listenForWaitingUsers() {
             if (waitingListener) {
@@ -2478,11 +2553,22 @@
                 const data = snapshot.val();
                 const userId = data.userId;
 
+                // تجاهل المستخدم نفسه
                 if (userId == currentUser.numericId) return;
+
+                // تجاهل المستخدمين الذين تم التطابق معهم مؤخراً (لمنع التكرار)
+                if (matchedUsers.has(userId)) {
+                    console.log('⏭️ تجاهل المستخدم (تم التطابق معه سابقاً):', userId);
+                    return;
+                }
 
                 console.log('👤 تم العثور على مستخدم منتظر:', data.username);
 
                 if (isSearching && !isCallActive && !isPartnerDisconnected && isPeerReady) {
+                    // إضافة المستخدم إلى قائمة المتطابقين
+                    matchedUsers.add(userId);
+
+                    // حذف كلا المستخدمين من قائمة الانتظار
                     database.ref('waiting_users/' + currentUser.numericId).remove();
                     database.ref('waiting_users/' + userId).remove();
 
@@ -2507,6 +2593,10 @@
 
             try {
                 console.log(`📞 Calling peer: ${partnerPeerId}`);
+
+                // التأكد من أن الصوت مفعل
+                mediaStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+
                 const call = peer.call(partnerPeerId, mediaStream);
                 currentCall = call;
 
@@ -2526,9 +2616,11 @@
                         document.getElementById('remotePlaceholderStatus').className = 'status-text';
 
                         isPartnerDisconnected = false;
+                        console.log('✅ Stream received from partner');
                     });
 
                     call.on('close', () => {
+                        console.log('📞 Call closed');
                         handlePartnerDisconnect();
                     });
 
@@ -2541,11 +2633,12 @@
                     callPartnerNumericId = partnerId;
                     callPartnerName = partnerUsername || 'شريك';
                     callPartnerId = partnerId;
+                    currentPartnerId = partnerId;
                     isMatching = false;
                     isSearching = false;
                     isPartnerDisconnected = false;
 
-                    // جلب بيانات الشريك
+                    // جلب بيانات الشريك الكاملة
                     database.ref('users')
                         .orderByChild('numericId')
                         .equalTo(parseInt(partnerId))
@@ -2579,6 +2672,7 @@
                     document.getElementById('matchBtnContainer').classList.add('hidden');
 
                     document.getElementById('stopSearchBtn').classList.remove('active');
+                    document.getElementById('matchStatusText').classList.remove('active');
 
                     stopMatchTimer();
 
@@ -2643,6 +2737,7 @@
             isSearching = false;
 
             document.getElementById('stopSearchBtn').classList.remove('active');
+            document.getElementById('matchStatusText').classList.remove('active');
 
             if (database && currentUser) {
                 database.ref('waiting_users/' + currentUser.numericId).remove();
@@ -2899,6 +2994,7 @@
             callPartnerNumericId = null;
             callPartnerName = null;
             callPartnerFirebaseKey = null;
+            currentPartnerId = null;
             callDurationSeconds = 0;
             isPartnerDisconnected = false;
 
@@ -2932,11 +3028,15 @@
         }
 
         // ============================================================
-        // ⏭️ الانتقال إلى الشريك التالي
+        // ⏭️ الانتقال إلى الشريك التالي - مع منع التطابق مع نفس المستخدم
         // ============================================================
         function nextMatch() {
             if (isCallActive || isPartnerDisconnected) {
                 if (isCallActive) {
+                    // إضافة المستخدم الحالي إلى قائمة المتطابقين لمنع التكرار
+                    if (currentPartnerId) {
+                        matchedUsers.add(currentPartnerId);
+                    }
                     endCall();
                 }
 
