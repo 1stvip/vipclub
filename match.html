@@ -388,6 +388,7 @@
             right: 10px;
         }
 
+        /* ===== أزرار الكاميرا فوق الفيديو ===== */
         .video-overlay-controls {
             position: absolute;
             top: 10px;
@@ -452,6 +453,11 @@
 
         .video-overlay-btn:hover .tooltip {
             opacity: 1;
+        }
+
+        /* ===== إظهار أزرار الكاميرا دائماً ===== */
+        .video-overlay-btn {
+            display: flex !important;
         }
 
         .video-box .mute-indicator {
@@ -1558,9 +1564,10 @@
                     <video id="localVideo" autoplay playsinline muted></video>
                     <div class="video-label">📹 أنت</div>
 
+                    <!-- أزرار الكاميرا فوق الفيديو - تظهر دائماً -->
                     <div class="video-overlay-controls">
-                        <button class="video-overlay-btn inactive" id="localMicOverlayBtn" onclick="toggleMicOverlay()" title="ميكروفون">
-                            <i class="fas fa-microphone-slash"></i>
+                        <button class="video-overlay-btn active" id="localMicOverlayBtn" onclick="toggleMicOverlay()" title="ميكروفون">
+                            <i class="fas fa-microphone"></i>
                             <span class="tooltip">ميكروفون</span>
                         </button>
                         <button class="video-overlay-btn active" id="localVideoOverlayBtn" onclick="toggleVideoOverlay()" title="كاميرا">
@@ -1621,8 +1628,8 @@
         </div>
 
         <div class="call-controls" id="callControls">
-            <button class="call-btn mic-btn muted" id="micBtn" onclick="toggleMic()">
-                <i class="fas fa-microphone-slash"></i> مكتوم
+            <button class="call-btn mic-btn active" id="micBtn" onclick="toggleMic()">
+                <i class="fas fa-microphone"></i> ميكروفون
             </button>
             <button class="call-btn end-call" onclick="endCall()">
                 <i class="fas fa-phone-slash"></i> إنهاء
@@ -1687,7 +1694,7 @@
         let peer = null;
         let myPeerId = null;
         let mediaStream = null;
-        let isMicMuted = true;
+        let isMicMuted = false; // الميكروفون مفتوح تلقائياً
         let isVideoOff = false;
         let isCallActive = false;
         let callPartnerId = null;
@@ -1710,7 +1717,7 @@
         let waitingListener = null;
         let partnerProfileData = null;
         let isPartnerDisconnected = false;
-        let currentMatchInterval = null;
+        let isPeerReady = false;
 
         // ============================================================
         // 🍞 توست
@@ -1857,7 +1864,7 @@
         }
 
         // ============================================================
-        // 🎙️ طلب إذن المايك والكاميرا
+        // 🎙️ طلب إذن المايك والكاميرا - الميكروفون مفتوح تلقائياً
         // ============================================================
         async function requestMediaPermissions() {
             try {
@@ -1886,24 +1893,25 @@
                 const localVideo = document.getElementById('localVideo');
                 localVideo.srcObject = stream;
 
-                stream.getAudioTracks().forEach(track => track.enabled = false);
-                isMicMuted = true;
+                // الميكروفون مفتوح تلقائياً
+                stream.getAudioTracks().forEach(track => track.enabled = true);
+                isMicMuted = false;
 
                 // تحديث أزرار التحكم
-                document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn inactive';
-                document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">ميكروفون</span>';
+                document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn active';
+                document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
                 document.getElementById('localVideoOverlayBtn').className = 'video-overlay-btn active';
                 document.getElementById('localVideoOverlayBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
-                document.getElementById('localMuteIndicator').style.display = 'block';
+                document.getElementById('localMuteIndicator').style.display = 'none';
 
-                document.getElementById('micBtn').className = 'call-btn mic-btn muted';
-                document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
+                document.getElementById('micBtn').className = 'call-btn mic-btn active';
+                document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
 
                 document.getElementById('localPlaceholder').style.display = 'none';
                 document.getElementById('localVideo').style.display = 'block';
                 document.getElementById('localFlipOverlayBtn').style.display = 'flex';
 
-                showToast('✅ تم الوصول إلى الميكروفون والكاميرا', 'success');
+                showToast('✅ تم الوصول إلى الميكروفون والكاميرا (الميكروفون مفتوح)', 'success');
 
                 initPeerJS();
                 listenForCallChatMessages();
@@ -1931,21 +1939,21 @@
                     const localVideo = document.getElementById('localVideo');
                     localVideo.srcObject = audioStream;
 
-                    audioStream.getAudioTracks().forEach(track => track.enabled = false);
-                    isMicMuted = true;
+                    audioStream.getAudioTracks().forEach(track => track.enabled = true);
+                    isMicMuted = false;
 
-                    document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn inactive';
-                    document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">ميكروفون</span>';
+                    document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn active';
+                    document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
                     document.getElementById('localVideoOverlayBtn').style.display = 'none';
                     document.getElementById('localFlipOverlayBtn').style.display = 'none';
-                    document.getElementById('localMuteIndicator').style.display = 'block';
+                    document.getElementById('localMuteIndicator').style.display = 'none';
                     document.getElementById('localPlaceholder').style.display = 'none';
                     document.getElementById('localVideo').style.display = 'block';
 
-                    document.getElementById('micBtn').className = 'call-btn mic-btn muted';
-                    document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
+                    document.getElementById('micBtn').className = 'call-btn mic-btn active';
+                    document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
 
-                    showToast('✅ تم الوصول إلى الميكروفون (الكاميرا غير متاحة)', 'success');
+                    showToast('✅ تم الوصول إلى الميكروفون (الميكروفون مفتوح، الكاميرا غير متاحة)', 'success');
 
                     initPeerJS();
                     listenForCallChatMessages();
@@ -2001,7 +2009,7 @@
                 overlayBtn.innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">ميكروفون</span>';
                 document.getElementById('localMuteIndicator').style.display = 'block';
             } else {
-                btn.className = 'call-btn mic-btn';
+                btn.className = 'call-btn mic-btn active';
                 btn.innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
                 overlayBtn.className = 'video-overlay-btn active';
                 overlayBtn.innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
@@ -2133,6 +2141,7 @@
 
             peer.on('open', (id) => {
                 myPeerId = id;
+                isPeerReady = true;
                 console.log('✅ PeerJS ready:', id);
                 if (database && currentFirebaseUserId) {
                     database.ref('users/' + currentFirebaseUserId + '/peerId').set(id);
@@ -2149,6 +2158,7 @@
 
             peer.on('disconnected', () => {
                 console.log('⚠️ Peer disconnected, reconnecting...');
+                isPeerReady = false;
                 setTimeout(() => {
                     if (peer) {
                         peer.reconnect();
@@ -2291,7 +2301,6 @@
             isPartnerDisconnected = true;
             isCallActive = false;
 
-            // تحديث واجهة المستخدم لإظهار انقطاع الشريك
             const nameDisplay = document.getElementById('remoteNameDisplay');
             nameDisplay.classList.add('active');
             document.getElementById('remoteStatusText').className = 'remote-status disconnected';
@@ -2302,18 +2311,16 @@
 
             document.getElementById('remoteVideo').style.display = 'none';
             document.getElementById('remotePlaceholder').style.display = 'flex';
-            document.getElementById('remotePlaceholderStatus').textContent = '❌ غير متصل - يمكنك البحث عن مستخدم آخر';
+            document.getElementById('remotePlaceholderStatus').textContent = '❌ غير متصل - اضغط "التالي" للبحث عن شريك جديد';
             document.getElementById('remotePlaceholderStatus').className = 'status-text';
 
-            showToast('⚠️ المستخدم الآخر غير متصل، يمكنك البحث عن مستخدم آخر', 'warning');
+            showToast('⚠️ المستخدم الآخر غير متصل، اضغط "التالي" للبحث عن شريك جديد', 'warning');
 
-            // إيقاف مؤقت المكالمة
             if (callTimerInterval) {
                 clearInterval(callTimerInterval);
                 callTimerInterval = null;
             }
 
-            // حساب التكلفة
             const durationMinutes = Math.ceil(callDurationSeconds / 60);
             const cost = durationMinutes * 10;
 
@@ -2333,11 +2340,9 @@
                 currentCall = null;
             }
 
-            // إظهار زر "التالي" للبحث عن شريك جديد
             document.getElementById('callControls').classList.add('active');
             document.getElementById('callControls').style.display = 'flex';
 
-            // تحديث حالة المستخدم
             if (database && currentFirebaseUserId) {
                 database.ref('users/' + currentFirebaseUserId).update({
                     inCall: false,
@@ -2350,35 +2355,31 @@
                 database.ref('active_calls/' + currentUser.numericId).remove();
             }
 
-            // إعادة تعيين المتغيرات
             callPartnerId = null;
             callPartnerNumericId = null;
             callPartnerName = null;
             callPartnerFirebaseKey = null;
 
             // إعادة تعيين أزرار الميكروفون
-            document.getElementById('micBtn').className = 'call-btn mic-btn muted';
-            document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
-            document.getElementById('localMuteIndicator').style.display = 'block';
+            document.getElementById('micBtn').className = 'call-btn mic-btn active';
+            document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
+            document.getElementById('localMuteIndicator').style.display = 'none';
 
-            // إظهار زر "التالي" بشكل بارز
             const nextBtn = document.querySelector('.call-btn.next-btn');
             if (nextBtn) {
                 nextBtn.style.background = 'rgba(139,92,246,0.3)';
                 nextBtn.style.borderColor = 'rgba(139,92,246,0.4)';
                 nextBtn.style.transform = 'scale(1.05)';
+                nextBtn.innerHTML = '<i class="fas fa-forward"></i> بحث عن شريك';
             }
 
-            // إضافة رسالة في الشات
-            addCallChatMessage('system', '❌ المستخدم الآخر غير متصل، يمكنك البحث عن مستخدم آخر');
+            addCallChatMessage('system', '❌ المستخدم الآخر غير متصل، اضغط "التالي" للبحث عن شريك جديد');
 
-            // إيقاف المؤقت
             if (callTimerInterval) {
                 clearInterval(callTimerInterval);
                 callTimerInterval = null;
             }
 
-            // إخفاء شات المكالمة
             document.getElementById('callChat').classList.remove('active');
             isCallChatOpen = false;
         }
@@ -2397,6 +2398,11 @@
             if (!mediaReady) {
                 showToast('⚠️ يرجى السماح بالوصول إلى المايك والكاميرا أولاً', 'warning');
                 document.getElementById('permissionOverlay').classList.add('active');
+                return;
+            }
+
+            if (!isPeerReady) {
+                showToast('⚠️ جاري تجهيز الاتصال، حاول مرة أخرى', 'warning');
                 return;
             }
 
@@ -2421,7 +2427,6 @@
 
             startMatchTimer();
 
-            // إزالة أي بيانات سابقة
             if (database && currentUser) {
                 database.ref('waiting_users/' + currentUser.numericId).remove();
             }
@@ -2477,7 +2482,7 @@
 
                 console.log('👤 تم العثور على مستخدم منتظر:', data.username);
 
-                if (isSearching && !isCallActive && !isPartnerDisconnected) {
+                if (isSearching && !isCallActive && !isPartnerDisconnected && isPeerReady) {
                     database.ref('waiting_users/' + currentUser.numericId).remove();
                     database.ref('waiting_users/' + userId).remove();
 
@@ -2495,7 +2500,10 @@
         // 📞 بدء المكالمة مع مستخدم محدد
         // ============================================================
         function startCallWithUser(partnerId, partnerPeerId, partnerUsername) {
-            if (!peer || !mediaStream) return;
+            if (!peer || !mediaStream || !isPeerReady) {
+                showToast('⚠️ الاتصال غير جاهز، حاول مرة أخرى', 'warning');
+                return;
+            }
 
             try {
                 console.log(`📞 Calling peer: ${partnerPeerId}`);
@@ -2644,12 +2652,12 @@
                 waitingListener = null;
             }
 
-            // إعادة تعيين زر "التالي"
             const nextBtn = document.querySelector('.call-btn.next-btn');
             if (nextBtn) {
                 nextBtn.style.background = '';
                 nextBtn.style.borderColor = '';
                 nextBtn.style.transform = '';
+                nextBtn.innerHTML = '<i class="fas fa-forward"></i> التالي';
             }
         }
 
@@ -2908,14 +2916,13 @@
             document.getElementById('remotePlaceholderStatus').className = 'status-text';
             document.getElementById('remoteStatus').classList.remove('active');
 
-            document.getElementById('micBtn').className = 'call-btn mic-btn muted';
-            document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
-            document.getElementById('localMuteIndicator').style.display = 'block';
+            document.getElementById('micBtn').className = 'call-btn mic-btn active';
+            document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
+            document.getElementById('localMuteIndicator').style.display = 'none';
             document.getElementById('chatTimer').textContent = '00:00';
 
-            // إعادة ضبط أزرار الكاميرا
-            document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn inactive';
-            document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">ميكروفون</span>';
+            document.getElementById('localMicOverlayBtn').className = 'video-overlay-btn active';
+            document.getElementById('localMicOverlayBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
             document.getElementById('localVideoOverlayBtn').className = 'video-overlay-btn active';
             document.getElementById('localVideoOverlayBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
 
@@ -2928,24 +2935,19 @@
         // ⏭️ الانتقال إلى الشريك التالي
         // ============================================================
         function nextMatch() {
-            // إنهاء المكالمة الحالية والبحث عن شريك جديد
             if (isCallActive || isPartnerDisconnected) {
-                // إنهاء المكالمة أولاً
                 if (isCallActive) {
                     endCall();
                 }
 
-                // إعادة تعيين حالة الانقطاع
                 isPartnerDisconnected = false;
 
-                // إعادة ضبط واجهة المكالمة
                 document.getElementById('remoteNameDisplay').classList.remove('active');
                 document.getElementById('remotePlaceholderStatus').textContent = '🔍 جاري البحث عن شريك جديد...';
                 document.getElementById('remotePlaceholderStatus').className = 'status-text connecting';
 
                 showToast(`⏭️ جاري البحث عن شريك جديد...`, 'info');
 
-                // بدء البحث تلقائياً
                 setTimeout(() => {
                     startMatching();
                 }, 1000);
