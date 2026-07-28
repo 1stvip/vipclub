@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌌 كوكبة - المطابقة العشوائية</title>
+    <title>🌌 كوكبة - المطابقة الصوتية</title>
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -11,7 +11,6 @@
     <!-- PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        /* ===== التصميم العام ===== */
         * {
             margin: 0;
             padding: 0;
@@ -28,7 +27,6 @@
             overflow-x: hidden;
         }
 
-        /* ===== خلفية متحركة ===== */
         .bg-layer {
             position: fixed;
             inset: 0;
@@ -49,7 +47,6 @@
             background: #8b5cf6;
             top: -150px;
             right: -100px;
-            animation-delay: 0s;
         }
         .bg-layer .orb2 {
             width: 400px;
@@ -83,7 +80,6 @@
             }
         }
 
-        /* ===== نجوم ===== */
         .stars {
             position: fixed;
             inset: 0;
@@ -111,7 +107,6 @@
             }
         }
 
-        /* ===== شريط التنقل ===== */
         .navbar {
             position: relative;
             z-index: 10;
@@ -189,7 +184,6 @@
             border-color: #ef4444;
         }
 
-        /* ===== المحتوى الرئيسي ===== */
         .main-container {
             position: relative;
             z-index: 5;
@@ -408,9 +402,6 @@
             animation: pulseSearch 1.2s ease-in-out infinite;
             background: linear-gradient(135deg, #f59e0b, #ef4444);
         }
-        .match-btn.searching .rotating-stars {
-            animation-duration: 4s;
-        }
         @keyframes pulseSearch {
             0%,
             100% {
@@ -423,7 +414,6 @@
             }
         }
 
-        /* ===== زر إيقاف البحث ===== */
         .stop-btn {
             display: none;
             padding: 10px 28px;
@@ -462,7 +452,6 @@
             font-weight: 700;
         }
 
-        /* ===== مؤقت المطابقة ===== */
         .match-timer {
             font-size: 1.8rem;
             font-weight: 900;
@@ -513,7 +502,6 @@
             }
         }
 
-        /* ===== واجهة المكالمة ===== */
         .call-interface {
             display: none;
             width: 100%;
@@ -622,7 +610,6 @@
             text-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
         }
 
-        /* ===== شات ===== */
         .call-chat {
             display: none;
             width: 100%;
@@ -744,7 +731,6 @@
             background: rgba(255, 215, 0, 0.15);
         }
 
-        /* ===== أزرار التحكم ===== */
         .call-controls {
             display: none;
             gap: 10px;
@@ -838,7 +824,6 @@
             border-color: rgba(139, 92, 246, 0.1);
         }
 
-        /* ===== إشعارات ===== */
         .gift-notif {
             position: fixed;
             top: 75px;
@@ -887,86 +872,6 @@
             }
         }
 
-        /* ===== مودال طلب الإذن ===== */
-        .perm-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(20px);
-            z-index: 99999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 20px;
-            padding: 30px;
-        }
-        .perm-overlay.active {
-            display: flex;
-            animation: fadeUp 0.5s ease;
-        }
-        .perm-overlay .icon {
-            font-size: 4.5rem;
-            animation: pulseIcon 1.5s ease-in-out infinite;
-        }
-        @keyframes pulseIcon {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.7;
-            }
-        }
-        .perm-overlay .title {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #ffd700;
-            text-align: center;
-        }
-        .perm-overlay .desc {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            text-align: center;
-            max-width: 380px;
-            line-height: 1.8;
-        }
-        .perm-overlay .desc .hl {
-            color: #ffd700;
-            font-weight: 700;
-        }
-        .perm-overlay .btn {
-            padding: 14px 45px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 40px rgba(139, 92, 246, 0.15);
-        }
-        .perm-overlay .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 60px rgba(139, 92, 246, 0.2);
-        }
-        .perm-overlay .btn:active {
-            transform: scale(0.95);
-        }
-        .perm-overlay .retry {
-            font-size: 0.8rem;
-            color: #666;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .perm-overlay .retry:hover {
-            color: #94a3b8;
-        }
-
-        /* ===== مودال الهدايا ===== */
         #giftModal {
             display: none;
             position: fixed;
@@ -1091,7 +996,6 @@
             display: block;
         }
 
-        /* ===== توست ===== */
         .toast {
             position: fixed;
             top: 75px;
@@ -1121,7 +1025,6 @@
             background: rgba(59, 130, 246, 0.9);
         }
 
-        /* ===== شريط سفلي ===== */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -1147,6 +1050,7 @@
         .bottom-nav .nav-btn i {
             font-size: 1.1rem;
         }
+
         @media(max-width:768px) {
             .bottom-nav {
                 display: flex;
@@ -1200,6 +1104,7 @@
                 font-size: 0.9rem;
             }
         }
+
         @media(max-width:480px) {
             .match-wrapper {
                 width: 200px;
@@ -1265,17 +1170,14 @@
 </head>
 <body>
 
-    <!-- ===== خلفية ===== -->
     <div class="bg-layer">
         <div class="orb orb1"></div>
         <div class="orb orb2"></div>
         <div class="orb orb3"></div>
     </div>
 
-    <!-- ===== نجوم ===== -->
     <div class="stars" id="starsContainer"></div>
 
-    <!-- ===== شريط التنقل ===== -->
     <nav class="navbar">
         <a href="index.html" class="logo">
             <i class="fas fa-comet"></i>
@@ -1298,37 +1200,10 @@
         </div>
     </nav>
 
-    <!-- ===== طلب الإذن ===== -->
-    <div class="perm-overlay" id="permOverlay">
-        <span class="icon">🎙️</span>
-        <div class="title">نحتاج إلى إذنك!</div>
-        <div class="desc">
-            للاستمتاع بالمكالمات الصوتية، نحتاج إلى الوصول إلى <span class="hl">الميكروفون</span>.
-            <br>
-            <small style="color:#666;">سيتم استخدامه فقط أثناء المكالمات</small>
-        </div>
-        <button class="btn" onclick="requestPerms()">
-            <i class="fas fa-check-circle"></i> السماح بالوصول
-        </button>
-        <span class="retry" onclick="requestPerms()">🔄 إعادة المحاولة</span>
-    </div>
-
-    <!-- ===== إشعار هدية ===== -->
-    <div class="gift-notif" id="giftNotif">
-        <div>
-            <span class="gift-emoji">🎁</span>
-            تلقيت <span class="gift-name">هدية</span> بقيمة <span class="gift-value">0</span> ج.م
-        </div>
-        <div class="time" id="giftTime">الآن</div>
-    </div>
-
-    <!-- ===== المحتوى الرئيسي ===== -->
     <div class="main-container">
 
-        <!-- ===== منطقة المطابقة ===== -->
         <div class="match-area" id="matchArea">
 
-            <!-- ===== زر المطابقة مع نجوم دوارة ===== -->
             <div class="match-wrapper">
                 <div class="rotating-stars" id="rotatingStars">
                     <span class="rs">⭐</span>
@@ -1366,7 +1241,6 @@
             </div>
         </div>
 
-        <!-- ===== واجهة المكالمة ===== -->
         <div class="call-interface" id="callInterface">
 
             <div class="partner-avatar" id="partnerAvatar">
@@ -1384,7 +1258,6 @@
 
             <div class="call-timer" id="callTimer">00:00</div>
 
-            <!-- ===== شات ===== -->
             <div class="call-chat" id="callChat">
                 <div class="chat-header">
                     <span>💬 شات المكالمة</span>
@@ -1402,7 +1275,6 @@
                 </div>
             </div>
 
-            <!-- ===== أزرار التحكم ===== -->
             <div class="call-controls" id="callControls">
                 <button class="call-btn mic-btn active" id="micBtn" onclick="toggleMic()">
                     <i class="fas fa-microphone"></i> ميكروفون
@@ -1420,7 +1292,6 @@
         </div>
     </div>
 
-    <!-- ===== مودال الهدايا ===== -->
     <div id="giftModal">
         <h3>🎁 إرسال هدية</h3>
         <div class="balance">💰 رصيدك: <span id="giftBalance">0</span> ج.م</div>
@@ -1432,7 +1303,6 @@
     </div>
     <div id="giftOverlay" onclick="closeGiftModal()"></div>
 
-    <!-- ===== شريط سفلي ===== -->
     <div class="bottom-nav" id="bottomNav">
         <a href="match.html" class="nav-btn active">
             <i class="fas fa-random"></i> مطابقة
@@ -1448,7 +1318,7 @@
 
     <script>
         // ============================================================
-        // 🔥 الإعدادات الأساسية (نفس الكود الذي يعمل)
+        // 🔥 الإعدادات الأساسية
         // ============================================================
         const CONFIG = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -1590,12 +1460,10 @@
         }
 
         // ============================================================
-        // 🎙️ طلب الإذن (مثل الكود الذي يعمل)
+        // 🎙️ طلب الميكروفون - مباشر بدون نافذة إضافية
         // ============================================================
-        async function requestPerms() {
+        async function initAudio() {
             try {
-                document.getElementById('permOverlay').classList.remove('active');
-
                 const constraints = {
                     audio: {
                         echoCancellation: true,
@@ -1623,22 +1491,15 @@
                 document.getElementById('matchArea').classList.remove('hidden');
 
             } catch (e) {
-                console.error('❌ خطأ في الإذن:', e);
-                document.getElementById('permOverlay').classList.add('active');
-                document.querySelector('.perm-overlay .desc').innerHTML = `
-                        ⚠️ ${e.message || 'تعذر الوصول إلى الميكروفون'}.
-                        <br>
-                        <small style="color:#ef4444;">يرجى السماح بالوصول في إعدادات المتصفح</small>
-                        <br><br>
-                        <button class="btn" onclick="requestPerms()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
-                            <i class="fas fa-redo"></i> إعادة المحاولة
-                        </button>
-                    `;
+                console.error('❌ خطأ في الميكروفون:', e);
+                toast('⚠️ تعذر الوصول إلى الميكروفون، يرجى السماح في المتصفح', 'warning');
+                // محاولة مرة أخرى بعد 2 ثانية
+                setTimeout(initAudio, 2000);
             }
         }
 
         // ============================================================
-        // 🔗 PeerJS (نفس الكود الذي يعمل)
+        // 🔗 PeerJS
         // ============================================================
         function initPeer() {
             if (!mediaStream) { setTimeout(initPeer, 1000); return; }
@@ -1686,7 +1547,7 @@
         }
 
         // ============================================================
-        // 📞 معالجة المكالمة (نفس الكود الذي يعمل)
+        // 📞 معالجة المكالمة
         // ============================================================
         function handleIncoming(call) {
             console.log('📞 مكالمة واردة من:', call.peer);
@@ -1828,8 +1689,8 @@
                 return;
             }
             if (!mediaStream) {
-                toast('⚠️ يرجى السماح بالوصول إلى الميكروفون أولاً', 'warning');
-                document.getElementById('permOverlay').classList.add('active');
+                toast('⚠️ جاري تحميل الميكروفون...', 'warning');
+                initAudio();
                 return;
             }
             if (!isPeerReady) {
@@ -1853,7 +1714,6 @@
                     <span class="btn-sub">جارٍ العثور على شريك</span>
                 `;
 
-            // تدوير النجوم بشكل أسرع أثناء البحث
             document.getElementById('rotatingStars').style.animationDuration = '3s';
 
             document.getElementById('stopBtn').classList.add('active');
@@ -1890,7 +1750,6 @@
             document.getElementById('stopBtn').classList.remove('active');
             document.getElementById('searchStatus').classList.remove('active');
 
-            // إعادة سرعة النجوم
             document.getElementById('rotatingStars').style.animationDuration = '20s';
 
             toast('🛑 تم إيقاف البحث', 'info');
@@ -1990,7 +1849,6 @@
                 document.getElementById('nextBtn').classList.remove('highlight');
                 document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
 
-                // إعادة سرعة النجوم
                 document.getElementById('rotatingStars').style.animationDuration = '20s';
 
                 stopMatchTimer();
@@ -2448,7 +2306,6 @@
             document.getElementById('stopBtn').classList.remove('active');
             document.getElementById('searchStatus').classList.remove('active');
 
-            // إعادة سرعة النجوم
             document.getElementById('rotatingStars').style.animationDuration = '20s';
 
             if (db && currentUser) db.ref('waiting_users/' + currentUser.numericId).remove();
@@ -2516,7 +2373,8 @@
 
             updateAuthUI();
 
-            document.getElementById('permOverlay').classList.add('active');
+            // بدء الميكروفون مباشرة
+            initAudio();
 
             listenDisconnect();
 
