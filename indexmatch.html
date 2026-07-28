@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏠 كوكبة - تواصل بلا حدود</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        /* ===== أنماط خاصة بالصفحة الرئيسية ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0a1a, #1a1040, #0f0c29);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* ===== خلفية متحركة ===== */
+        .hero-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .hero-background .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            animation: floatOrb 12s ease-in-out infinite;
+        }
+
+        .hero-background .orb1 {
+            width: 500px;
+            height: 500px;
+            background: #4f46e5;
+            top: -150px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .hero-background .orb2 {
+            width: 400px;
+            height: 400px;
+            background: #8b5cf6;
+            bottom: -100px;
+            left: -100px;
+            animation-delay: 4s;
+            animation-duration: 15s;
+        }
+
+        .hero-background .orb3 {
+            width: 300px;
+            height: 300px;
+            background: #ffd700;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            animation-delay: 8s;
+            animation-duration: 18s;
+        }
+
+        @keyframes floatOrb {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(40px, -40px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        /* ===== النجوم المتطايرة ===== */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            background: rgba(10, 10, 30, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 0.6rem 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 65px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.6rem;
+        }
+
+        .logo .logo-text {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+        }
+
+        .nav-btn .badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.6rem;
+            padding: 1px 6px;
+            border-radius: 50%;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .nav-btn .icon-only {
+            font-size: 1.1rem;
+        }
+
+        /* ===== المحتوى الرئيسي ===== */
+        .main-container {
+            flex: 1;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            min-height: calc(100vh - 65px);
+        }
+
+        /* ===== الهيرو ===== */
+        .hero-section {
+            text-align: center;
+            padding: 30px 20px;
+            max-width: 800px;
+        }
+
+        .hero-section .hero-icon {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 20px;
+            animation: floatIcon 4s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #f59e0b, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero-section .subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .hero-section .description {
+            font-size: 0.95rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+
+        /* ===== أزرار الهيرو ===== */
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero-btn {
+            padding: 14px 32px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .hero-btn.primary {
+            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+            color: white;
+            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .hero-btn.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        .hero-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .hero-btn.gold {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a1a2e;
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .hero-btn.gold:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 50px rgba(255, 215, 0, 0.3);
+        }
+
+        /* ===== إحصائيات ===== */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 30px 0 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-3px);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffd700;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .stat-card .icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 6px;
+            opacity: 0.5;
+        }
+
+        /* ===== المميزات ===== */
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.15);
+        }
+
+        .feature-card .feature-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h4 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .feature-card p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* ===== حالة المستخدم ===== */
+        .user-status {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px 30px;
+            display: none;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 15px;
+        }
+
+        .user-status.active {
+            display: flex;
+        }
+
+        .user-status .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+        }
+
+        .user-status .user-info {
+            flex: 1;
+            text-align: right;
+        }
+
+        .user-status .user-info .name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .user-status .user-info .balance {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .user-status .user-info .balance span {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .user-status .quick-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .user-status .quick-actions button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .user-status .quick-actions .btn-match {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .user-status .quick-actions .btn-match:hover {
+            background: #7c3aed;
+            transform: scale(1.05);
+        }
+
+        .user-status .quick-actions .btn-profile {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+        }
+
+        .user-status .quick-actions .btn-profile:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== توست ===== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 100000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            animation: slideIn 0.3s ease;
+            max-width: 320px;
+            font-size: 0.85rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+        .toast.warning {
+            background: rgba(245, 158, 11, 0.9);
+        }
+        .toast.info {
+            background: rgba(59, 130, 246, 0.9);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== مودال الدخول ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 35px 30px;
+            max-width: 420px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal .modal-logo {
+            text-align: center;
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modal h2 {
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .modal .modal-sub {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .modal .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal .form-group label {
+            display: block;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .modal .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .modal .form-group input:focus {
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .modal .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .modal .modal-actions .btn-login {
+            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+            color: white;
+        }
+
+        .modal .modal-actions .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .modal .modal-actions .btn-register {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+        }
+
+        .modal .modal-actions .btn-register:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .modal-switch {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .modal .modal-switch a {
+            color: #8b5cf6;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal .modal-switch a:hover {
+            color: #a78bfa;
+        }
+
+        .modal .error-msg {
+            color: #ef4444;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .modal .error-msg.visible {
+            display: block;
+        }
+
+        /* ===== استجابة ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.4rem 2%;
+                min-height: 55px;
+            }
+            .logo {
+                font-size: 1rem;
+            }
+            .logo i {
+                font-size: 1.2rem;
+            }
+            .nav-btn {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+            .nav-btn .icon-only {
+                font-size: 0.9rem;
+            }
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+            .hero-section .hero-icon {
+                font-size: 3.5rem;
+            }
+            .hero-section .subtitle {
+                font-size: 1rem;
+            }
+            .hero-section .description {
+                font-size: 0.85rem;
+            }
+            .hero-btn {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .stat-card .number {
+                font-size: 1.5rem;
+            }
+            .features-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .feature-card {
+                padding: 16px;
+            }
+            .feature-card .feature-icon {
+                font-size: 2rem;
+            }
+            .user-status {
+                padding: 15px 20px;
+                gap: 12px;
+            }
+            .user-status .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            .modal {
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section h1 {
+                font-size: 1.8rem;
+            }
+            .hero-section .hero-icon {
+                font-size: 3rem;
+            }
+            .hero-btn {
+                padding: 10px 18px;
+                font-size: 0.8rem;
+                gap: 6px;
+            }
+            .stats-section {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .features-section {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .user-status {
+                flex-direction: column;
+                text-align: center;
+            }
+            .user-status .user-info {
+                text-align: center;
+            }
+            .user-status .quick-actions {
+                justify-content: center;
+            }
+            .modal {
+                padding: 20px 16px;
+            }
+            .modal .modal-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* ===== شريط التنقل السفلي ===== */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            padding: 8px;
+            justify-content: space-around;
+            z-index: 99;
+        }
+
+        .bottom-nav .nav-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 0;
+            font-size: 0.7rem;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bottom-nav .nav-btn i {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-nav {
+                display: flex;
+            }
+            .main-container {
+                padding-bottom: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== خلفية ===== -->
+    <div class="hero-background">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <!-- ===== النجوم ===== -->
+    <div class="stars" id="starsContainer"></div>
+
+    <!-- ===== شريط التنقل ===== -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i class="fas fa-comet"></i>
+            <span class="logo-text">كوكبة</span>
+        </a>
+        <div class="nav-icons">
+            <a href="match.html" class="nav-btn">
+                <i class="fas fa-random icon-only"></i>
+                <span class="hide-mobile">مطابقة</span>
+            </a>
+            <a href="friends.html" class="nav-btn">
+                <i class="fas fa-user-friends icon-only"></i>
+                <span class="hide-mobile">أصدقاء</span>
+                <span class="badge" id="friendRequestsBadge">0</span>
+            </a>
+            <a href="profile.html" class="nav-btn">
+                <i class="fas fa-user-circle icon-only"></i>
+                <span class="hide-mobile">حسابي</span>
+            </a>
+            <button class="nav-btn" id="authBtn" onclick="toggleAuth()">
+                <i class="fas fa-sign-in-alt icon-only"></i>
+                <span class="hide-mobile" id="authBtnText">دخول</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== المحتوى الرئيسي ===== -->
+    <div class="main-container">
+        <!-- ===== الهيرو ===== -->
+        <div class="hero-section">
+            <span class="hero-icon">🌌</span>
+            <h1>كوكبة</h1>
+            <div class="subtitle">تواصل بلا حدود مع أشخاص جدد</div>
+            <div class="description">
+                اكتشف عالمًا من التواصل العشوائي، وتعرف على أشخاص من جميع أنحاء العالم،
+                وشارك لحظات مميزة عبر المكالمات الفورية والهدايا والتفاعلات اليومية.
+            </div>
+            <div class="hero-buttons" id="heroButtons">
+                <a href="match.html" class="hero-btn primary">
+                    <i class="fas fa-random"></i> ابدأ المطابقة
+                </a>
+                <a href="friends.html" class="hero-btn secondary">
+                    <i class="fas fa-user-friends"></i> الأصدقاء
+                </a>
+                <button class="hero-btn gold" onclick="openAuthModal()">
+                    <i class="fas fa-gem"></i> انضم الآن
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== إحصائيات ===== -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <span class="icon">👥</span>
+                <span class="number" id="onlineUsers">0</span>
+                <span class="label">مستخدم متصل</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">💬</span>
+                <span class="number" id="totalChats">0</span>
+                <span class="label">محادثة نشطة</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">🎁</span>
+                <span class="number" id="totalGifts">0</span>
+                <span class="label">هدية مرسلة</span>
+            </div>
+            <div class="stat-card">
+                <span class="icon">📞</span>
+                <span class="number" id="totalCalls">0</span>
+                <span class="label">مكالمة اليوم</span>
+            </div>
+        </div>
+
+        <!-- ===== المميزات ===== -->
+        <div class="features-section">
+            <div class="feature-card">
+                <span class="feature-icon">🎯</span>
+                <h4>مطابقة عشوائية</h4>
+                <p>تعرف على أشخاص جدد من جميع أنحاء العالم بشكل عشوائي</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📹</span>
+                <h4>مكالمات فيديو</h4>
+                <p>تواصل وجهًا لوجه مع مكالمات فيديو عالية الجودة</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🎁</span>
+                <h4>الهدايا</h4>
+                <p>أرسل هدايا افتراضية تعبر عن مشاعرك للأصدقاء</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">👑</span>
+                <h4>نظام VIP</h4>
+                <p>استمتع بمميزات حصرية مع نظام VIP المتطور</p>
+            </div>
+        </div>
+
+        <!-- ===== حالة المستخدم ===== -->
+        <div class="user-status" id="userStatus">
+            <div class="user-avatar" id="statusAvatar">👤</div>
+            <div class="user-info">
+                <div class="name" id="statusName">مستخدم</div>
+                <div class="balance">💰 الرصيد: <span id="statusBalance">0</span> ج.م</div>
+            </div>
+            <div class="quick-actions">
+                <button class="btn-match" onclick="window.location.href='match.html'">
+                    <i class="fas fa-random"></i> مطابقة
+                </button>
+                <button class="btn-profile" onclick="window.location.href='profile.html'">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== شريط التنقل السفلي ===== -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-btn active">
+            <i class="fas fa-home"></i>
+            الرئيسية
+        </a>
+        <a href="match.html" class="nav-btn">
+            <i class="fas fa-random"></i>
+            مطابقة
+        </a>
+        <a href="friends.html" class="nav-btn">
+            <i class="fas fa-user-friends"></i>
+            أصدقاء
+            <span class="badge" id="bottomFriendBadge">0</span>
+        </a>
+        <a href="profile.html" class="nav-btn">
+            <i class="fas fa-user-circle"></i>
+            حسابي
+        </a>
+    </div>
+
+    <!-- ===== مودال الدخول/التسجيل ===== -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <span class="modal-logo">🌌</span>
+            <h2 id="authModalTitle">مرحباً بك</h2>
+            <div class="modal-sub" id="authModalSub">سجل الدخول للاستمتاع بجميع المميزات</div>
+
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>👤 اسم المستخدم</label>
+                    <input type="text" id="loginUsername" placeholder="أدخل اسم المستخدم">
+                </div>
+                <div class="form-group">
+                    <label>🔒 كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" onkeypress="if(event.key==='Enter') handleAuth()">
+                </div>
+            </div>
+
+            <div id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label>👤 اسم المستخدم</label>
+                    <input type="text" id="registerUsername" placeholder="اختر اسم مستخدم">
+                </div>
+                <div class="form-group">
+                    <label>📛 الاسم المستعار</label>
+                    <input type="text" id="registerNickname" placeholder="الاسم الذي سيظهر للآخرين">
+                </div>
+                <div class="form-group">
+                    <label>🔒 كلمة المرور</label>
+                    <input type="password" id="registerPassword" placeholder="اختر كلمة مرور قوية" onkeypress="if(event.key==='Enter') handleAuth()">
+                </div>
+            </div>
+
+            <div class="error-msg" id="authError"></div>
+
+            <div class="modal-actions">
+                <button class="btn-login" id="authActionBtn" onclick="handleAuth()">دخول</button>
+                <button class="btn-register" id="authSwitchBtn" onclick="switchAuthMode()">ليس لديك حساب؟ سجل الآن</button>
+            </div>
+
+            <div class="modal-switch">
+                <span id="authSwitchText">ليس لديك حساب؟ <a onclick="switchAuthMode()">سجل الآن</a></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
+        };
+
+        // ============================================================
+        // 📋 المتغيرات العامة
+        // ============================================================
+        let database;
+        let currentUser = null;
+        let currentFirebaseUserId = null;
+        let isLoginMode = true;
+
+        // ============================================================
+        // 🍞 توست
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: 'rgba(16,185,129,0.9)',
+                error: 'rgba(239,68,68,0.9)',
+                warning: 'rgba(245,158,11,0.9)',
+                info: 'rgba(59,130,246,0.9)'
+            };
+            const old = document.querySelector('.toast');
+            if (old) old.remove();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.style.background = colors[type] || colors.info;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================================
+        // 🔥 تهيئة Firebase
+        // ============================================================
+        async function initializeFirebase() {
+            try {
+                if (firebase.apps.length > 0) await firebase.app().delete();
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                console.log('✅ Firebase initialized');
+            } catch (error) {
+                console.error('❌ Firebase error:', error);
+            }
+        }
+
+        // ============================================================
+        // 👤 المستخدم
+        // ============================================================
+        function getStoredUser() {
+            try { return JSON.parse(localStorage.getItem('currentUser')); } catch (e) { return null; }
+        }
+
+        function isLoggedIn() { return getStoredUser() !== null; }
+
+        function generateNumericId() { return Math.floor(100000 + Math.random() * 900000); }
+
+        async function getCurrentUserFullData() {
+            try {
+                const stored = getStoredUser();
+                if (!stored) return null;
+                if (!database) return stored;
+                const numericId = stored.numericId || generateNumericId();
+                if (!stored.numericId) {
+                    stored.numericId = numericId;
+                    localStorage.setItem('currentUser', JSON.stringify(stored));
+                }
+                const snapshot = await database.ref('users')
+                    .orderByChild('numericId')
+                    .equalTo(numericId)
+                    .once('value');
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const firebaseKey = Object.keys(userData)[0];
+                    const fullUser = userData[firebaseKey];
+                    const merged = { ...stored, ...fullUser, numericId: numericId, firebaseKey: firebaseKey };
+                    localStorage.setItem('currentUser', JSON.stringify(merged));
+                    currentFirebaseUserId = firebaseKey;
+                    return merged;
+                }
+                return stored;
+            } catch (e) { return getStoredUser(); }
+        }
+
+        // ============================================================
+        // ⭐ إنشاء النجوم
+        // ============================================================
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (2 + Math.random() * 3) + 's';
+                star.style.width = (1 + Math.random() * 2) + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
+            }
+        }
+
+        // ============================================================
+        // 📊 تحديث الإحصائيات
+        // ============================================================
+        async function updateStats() {
+            if (!database) return;
+
+            try {
+                // عدد المستخدمين المتصلين
+                const usersSnapshot = await database.ref('users').once('value');
+                let onlineCount = 0;
+                let totalUsers = 0;
+                if (usersSnapshot.exists()) {
+                    const users = usersSnapshot.val();
+                    for (const key in users) {
+                        totalUsers++;
+                        if (users[key].isOnline) onlineCount++;
+                    }
+                }
+                document.getElementById('onlineUsers').textContent = onlineCount;
+
+                // عدد المحادثات النشطة
+                const chatsSnapshot = await database.ref('active_calls').once('value');
+                let activeCalls = 0;
+                if (chatsSnapshot.exists()) {
+                    activeCalls = Object.keys(chatsSnapshot.val()).length;
+                }
+                document.getElementById('totalChats').textContent = activeCalls;
+
+                // عدد الهدايا (تقديري)
+                const giftsSnapshot = await database.ref('orders')
+                    .orderByChild('type')
+                    .equalTo('deposit')
+                    .once('value');
+                let giftCount = 0;
+                if (giftsSnapshot.exists()) {
+                    giftCount = Object.keys(giftsSnapshot.val()).length;
+                }
+                document.getElementById('totalGifts').textContent = giftCount;
+
+                // عدد المكالمات اليوم
+                const today = new Date().toISOString().split('T')[0];
+                const callsSnapshot = await database.ref('call_history').once('value');
+                let todayCalls = 0;
+                if (callsSnapshot.exists()) {
+                    const calls = callsSnapshot.val();
+                    for (const userId in calls) {
+                        const userCalls = calls[userId];
+                        if (typeof userCalls === 'object') {
+                            for (const callKey in userCalls) {
+                                const call = userCalls[callKey];
+                                if (call.endTime && call.endTime.startsWith(today)) {
+                                    todayCalls++;
+                                }
+                            }
+                        }
+                    }
+                }
+                document.getElementById('totalCalls').textContent = todayCalls;
+
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+        // ============================================================
+        // 🔄 تحديث حالة المستخدم
+        // ============================================================
+        async function updateUserStatus() {
+            const user = await getCurrentUserFullData();
+            if (user && user.numericId) {
+                currentUser = user;
+                document.getElementById('userStatus').classList.add('active');
+                document.getElementById('statusAvatar').textContent = (user.nickname || user.username || 'U').charAt(0)
+                    .toUpperCase();
+                document.getElementById('statusName').textContent = user.nickname || user.username || 'مستخدم';
+                document.getElementById('statusBalance').textContent = user.balanceEGP || 0;
+
+                document.getElementById('authBtnText').textContent = 'خروج';
+                document.getElementById('authBtn').onclick = logout;
+
+                // تحديث شارات الأصدقاء
+                updateFriendRequestsBadge();
+
+                return true;
+            } else {
+                document.getElementById('userStatus').classList.remove('active');
+                document.getElementById('authBtnText').textContent = 'دخول';
+                document.getElementById('authBtn').onclick = toggleAuth;
+                return false;
+            }
+        }
+
+        // ============================================================
+        // 👥 تحديث طلبات الصداقة
+        // ============================================================
+        async function updateFriendRequestsBadge() {
+            if (!database || !currentFirebaseUserId) return;
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId + '/friendRequests').once('value');
+                let count = 0;
+                if (snapshot.exists()) {
+                    const requests = snapshot.val();
+                    for (const key in requests) {
+                        if (requests[key].status === 'pending') count++;
+                    }
+                }
+                document.getElementById('friendRequestsBadge').textContent = count;
+                document.getElementById('bottomFriendBadge').textContent = count;
+            } catch (e) {}
+        }
+
+        // ============================================================
+        // 🔐 نظام المصادقة
+        // ============================================================
+        function toggleAuth() {
+            if (isLoggedIn()) {
+                logout();
+            } else {
+                openAuthModal();
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('authError').classList.remove('visible');
+            isLoginMode = true;
+            updateAuthUI();
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function switchAuthMode() {
+            isLoginMode = !isLoginMode;
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const title = document.getElementById('authModalTitle');
+            const sub = document.getElementById('authModalSub');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const actionBtn = document.getElementById('authActionBtn');
+            const switchBtn = document.getElementById('authSwitchBtn');
+            const switchText = document.getElementById('authSwitchText');
+            const error = document.getElementById('authError');
+
+            error.classList.remove('visible');
+
+            if (isLoginMode) {
+                title.textContent = 'مرحباً بك';
+                sub.textContent = 'سجل الدخول للاستمتاع بجميع المميزات';
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                actionBtn.textContent = 'دخول';
+                switchBtn.textContent = 'ليس لديك حساب؟ سجل الآن';
+                switchText.innerHTML = 'ليس لديك حساب؟ <a onclick="switchAuthMode()">سجل الآن</a>';
+            } else {
+                title.textContent = 'انضم إلى كوكبة';
+                sub.textContent = 'أنشئ حساباً مجاناً وابدأ التواصل';
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                actionBtn.textContent = 'تسجيل';
+                switchBtn.textContent = 'لديك حساب؟ سجل الدخول';
+                switchText.innerHTML = 'لديك حساب؟ <a onclick="switchAuthMode()">سجل الدخول</a>';
+            }
+        }
+
+        async function handleAuth() {
+            const error = document.getElementById('authError');
+            error.classList.remove('visible');
+
+            if (isLoginMode) {
+                // تسجيل الدخول
+                const username = document.getElementById('loginUsername').value.trim();
+                const password = document.getElementById('loginPassword').value.trim();
+
+                if (!username || !password) {
+                    error.textContent = '⚠️ يرجى ملء جميع الحقول';
+                    error.classList.add('visible');
+                    return;
+                }
+
+                try {
+                    const snapshot = await database.ref('users')
+                        .orderByChild('username')
+                        .equalTo(username)
+                        .once('value');
+
+                    if (!snapshot.exists()) {
+                        error.textContent = '❌ اسم المستخدم غير موجود';
+                        error.classList.add('visible');
+                        return;
+                    }
+
+                    const userData = snapshot.val();
+                    const firebaseKey = Object.keys(userData)[0];
+                    const user = userData[firebaseKey];
+
+                    if (user.password !== password) {
+                        error.textContent = '❌ كلمة المرور غير صحيحة';
+                        error.classList.add('visible');
+                        return;
+                    }
+
+                    if (user.isBanned) {
+                        error.textContent = '🚫 هذا الحساب محظور';
+                        error.classList.add('visible');
+                        return;
+                    }
+
+                    // حفظ بيانات المستخدم
+                    const storedUser = {
+                        numericId: user.numericId,
+                        username: user.username,
+                        nickname: user.nickname || user.username,
+                        firebaseKey: firebaseKey,
+                        balanceEGP: user.balanceEGP || 0,
+                        balanceUSD: user.balanceUSD || 0,
+                        vip: user.vip || null,
+                        avatar: user.avatar || null
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(storedUser));
+                    currentUser = storedUser;
+                    currentFirebaseUserId = firebaseKey;
+
+                    // تحديث حالة المستخدم
+                    await database.ref('users/' + firebaseKey).update({
+                        isOnline: true,
+                        lastActive: new Date().toISOString()
+                    });
+
+                    showToast('✅ مرحباً بك ' + (user.nickname || user.username), 'success');
+                    closeAuthModal();
+                    await updateUserStatus();
+                    await updateStats();
+
+                } catch (error) {
+                    console.error('Login error:', error);
+                    error.textContent = '❌ حدث خطأ في تسجيل الدخول';
+                    error.classList.add('visible');
+                }
+
+            } else {
+                // تسجيل حساب جديد
+                const username = document.getElementById('registerUsername').value.trim();
+                const nickname = document.getElementById('registerNickname').value.trim() || username;
+                const password = document.getElementById('registerPassword').value.trim();
+
+                if (!username || !password) {
+                    error.textContent = '⚠️ يرجى ملء جميع الحقول';
+                    error.classList.add('visible');
+                    return;
+                }
+
+                if (password.length < 4) {
+                    error.textContent = '⚠️ كلمة المرور يجب أن تكون 4 أحرف على الأقل';
+                    error.classList.add('visible');
+                    return;
+                }
+
+                try {
+                    // التحقق من عدم وجود المستخدم
+                    const checkSnapshot = await database.ref('users')
+                        .orderByChild('username')
+                        .equalTo(username)
+                        .once('value');
+
+                    if (checkSnapshot.exists()) {
+                        error.textContent = '❌ اسم المستخدم موجود بالفعل';
+                        error.classList.add('visible');
+                        return;
+                    }
+
+                    const numericId = generateNumericId();
+
+                    // إنشاء مستخدم جديد
+                    const newUser = {
+                        numericId: numericId,
+                        username: username,
+                        nickname: nickname,
+                        password: password,
+                        balanceEGP: 0,
+                        balanceUSD: 0,
+                        isBanned: false,
+                        isOnline: true,
+                        createdAt: new Date().toISOString(),
+                        lastActive: new Date().toISOString(),
+                        bio: '',
+                        avatar: null,
+                        vip: null,
+                        vipPurchased: {},
+                        frames: {},
+                        collectibles: {},
+                        activeFrame: null,
+                        activeCollectible: null,
+                        chatStyles: {},
+                        activeChatStyle: null,
+                        friends: {},
+                        friendRequests: {},
+                        blocked: {},
+                        giftsList: [],
+                        gifts: 0,
+                        likes: 0,
+                        visits: 0,
+                        likedBy: [],
+                        recentVisitors: [],
+                        todayVisits: {},
+                        todayLikes: {},
+                        notifications: {}
+                    };
+
+                    const newUserRef = database.ref('users').push();
+                    await newUserRef.set(newUser);
+
+                    // حفظ بيانات المستخدم
+                    const storedUser = {
+                        numericId: numericId,
+                        username: username,
+                        nickname: nickname,
+                        firebaseKey: newUserRef.key,
+                        balanceEGP: 0,
+                        balanceUSD: 0
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(storedUser));
+                    currentUser = storedUser;
+                    currentFirebaseUserId = newUserRef.key;
+
+                    showToast('✅ تم إنشاء الحساب بنجاح!', 'success');
+                    closeAuthModal();
+                    await updateUserStatus();
+                    await updateStats();
+
+                } catch (error) {
+                    console.error('Register error:', error);
+                    error.textContent = '❌ حدث خطأ في إنشاء الحساب';
+                    error.classList.add('visible');
+                }
+            }
+        }
+
+        // ============================================================
+        // 🚪 تسجيل الخروج
+        // ============================================================
+        async function logout() {
+            try {
+                if (database && currentFirebaseUserId) {
+                    await database.ref('users/' + currentFirebaseUserId).update({
+                        isOnline: false,
+                        lastActive: new Date().toISOString()
+                    });
+                }
+            } catch (e) {}
+
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            currentFirebaseUserId = null;
+            await updateUserStatus();
+            showToast('👋 تم تسجيل الخروج', 'info');
+        }
+
+        // ============================================================
+        // 🔄 الاستماع للتحديثات في الوقت الفعلي
+        // ============================================================
+        function listenForRealtimeUpdates() {
+            if (!database) return;
+
+            // تحديث الإحصائيات كل 30 ثانية
+            setInterval(updateStats, 30000);
+
+            // الاستماع لتغييرات حالة المستخدمين
+            database.ref('users').on('value', () => {
+                updateStats();
+            });
+
+            // الاستماع لتغييرات طلبات الصداقة
+            if (currentFirebaseUserId) {
+                database.ref('users/' + currentFirebaseUserId + '/friendRequests').on('value', () => {
+                    updateFriendRequestsBadge();
+                });
+            }
+        }
+
+        // ============================================================
+        // 🚀 التهيئة
+        // ============================================================
+        window.onload = async function() {
+            // إنشاء النجوم
+            createStars();
+
+            await initializeFirebase();
+
+            // تحديث حالة المستخدم
+            await updateUserStatus();
+
+            // تحديث الإحصائيات
+            await updateStats();
+
+            // الاستماع للتحديثات
+            listenForRealtimeUpdates();
+
+            // إظهار التنقل السفلي للجوال
+            if (window.innerWidth <= 768) {
+                document.querySelector('.bottom-nav').style.display = 'flex';
+            }
+
+            // إغلاق المودال عند الضغط خارجها
+            document.getElementById('authModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAuthModal();
+                }
+            });
+
+            // إغلاق المودال بزر ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAuthModal();
+                }
+            });
+        };
+
+        // ============================================================
+        // 🧹 تنظيف عند الخروج
+        // ============================================================
+        window.addEventListener('beforeunload', function() {
+            if (database && currentFirebaseUserId) {
+                database.ref('users/' + currentFirebaseUserId).update({
+                    isOnline: false,
+                    lastActive: new Date().toISOString()
+                });
+            }
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js">
+    </script>
+</body>
+</html>
