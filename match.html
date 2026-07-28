@@ -11,7 +11,6 @@
     <!-- PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        /* ===== أنماط خاصة بالمطابقة ===== */
         * {
             margin: 0;
             padding: 0;
@@ -1592,7 +1591,7 @@
 
                     <div class="remote-name-display" id="remoteNameDisplay" onclick="openPartnerProfile()">
                         <span id="remoteNameText">شريك</span>
-                        <span class="remote-status searching" id="remoteStatusText">🔍 جاري البحث...</span>
+                        <span class="remote-status connected" id="remoteStatusText">🟢 متصل</span>
                     </div>
 
                     <div class="mute-indicator" id="remoteMuteIndicator">🔇 مكتوم</div>
@@ -1716,6 +1715,7 @@
         let isPartnerDisconnected = false;
         let isPeerReady = false;
         let isCallInitiator = false;
+        let remoteStreamReceived = false;
 
         // ============================================================
         // 🍞 توست
@@ -1862,19 +1862,18 @@
         }
 
         // ============================================================
-        // 🎙️ طلب إذن المايك والكاميرا - إصلاح نهائي للهواتف
+        // 🎙️ طلب إذن المايك والكاميرا - إصلاح نهائي
         // ============================================================
         async function requestMediaPermissions() {
             try {
                 const overlay = document.getElementById('permissionOverlay');
                 overlay.classList.remove('active');
 
-                // محاولة الحصول على الصوت أولاً (الأهم)
+                // محاولة الحصول على الصوت والفيديو معاً
                 let stream;
                 let hasVideo = false;
 
                 try {
-                    // محاولة الحصول على الصوت والفيديو معاً
                     const constraints = {
                         audio: {
                             echoCancellation: true,
@@ -1884,15 +1883,14 @@
                         video: {
                             facingMode: 'user',
                             width: { ideal: 640 },
-                            height: { ideal: 480 },
-                            frameRate: { ideal: 30 }
+                            height: { ideal: 480 }
                         }
                     };
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
                     hasVideo = stream.getVideoTracks().length > 0;
+                    console.log('✅ تم الحصول على الصوت والفيديو');
                 } catch (videoError) {
-                    console.log('⚠️ محاولة بدون فيديو:', videoError);
-                    // محاولة الحصول على الصوت فقط
+                    console.log('⚠️ فشل الحصول على الفيديو، محاولة الصوت فقط:', videoError);
                     const audioConstraints = {
                         audio: {
                             echoCancellation: true,
@@ -2062,8 +2060,7 @@
                     video: {
                         facingMode: facingMode,
                         width: { ideal: 640 },
-                        height: { ideal: 480 },
-                        frameRate: { ideal: 30 }
+                        height: { ideal: 480 }
                     }
                 };
 
@@ -2111,7 +2108,7 @@
         }
 
         // ============================================================
-        // 🔗 PeerJS
+        // 🔗 PeerJS - تحسين نقل الصوت والفيديو
         // ============================================================
         function initPeerJS() {
             if (!mediaReady) {
@@ -2181,7 +2178,7 @@
         }
 
         // ============================================================
-        // 📞 معالجة المكالمة الواردة
+        // 📞 معالجة المكالمة الواردة - تحسين الصوت والفيديو
         // ============================================================
         function handleIncomingCall(call) {
             console.log('📞 Incoming call from:', call.peer);
@@ -2198,19 +2195,25 @@
             }
 
             try {
+                // التأكد من تفعيل الصوت
                 mediaStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
 
                 call.answer(mediaStream);
                 currentCall = call;
                 isCallInitiator = false;
+                remoteStreamReceived = false;
 
                 call.on('stream', (remoteStream) => {
+                    console.log('✅ Stream received from partner');
                     const remoteVideo = document.getElementById('remoteVideo');
                     remoteVideo.srcObject = remoteStream;
+
+                    // إخفاء البلاسهولدر وإظهار الفيديو
                     document.getElementById('remotePlaceholder').style.display = 'none';
                     remoteVideo.style.display = 'block';
                     document.getElementById('remoteStatus').classList.add('active');
 
+                    // تحديث اسم الشريك وحالته
                     const nameDisplay = document.getElementById('remoteNameDisplay');
                     nameDisplay.classList.add('active');
                     document.getElementById('remoteStatusText').className = 'remote-status connected';
@@ -2219,7 +2222,7 @@
                     document.getElementById('remotePlaceholderStatus').className = 'status-text';
 
                     isPartnerDisconnected = false;
-                    console.log('✅ Stream received from partner');
+                    remoteStreamReceived = true;
                 });
 
                 call.on('close', () => {
@@ -2232,6 +2235,7 @@
                     handlePartnerDisconnect();
                 });
 
+                // بدء المكالمة
                 isCallActive = true;
                 isSearching = false;
                 isMatching = false;
@@ -2240,6 +2244,7 @@
                 document.getElementById('matchBtnContainer').classList.add('hidden');
                 stopMatchTimer();
 
+                // جلب اسم الشريك
                 const callerId = call.peer.replace('match_', '');
                 database.ref('users')
                     .orderByChild('numericId')
@@ -2270,6 +2275,7 @@
                         }
                     });
 
+                // بدء مؤقت المكالمة
                 callStartTime = Date.now();
                 callDurationSeconds = 0;
                 if (callTimerInterval) clearInterval(callTimerInterval);
@@ -2285,6 +2291,7 @@
                     toggleCallChat();
                 }
 
+                // تنظيف قائمة الانتظار
                 if (database && currentUser) {
                     database.ref('waiting_users/' + currentUser.numericId).remove();
                 }
@@ -2398,7 +2405,7 @@
         }
 
         // ============================================================
-        // 🎯 بدء المطابقة - مع إمكانية التطابق مع نفس المستخدم
+        // 🎯 بدء المطابقة
         // ============================================================
         function startMatching() {
             if (isMatching || isCallActive || isSearching) return;
@@ -2428,6 +2435,7 @@
             isMatching = true;
             isSearching = true;
             isCallInitiator = true;
+            remoteStreamReceived = false;
 
             const btn = document.getElementById('matchBtn');
             btn.classList.add('searching');
@@ -2481,7 +2489,7 @@
         }
 
         // ============================================================
-        // 📡 الاستماع للمستخدمين المنتظرين - مع إمكانية التطابق مع نفس المستخدم
+        // 📡 الاستماع للمستخدمين المنتظرين
         // ============================================================
         function listenForWaitingUsers() {
             if (waitingListener) {
@@ -2492,13 +2500,11 @@
                 const data = snapshot.val();
                 const userId = data.userId;
 
-                // تجاهل المستخدم نفسه فقط (لا نمنع التطابق مع نفس المستخدم)
                 if (userId == currentUser.numericId) return;
 
                 console.log('👤 تم العثور على مستخدم منتظر:', data.username);
 
                 if (isSearching && !isCallActive && !isPartnerDisconnected && isPeerReady) {
-                    // حذف كلا المستخدمين من قائمة الانتظار
                     database.ref('waiting_users/' + currentUser.numericId).remove();
                     database.ref('waiting_users/' + userId).remove();
 
@@ -2513,7 +2519,7 @@
         }
 
         // ============================================================
-        // 📞 بدء المكالمة مع مستخدم محدد
+        // 📞 بدء المكالمة مع مستخدم محدد - تحسين الصوت والفيديو
         // ============================================================
         function startCallWithUser(partnerId, partnerPeerId, partnerUsername) {
             if (!peer || !mediaStream || !isPeerReady) {
@@ -2524,16 +2530,21 @@
             try {
                 console.log(`📞 Calling peer: ${partnerPeerId}`);
 
+                // التأكد من تفعيل الصوت
                 mediaStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
 
                 const call = peer.call(partnerPeerId, mediaStream);
                 currentCall = call;
                 isCallInitiator = true;
+                remoteStreamReceived = false;
 
                 if (call) {
                     call.on('stream', (remoteStream) => {
+                        console.log('✅ Stream received from partner');
                         const remoteVideo = document.getElementById('remoteVideo');
                         remoteVideo.srcObject = remoteStream;
+
+                        // إخفاء البلاسهولدر وإظهار الفيديو
                         document.getElementById('remotePlaceholder').style.display = 'none';
                         remoteVideo.style.display = 'block';
                         document.getElementById('remoteStatus').classList.add('active');
@@ -2546,7 +2557,7 @@
                         document.getElementById('remotePlaceholderStatus').className = 'status-text';
 
                         isPartnerDisconnected = false;
-                        console.log('✅ Stream received from partner');
+                        remoteStreamReceived = true;
                     });
 
                     call.on('close', () => {
@@ -2559,6 +2570,7 @@
                         handlePartnerDisconnect();
                     });
 
+                    // بدء المكالمة
                     isCallActive = true;
                     callPartnerNumericId = partnerId;
                     callPartnerName = partnerUsername || 'شريك';
@@ -2567,6 +2579,7 @@
                     isSearching = false;
                     isPartnerDisconnected = false;
 
+                    // جلب بيانات الشريك
                     database.ref('users')
                         .orderByChild('numericId')
                         .equalTo(parseInt(partnerId))
@@ -2595,6 +2608,7 @@
                             }
                         });
 
+                    // إظهار واجهة المكالمة
                     document.getElementById('videoContainer').classList.add('active');
                     document.getElementById('callControls').classList.add('active');
                     document.getElementById('matchBtnContainer').classList.add('hidden');
@@ -2603,6 +2617,7 @@
 
                     stopMatchTimer();
 
+                    // بدء مؤقت المكالمة
                     callStartTime = Date.now();
                     callDurationSeconds = 0;
                     if (callTimerInterval) clearInterval(callTimerInterval);
@@ -2618,6 +2633,7 @@
                         toggleCallChat();
                     }
 
+                    // تسجيل المكالمة
                     database.ref('active_calls/' + currentUser.numericId).set({
                         partnerId: partnerId,
                         partnerName: partnerUsername || 'شريك',
@@ -2772,7 +2788,7 @@
                 const targetId = partnerProfileData.numericId;
 
                 const friendCheck = await database.ref('users/' + currentFirebaseUserId + '/friends/' + targetId).once(
-                'value');
+                    'value');
                 if (friendCheck.exists()) {
                     showToast('⚠️ هذا المستخدم صديق بالفعل', 'warning');
                     return;
