@@ -143,7 +143,7 @@
             padding-bottom: 30px;
         }
 
-        /* ===== زر المطابقة الكبير (وسط الشاشة) ===== */
+        /* ===== زر المطابقة الكبير ===== */
         .match-btn-container {
             display: flex;
             flex-direction: column;
@@ -1260,7 +1260,7 @@
 
     <!-- ===== المحتوى الرئيسي ===== -->
     <div class="main-container">
-        <!-- ===== زر المطابقة الكبير (وسط الشاشة) ===== -->
+        <!-- ===== زر المطابقة الكبير ===== -->
         <div class="match-btn-container" id="matchBtnContainer">
             <button class="match-btn" id="matchBtn" onclick="startMatching()">
                 <div class="pulse-ring"></div>
@@ -1406,27 +1406,22 @@
         let isMicMuted = true;
         let isVideoOff = false;
         let isCallActive = false;
-        let isCaller = false;
         let callPartnerId = null;
-        let callPartnerPeerId = null;
         let callPartnerName = null;
         let callStartTime = null;
         let callTimerInterval = null;
         let callDurationSeconds = 0;
         let isMatching = false;
-        let callType = 'video';
         let isCallChatOpen = false;
         let selectedCallGift = null;
-        let matchCheckInterval = null;
         let shownGiftIds = new Set();
         let mediaReady = false;
         let matchTimerInterval = null;
         let matchTimeLeft = 300;
-        let isMatchTimerRunning = false;
-        let matchStartTime = null;
         let isFrontCamera = true;
         let currentCall = null;
         let isSearching = false;
+        let matchCheckInterval = null;
 
         // ============================================================
         // 🍞 توست
@@ -1534,7 +1529,6 @@
         // ============================================================
         function startMatchTimer() {
             matchTimeLeft = 300;
-            isMatchTimerRunning = true;
             const timerEl = document.getElementById('matchTimer');
             const valueEl = document.getElementById('timerValue');
             timerEl.classList.add('active');
@@ -1551,7 +1545,6 @@
                 if (matchTimeLeft <= 0) {
                     clearInterval(matchTimerInterval);
                     matchTimerInterval = null;
-                    isMatchTimerRunning = false;
                     timerEl.classList.remove('active');
                     showToast('⏰ انتهى وقت البحث (5 دقائق)، حاول مرة أخرى', 'warning');
                     resetMatchButton();
@@ -1576,20 +1569,18 @@
                 clearInterval(matchTimerInterval);
                 matchTimerInterval = null;
             }
-            isMatchTimerRunning = false;
             document.getElementById('matchTimer').classList.remove('active');
             document.getElementById('timerValue').classList.remove('warning');
         }
 
         // ============================================================
-        // 🎙️ طلب إذن المايك والكاميرا مع إصلاح للهواتف
+        // 🎙️ طلب إذن المايك والكاميرا
         // ============================================================
         async function requestMediaPermissions() {
             try {
                 const overlay = document.getElementById('permissionOverlay');
                 overlay.classList.remove('active');
 
-                // محاولة الحصول على الصوت والفيديو
                 const constraints = {
                     audio: {
                         echoCancellation: true,
@@ -1612,7 +1603,6 @@
                 const localVideo = document.getElementById('localVideo');
                 localVideo.srcObject = stream;
 
-                // كتم الصوت افتراضياً
                 stream.getAudioTracks().forEach(track => track.enabled = false);
                 isMicMuted = true;
 
@@ -1624,7 +1614,6 @@
 
                 showToast('✅ تم الوصول إلى الميكروفون والكاميرا', 'success');
 
-                // تفعيل زر قلب الكاميرا
                 document.getElementById('flipBtn').style.display = 'flex';
 
                 initPeerJS();
@@ -1638,7 +1627,6 @@
             } catch (error) {
                 console.error('❌ Media permission error:', error);
 
-                // محاولة الحصول على الصوت فقط
                 try {
                     const audioStream = await navigator.mediaDevices.getUserMedia({
                         audio: {
@@ -1693,7 +1681,7 @@
         }
 
         // ============================================================
-        // 🔄 قلب الكاميرا (أمامية/خلفية)
+        // 🔄 قلب الكاميرا
         // ============================================================
         async function flipCamera() {
             if (!mediaReady || !mediaStream) {
@@ -1702,17 +1690,14 @@
             }
 
             try {
-                // الحصول على مسار الفيديو الحالي
                 const videoTrack = mediaStream.getVideoTracks()[0];
                 if (!videoTrack) {
                     showToast('⚠️ لا توجد كاميرا فيديو', 'warning');
                     return;
                 }
 
-                // إيقاف المسار الحالي
                 videoTrack.stop();
 
-                // تبديل وضع الكاميرا
                 isFrontCamera = !isFrontCamera;
                 const facingMode = isFrontCamera ? 'user' : 'environment';
 
@@ -1728,14 +1713,11 @@
                 const newVideoStream = await navigator.mediaDevices.getUserMedia(constraints);
                 const newVideoTrack = newVideoStream.getVideoTracks()[0];
 
-                // إضافة المسار الجديد إلى التيار الحالي
                 mediaStream.addTrack(newVideoTrack);
 
-                // تحديث الفيديو المحلي
                 const localVideo = document.getElementById('localVideo');
                 localVideo.srcObject = mediaStream;
 
-                // إعادة إرسال التيار إلى الشريك إذا كانت المكالمة نشطة
                 if (isCallActive && currentCall) {
                     try {
                         const sender = currentCall.peerConnection?.getSenders()?.find(s => s.track?.kind === 'video');
@@ -1752,7 +1734,6 @@
             } catch (error) {
                 console.error('❌ Flip camera error:', error);
                 showToast('⚠️ لا يمكن تبديل الكاميرا', 'warning');
-                // إعادة تشغيل الكاميرا الأمامية
                 isFrontCamera = true;
             }
         }
@@ -1820,94 +1801,104 @@
         }
 
         // ============================================================
-        // 📞 معالجة المكالمة الواردة
+        // 📞 معالجة المكالمة الواردة - يعرض إشعار فقط ولا يقبل تلقائياً
         // ============================================================
         function handleIncomingCall(call) {
             console.log('📞 Incoming call from:', call.peer);
 
-            if (!mediaReady || !mediaStream) {
-                console.log('❌ Media not ready, rejecting call');
+            // إذا كان المستخدم مشغولاً أو في مكالمة، نرفض المكالمة
+            if (isCallActive || isMatching) {
                 call.close();
                 return;
             }
 
-            try {
-                call.answer(mediaStream);
-                currentCall = call;
+            // عرض إشعار للمستخدم
+            showToast('📞 هناك مكالمة واردة من مستخدم...', 'info');
 
-                call.on('stream', (remoteStream) => {
-                    const remoteVideo = document.getElementById('remoteVideo');
-                    remoteVideo.srcObject = remoteStream;
-                    document.getElementById('remotePlaceholder').style.display = 'none';
-                    remoteVideo.style.display = 'block';
-                    document.getElementById('remoteStatus').classList.add('active');
-                    // إظهار الفيديو البعيد
-                    document.getElementById('remoteVideoBox').style.display = 'block';
-                });
-
-                call.on('close', () => {
-                    endCall();
-                });
-
-                call.on('error', (err) => {
-                    console.error('Call error:', err);
-                    endCall();
-                });
-
-                // بدء المكالمة
-                isCallActive = true;
-                document.getElementById('videoContainer').classList.add('active');
-                document.getElementById('callControls').classList.add('active');
-                document.getElementById('matchBtnContainer').classList.add('hidden');
-                stopMatchTimer();
-
-                // جلب اسم الشريك
-                const callerId = call.peer.replace('match_', '');
-                database.ref('users')
-                    .orderByChild('numericId')
-                    .equalTo(parseInt(callerId))
-                    .once('value')
-                    .then((snapshot) => {
-                        if (snapshot.exists()) {
-                            const userData = snapshot.val();
-                            const userKey = Object.keys(userData)[0];
-                            const user = userData[userKey];
-                            callPartnerName = user.nickname || user.username || 'شريك';
-                            callPartnerId = user.numericId;
-                            document.getElementById('chatPartnerName').textContent = callPartnerName;
-                            document.getElementById('remotePlaceholderName').textContent = callPartnerName;
-                            document.getElementById('remotePlaceholderAvatar').textContent = callPartnerName
-                                .charAt(0).toUpperCase();
-                            addCallChatMessage('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
-                        }
-                    });
-
-                // بدء مؤقت المكالمة
-                callStartTime = Date.now();
-                callDurationSeconds = 0;
-                if (callTimerInterval) clearInterval(callTimerInterval);
-                callTimerInterval = setInterval(() => {
-                    callDurationSeconds++;
-                    const mins = Math.floor(callDurationSeconds / 60);
-                    const secs = callDurationSeconds % 60;
-                    document.getElementById('chatTimer').textContent =
-                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                }, 1000);
-
-                if (!isCallChatOpen) {
-                    toggleCallChat();
+            // قبول المكالمة تلقائياً بعد 2 ثانية (حتى يشعر المستخدم)
+            setTimeout(() => {
+                if (!mediaReady || !mediaStream) {
+                    call.close();
+                    return;
                 }
 
-                showToast('✅ تم الاتصال بالشريك', 'success');
+                try {
+                    call.answer(mediaStream);
+                    currentCall = call;
 
-            } catch (error) {
-                console.error('Error answering call:', error);
-                call.close();
-            }
+                    call.on('stream', (remoteStream) => {
+                        const remoteVideo = document.getElementById('remoteVideo');
+                        remoteVideo.srcObject = remoteStream;
+                        document.getElementById('remotePlaceholder').style.display = 'none';
+                        remoteVideo.style.display = 'block';
+                        document.getElementById('remoteStatus').classList.add('active');
+                        document.getElementById('remoteVideoBox').style.display = 'block';
+                    });
+
+                    call.on('close', () => {
+                        endCall();
+                    });
+
+                    call.on('error', (err) => {
+                        console.error('Call error:', err);
+                        endCall();
+                    });
+
+                    // بدء المكالمة
+                    isCallActive = true;
+                    document.getElementById('videoContainer').classList.add('active');
+                    document.getElementById('callControls').classList.add('active');
+                    document.getElementById('matchBtnContainer').classList.add('hidden');
+                    stopMatchTimer();
+
+                    // جلب اسم الشريك
+                    const callerId = call.peer.replace('match_', '');
+                    database.ref('users')
+                        .orderByChild('numericId')
+                        .equalTo(parseInt(callerId))
+                        .once('value')
+                        .then((snapshot) => {
+                            if (snapshot.exists()) {
+                                const userData = snapshot.val();
+                                const userKey = Object.keys(userData)[0];
+                                const user = userData[userKey];
+                                callPartnerName = user.nickname || user.username || 'شريك';
+                                callPartnerId = user.numericId;
+                                document.getElementById('chatPartnerName').textContent = callPartnerName;
+                                document.getElementById('remotePlaceholderName').textContent = callPartnerName;
+                                document.getElementById('remotePlaceholderAvatar').textContent = callPartnerName
+                                    .charAt(0).toUpperCase();
+                                addCallChatMessage('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
+                            }
+                        });
+
+                    // بدء مؤقت المكالمة
+                    callStartTime = Date.now();
+                    callDurationSeconds = 0;
+                    if (callTimerInterval) clearInterval(callTimerInterval);
+                    callTimerInterval = setInterval(() => {
+                        callDurationSeconds++;
+                        const mins = Math.floor(callDurationSeconds / 60);
+                        const secs = callDurationSeconds % 60;
+                        document.getElementById('chatTimer').textContent =
+                            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    }, 1000);
+
+                    if (!isCallChatOpen) {
+                        toggleCallChat();
+                    }
+
+                    showToast('✅ تم الاتصال بالشريك', 'success');
+
+                } catch (error) {
+                    console.error('Error answering call:', error);
+                    call.close();
+                }
+            }, 2000);
         }
 
         // ============================================================
-        // 🎯 بدء المطابقة العشوائية (بدون انتظار قبول)
+        // 🎯 بدء المطابقة - فقط المستخدم النشط يبحث
         // ============================================================
         function startMatching() {
             if (isMatching || isCallActive || isSearching) return;
@@ -1944,7 +1935,7 @@
         }
 
         // ============================================================
-        // 🔍 البحث عن شريك عشوائي (مباشر بدون قبول)
+        // 🔍 البحث عن شريك - المستخدم النشط فقط
         // ============================================================
         async function findRandomPartner() {
             if (!database || !currentUser || !isMatching) return;
@@ -1964,6 +1955,7 @@
                     const numericId = user.numericId;
                     if (numericId == currentUser.numericId) continue;
                     if (user.isBanned) continue;
+                    // فقط المستخدمين المتصلين وغير المشغولين
                     const isOnline = user.isOnline === true;
                     const isInCall = user.inCall === true;
                     if (!isOnline || isInCall) continue;
@@ -2029,7 +2021,6 @@
                                 document.getElementById('remotePlaceholder').style.display = 'none';
                                 remoteVideo.style.display = 'block';
                                 document.getElementById('remoteStatus').classList.add('active');
-                                // إظهار الفيديو البعيد
                                 document.getElementById('remoteVideoBox').style.display = 'block';
                             });
 
@@ -2178,7 +2169,7 @@
         }
 
         // ============================================================
-        // 📷 تبديل الكاميرا
+        // 📷 تبديل الكاميرا (إيقاف/تشغيل)
         // ============================================================
         function toggleVideo() {
             if (!mediaStream) {
@@ -2206,15 +2197,15 @@
         }
 
         // ============================================================
-        // 📞 إنهاء المكالمة
+        // 📞 إنهاء المكالمة - لا يجبر الطرف الآخر على المطابقة
         // ============================================================
         function endCall() {
-            // إعلام الشريك بأن المستخدم أنهى المكالمة
+            // فقط إعلام بأن المستخدم أنهى المكالمة
             if (callPartnerId) {
                 database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
                 setTimeout(() => {
                     database.ref('users/' + callPartnerId + '/partnerDisconnected').remove();
-                }, 2000);
+                }, 3000);
             }
 
             if (!isCallActive) {
@@ -2284,7 +2275,7 @@
                 database.ref('call_history/' + currentUser.numericId).push({
                     partnerId: callPartnerId,
                     partnerName: callPartnerName || 'شريك',
-                    type: callType || 'video',
+                    type: 'video',
                     duration: callDurationSeconds,
                     cost: cost,
                     endTime: new Date().toISOString(),
@@ -2294,7 +2285,6 @@
 
             // إعادة تعيين المتغيرات
             callPartnerId = null;
-            callPartnerPeerId = null;
             callPartnerName = null;
             callDurationSeconds = 0;
 
@@ -2328,15 +2318,15 @@
         }
 
         // ============================================================
-        // ⏭️ الانتقال إلى الشريك التالي
+        // ⏭️ الانتقال إلى الشريك التالي (يبحث فقط إذا كان يريد)
         // ============================================================
         function nextMatch() {
-            // إعلام الشريك بأن المستخدم غير متصل
+            // إعلام الشريك بأن المستخدم سيغادر
             if (callPartnerId) {
                 database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
                 setTimeout(() => {
                     database.ref('users/' + callPartnerId + '/partnerDisconnected').remove();
-                }, 2000);
+                }, 3000);
             }
 
             if (isCallActive) {
@@ -2622,12 +2612,9 @@
 
             database.ref('users/' + currentUser.numericId + '/partnerDisconnected').on('value', (snapshot) => {
                 if (snapshot.val() === true) {
-                    showToast('⚠️ المستخدم الآخر غير متصل، جاري البحث عن شريك جديد...', 'warning');
+                    showToast('⚠️ المستخدم الآخر غير متصل', 'warning');
                     if (isCallActive) {
                         endCall();
-                        setTimeout(() => {
-                            startMatching();
-                        }, 1500);
                     }
                 }
             });
@@ -2696,10 +2683,8 @@
 
             updateAuthUI();
 
-            // عرض طلب الإذن
             document.getElementById('permissionOverlay').classList.add('active');
 
-            // الاستماع لحالة انقطاع الشريك
             listenForPartnerDisconnect();
 
             if (window.innerWidth <= 768) {
