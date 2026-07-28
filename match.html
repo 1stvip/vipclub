@@ -1449,7 +1449,7 @@
 
                     <div class="remote-name-display" id="remoteNameDisplay" onclick="openPartnerProfile()">
                         <span id="remoteNameText">شريك</span>
-                        <span class="remote-status searching" id="remoteStatusText">🔍 جاري البحث...</span>
+                        <span class="remote-status connected" id="remoteStatusText">🟢 متصل</span>
                     </div>
 
                     <div class="mute-indicator" id="remoteMuteIndicator">🔇 مكتوم</div>
@@ -1548,7 +1548,7 @@
         let peer = null;
         let myPeerId = null;
         let mediaStream = null;
-        let isMicMuted = false; // الميكروفون مفتوح تلقائياً
+        let isMicMuted = false;
         let isVideoOff = false;
         let isCallActive = false;
         let callPartnerId = null;
@@ -1573,7 +1573,7 @@
         let isPeerReady = false;
         let isCallInitiator = false;
         let remoteStreamReceived = false;
-        let waitingUsersRef = null;
+        let isStreaming = false;
 
         // ============================================================
         // 🍞 توست
@@ -1730,35 +1730,43 @@
                 let stream;
                 let hasVideo = false;
 
+                // محاولة الحصول على الصوت فقط أولاً للتأكد من عمل الصوت
                 try {
-                    const constraints = {
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true,
-                            sampleRate: 48000
-                        },
-                        video: {
-                            facingMode: 'user',
-                            width: { ideal: 640 },
-                            height: { ideal: 480 }
-                        }
-                    };
-                    stream = await navigator.mediaDevices.getUserMedia(constraints);
-                    hasVideo = stream.getVideoTracks().length > 0;
-                    console.log('✅ تم الحصول على الصوت والفيديو');
-                } catch (videoError) {
-                    console.log('⚠️ فشل الحصول على الفيديو، محاولة الصوت فقط:', videoError);
                     const audioConstraints = {
                         audio: {
                             echoCancellation: true,
                             noiseSuppression: true,
                             autoGainControl: true,
-                            sampleRate: 48000
+                            sampleRate: 48000,
+                            channelCount: 1
                         }
                     };
                     stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-                    hasVideo = false;
+                    console.log('✅ تم الحصول على الصوت بنجاح');
+                } catch (audioError) {
+                    console.error('❌ فشل الحصول على الصوت:', audioError);
+                    throw audioError;
+                }
+
+                // محاولة إضافة الفيديو بعد الحصول على الصوت
+                try {
+                    const videoConstraints = {
+                        video: {
+                            facingMode: 'user',
+                            width: { ideal: 640 },
+                            height: { ideal: 480 },
+                            frameRate: { ideal: 15 }
+                        }
+                    };
+                    const videoStream = await navigator.mediaDevices.getUserMedia(videoConstraints);
+                    const videoTrack = videoStream.getVideoTracks()[0];
+                    if (videoTrack) {
+                        stream.addTrack(videoTrack);
+                        hasVideo = true;
+                        console.log('✅ تم إضافة الفيديو بنجاح');
+                    }
+                } catch (videoError) {
+                    console.error('⚠️ فشل الحصول على الفيديو:', videoError);
                     showToast('⚠️ تم الوصول إلى الميكروفون فقط (الكاميرا غير متاحة)', 'warning');
                 }
 
@@ -1798,6 +1806,12 @@
                     document.getElementById('localPlaceholder').style.display = 'flex';
                     document.getElementById('localPlaceholderName').textContent = 'الكاميرا غير متاحة';
                     showToast('✅ تم الوصول إلى الميكروفون فقط (الميكروفون مفتوح)', 'success');
+                }
+
+                // بدء البث
+                if (mediaStream) {
+                    isStreaming = true;
+                    console.log('✅ بدء البث الصوتي');
                 }
 
                 initPeerJS();
@@ -1973,7 +1987,7 @@
         // 🔗 PeerJS - تحسين نقل الصوت
         // ============================================================
         function initPeerJS() {
-            if (!mediaReady) {
+            if (!mediaReady || !mediaStream) {
                 setTimeout(initPeerJS, 1000);
                 return;
             }
@@ -2278,7 +2292,7 @@
                 return;
             }
 
-            if (!mediaReady) {
+            if (!mediaReady || !mediaStream) {
                 showToast('⚠️ يرجى السماح بالوصول إلى المايك والكاميرا أولاً', 'warning');
                 document.getElementById('permissionOverlay').classList.add('active');
                 return;
