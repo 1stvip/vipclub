@@ -607,6 +607,7 @@
             justify-content: center;
             padding: 5px 0;
             flex-shrink: 0;
+            margin-top: 5px;
         }
 
         .call-controls.active {
@@ -1801,22 +1802,15 @@
         }
 
         // ============================================================
-        // 📞 معالجة المكالمة الواردة - يعرض إشعار فقط ولا يقبل تلقائياً
+        // 📞 معالجة المكالمة الواردة - قبول تلقائي إذا كان في وضع البحث
         // ============================================================
         function handleIncomingCall(call) {
             console.log('📞 Incoming call from:', call.peer);
 
-            // إذا كان المستخدم مشغولاً أو في مكالمة، نرفض المكالمة
-            if (isCallActive || isMatching) {
-                call.close();
-                return;
-            }
+            // إذا كان المستخدم في وضع البحث (ضغط على مطابقة)
+            if (isSearching) {
+                console.log('✅ المستخدم في وضع البحث، قبول المكالمة تلقائياً');
 
-            // عرض إشعار للمستخدم
-            showToast('📞 هناك مكالمة واردة من مستخدم...', 'info');
-
-            // قبول المكالمة تلقائياً بعد 2 ثانية (حتى يشعر المستخدم)
-            setTimeout(() => {
                 if (!mediaReady || !mediaStream) {
                     call.close();
                     return;
@@ -1846,6 +1840,8 @@
 
                     // بدء المكالمة
                     isCallActive = true;
+                    isMatching = false;
+                    isSearching = false;
                     document.getElementById('videoContainer').classList.add('active');
                     document.getElementById('callControls').classList.add('active');
                     document.getElementById('matchBtnContainer').classList.add('hidden');
@@ -1888,17 +1884,23 @@
                         toggleCallChat();
                     }
 
+                    resetMatchButton();
                     showToast('✅ تم الاتصال بالشريك', 'success');
 
                 } catch (error) {
                     console.error('Error answering call:', error);
                     call.close();
                 }
-            }, 2000);
+            } else {
+                // إذا لم يكن في وضع البحث، نرفض المكالمة
+                console.log('❌ المستخدم ليس في وضع البحث، رفض المكالمة');
+                call.close();
+                showToast('📞 مكالمة واردة لكنك لست في وضع البحث', 'warning');
+            }
         }
 
         // ============================================================
-        // 🎯 بدء المطابقة - فقط المستخدم النشط يبحث
+        // 🎯 بدء المطابقة - المستخدم يدخل في وضع البحث
         // ============================================================
         function startMatching() {
             if (isMatching || isCallActive || isSearching) return;
@@ -1931,198 +1933,153 @@
             `;
 
             startMatchTimer();
-            findRandomPartner();
+
+            // وضع المستخدم في قائمة المنتظرين
+            database.ref('waiting_users/' + currentUser.numericId).set({
+                userId: currentUser.numericId,
+                username: currentUser.nickname || currentUser.username || 'مستخدم',
+                peerId: myPeerId,
+                joinedAt: new Date().toISOString()
+            });
+
+            // الاستماع للمستخدمين الآخرين المنتظرين
+            listenForWaitingUsers();
         }
 
         // ============================================================
-        // 🔍 البحث عن شريك - المستخدم النشط فقط
+        // 📡 الاستماع للمستخدمين المنتظرين
         // ============================================================
-        async function findRandomPartner() {
-            if (!database || !currentUser || !isMatching) return;
+        let waitingListener = null;
+
+        function listenForWaitingUsers() {
+            if (waitingListener) {
+                database.ref('waiting_users').off();
+            }
+
+            waitingListener = database.ref('waiting_users').on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                const userId = data.userId;
+
+                // تجاهل المستخدم نفسه
+                if (userId == currentUser.numericId) return;
+
+                console.log('👤 تم العثور على مستخدم منتظر:', data.username);
+
+                // إذا كان المستخدم في وضع البحث، نبدأ المكالمة مع المستخدم الآخر
+                if (isSearching && !isCallActive) {
+                    // حذف المستخدمين من قائمة الانتظار
+                    database.ref('waiting_users/' + currentUser.numericId).remove();
+                    database.ref('waiting_users/' + userId).remove();
+
+                    // إيقاف الاستماع
+                    if (waitingListener) {
+                        database.ref('waiting_users').off();
+                        waitingListener = null;
+                    }
+
+                    // بدء المكالمة مع المستخدم الآخر
+                    startCallWithUser(userId, data.peerId, data.username);
+                }
+            });
+        }
+
+        // ============================================================
+        // 📞 بدء المكالمة مع مستخدم محدد
+        // ============================================================
+        function startCallWithUser(partnerId, partnerPeerId, partnerUsername) {
+            if (!peer || !mediaStream) return;
 
             try {
-                const snapshot = await database.ref('users').once('value');
-                if (!snapshot.exists()) {
-                    setTimeout(findRandomPartner, 3000);
-                    return;
-                }
+                console.log(`📞 Calling peer: ${partnerPeerId}`);
+                const call = peer.call(partnerPeerId, mediaStream);
+                currentCall = call;
 
-                const users = snapshot.val();
-                const availableUsers = [];
-
-                for (const key in users) {
-                    const user = users[key];
-                    const numericId = user.numericId;
-                    if (numericId == currentUser.numericId) continue;
-                    if (user.isBanned) continue;
-                    // فقط المستخدمين المتصلين وغير المشغولين
-                    const isOnline = user.isOnline === true;
-                    const isInCall = user.inCall === true;
-                    if (!isOnline || isInCall) continue;
-
-                    availableUsers.push({
-                        numericId: numericId,
-                        username: user.username,
-                        nickname: user.nickname || user.username,
-                        firebaseKey: key,
-                        peerId: user.peerId || null
+                if (call) {
+                    call.on('stream', (remoteStream) => {
+                        const remoteVideo = document.getElementById('remoteVideo');
+                        remoteVideo.srcObject = remoteStream;
+                        document.getElementById('remotePlaceholder').style.display = 'none';
+                        remoteVideo.style.display = 'block';
+                        document.getElementById('remoteStatus').classList.add('active');
+                        document.getElementById('remoteVideoBox').style.display = 'block';
                     });
-                }
 
-                if (availableUsers.length === 0) {
-                    setTimeout(findRandomPartner, 3000);
-                    return;
-                }
-
-                // اختيار مستخدم عشوائي
-                const randomIndex = Math.floor(Math.random() * availableUsers.length);
-                const partner = availableUsers[randomIndex];
-
-                // التحقق من أن الشريك لا يزال متاحاً
-                const partnerSnapshot = await database.ref('users')
-                    .orderByChild('numericId')
-                    .equalTo(partner.numericId)
-                    .once('value');
-
-                if (!partnerSnapshot.exists()) {
-                    setTimeout(findRandomPartner, 1000);
-                    return;
-                }
-
-                const partnerData = partnerSnapshot.val();
-                const partnerKey = Object.keys(partnerData)[0];
-                const partnerUser = partnerData[partnerKey];
-
-                if (partnerUser.isBanned || partnerUser.inCall) {
-                    setTimeout(findRandomPartner, 1000);
-                    return;
-                }
-
-                // تحديث حالة المستخدم
-                await database.ref('users/' + currentFirebaseUserId).update({
-                    inCall: true,
-                    callPartner: partner.numericId,
-                    peerId: myPeerId,
-                    updatedAt: new Date().toISOString()
-                });
-
-                const peerId = partnerUser.peerId || partner.peerId;
-
-                if (peer && peerId && mediaStream) {
-                    try {
-                        console.log(`📞 Calling peer: ${peerId}`);
-                        const call = peer.call(peerId, mediaStream);
-                        currentCall = call;
-
-                        if (call) {
-                            call.on('stream', (remoteStream) => {
-                                const remoteVideo = document.getElementById('remoteVideo');
-                                remoteVideo.srcObject = remoteStream;
-                                document.getElementById('remotePlaceholder').style.display = 'none';
-                                remoteVideo.style.display = 'block';
-                                document.getElementById('remoteStatus').classList.add('active');
-                                document.getElementById('remoteVideoBox').style.display = 'block';
-                            });
-
-                            call.on('close', () => {
-                                if (callPartnerId) {
-                                    database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
-                                }
-                                endCall();
-                            });
-
-                            call.on('error', (err) => {
-                                console.error('Call error:', err);
-                                endCall();
-                            });
-
-                            // بدء المكالمة
-                            isCallActive = true;
-                            callPartnerId = partner.numericId;
-                            callPartnerName = partner.nickname || partner.username;
-
-                            document.getElementById('chatPartnerName').textContent = callPartnerName;
-                            document.getElementById('remotePlaceholderName').textContent = callPartnerName;
-                            document.getElementById('remotePlaceholderAvatar').textContent = callPartnerName
-                                .charAt(0).toUpperCase();
-
-                            document.getElementById('videoContainer').classList.add('active');
-                            document.getElementById('callControls').classList.add('active');
-                            document.getElementById('matchBtnContainer').classList.add('hidden');
-
-                            stopMatchTimer();
-
-                            callStartTime = Date.now();
-                            callDurationSeconds = 0;
-                            if (callTimerInterval) clearInterval(callTimerInterval);
-                            callTimerInterval = setInterval(() => {
-                                callDurationSeconds++;
-                                const mins = Math.floor(callDurationSeconds / 60);
-                                const secs = callDurationSeconds % 60;
-                                document.getElementById('chatTimer').textContent =
-                                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                            }, 1000);
-
-                            if (!isCallChatOpen) {
-                                toggleCallChat();
-                            }
-
-                            addCallChatMessage('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
-
-                            await database.ref('active_calls/' + currentUser.numericId).set({
-                                partnerId: partner.numericId,
-                                partnerName: partner.nickname || partner.username,
-                                startTime: new Date().toISOString(),
-                                type: 'video'
-                            });
-
-                            await database.ref('call_history/' + currentUser.numericId).push({
-                                partnerId: partner.numericId,
-                                partnerName: partner.nickname || partner.username,
-                                type: 'video',
-                                startTime: new Date().toISOString(),
-                                status: 'initiated'
-                            });
-
-                            showToast(`✅ بدأت المكالمة مع ${callPartnerName}`, 'success');
-
-                            resetMatchButton();
-                            isMatching = false;
-                            isSearching = false;
-                        } else {
-                            await database.ref('users/' + currentFirebaseUserId).update({
-                                inCall: false,
-                                callPartner: null
-                            });
-                            setTimeout(findRandomPartner, 2000);
+                    call.on('close', () => {
+                        if (callPartnerId) {
+                            database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
                         }
-
-                    } catch (error) {
-                        console.error('Call error:', error);
-                        await database.ref('users/' + currentFirebaseUserId).update({
-                            inCall: false,
-                            callPartner: null
-                        });
-                        setTimeout(findRandomPartner, 2000);
-                    }
-                } else {
-                    await database.ref('users/' + currentFirebaseUserId).update({
-                        inCall: false,
-                        callPartner: null
+                        endCall();
                     });
-                    setTimeout(findRandomPartner, 2000);
+
+                    call.on('error', (err) => {
+                        console.error('Call error:', err);
+                        endCall();
+                    });
+
+                    // بدء المكالمة
+                    isCallActive = true;
+                    callPartnerId = partnerId;
+                    callPartnerName = partnerUsername || 'شريك';
+                    isMatching = false;
+                    isSearching = false;
+
+                    document.getElementById('chatPartnerName').textContent = callPartnerName;
+                    document.getElementById('remotePlaceholderName').textContent = callPartnerName;
+                    document.getElementById('remotePlaceholderAvatar').textContent = callPartnerName
+                        .charAt(0).toUpperCase();
+
+                    document.getElementById('videoContainer').classList.add('active');
+                    document.getElementById('callControls').classList.add('active');
+                    document.getElementById('matchBtnContainer').classList.add('hidden');
+
+                    stopMatchTimer();
+
+                    callStartTime = Date.now();
+                    callDurationSeconds = 0;
+                    if (callTimerInterval) clearInterval(callTimerInterval);
+                    callTimerInterval = setInterval(() => {
+                        callDurationSeconds++;
+                        const mins = Math.floor(callDurationSeconds / 60);
+                        const secs = callDurationSeconds % 60;
+                        document.getElementById('chatTimer').textContent =
+                            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    }, 1000);
+
+                    if (!isCallChatOpen) {
+                        toggleCallChat();
+                    }
+
+                    addCallChatMessage('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
+
+                    database.ref('active_calls/' + currentUser.numericId).set({
+                        partnerId: partnerId,
+                        partnerName: partnerUsername || 'شريك',
+                        startTime: new Date().toISOString(),
+                        type: 'video'
+                    });
+
+                    database.ref('call_history/' + currentUser.numericId).push({
+                        partnerId: partnerId,
+                        partnerName: partnerUsername || 'شريك',
+                        type: 'video',
+                        startTime: new Date().toISOString(),
+                        status: 'initiated'
+                    });
+
+                    // تحديث حالة المستخدم
+                    database.ref('users/' + currentFirebaseUserId).update({
+                        inCall: true,
+                        callPartner: partnerId,
+                        updatedAt: new Date().toISOString()
+                    });
+
+                    resetMatchButton();
+                    showToast(`✅ بدأت المكالمة مع ${callPartnerName}`, 'success');
                 }
 
             } catch (error) {
-                console.error('Find partner error:', error);
-                resetMatchButton();
-                isMatching = false;
-                isSearching = false;
-                stopMatchTimer();
-                await database.ref('users/' + currentFirebaseUserId).update({
-                    inCall: false,
-                    callPartner: null
-                });
+                console.error('Call error:', error);
+                endCall();
             }
         }
 
@@ -2143,6 +2100,15 @@
             }
             stopMatchTimer();
             isSearching = false;
+
+            // حذف من قائمة الانتظار
+            if (database && currentUser) {
+                database.ref('waiting_users/' + currentUser.numericId).remove();
+            }
+            if (waitingListener) {
+                database.ref('waiting_users').off();
+                waitingListener = null;
+            }
         }
 
         // ============================================================
@@ -2197,10 +2163,9 @@
         }
 
         // ============================================================
-        // 📞 إنهاء المكالمة - لا يجبر الطرف الآخر على المطابقة
+        // 📞 إنهاء المكالمة
         // ============================================================
         function endCall() {
-            // فقط إعلام بأن المستخدم أنهى المكالمة
             if (callPartnerId) {
                 database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
                 setTimeout(() => {
@@ -2238,7 +2203,6 @@
 
             stopMatchTimer();
 
-            // حساب المدة والتكلفة
             const durationMinutes = Math.ceil(callDurationSeconds / 60);
             const cost = durationMinutes * 10;
 
@@ -2283,18 +2247,15 @@
                 });
             }
 
-            // إعادة تعيين المتغيرات
             callPartnerId = null;
             callPartnerName = null;
             callDurationSeconds = 0;
 
-            // إخفاء واجهة المكالمة
             document.getElementById('videoContainer').classList.remove('active');
             document.getElementById('callControls').classList.remove('active');
             document.getElementById('callChat').classList.remove('active');
             document.getElementById('matchBtnContainer').classList.remove('hidden');
 
-            // إعادة تعيين حالة الفيديو
             document.getElementById('localVideo').style.display = 'block';
             document.getElementById('localPlaceholder').style.display = 'none';
             document.getElementById('remoteVideo').style.display = 'none';
@@ -2304,7 +2265,6 @@
             document.getElementById('remoteStatus').classList.remove('active');
             document.getElementById('remoteVideoBox').style.display = 'block';
 
-            // إعادة ضبط أزرار
             document.getElementById('micBtn').className = 'call-btn mic-btn';
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
             document.getElementById('videoBtn').className = 'call-btn video-btn';
@@ -2318,10 +2278,9 @@
         }
 
         // ============================================================
-        // ⏭️ الانتقال إلى الشريك التالي (يبحث فقط إذا كان يريد)
+        // ⏭️ الانتقال إلى الشريك التالي
         // ============================================================
         function nextMatch() {
-            // إعلام الشريك بأن المستخدم سيغادر
             if (callPartnerId) {
                 database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
                 setTimeout(() => {
@@ -2705,9 +2664,14 @@
                     isOnline: false,
                     inCall: false
                 });
+                database.ref('waiting_users/' + currentUser.numericId).remove();
             }
             if (peer) {
                 try { peer.destroy(); } catch (e) {}
+            }
+            if (waitingListener) {
+                database.ref('waiting_users').off();
+                waitingListener = null;
             }
             stopMatchTimer();
         });
