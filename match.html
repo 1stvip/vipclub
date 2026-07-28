@@ -1715,7 +1715,6 @@
         let partnerProfileData = null;
         let isPartnerDisconnected = false;
         let isPeerReady = false;
-        let matchedUsers = new Set();
         let isCallInitiator = false;
 
         // ============================================================
@@ -1863,18 +1862,19 @@
         }
 
         // ============================================================
-        // 🎙️ طلب إذن المايك والكاميرا - مع إصلاح للهواتف
+        // 🎙️ طلب إذن المايك والكاميرا - إصلاح نهائي للهواتف
         // ============================================================
         async function requestMediaPermissions() {
             try {
                 const overlay = document.getElementById('permissionOverlay');
                 overlay.classList.remove('active');
 
-                // محاولة الحصول على الصوت أولاً للتأكد
+                // محاولة الحصول على الصوت أولاً (الأهم)
                 let stream;
+                let hasVideo = false;
 
                 try {
-                    // طلب الصوت والفيديو معاً
+                    // محاولة الحصول على الصوت والفيديو معاً
                     const constraints = {
                         audio: {
                             echoCancellation: true,
@@ -1889,6 +1889,7 @@
                         }
                     };
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    hasVideo = stream.getVideoTracks().length > 0;
                 } catch (videoError) {
                     console.log('⚠️ محاولة بدون فيديو:', videoError);
                     // محاولة الحصول على الصوت فقط
@@ -1900,6 +1901,7 @@
                         }
                     };
                     stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+                    hasVideo = false;
                     showToast('⚠️ تم الوصول إلى الميكروفون فقط (الكاميرا غير متاحة)', 'warning');
                 }
 
@@ -1921,9 +1923,6 @@
                 document.getElementById('micBtn').className = 'call-btn mic-btn active';
                 document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
 
-                // التحقق من وجود كاميرا
-                const hasVideo = stream.getVideoTracks().length > 0;
-
                 if (hasVideo) {
                     document.getElementById('localVideoOverlayBtn').style.display = 'flex';
                     document.getElementById('localFlipOverlayBtn').style.display = 'flex';
@@ -1931,7 +1930,7 @@
                     document.getElementById('localPlaceholder').style.display = 'none';
                     document.getElementById('localVideoOverlayBtn').className = 'video-overlay-btn active';
                     document.getElementById('localVideoOverlayBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
-                    showToast('✅ تم الوصول إلى الميكروفون والكاميرا (الميكروفون مفتوح)', 'success');
+                    showToast('✅ تم الوصول إلى الميكروفون والكاميرا', 'success');
                 } else {
                     document.getElementById('localVideoOverlayBtn').style.display = 'none';
                     document.getElementById('localFlipOverlayBtn').style.display = 'none';
@@ -2399,7 +2398,7 @@
         }
 
         // ============================================================
-        // 🎯 بدء المطابقة
+        // 🎯 بدء المطابقة - مع إمكانية التطابق مع نفس المستخدم
         // ============================================================
         function startMatching() {
             if (isMatching || isCallActive || isSearching) return;
@@ -2482,7 +2481,7 @@
         }
 
         // ============================================================
-        // 📡 الاستماع للمستخدمين المنتظرين
+        // 📡 الاستماع للمستخدمين المنتظرين - مع إمكانية التطابق مع نفس المستخدم
         // ============================================================
         function listenForWaitingUsers() {
             if (waitingListener) {
@@ -2493,18 +2492,13 @@
                 const data = snapshot.val();
                 const userId = data.userId;
 
+                // تجاهل المستخدم نفسه فقط (لا نمنع التطابق مع نفس المستخدم)
                 if (userId == currentUser.numericId) return;
-
-                if (matchedUsers.has(userId)) {
-                    console.log('⏭️ تجاهل المستخدم (تم التطابق معه سابقاً):', userId);
-                    return;
-                }
 
                 console.log('👤 تم العثور على مستخدم منتظر:', data.username);
 
                 if (isSearching && !isCallActive && !isPartnerDisconnected && isPeerReady) {
-                    matchedUsers.add(userId);
-
+                    // حذف كلا المستخدمين من قائمة الانتظار
                     database.ref('waiting_users/' + currentUser.numericId).remove();
                     database.ref('waiting_users/' + userId).remove();
 
@@ -2964,9 +2958,6 @@
         function nextMatch() {
             if (isCallActive || isPartnerDisconnected) {
                 if (isCallActive) {
-                    if (currentPartnerId) {
-                        matchedUsers.add(currentPartnerId);
-                    }
                     endCall();
                 }
 
