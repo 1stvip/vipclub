@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📞 مكالمة - كوكبة</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <!-- PeerJS -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        /* ===== أنماط خاصة بصفحة المكالمة ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0a0a1a;
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ===== خلفية المكالمة ===== */
+        .call-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #0a0a1a, #1a1040);
+            z-index: 0;
+        }
+
+        .call-background .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+        }
+
+        .call-background .orb1 {
+            width: 400px;
+            height: 400px;
+            background: #4f46e5;
+            top: -100px;
+            right: -100px;
+            animation: floatOrb 8s ease-in-out infinite;
+        }
+
+        .call-background .orb2 {
+            width: 300px;
+            height: 300px;
+            background: #8b5cf6;
+            bottom: -50px;
+            left: -50px;
+            animation: floatOrb 10s ease-in-out infinite reverse;
+        }
+
+        .call-background .orb3 {
+            width: 200px;
+            height: 200px;
+            background: #ffd700;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.1;
+            animation: floatOrb 12s ease-in-out infinite;
+        }
+
+        @keyframes floatOrb {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            background: rgba(10, 10, 30, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 0.6rem 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 60px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.3rem;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn .badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.5rem;
+            padding: 1px 6px;
+            border-radius: 50%;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        .back-btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        /* ===== المحتوى الرئيسي ===== */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 5;
+            height: calc(100vh - 60px);
+            gap: 15px;
+        }
+
+        /* ===== معلومات المكالمة ===== */
+        .call-info {
+            text-align: center;
+            z-index: 5;
+        }
+
+        .call-info .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            border: 3px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .call-info .avatar .online-dot {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 18px;
+            height: 18px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 3px solid #0a0a1a;
+        }
+
+        .call-info .avatar.ringing {
+            animation: avatarPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 60px rgba(139, 92, 246, 0.5), 0 0 100px rgba(139, 92, 246, 0.2);
+            }
+        }
+
+        .call-info .name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .call-info .status {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .call-info .status .timer {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        .call-info .status .call-type {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        /* ===== فيديو المكالمة ===== */
+        .video-container {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .video-container.active {
+            display: flex;
+        }
+
+        .video-box {
+            flex: 1;
+            min-width: 280px;
+            max-width: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            aspect-ratio: 4/3;
+        }
+
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #111;
+        }
+
+        .video-box .video-label {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            color: #fff;
+            backdrop-filter: blur(5px);
+        }
+
+        .video-box .video-label.remote {
+            left: auto;
+            right: 10px;
+        }
+
+        .video-box .mute-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            color: #ef4444;
+            display: none;
+        }
+
+        .video-box .video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            background: #0a0a1a;
+        }
+
+        .video-box .video-placeholder .big-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+        }
+
+        .video-box .video-placeholder .big-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        /* ===== أزرار التحكم ===== */
+        .call-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 5;
+            padding: 10px 0;
+        }
+
+        .call-btn {
+            padding: 14px 24px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .call-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .call-btn .tooltip {
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 0.55rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+            font-weight: 600;
+        }
+
+        .call-btn:hover .tooltip {
+            opacity: 1;
+        }
+
+        .call-btn.mic-btn {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .call-btn.mic-btn.muted {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .call-btn.video-btn {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .call-btn.video-btn.off {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .call-btn.end-call-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 70px;
+            height: 70px;
+            font-size: 1.5rem;
+        }
+
+        .call-btn.end-call-btn:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            transform: scale(1.1);
+        }
+
+        .call-btn.gift-call-btn {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .call-btn.gift-call-btn:hover {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        .call-btn.chat-call-btn {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .call-btn.chat-call-btn:hover {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .call-btn.speaker-btn {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .call-btn.speaker-btn.off {
+            background: rgba(107, 114, 128, 0.15);
+            border-color: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+        }
+
+        /* ===== شات المكالمة ===== */
+        .call-chat {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            max-height: 200px;
+            flex-direction: column;
+            z-index: 5;
+        }
+
+        .call-chat.active {
+            display: flex;
+        }
+
+        .call-chat .chat-header {
+            padding: 6px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.75rem;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .call-chat .chat-messages {
+            flex: 1;
+            padding: 6px 12px;
+            overflow-y: auto;
+            max-height: 120px;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .call-chat .chat-messages .msg {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .call-chat .chat-messages .msg.own {
+            background: rgba(139, 92, 246, 0.2);
+            align-self: flex-end;
+            border-radius: 8px 8px 4px 8px;
+        }
+
+        .call-chat .chat-messages .msg.other {
+            background: rgba(255, 255, 255, 0.05);
+            align-self: flex-start;
+            border-radius: 8px 8px 8px 4px;
+        }
+
+        .call-chat .chat-messages .msg .sender {
+            font-size: 0.55rem;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+
+        .call-chat .chat-messages .msg.system {
+            text-align: center;
+            color: #666;
+            font-size: 0.65rem;
+            align-self: center;
+            background: transparent;
+            max-width: 90%;
+        }
+
+        .call-chat .chat-input {
+            display: flex;
+            gap: 6px;
+            padding: 4px 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+
+        .call-chat .chat-input input {
+            flex: 1;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+            font-size: 0.75rem;
+        }
+
+        .call-chat .chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .call-chat .chat-input button {
+            padding: 6px 12px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+
+        .call-chat .chat-input button:hover {
+            background: #7c3aed;
+            transform: scale(1.05);
+        }
+
+        /* ===== إشعار المكالمة الواردة ===== */
+        .incoming-call-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .incoming-call-overlay.active {
+            display: flex;
+        }
+
+        .incoming-call-box {
+            background: #1a1a2e;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 24px;
+            padding: 35px 40px;
+            max-width: 380px;
+            width: 95%;
+            text-align: center;
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .incoming-call-box .caller-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            margin: 0 auto 15px;
+            animation: pulseAvatar 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseAvatar {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(139, 92, 246, 0);
+            }
+        }
+
+        .incoming-call-box .caller-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .incoming-call-box .call-type {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin: 5px 0 20px;
+        }
+
+        .incoming-call-box .call-actions {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .incoming-call-box .call-actions button {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .incoming-call-box .call-actions .btn-accept {
+            background: #10b981;
+            color: white;
+        }
+
+        .incoming-call-box .call-actions .btn-accept:hover {
+            background: #059669;
+            transform: scale(1.1);
+        }
+
+        .incoming-call-box .call-actions .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .incoming-call-box .call-actions .btn-reject:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        /* ===== هدايا المكالمة ===== */
+        .gift-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a2e;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            z-index: 99998;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            min-width: 280px;
+            max-width: 90%;
+            animation: popIn 0.3s ease;
+        }
+
+        .gift-modal.active {
+            display: flex;
+        }
+
+        .gift-modal h3 {
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .gift-modal .gift-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 8px;
+            width: 100%;
+        }
+
+        .gift-modal .gift-grid .gift-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gift-modal .gift-grid .gift-option:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        .gift-modal .gift-grid .gift-option.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        .gift-modal .gift-grid .gift-option .emoji {
+            font-size: 1.8rem;
+            display: block;
+        }
+
+        .gift-modal .gift-grid .gift-option .name {
+            font-size: 0.6rem;
+            color: #94a3b8;
+        }
+
+        .gift-modal .gift-grid .gift-option .price {
+            font-size: 0.55rem;
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .gift-modal .gift-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .gift-modal .gift-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .gift-modal .gift-actions .btn-send-gift {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .gift-modal .gift-actions .btn-send-gift:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        .gift-modal .gift-actions .btn-close-gift {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+        }
+
+        .gift-modal .gift-actions .btn-close-gift:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .gift-modal .balance-display {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .gift-modal .balance-display span {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        /* ===== هدية واردة ===== */
+        .gift-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            z-index: 99997;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-width: 250px;
+            max-width: 90%;
+            animation: popIn 0.3s ease;
+        }
+
+        .gift-popup.active {
+            display: flex;
+        }
+
+        .gift-popup .gift-emoji-big {
+            font-size: 4rem;
+        }
+
+        .gift-popup .gift-text {
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            color: #fff;
+        }
+
+        .gift-popup .gift-sender {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* ===== توست ===== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 100000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            font-size: 0.8rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+        .toast.warning {
+            background: rgba(245, 158, 11, 0.9);
+        }
+        .toast.info {
+            background: rgba(59, 130, 246, 0.9);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== استجابة ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.4rem 2%;
+                min-height: 50px;
+            }
+            .logo {
+                font-size: 0.9rem;
+            }
+            .logo i {
+                font-size: 1.1rem;
+            }
+            .nav-btn {
+                padding: 4px 10px;
+                font-size: 0.65rem;
+            }
+            .call-info .avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2.2rem;
+            }
+            .call-info .name {
+                font-size: 1.2rem;
+            }
+            .call-info .status {
+                font-size: 0.8rem;
+            }
+            .video-box {
+                min-width: 200px;
+                max-width: 100%;
+            }
+            .call-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.1rem;
+            }
+            .call-btn.end-call-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.3rem;
+            }
+            .incoming-call-box {
+                padding: 25px 20px;
+            }
+            .incoming-call-box .call-actions button {
+                width: 55px;
+                height: 55px;
+                font-size: 1.2rem;
+            }
+            .call-controls {
+                gap: 10px;
+            }
+            .gift-modal {
+                padding: 20px;
+                min-width: 250px;
+            }
+            .gift-modal .gift-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 10px 12px;
+                gap: 10px;
+            }
+            .call-info .avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            .call-info .name {
+                font-size: 1rem;
+            }
+            .call-info .status {
+                font-size: 0.7rem;
+            }
+            .call-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 0.9rem;
+            }
+            .call-btn.end-call-btn {
+                width: 54px;
+                height: 54px;
+                font-size: 1.1rem;
+            }
+            .video-box {
+                min-width: 100%;
+                aspect-ratio: 4/3;
+            }
+            .video-container {
+                gap: 10px;
+            }
+            .incoming-call-box {
+                padding: 20px 15px;
+            }
+            .incoming-call-box .call-actions button {
+                width: 48px;
+                height: 48px;
+                font-size: 1rem;
+            }
+            .call-chat .chat-messages {
+                max-height: 80px;
+                min-height: 40px;
+            }
+            .call-chat .chat-input input {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+            .call-chat .chat-input button {
+                padding: 4px 10px;
+                font-size: 0.6rem;
+            }
+        }
+
+        /* ===== شريط التنقل السفلي ===== */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            padding: 8px;
+            justify-content: space-around;
+            z-index: 99;
+        }
+
+        .bottom-nav .nav-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 6px 0;
+            font-size: 0.65rem;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bottom-nav .nav-btn i {
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-nav {
+                display: flex;
+            }
+            .main-container {
+                padding-bottom: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== خلفية ===== -->
+    <div class="call-background">
+        <div class="gradient-orb orb1"></div>
+        <div class="gradient-orb orb2"></div>
+        <div class="gradient-orb orb3"></div>
+    </div>
+
+    <!-- ===== شريط التنقل ===== -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i class="fas fa-comet"></i>
+            كوكبة
+        </a>
+        <div class="nav-icons">
+            <a href="match.html" class="nav-btn">
+                <i class="fas fa-random"></i> مطابقة
+            </a>
+            <a href="friends.html" class="nav-btn">
+                <i class="fas fa-user-friends"></i> أصدقاء
+                <span class="badge" id="friendRequestsBadge">0</span>
+            </a>
+            <a href="profile.html" class="nav-btn">
+                <i class="fas fa-user-circle"></i> حسابي
+            </a>
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== إشعار مكالمة واردة ===== -->
+    <div class="incoming-call-overlay" id="incomingCallOverlay">
+        <div class="incoming-call-box">
+            <div class="caller-avatar" id="incomingCallerAvatar">👤</div>
+            <div class="caller-name" id="incomingCallerName">مستخدم</div>
+            <div class="call-type" id="incomingCallType">📹 مكالمة فيديو</div>
+            <div class="call-actions">
+                <button class="btn-accept" onclick="acceptIncomingCall()">
+                    <i class="fas fa-phone"></i>
+                </button>
+                <button class="btn-reject" onclick="rejectIncomingCall()">
+                    <i class="fas fa-phone-slash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== المحتوى الرئيسي ===== -->
+    <div class="main-container">
+        <!-- ===== معلومات المكالمة ===== -->
+        <div class="call-info" id="callInfo">
+            <div class="avatar ringing" id="callAvatar">
+                <span id="avatarLetter">👤</span>
+                <span class="online-dot"></span>
+            </div>
+            <div class="name" id="callPartnerName">جاري الاتصال...</div>
+            <div class="status" id="callStatus">
+                <span class="call-type" id="callTypeBadge">📹 فيديو</span>
+                <span style="display:block;margin-top:5px;" id="callTimerDisplay">
+                    <span class="timer" id="callTimer">00:00</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== فيديو المكالمة ===== -->
+        <div class="video-container" id="videoContainer">
+            <div class="video-box" id="localVideoBox">
+                <video id="localVideo" autoplay playsinline muted></video>
+                <div class="video-label">📹 أنت</div>
+                <div class="mute-indicator" id="localMuteIndicator">🔇 مكتوم</div>
+            </div>
+            <div class="video-box" id="remoteVideoBox">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="video-label remote" id="remoteLabel">👤 الشريك</div>
+                <div class="mute-indicator" id="remoteMuteIndicator">🔇 مكتوم</div>
+                <div class="video-placeholder" id="remotePlaceholder">
+                    <div class="big-avatar" id="remotePlaceholderAvatar">👤</div>
+                    <div class="big-name" id="remotePlaceholderName">في انتظار الاتصال...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== شات المكالمة ===== -->
+        <div class="call-chat" id="callChat">
+            <div class="chat-header">
+                <span>💬 شات المكالمة</span>
+                <span id="chatPartnerName">الشريك</span>
+            </div>
+            <div class="chat-messages" id="callChatMessages"></div>
+            <div class="chat-input">
+                <input type="text" id="callChatInput" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter') sendCallChatMessage()">
+                <button onclick="sendCallChatMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== أزرار التحكم ===== -->
+        <div class="call-controls" id="callControls">
+            <button class="call-btn mic-btn" id="micBtn" onclick="toggleMic()">
+                <i class="fas fa-microphone"></i>
+                <span class="tooltip">ميكروفون</span>
+            </button>
+            <button class="call-btn video-btn" id="videoBtn" onclick="toggleVideo()">
+                <i class="fas fa-video"></i>
+                <span class="tooltip">كاميرا</span>
+            </button>
+            <button class="call-btn speaker-btn" id="speakerBtn" onclick="toggleSpeaker()">
+                <i class="fas fa-volume-up"></i>
+                <span class="tooltip">سماعة</span>
+            </button>
+            <button class="call-btn gift-call-btn" onclick="openGiftModal()">
+                <i class="fas fa-gift"></i>
+                <span class="tooltip">هدية</span>
+            </button>
+            <button class="call-btn chat-call-btn" onclick="toggleCallChat()">
+                <i class="fas fa-comment"></i>
+                <span class="tooltip">شات</span>
+            </button>
+            <button class="call-btn end-call-btn" onclick="endCall()">
+                <i class="fas fa-phone-slash"></i>
+                <span class="tooltip">إنهاء</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== هدايا المكالمة ===== -->
+    <div class="gift-modal" id="giftModal">
+        <h3>🎁 إرسال هدية</h3>
+        <div class="balance-display">رصيدك: <span id="giftBalance">0</span> ج.م</div>
+        <div class="gift-grid" id="giftGrid">
+            <!-- سيتم تعبئتها بواسطة JavaScript -->
+        </div>
+        <div class="gift-actions">
+            <button class="btn-send-gift" onclick="sendCallGift()">إرسال</button>
+            <button class="btn-close-gift" onclick="closeGiftModal()">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- ===== هدية واردة ===== -->
+    <div class="gift-popup" id="giftPopup">
+        <div class="gift-emoji-big" id="giftPopupEmoji">🎁</div>
+        <div class="gift-text" id="giftPopupText">تلقيت هدية!</div>
+        <div class="gift-sender" id="giftPopupSender">من: مستخدم</div>
+    </div>
+
+    <!-- ===== شريط التنقل السفلي ===== -->
+    <div class="bottom-nav">
+        <a href="match.html" class="nav-btn">
+            <i class="fas fa-random"></i>
+            مطابقة
+        </a>
+        <a href="friends.html" class="nav-btn">
+            <i class="fas fa-user-friends"></i>
+            أصدقاء
+            <span class="badge" id="bottomFriendBadge">0</span>
+        </a>
+        <a href="profile.html" class="nav-btn">
+            <i class="fas fa-user-circle"></i>
+            حسابي
+        </a>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
+        };
+
+        // ============================================================
+        // 📋 المتغيرات العامة
+        // ============================================================
+        let database;
+        let currentUser = null;
+        let currentFirebaseUserId = null;
+        let partnerId = null;
+        let partnerData = null;
+        let isCallActive = false;
+        let isCaller = false;
+        let callType = 'video';
+        let callDurationSeconds = 0;
+        let callTimerInterval = null;
+        let peer = null;
+        let myPeerId = null;
+        let mediaStream = null;
+        let isMicMuted = true;
+        let isVideoOff = false;
+        let isSpeakerOn = true;
+        let incomingCallData = null;
+        let isCallChatOpen = false;
+        let selectedGift = null;
+        let callStartTime = null;
+
+        // الهدايا
+        const GIFT_TYPES = [
+            { id: 'rose', name: 'وردة', emoji: '🌹', price: 10 },
+            { id: 'heart', name: 'قلب', emoji: '❤️', price: 15 },
+            { id: 'chain', name: 'سلسلة', emoji: '🔗', price: 30 },
+            { id: 'silver_ring', name: 'خاتم فضي', emoji: '💍', price: 200 },
+            { id: 'diamond_ring', name: 'خاتم ألماس', emoji: '💎', price: 500 },
+            { id: 'gold_ring', name: 'خاتم ذهب', emoji: '👑', price: 2500 }
+        ];
+
+        // ============================================================
+        // 🍞 توست
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: 'rgba(16,185,129,0.9)',
+                error: 'rgba(239,68,68,0.9)',
+                warning: 'rgba(245,158,11,0.9)',
+                info: 'rgba(59,130,246,0.9)'
+            };
+            const old = document.querySelector('.toast');
+            if (old) old.remove();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.style.background = colors[type] || colors.info;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================================
+        // 🔥 تهيئة Firebase
+        // ============================================================
+        async function initializeFirebase() {
+            try {
+                if (firebase.apps.length > 0) await firebase.app().delete();
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                console.log('✅ Firebase initialized');
+            } catch (error) {
+                console.error('❌ Firebase error:', error);
+            }
+        }
+
+        // ============================================================
+        // 👤 المستخدم
+        // ============================================================
+        function getStoredUser() {
+            try { return JSON.parse(localStorage.getItem('currentUser')); } catch (e) { return null; }
+        }
+
+        function isLoggedIn() { return getStoredUser() !== null; }
+
+        function generateNumericId() { return Math.floor(100000 + Math.random() * 900000); }
+
+        async function getCurrentUserFullData() {
+            try {
+                const stored = getStoredUser();
+                if (!stored) return null;
+                if (!database) return stored;
+                const numericId = stored.numericId || generateNumericId();
+                if (!stored.numericId) {
+                    stored.numericId = numericId;
+                    localStorage.setItem('currentUser', JSON.stringify(stored));
+                }
+                const snapshot = await database.ref('users')
+                    .orderByChild('numericId')
+                    .equalTo(numericId)
+                    .once('value');
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const firebaseKey = Object.keys(userData)[0];
+                    const fullUser = userData[firebaseKey];
+                    const merged = { ...stored, ...fullUser, numericId: numericId, firebaseKey: firebaseKey };
+                    localStorage.setItem('currentUser', JSON.stringify(merged));
+                    currentFirebaseUserId = firebaseKey;
+                    return merged;
+                }
+                return stored;
+            } catch (e) { return getStoredUser(); }
+        }
+
+        // ============================================================
+        // 🔗 الحصول على بيانات المكالمة
+        // ============================================================
+        function getCallDataFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                user: params.get('user'),
+                type: params.get('type') || 'video',
+                callId: params.get('callId')
+            };
+        }
+
+        // ============================================================
+        // 📊 تحميل بيانات الشريك
+        // ============================================================
+        async function loadPartnerData() {
+            const callData = getCallDataFromURL();
+            const partnerIdParam = callData.user;
+
+            if (!partnerIdParam) {
+                showToast('❌ لم يتم تحديد المستخدم', 'error');
+                setTimeout(() => window.location.href = 'friends.html', 2000);
+                return;
+            }
+
+            partnerId = parseInt(partnerIdParam);
+            callType = callData.type || 'video';
+
+            try {
+                const snapshot = await database.ref('users')
+                    .orderByChild('numericId')
+                    .equalTo(partnerId)
+                    .once('value');
+
+                if (!snapshot.exists()) {
+                    showToast('❌ المستخدم غير موجود', 'error');
+                    setTimeout(() => window.location.href = 'friends.html', 2000);
+                    return;
+                }
+
+                const userData = snapshot.val();
+                const userKey = Object.keys(userData)[0];
+                partnerData = userData[userKey];
+                partnerData.firebaseKey = userKey;
+
+                // تحديث الواجهة
+                updateCallUI();
+
+                // التحقق من الحظر
+                const blockedSnapshot = await database.ref('users/' + currentFirebaseUserId + '/blocked/' + partnerId)
+                    .once('value');
+                if (blockedSnapshot.exists()) {
+                    showToast('⚠️ هذا المستخدم محظور', 'warning');
+                    setTimeout(() => window.location.href = 'friends.html', 2000);
+                    return;
+                }
+
+                // بدء المكالمة
+                await startCall();
+
+            } catch (error) {
+                console.error('Error loading partner:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ تحديث واجهة المكالمة
+        // ============================================================
+        function updateCallUI() {
+            const name = partnerData?.nickname || partnerData?.username || 'مستخدم';
+            const initial = name.charAt(0).toUpperCase();
+
+            document.getElementById('callPartnerName').textContent = name;
+            document.getElementById('avatarLetter').textContent = initial;
+            document.getElementById('callTypeBadge').textContent = callType === 'video' ? '📹 فيديو' : '🎧 صوت';
+            document.getElementById('remotePlaceholderName').textContent = name;
+            document.getElementById('remotePlaceholderAvatar').textContent = initial;
+            document.getElementById('chatPartnerName').textContent = name;
+
+            // تحديث حالة المكالمة
+            document.getElementById('callStatus').innerHTML = `
+                <span class="call-type">${callType === 'video' ? '📹 فيديو' : '🎧 صوت'}</span>
+                <span style="display:block;margin-top:5px;" id="callTimerDisplay">
+                    <span class="timer" id="callTimer">00:00</span>
+                </span>
+            `;
+
+            // إذا كانت مكالمة صوت فقط، إخفاء الفيديو
+            if (callType === 'audio') {
+                document.getElementById('videoContainer').style.display = 'none';
+                document.getElementById('videoBtn').style.display = 'none';
+            } else {
+                document.getElementById('videoContainer').classList.add('active');
+            }
+        }
+
+        // ============================================================
+        // 📞 بدء المكالمة
+        // ============================================================
+        async function startCall() {
+            try {
+                // التحقق من الرصيد
+                if ((currentUser.balanceEGP || 0) < 10) {
+                    showToast('⚠️ رصيد غير كافٍ (تحتاج 10 ج.م للدقيقة)', 'warning');
+                    setTimeout(() => window.location.href = 'friends.html', 2000);
+                    return;
+                }
+
+                isCaller = true;
+
+                // الحصول على وسائط الصوت والفيديو
+                const constraints = {
+                    audio: { echoCancellation: true, noiseSuppression: true }
+                };
+
+                if (callType === 'video') {
+                    constraints.video = { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } };
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                mediaStream = stream;
+                isMicMuted = true;
+                mediaStream.getAudioTracks().forEach(track => track.enabled = false);
+
+                // عرض الفيديو المحلي
+                const localVideo = document.getElementById('localVideo');
+                localVideo.srcObject = stream;
+
+                if (callType === 'video') {
+                    document.getElementById('localVideoBox').style.display = 'block';
+                } else {
+                    document.getElementById('localVideoBox').style.display = 'none';
+                }
+
+                // تهيئة PeerJS
+                await initPeerJS();
+
+                // إرسال طلب مكالمة
+                const callId = 'call_' + Date.now();
+
+                await database.ref('call_requests/' + partnerId + '/' + callId).set({
+                    callerId: currentUser.numericId,
+                    callerName: currentUser.nickname || currentUser.username || 'مستخدم',
+                    callerPeerId: myPeerId,
+                    type: callType,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + 60000).toISOString()
+                });
+
+                // تحديث حالة المستخدم
+                await database.ref('users/' + currentFirebaseUserId).update({
+                    inCall: true,
+                    callPartner: partnerId,
+                    updatedAt: new Date().toISOString()
+                });
+
+                // تحديث حالة المكالمة
+                isCallActive = true;
+
+                // بدء مؤقت الانتظار
+                let waitingSeconds = 0;
+                const waitingInterval = setInterval(() => {
+                    waitingSeconds++;
+                    const mins = Math.floor(waitingSeconds / 60);
+                    const secs = waitingSeconds % 60;
+                    document.getElementById('callTimer').textContent =
+                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+
+                // انتظار قبول المكالمة
+                let accepted = false;
+                let attempts = 0;
+
+                const checkInterval = setInterval(async () => {
+                    attempts++;
+                    try {
+                        const statusSnapshot = await database.ref('call_requests/' + partnerId + '/' + callId)
+                            .once('value');
+                        const statusData = statusSnapshot.val();
+
+                        if (!statusData || statusData.status === 'rejected' || statusData.status === 'expired') {
+                            clearInterval(checkInterval);
+                            clearInterval(waitingInterval);
+                            showToast('❌ لم يقبل الشريك المكالمة', 'warning');
+                            endCall();
+                            return;
+                        }
+
+                        if (statusData.status === 'accepted') {
+                            clearInterval(checkInterval);
+                            clearInterval(waitingInterval);
+                            accepted = true;
+
+                            // بدء المكالمة مع PeerJS
+                            const call = peer.call(partnerData.peerId || statusData.callerPeerId, stream);
+                            if (call) {
+                                call.on('stream', (remoteStream) => {
+                                    const remoteVideo = document.getElementById('remoteVideo');
+                                    remoteVideo.srcObject = remoteStream;
+                                    document.getElementById('remotePlaceholder').style.display = 'none';
+                                    remoteVideo.style.display = 'block';
+
+                                    // تحديث حالة المكالمة
+                                    document.getElementById('callStatus').innerHTML = `
+                                        <span class="call-type">${callType === 'video' ? '📹 فيديو' : '🎧 صوت'}</span>
+                                        <span style="display:block;margin-top:5px;color:#10b981;">🔴 جارية</span>
+                                        <span style="display:block;margin-top:5px;">
+                                            <span class="timer" id="callTimer">00:00</span>
+                                        </span>
+                                    `;
+
+                                    // إزالة حالة الرنين
+                                    document.getElementById('callAvatar').classList.remove('ringing');
+                                });
+                                call.on('close', () => {
+                                    endCall();
+                                });
+                                window._currentCall = call;
+                            }
+
+                            // بدء مؤقت المكالمة
+                            callStartTime = Date.now();
+                            callDurationSeconds = 0;
+                            if (callTimerInterval) clearInterval(callTimerInterval);
+                            callTimerInterval = setInterval(() => {
+                                callDurationSeconds++;
+                                const mins = Math.floor(callDurationSeconds / 60);
+                                const secs = callDurationSeconds % 60;
+                                document.getElementById('callTimer').textContent =
+                                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                            }, 1000);
+
+                            // حذف طلب المكالمة
+                            database.ref('call_requests/' + partnerId + '/' + callId).remove();
+
+                            // إضافة رسالة نظام
+                            addCallChatMessage('system', '📞 بدأت المكالمة');
+
+                            showToast('✅ تم الاتصال', 'success');
+
+                            // تحديث حالة المستخدم في Firebase
+                            database.ref('users/' + currentFirebaseUserId).update({
+                                inCall: true,
+                                callPartner: partnerId,
+                                updatedAt: new Date().toISOString()
+                            });
+
+                            // تسجيل المكالمة النشطة
+                            await database.ref('active_calls/' + currentUser.numericId).set({
+                                partnerId: partnerId,
+                                partnerName: partnerData?.nickname || partnerData?.username || 'مستخدم',
+                                startTime: new Date().toISOString(),
+                                callId: callId,
+                                type: callType
+                            });
+                        }
+
+                        if (attempts > 30) {
+                            clearInterval(checkInterval);
+                            clearInterval(waitingInterval);
+                            if (!accepted) {
+                                database.ref('call_requests/' + partnerId + '/' + callId).update({
+                                    status: 'expired',
+                                    expiredAt: new Date().toISOString()
+                                });
+                                showToast('⏰ انتهت مهلة الانتظار', 'warning');
+                                endCall();
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Check error:', e);
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error starting call:', error);
+                showToast('❌ حدث خطأ في بدء المكالمة', 'error');
+                endCall();
+            }
+        }
+
+        // ============================================================
+        // 🔗 PeerJS
+        // ============================================================
+        async function initPeerJS() {
+            if (!currentUser) return;
+
+            try {
+                const peerId = 'call_' + currentUser.numericId + '_' + Date.now();
+                peer = new Peer(peerId, {
+                    debug: 2,
+                    config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
+                });
+
+                myPeerId = peer.id;
+
+                peer.on('open', (id) => {
+                    myPeerId = id;
+                    console.log('✅ PeerJS ready:', id);
+                });
+
+                peer.on('call', (call) => {
+                    handleIncomingPeerCall(call);
+                });
+
+                peer.on('error', (err) => {
+                    console.error('Peer error:', err);
+                });
+
+                // تحديث Peer ID في Firebase
+                await database.ref('users/' + currentFirebaseUserId + '/peerId').set(myPeerId);
+
+            } catch (error) {
+                console.error('Error initializing PeerJS:', error);
+            }
+        }
+
+        // ============================================================
+        // 📞 معالجة مكالمة واردة من PeerJS
+        // ============================================================
+        function handleIncomingPeerCall(call) {
+            // يتم التعامل مع المكالمات عبر Firebase
+            // لكن نضيف هذه الدالة للتوافق
+            console.log('📞 Incoming peer call from:', call.peer);
+        }
+
+        // ============================================================
+        // 📞 الاستماع لطلبات المكالمات (للمستقبل)
+        // ============================================================
+        function listenForCallRequests() {
+            if (!database || !currentUser) return;
+
+            database.ref('call_requests/' + currentUser.numericId).on('child_added', (snapshot) => {
+                const callData = snapshot.val();
+                if (callData && callData.status === 'pending') {
+                    showIncomingCall(snapshot.key, callData);
+                }
+            });
+        }
+
+        // ============================================================
+        // 📞 عرض إشعار المكالمة الواردة
+        // ============================================================
+        function showIncomingCall(callId, callData) {
+            // إذا كانت هناك مكالمة نشطة، تجاهل
+            if (isCallActive) {
+                database.ref('call_requests/' + currentUser.numericId + '/' + callId).update({
+                    status: 'rejected',
+                    rejectedAt: new Date().toISOString(),
+                    reason: 'مشغول'
+                });
+                return;
+            }
+
+            incomingCallData = {
+                callId: callId,
+                callerId: callData.callerId,
+                callerName: callData.callerName || 'مستخدم',
+                callerPeerId: callData.callerPeerId,
+                type: callData.type || 'video'
+            };
+
+            document.getElementById('incomingCallerAvatar').textContent = incomingCallData.callerName.charAt(0)
+            .toUpperCase();
+            document.getElementById('incomingCallerName').textContent = incomingCallData.callerName;
+            document.getElementById('incomingCallType').textContent =
+                incomingCallData.type === 'video' ? '📹 مكالمة فيديو' : '🎧 مكالمة صوتية';
+
+            document.getElementById('incomingCallOverlay').classList.add('active');
+
+            // تشغيل صوت الرنين
+            playRingtone();
+        }
+
+        // ============================================================
+        // 🎵 رنين المكالمة
+        // ============================================================
+        function playRingtone() {
+            try {
+                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-phone-ringing-2874.mp3');
+                audio.loop = true;
+                audio.volume = 0.3;
+                audio.play();
+                window._ringtone = audio;
+            } catch (e) {}
+        }
+
+        function stopRingtone() {
+            try {
+                if (window._ringtone) {
+                    window._ringtone.pause();
+                    window._ringtone = null;
+                }
+            } catch (e) {}
+        }
+
+        // ============================================================
+        // ✅ قبول المكالمة الواردة
+        // ============================================================
+        async function acceptIncomingCall() {
+            if (!incomingCallData) return;
+
+            stopRingtone();
+            document.getElementById('incomingCallOverlay').classList.remove('active');
+
+            try {
+                isCaller = false;
+                callType = incomingCallData.type;
+                partnerId = incomingCallData.callerId;
+
+                // جلب بيانات الشريك
+                const snapshot = await database.ref('users')
+                    .orderByChild('numericId')
+                    .equalTo(partnerId)
+                    .once('value');
+
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const userKey = Object.keys(userData)[0];
+                    partnerData = userData[userKey];
+                    partnerData.firebaseKey = userKey;
+                }
+
+                // الحصول على وسائط الصوت والفيديو
+                const constraints = {
+                    audio: { echoCancellation: true, noiseSuppression: true }
+                };
+
+                if (callType === 'video') {
+                    constraints.video = { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } };
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                mediaStream = stream;
+                isMicMuted = true;
+                mediaStream.getAudioTracks().forEach(track => track.enabled = false);
+
+                // عرض الفيديو المحلي
+                const localVideo = document.getElementById('localVideo');
+                localVideo.srcObject = stream;
+
+                if (callType === 'video') {
+                    document.getElementById('localVideoBox').style.display = 'block';
+                } else {
+                    document.getElementById('localVideoBox').style.display = 'none';
+                }
+
+                // تهيئة PeerJS
+                await initPeerJS();
+
+                // الاتصال بالمستدعي
+                const call = peer.call(incomingCallData.callerPeerId, stream);
+                if (call) {
+                    call.on('stream', (remoteStream) => {
+                        const remoteVideo = document.getElementById('remoteVideo');
+                        remoteVideo.srcObject = remoteStream;
+                        document.getElementById('remotePlaceholder').style.display = 'none';
+                        remoteVideo.style.display = 'block';
+
+                        document.getElementById('callStatus').innerHTML = `
+                            <span class="call-type">${callType === 'video' ? '📹 فيديو' : '🎧 صوت'}</span>
+                            <span style="display:block;margin-top:5px;color:#10b981;">🔴 جارية</span>
+                            <span style="display:block;margin-top:5px;">
+                                <span class="timer" id="callTimer">00:00</span>
+                            </span>
+                        `;
+
+                        document.getElementById('callAvatar').classList.remove('ringing');
+                    });
+                    call.on('close', () => {
+                        endCall();
+                    });
+                    window._currentCall = call;
+                }
+
+                // تحديث حالة المكالمة
+                isCallActive = true;
+
+                // تحديث حالة المستخدم في Firebase
+                await database.ref('users/' + currentFirebaseUserId).update({
+                    inCall: true,
+                    callPartner: partnerId,
+                    updatedAt: new Date().toISOString()
+                });
+
+                // قبول المكالمة في Firebase
+                await database.ref('call_requests/' + currentUser.numericId + '/' + incomingCallData.callId).update({
+                    status: 'accepted',
+                    acceptedAt: new Date().toISOString()
+                });
+
+                // حذف طلب المكالمة
+                setTimeout(() => {
+                    database.ref('call_requests/' + currentUser.numericId + '/' + incomingCallData.callId).remove();
+                }, 5000);
+
+                // تحديث واجهة المكالمة
+                updateCallUI();
+
+                // بدء المؤقت
+                callStartTime = Date.now();
+                callDurationSeconds = 0;
+                if (callTimerInterval) clearInterval(callTimerInterval);
+                callTimerInterval = setInterval(() => {
+                    callDurationSeconds++;
+                    const mins = Math.floor(callDurationSeconds / 60);
+                    const secs = callDurationSeconds % 60;
+                    document.getElementById('callTimer').textContent =
+                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+
+                // إضافة رسالة نظام
+                addCallChatMessage('system', '📞 بدأت المكالمة');
+
+                // تسجيل المكالمة النشطة
+                await database.ref('active_calls/' + currentUser.numericId).set({
+                    partnerId: partnerId,
+                    partnerName: partnerData?.nickname || partnerData?.username || 'مستخدم',
+                    startTime: new Date().toISOString(),
+                    callId: incomingCallData.callId,
+                    type: callType
+                });
+
+                showToast('✅ تم الاتصال', 'success');
+
+            } catch (error) {
+                console.error('Error accepting call:', error);
+                showToast('❌ حدث خطأ', 'error');
+                endCall();
+            }
+
+            incomingCallData = null;
+        }
+
+        // ============================================================
+        // ❌ رفض المكالمة الواردة
+        // ============================================================
+        function rejectIncomingCall() {
+            if (!incomingCallData) return;
+
+            stopRingtone();
+            document.getElementById('incomingCallOverlay').classList.remove('active');
+
+            database.ref('call_requests/' + currentUser.numericId + '/' + incomingCallData.callId).update({
+                status: 'rejected',
+                rejectedAt: new Date().toISOString()
+            });
+
+            setTimeout(() => {
+                database.ref('call_requests/' + currentUser.numericId + '/' + incomingCallData.callId).remove();
+            }, 1000);
+
+            showToast('❌ تم رفض المكالمة', 'warning');
+            incomingCallData = null;
+
+            // العودة للصفحة السابقة
+            setTimeout(() => window.location.href = 'friends.html', 1000);
+        }
+
+        // ============================================================
+        // 🎤 تبديل الميكروفون
+        // ============================================================
+        function toggleMic() {
+            if (!mediaStream) return;
+
+            isMicMuted = !isMicMuted;
+            mediaStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+
+            const btn = document.getElementById('micBtn');
+            if (isMicMuted) {
+                btn.className = 'call-btn mic-btn muted';
+                btn.innerHTML = '<i class="fas fa-microphone-slash"></i><span class="tooltip">ميكروفون</span>';
+                document.getElementById('localMuteIndicator').style.display = 'block';
+            } else {
+                btn.className = 'call-btn mic-btn';
+                btn.innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
+                document.getElementById('localMuteIndicator').style.display = 'none';
+            }
+
+            // تحديث الحالة في Firebase
+            if (database && currentFirebaseUserId) {
+                database.ref('users/' + currentFirebaseUserId + '/isMuted').set(isMicMuted);
+            }
+        }
+
+        // ============================================================
+        // 📷 تبديل الكاميرا
+        // ============================================================
+        function toggleVideo() {
+            if (!mediaStream || callType === 'audio') return;
+
+            isVideoOff = !isVideoOff;
+            mediaStream.getVideoTracks().forEach(track => track.enabled = !isVideoOff);
+
+            const btn = document.getElementById('videoBtn');
+            const localVideo = document.getElementById('localVideo');
+
+            if (isVideoOff) {
+                btn.className = 'call-btn video-btn off';
+                btn.innerHTML = '<i class="fas fa-video-slash"></i><span class="tooltip">كاميرا</span>';
+                localVideo.style.display = 'none';
+            } else {
+                btn.className = 'call-btn video-btn';
+                btn.innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
+                localVideo.style.display = 'block';
+            }
+
+            // تحديث الحالة في Firebase
+            if (database && currentFirebaseUserId) {
+                database.ref('users/' + currentFirebaseUserId + '/isVideoOff').set(isVideoOff);
+            }
+        }
+
+        // ============================================================
+        // 🔊 تبديل السماعة
+        // ============================================================
+        function toggleSpeaker() {
+            isSpeakerOn = !isSpeakerOn;
+
+            const btn = document.getElementById('speakerBtn');
+            if (isSpeakerOn) {
+                btn.className = 'call-btn speaker-btn';
+                btn.innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">سماعة</span>';
+            } else {
+                btn.className = 'call-btn speaker-btn off';
+                btn.innerHTML = '<i class="fas fa-volume-mute"></i><span class="tooltip">سماعة</span>';
+            }
+
+            // تفعيل/تعطيل الصوت في جميع المسارات البعيدة
+            const remoteVideo = document.getElementById('remoteVideo');
+            if (remoteVideo.srcObject) {
+                remoteVideo.srcObject.getAudioTracks().forEach(track => track.enabled = isSpeakerOn);
+            }
+
+            // تحديث الحالة في Firebase
+            if (database && currentFirebaseUserId) {
+                database.ref('users/' + currentFirebaseUserId + '/isSpeakerOn').set(isSpeakerOn);
+            }
+        }
+
+        // ============================================================
+        // 📞 إنهاء المكالمة
+        // ============================================================
+        function endCall() {
+            if (!isCallActive && !document.getElementById('callModal')?.classList.contains('active')) {
+                // إذا لم تكن المكالمة نشطة، فقط اذهب للخلف
+                goBack();
+                return;
+            }
+
+            isCallActive = false;
+
+            // إيقاف المؤقت
+            if (callTimerInterval) {
+                clearInterval(callTimerInterval);
+                callTimerInterval = null;
+            }
+
+            stopRingtone();
+
+            // حساب المدة والتكلفة
+            const durationMinutes = Math.ceil(callDurationSeconds / 60);
+            const cost = durationMinutes * 10; // 10 جنيه للدقيقة
+
+            // خصم الرصيد إذا كانت المكالمة أطول من 0 ثانية وكان المستخدم هو المتصل
+            if (callDurationSeconds > 0 && isCaller && currentUser) {
+                const newBalance = (currentUser.balanceEGP || 0) - cost;
+                if (newBalance >= 0) {
+                    database.ref('users/' + currentFirebaseUserId + '/balanceEGP').set(newBalance);
+                    currentUser.balanceEGP = newBalance;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showToast(`💰 تم خصم ${cost} جنيه مقابل ${durationMinutes} دقيقة`, 'info');
+                }
+            }
+
+            // إغلاق الاتصال
+            if (window._currentCall) {
+                try {
+                    window._currentCall.close();
+                } catch (e) {}
+                window._currentCall = null;
+            }
+
+            // إغلاق الوسائط
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(t => t.stop());
+                mediaStream = null;
+            }
+
+            // تسجيل في سجل المكالمات
+            if (database && currentUser && partnerId) {
+                database.ref('call_history/' + currentUser.numericId).push({
+                    partnerId: partnerId,
+                    partnerName: partnerData?.nickname || partnerData?.username || 'مستخدم',
+                    type: callType || 'video',
+                    duration: callDurationSeconds,
+                    cost: cost,
+                    endTime: new Date().toISOString(),
+                    status: callDurationSeconds > 0 ? 'completed' : 'missed',
+                    isCaller: isCaller
+                });
+            }
+
+            // تحديث حالة المستخدم
+            if (database && currentFirebaseUserId) {
+                database.ref('users/' + currentFirebaseUserId).update({
+                    inCall: false,
+                    callPartner: null,
+                    isMuted: true,
+                    isVideoOff: false,
+                    updatedAt: new Date().toISOString()
+                });
+            }
+
+            // حذف المكالمة النشطة
+            if (database && currentUser) {
+                database.ref('active_calls/' + currentUser.numericId).remove();
+            }
+
+            // إضافة رسالة نظام
+            if (callDurationSeconds > 0) {
+                addCallChatMessage('system', `📞 انتهت المكالمة (${durationMinutes} دقيقة)`);
+            }
+
+            // إغلاق واجهة المكالمة
+            document.getElementById('videoContainer').classList.remove('active');
+            document.getElementById('callChat').classList.remove('active');
+            document.getElementById('incomingCallOverlay').classList.remove('active');
+
+            // إعادة تعيين المؤقت
+            document.getElementById('callTimer').textContent = '00:00';
+
+            // إعادة تعيين الأزرار
+            document.getElementById('micBtn').className = 'call-btn mic-btn';
+            document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i><span class="tooltip">ميكروفون</span>';
+            document.getElementById('videoBtn').className = 'call-btn video-btn';
+            document.getElementById('videoBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
+            document.getElementById('speakerBtn').className = 'call-btn speaker-btn';
+            document.getElementById('speakerBtn').innerHTML = '<i class="fas fa-volume-up"></i><span class="tooltip">سماعة</span>';
+
+            showToast('📞 تم إنهاء المكالمة', 'info');
+
+            // العودة للصفحة السابقة
+            setTimeout(goBack, 1500);
+        }
+
+        // ============================================================
+        // 🔙 الرجوع للصفحة السابقة
+        // ============================================================
+        function goBack() {
+            if (isCallActive) {
+                endCall();
+                return;
+            }
+            window.history.back();
+        }
+
+        // ============================================================
+        // 💬 شات المكالمة
+        // ============================================================
+        function toggleCallChat() {
+            isCallChatOpen = !isCallChatOpen;
+            const chat = document.getElementById('callChat');
+            if (isCallChatOpen) {
+                chat.classList.add('active');
+            } else {
+                chat.classList.remove('active');
+            }
+        }
+
+        function addCallChatMessage(type, text, sender = null) {
+            const container = document.getElementById('callChatMessages');
+            const msg = document.createElement('div');
+            msg.className = `msg ${type === 'own' ? 'own' : type === 'other' ? 'other' : 'system'}`;
+
+            if (type === 'system') {
+                msg.textContent = text;
+            } else {
+                const senderName = type === 'own' ? 'أنت' : (sender || partnerData?.nickname || partnerData?.username ||
+                    'شريك');
+                msg.innerHTML = `
+                    <div class="sender">${senderName}</div>
+                    <div>${text}</div>
+                `;
+            }
+
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendCallChatMessage() {
+            const input = document.getElementById('callChatInput');
+            const text = input.value.trim();
+            if (!text || !isCallActive) return;
+
+            addCallChatMessage('own', text);
+            input.value = '';
+
+            // إرسال الرسالة إلى الشريك عبر Firebase
+            if (database && partnerId) {
+                const chatRef = database.ref('chat_messages/' + partnerId);
+                chatRef.push({
+                    senderId: currentUser.numericId,
+                    senderName: currentUser.nickname || currentUser.username || 'مستخدم',
+                    text: text,
+                    type: 'call_chat',
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
+        // ============================================================
+        // 📨 الاستماع لرسائل الشات من الشريك
+        // ============================================================
+        function listenForCallChatMessages() {
+            if (!database || !currentUser) return;
+
+            database.ref('chat_messages/' + currentUser.numericId).on('child_added', (snapshot) => {
+                const msg = snapshot.val();
+                if (msg && msg.senderId != currentUser.numericId && isCallActive) {
+                    addCallChatMessage('other', msg.text, msg.senderName);
+                }
+            });
+        }
+
+        // ============================================================
+        // 🎁 هدايا المكالمة
+        // ============================================================
+        function openGiftModal() {
+            if (!isCallActive) {
+                showToast('⚠️ لا توجد مكالمة نشطة', 'warning');
+                return;
+            }
+
+            const grid = document.getElementById('giftGrid');
+            grid.innerHTML = GIFT_TYPES.map(g => `
+                <div class="gift-option" onclick="selectCallGift('${g.id}')" data-gift-id="${g.id}">
+                    <span class="emoji">${g.emoji}</span>
+                    <span class="name">${g.name}</span>
+                    <span class="price">💰 ${g.price}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('giftBalance').textContent = currentUser?.balanceEGP || 0;
+            document.getElementById('giftModal').classList.add('active');
+            selectedGift = null;
+        }
+
+        function closeGiftModal() {
+            document.getElementById('giftModal').classList.remove('active');
+            selectedGift = null;
+        }
+
+        function selectCallGift(giftId) {
+            document.querySelectorAll('.gift-option').forEach(el => el.classList.remove('selected'));
+            const selected = document.querySelector(`.gift-option[data-gift-id="${giftId}"]`);
+            if (selected) {
+                selected.classList.add('selected');
+                selectedGift = GIFT_TYPES.find(g => g.id === giftId);
+            }
+        }
+
+        async function sendCallGift() {
+            if (!selectedGift) {
+                showToast('⚠️ اختر هدية أولاً', 'warning');
+                return;
+            }
+
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول', 'warning');
+                return;
+            }
+
+            if (currentUser.balanceEGP < selectedGift.price) {
+                showToast(`⚠️ رصيد غير كافٍ (تحتاج ${selectedGift.price} ج.م)`, 'warning');
+                return;
+            }
+
+            if (!partnerId) {
+                showToast('❌ لا يوجد شريك في المكالمة', 'error');
+                return;
+            }
+
+            try {
+                // خصم الرصيد
+                const newBalance = (currentUser.balanceEGP || 0) - selectedGift.price;
+                await database.ref('users/' + currentFirebaseUserId + '/balanceEGP').set(newBalance);
+                currentUser.balanceEGP = newBalance;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                // إرسال الهدية إلى الشريك
+                await database.ref('users')
+                    .orderByChild('numericId')
+                    .equalTo(partnerId)
+                    .once('value')
+                    .then(async (snapshot) => {
+                        if (snapshot.exists()) {
+                            const userData = snapshot.val();
+                            const userKey = Object.keys(userData)[0];
+                            const user = userData[userKey];
+
+                            const giftsList = user.giftsList || [];
+                            giftsList.push({
+                                senderId: currentUser.numericId,
+                                senderName: currentUser.nickname || currentUser.username || 'مستخدم',
+                                giftType: selectedGift.id,
+                                giftName: selectedGift.name,
+                                giftEmoji: selectedGift.emoji,
+                                value: selectedGift.price,
+                                date: new Date().toLocaleString('ar-EG'),
+                                timestamp: new Date().toISOString(),
+                                fromCall: true
+                            });
+
+                            await database.ref('users/' + userKey).update({
+                                giftsList: giftsList,
+                                gifts: (user.gifts || 0) + 1,
+                                updatedAt: new Date().toISOString()
+                            });
+
+                            // إشعار للشريك
+                            await database.ref('users/' + userKey + '/notifications').push({
+                                id: Date.now(),
+                                text: `🎁 تلقيت ${selectedGift.emoji} ${selectedGift.name} من ${currentUser.nickname || currentUser.username} أثناء المكالمة! 💰 ${selectedGift.price} ج.م`,
+                                read: false,
+                                date: new Date().toLocaleString('ar-EG'),
+                                type: 'gift_received',
+                                createdAt: new Date().toISOString()
+                            });
+
+                            // عرض الهدية للشريك
+                            showIncomingGift({
+                                emoji: selectedGift.emoji,
+                                name: selectedGift.name,
+                                price: selectedGift.price,
+                                senderName: currentUser.nickname || currentUser.username || 'مستخدم'
+                            });
+                        }
+                    });
+
+                // رسالة في الشات
+                addCallChatMessage('system', `🎁 ${currentUser.nickname || currentUser.username} أرسل ${selectedGift.emoji} ${selectedGift.name}`);
+
+                showToast(`✅ تم إرسال ${selectedGift.emoji} ${selectedGift.name}`, 'success');
+                closeGiftModal();
+
+            } catch (error) {
+                console.error('Send gift error:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🎁 عرض الهدية الواردة
+        // ============================================================
+        function showIncomingGift(giftData) {
+            const popup = document.getElementById('giftPopup');
+            document.getElementById('giftPopupEmoji').textContent = giftData.emoji || '🎁';
+            document.getElementById('giftPopupText').textContent = `تلقيت ${giftData.name || 'هدية'}! 💰 ${giftData.price || 0} ج.م`;
+            document.getElementById('giftPopupSender').textContent = `من: ${giftData.senderName || 'مستخدم'}`;
+            popup.classList.add('active');
+
+            setTimeout(() => {
+                popup.classList.remove('active');
+            }, 5000);
+        }
+
+        // ============================================================
+        // 📨 الاستماع للهدايا الواردة
+        // ============================================================
+        function listenForIncomingGifts() {
+            if (!database || !currentUser) return;
+
+            database.ref('users/' + currentFirebaseUserId + '/giftsList').on('child_added', (snapshot) => {
+                const gift = snapshot.val();
+                if (gift && gift.fromCall && !gift._shown) {
+                    gift._shown = true;
+                    showIncomingGift({
+                        emoji: gift.giftEmoji,
+                        name: gift.giftName,
+                        price: gift.value,
+                        senderName: gift.senderName
+                    });
+                }
+            });
+        }
+
+        // ============================================================
+        // 🚪 تسجيل الخروج
+        // ============================================================
+        async function logout() {
+            if (isCallActive) endCall();
+            try { if (firebase.auth) await firebase.auth().signOut(); } catch (e) {}
+            localStorage.removeItem('currentUser');
+            window.location.reload();
+        }
+
+        // ============================================================
+        // 👥 تحديث طلبات الصداقة
+        // ============================================================
+        async function updateFriendRequestsBadge() {
+            if (!database || !currentUser) return;
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId + '/friendRequests').once('value');
+                let count = 0;
+                if (snapshot.exists()) {
+                    const requests = snapshot.val();
+                    for (const key in requests) {
+                        if (requests[key].status === 'pending') count++;
+                    }
+                }
+                document.getElementById('friendRequestsBadge').textContent = count;
+                document.getElementById('bottomFriendBadge').textContent = count;
+            } catch (e) {}
+        }
+
+        // ============================================================
+        // 🚀 التهيئة
+        // ============================================================
+        window.onload = async function() {
+            await initializeFirebase();
+
+            const user = await getCurrentUserFullData();
+            if (user) {
+                currentUser = user;
+                currentFirebaseUserId = user.firebaseKey;
+                console.log('✅ User loaded:', user.nickname || user.username);
+
+                // تحديث حالة المستخدم
+                if (database && currentFirebaseUserId) {
+                    database.ref('users/' + currentFirebaseUserId).update({
+                        isOnline: true,
+                        lastActive: new Date().toISOString()
+                    });
+
+                    window.addEventListener('beforeunload', function() {
+                        if (isCallActive) endCall();
+                        database.ref('users/' + currentFirebaseUserId).update({
+                            isOnline: false,
+                            inCall: false
+                        });
+                    });
+                }
+
+                // تحميل بيانات الشريك
+                await loadPartnerData();
+
+                // الاستماع لطلبات المكالمات (للمستقبل)
+                listenForCallRequests();
+
+                // الاستماع لرسائل الشات
+                listenForCallChatMessages();
+
+                // الاستماع للهدايا
+                listenForIncomingGifts();
+
+                // تحديث شارات الأصدقاء
+                updateFriendRequestsBadge();
+
+                // إظهار التنقل السفلي للجوال
+                if (window.innerWidth <= 768) {
+                    document.querySelector('.bottom-nav').style.display = 'flex';
+                }
+
+            } else {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            }
+        };
+
+        // ============================================================
+        // 🧹 تنظيف عند الخروج
+        // ============================================================
+        window.addEventListener('beforeunload', function() {
+            if (isCallActive) endCall();
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(t => t.stop());
+            }
+            if (peer) {
+                try { peer.destroy(); } catch (e) {}
+            }
+            stopRingtone();
+            if (database && currentFirebaseUserId) {
+                database.ref('users/' + currentFirebaseUserId).update({
+                    isOnline: false,
+                    inCall: false
+                });
+            }
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js">
+    </script>
+</body>
+</html>
