@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌌 كوكبة - المطابقة الصوتية</title>
+    <title>🌌 كوكبة - المطابقة العشوائية</title>
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -11,7 +11,7 @@
     <!-- PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        /* ===== التصميم العام مع ألوان متناسقة ===== */
+        /* ===== التصميم العام ===== */
         * {
             margin: 0;
             padding: 0;
@@ -28,7 +28,7 @@
             overflow-x: hidden;
         }
 
-        /* ===== خلفية متحركة جذابة ===== */
+        /* ===== خلفية متحركة ===== */
         .bg-layer {
             position: fixed;
             inset: 0;
@@ -40,7 +40,7 @@
             position: absolute;
             border-radius: 50%;
             filter: blur(100px);
-            opacity: 0.12;
+            opacity: 0.1;
             animation: floatOrb 14s ease-in-out infinite;
         }
         .bg-layer .orb1 {
@@ -71,9 +71,16 @@
             animation-duration: 20s;
         }
         @keyframes floatOrb {
-            0%,100% { transform: translate(0,0) scale(1); }
-            33% { transform: translate(40px,-40px) scale(1.1); }
-            66% { transform: translate(-30px,30px) scale(0.9); }
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(40px, -40px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
         }
 
         /* ===== نجوم ===== */
@@ -93,21 +100,28 @@
             animation: twinkle 3s ease-in-out infinite;
         }
         @keyframes twinkle {
-            0%,100% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.5); }
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
         }
 
         /* ===== شريط التنقل ===== */
         .navbar {
             position: relative;
             z-index: 10;
-            background: rgba(10,10,30,0.85);
+            background: rgba(10, 10, 30, 0.85);
             backdrop-filter: blur(20px);
             padding: 0.6rem 4%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,215,0,0.08);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.08);
             flex-wrap: wrap;
             gap: 8px;
             min-height: 60px;
@@ -121,7 +135,9 @@
             color: #ffd700;
             text-decoration: none;
         }
-        .logo i { font-size: 1.5rem; }
+        .logo i {
+            font-size: 1.5rem;
+        }
         .logo .logo-text {
             background: linear-gradient(135deg, #ffd700, #f59e0b);
             -webkit-background-clip: text;
@@ -136,8 +152,8 @@
         .nav-btn {
             padding: 6px 14px;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
             color: #f8fafc;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -149,8 +165,8 @@
             font-weight: 600;
         }
         .nav-btn:hover {
-            background: rgba(139,92,246,0.15);
-            border-color: rgba(139,92,246,0.2);
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.2);
             transform: translateY(-2px);
         }
         .nav-btn .badge {
@@ -163,8 +179,8 @@
             text-align: center;
         }
         .nav-btn.logout-btn {
-            background: rgba(239,68,68,0.1);
-            border-color: rgba(239,68,68,0.1);
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.1);
             color: #ef4444;
         }
         .nav-btn.logout-btn:hover {
@@ -191,35 +207,119 @@
             padding-bottom: 80px;
         }
 
-        /* ===== زر المطابقة الكبير ===== */
-        .match-area {
+        /* ===== زر المطابقة مع نجوم دوارة ===== */
+        .match-wrapper {
+            position: relative;
+            width: 340px;
+            height: 340px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            width: 100%;
-            transition: all 0.5s ease;
         }
-        .match-area.hidden { display: none; }
+
+        .rotating-stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotateStars 20s linear infinite;
+        }
+        @keyframes rotateStars {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .rotating-stars .rs {
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
+            animation: starPulse 2s ease-in-out infinite;
+        }
+        @keyframes starPulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+        }
+        .rotating-stars .rs:nth-child(1) {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+        .rotating-stars .rs:nth-child(2) {
+            top: 20%;
+            right: 0;
+            animation-delay: 0.3s;
+        }
+        .rotating-stars .rs:nth-child(3) {
+            bottom: 20%;
+            right: 0;
+            animation-delay: 0.6s;
+        }
+        .rotating-stars .rs:nth-child(4) {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.9s;
+        }
+        .rotating-stars .rs:nth-child(5) {
+            bottom: 20%;
+            left: 0;
+            animation-delay: 1.2s;
+        }
+        .rotating-stars .rs:nth-child(6) {
+            top: 20%;
+            left: 0;
+            animation-delay: 1.5s;
+        }
+        .rotating-stars .rs:nth-child(7) {
+            top: 5%;
+            right: 15%;
+            animation-delay: 0.2s;
+        }
+        .rotating-stars .rs:nth-child(8) {
+            bottom: 5%;
+            left: 15%;
+            animation-delay: 0.8s;
+        }
+        .rotating-stars .rs:nth-child(9) {
+            top: 5%;
+            left: 15%;
+            animation-delay: 1.0s;
+        }
+        .rotating-stars .rs:nth-child(10) {
+            bottom: 5%;
+            right: 15%;
+            animation-delay: 1.4s;
+        }
 
         .match-btn {
-            width: 280px;
-            height: 280px;
+            width: 260px;
+            height: 260px;
             border-radius: 50%;
             border: none;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: #fff;
-            font-size: 5rem;
+            font-size: 4.5rem;
             cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1);
-            box-shadow: 0 0 80px rgba(139,92,246,0.2);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 80px rgba(139, 92, 246, 0.2), inset 0 -4px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             position: relative;
+            z-index: 2;
             overflow: hidden;
         }
         .match-btn::before {
@@ -235,23 +335,32 @@
             opacity: 0;
             transition: opacity 0.5s ease;
         }
-        .match-btn:hover::before { opacity: 1; }
+        .match-btn:hover::before {
+            opacity: 1;
+        }
         .match-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 120px rgba(139,92,246,0.3);
+            box-shadow: 0 0 120px rgba(139, 92, 246, 0.3);
         }
-        .match-btn:active { transform: scale(0.95); }
+        .match-btn:active {
+            transform: scale(0.95);
+        }
         .match-btn .btn-icon {
-            font-size: 4.5rem;
+            font-size: 4rem;
             display: block;
             animation: floatIcon 3s ease-in-out infinite;
         }
         @keyframes floatIcon {
-            0%,100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
         .match-btn .btn-label {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 900;
             letter-spacing: 2px;
             background: linear-gradient(135deg, #fff, #e0e7ff);
@@ -259,31 +368,98 @@
             -webkit-text-fill-color: transparent;
         }
         .match-btn .btn-sub {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             opacity: 0.6;
             font-weight: 400;
         }
         .match-btn .pulse-ring {
             position: absolute;
             border-radius: 50%;
-            border: 2px solid rgba(255,215,0,0.08);
+            border: 2px solid rgba(255, 215, 0, 0.08);
             animation: pulseRing 2.5s ease-out infinite;
             pointer-events: none;
         }
-        .match-btn .pulse-ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
-        .match-btn .pulse-ring:nth-child(2) { width: 130%; height: 130%; animation-delay: 0.8s; }
-        .match-btn .pulse-ring:nth-child(3) { width: 160%; height: 160%; animation-delay: 1.6s; }
+        .match-btn .pulse-ring:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            animation-delay: 0s;
+        }
+        .match-btn .pulse-ring:nth-child(2) {
+            width: 130%;
+            height: 130%;
+            animation-delay: 0.8s;
+        }
+        .match-btn .pulse-ring:nth-child(3) {
+            width: 160%;
+            height: 160%;
+            animation-delay: 1.6s;
+        }
         @keyframes pulseRing {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(1.6); opacity: 0; }
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
         }
         .match-btn.searching {
             animation: pulseSearch 1.2s ease-in-out infinite;
             background: linear-gradient(135deg, #f59e0b, #ef4444);
         }
+        .match-btn.searching .rotating-stars {
+            animation-duration: 4s;
+        }
         @keyframes pulseSearch {
-            0%,100% { transform: scale(1); box-shadow: 0 0 80px rgba(245,158,11,0.3); }
-            50% { transform: scale(1.05); box-shadow: 0 0 120px rgba(245,158,11,0.4); }
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 80px rgba(245, 158, 11, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 120px rgba(245, 158, 11, 0.4);
+            }
+        }
+
+        /* ===== زر إيقاف البحث ===== */
+        .stop-btn {
+            display: none;
+            padding: 10px 28px;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            margin-top: 5px;
+        }
+        .stop-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            transform: scale(1.05);
+        }
+        .stop-btn.active {
+            display: block;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .search-status {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-align: center;
+            display: none;
+            margin-top: 5px;
+        }
+        .search-status.active {
+            display: block;
+            animation: fadeUp 0.4s ease;
+        }
+        .search-status .highlight {
+            color: #ffd700;
+            font-weight: 700;
         }
 
         /* ===== مؤقت المطابقة ===== */
@@ -294,44 +470,50 @@
             font-family: 'Courier New', monospace;
             text-align: center;
             display: none;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             padding: 8px 25px;
             border-radius: 14px;
-            border: 1px solid rgba(255,215,0,0.08);
+            border: 1px solid rgba(255, 215, 0, 0.08);
             backdrop-filter: blur(10px);
         }
-        .match-timer.active { display: block; animation: fadeUp 0.4s ease; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
-        .match-timer .timer-label { font-size: 0.7rem; color: #94a3b8; font-weight: 400; display: block; }
-        .match-timer .timer-value { font-size: 2.2rem; }
-        .match-timer .timer-value.warning { color: #ef4444; animation: blink 0.5s ease-in-out infinite; }
-        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-
-        .stop-btn {
-            display: none;
-            padding: 10px 28px;
-            border-radius: 12px;
-            border: 1px solid rgba(239,68,68,0.2);
-            background: rgba(239,68,68,0.08);
-            color: #ef4444;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
+        .match-timer.active {
+            display: block;
+            animation: fadeUp 0.4s ease;
         }
-        .stop-btn:hover { background: rgba(239,68,68,0.15); transform: scale(1.05); }
-        .stop-btn.active { display: block; animation: fadeUp 0.4s ease; }
-
-        .search-status {
-            font-size: 0.85rem;
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .match-timer .timer-label {
+            font-size: 0.7rem;
             color: #94a3b8;
-            text-align: center;
-            display: none;
+            font-weight: 400;
+            display: block;
         }
-        .search-status.active { display: block; animation: fadeUp 0.4s ease; }
-        .search-status .highlight { color: #ffd700; font-weight: 700; }
+        .match-timer .timer-value {
+            font-size: 2.2rem;
+        }
+        .match-timer .timer-value.warning {
+            color: #ef4444;
+            animation: blink 0.5s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
 
-        /* ===== واجهة المكالمة الصوتية ===== */
+        /* ===== واجهة المكالمة ===== */
         .call-interface {
             display: none;
             width: 100%;
@@ -339,9 +521,11 @@
             align-items: center;
             gap: 12px;
         }
-        .call-interface.active { display: flex; animation: fadeUp 0.5s ease; }
+        .call-interface.active {
+            display: flex;
+            animation: fadeUp 0.5s ease;
+        }
 
-        /* ===== صورة الشريك ===== */
         .partner-avatar {
             width: 160px;
             height: 160px;
@@ -353,8 +537,8 @@
             font-size: 4rem;
             font-weight: 900;
             color: #fff;
-            box-shadow: 0 0 80px rgba(139,92,246,0.15);
-            border: 3px solid rgba(255,215,0,0.1);
+            box-shadow: 0 0 80px rgba(139, 92, 246, 0.15);
+            border: 3px solid rgba(255, 215, 0, 0.1);
             position: relative;
             transition: all 0.5s ease;
             flex-shrink: 0;
@@ -368,16 +552,38 @@
             border-radius: 50%;
             border: 3px solid #0a0a1a;
         }
-        .partner-avatar .dot.online { background: #10b981; box-shadow: 0 0 30px rgba(16,185,129,0.3); }
-        .partner-avatar .dot.offline { background: #ef4444; box-shadow: 0 0 30px rgba(239,68,68,0.3); }
-        .partner-avatar .dot.searching { background: #f59e0b; box-shadow: 0 0 30px rgba(245,158,11,0.3); animation: blink 1s ease-in-out infinite; }
-        .partner-avatar.speaking { animation: pulseAvatar 1.5s ease-in-out infinite; border-color: rgba(255,215,0,0.2); }
+        .partner-avatar .dot.online {
+            background: #10b981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+        .partner-avatar .dot.offline {
+            background: #ef4444;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+        }
+        .partner-avatar .dot.searching {
+            background: #f59e0b;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+            animation: blink 1s ease-in-out infinite;
+        }
+        .partner-avatar.speaking {
+            animation: pulseAvatar 1.5s ease-in-out infinite;
+            border-color: rgba(255, 215, 0, 0.2);
+        }
         @keyframes pulseAvatar {
-            0%,100% { transform: scale(1); box-shadow: 0 0 60px rgba(139,92,246,0.15); }
-            50% { transform: scale(1.03); box-shadow: 0 0 100px rgba(139,92,246,0.2); }
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 60px rgba(139, 92, 246, 0.15);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 0 100px rgba(139, 92, 246, 0.2);
+            }
         }
 
-        .partner-info { text-align: center; }
+        .partner-info {
+            text-align: center;
+        }
         .partner-info .name {
             font-size: 1.3rem;
             font-weight: 800;
@@ -387,15 +593,25 @@
             justify-content: center;
             gap: 8px;
         }
-        .partner-info .name .crown { color: #ffd700; font-size: 1.1rem; }
+        .partner-info .name .crown {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
         .partner-info .status {
             font-size: 0.75rem;
             color: #94a3b8;
             margin-top: 2px;
         }
-        .partner-info .status.connected { color: #10b981; }
-        .partner-info .status.disconnected { color: #ef4444; }
-        .partner-info .status.searching { color: #f59e0b; animation: blink 1s ease-in-out infinite; }
+        .partner-info .status.connected {
+            color: #10b981;
+        }
+        .partner-info .status.disconnected {
+            color: #ef4444;
+        }
+        .partner-info .status.searching {
+            color: #f59e0b;
+            animation: blink 1s ease-in-out infinite;
+        }
 
         .call-timer {
             font-size: 1.6rem;
@@ -403,26 +619,29 @@
             color: #ffd700;
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
-            text-shadow: 0 0 30px rgba(255,215,0,0.05);
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
         }
 
-        /* ===== شات المكالمة ===== */
+        /* ===== شات ===== */
         .call-chat {
             display: none;
             width: 100%;
             max-width: 650px;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
             border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             overflow: hidden;
             max-height: 200px;
             flex-direction: column;
             backdrop-filter: blur(10px);
         }
-        .call-chat.active { display: flex; animation: fadeUp 0.4s ease; }
+        .call-chat.active {
+            display: flex;
+            animation: fadeUp 0.4s ease;
+        }
         .call-chat .chat-header {
             padding: 6px 14px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             font-size: 0.7rem;
             color: #94a3b8;
             display: flex;
@@ -430,7 +649,10 @@
             align-items: center;
             flex-shrink: 0;
         }
-        .call-chat .chat-header .pname { color: #fff; font-weight: 700; }
+        .call-chat .chat-header .pname {
+            color: #fff;
+            font-weight: 700;
+        }
         .call-chat .chat-messages {
             flex: 1;
             padding: 6px 12px;
@@ -450,40 +672,54 @@
             animation: fadeUp 0.3s ease;
         }
         .call-chat .chat-messages .msg.own {
-            background: rgba(139,92,246,0.15);
+            background: rgba(139, 92, 246, 0.15);
             align-self: flex-end;
             border-radius: 10px 10px 4px 10px;
-            border: 1px solid rgba(139,92,246,0.06);
+            border: 1px solid rgba(139, 92, 246, 0.06);
         }
         .call-chat .chat-messages .msg.other {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             align-self: flex-start;
             border-radius: 10px 10px 10px 4px;
-            border: 1px solid rgba(255,255,255,0.02);
+            border: 1px solid rgba(255, 255, 255, 0.02);
         }
-        .call-chat .chat-messages .msg .sender { font-size: 0.5rem; color: #94a3b8; margin-bottom: 2px; font-weight: 600; }
+        .call-chat .chat-messages .msg .sender {
+            font-size: 0.5rem;
+            color: #94a3b8;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
         .call-chat .chat-messages .msg.system {
-            text-align: center; color: #666; font-size: 0.6rem; align-self: center; background: transparent; max-width: 90%;
+            text-align: center;
+            color: #666;
+            font-size: 0.6rem;
+            align-self: center;
+            background: transparent;
+            max-width: 90%;
         }
         .call-chat .chat-input {
             display: flex;
             gap: 6px;
             padding: 5px 10px;
-            border-top: 1px solid rgba(255,255,255,0.04);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
             flex-shrink: 0;
         }
         .call-chat .chat-input input {
             flex: 1;
             padding: 6px 12px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             color: #fff;
             outline: none;
             font-size: 0.75rem;
         }
-        .call-chat .chat-input input:focus { border-color: rgba(139,92,246,0.2); }
-        .call-chat .chat-input input::placeholder { color: rgba(255,255,255,0.2); }
+        .call-chat .chat-input input:focus {
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .call-chat .chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
         .call-chat .chat-input button {
             padding: 6px 12px;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
@@ -495,13 +731,18 @@
             font-size: 0.7rem;
             transition: all 0.3s ease;
         }
-        .call-chat .chat-input button:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(139,92,246,0.15); }
-        .call-chat .chat-input .gift-btn {
-            background: rgba(255,215,0,0.08);
-            color: #ffd700;
-            border: 1px solid rgba(255,215,0,0.06);
+        .call-chat .chat-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
         }
-        .call-chat .chat-input .gift-btn:hover { background: rgba(255,215,0,0.15); }
+        .call-chat .chat-input .gift-btn {
+            background: rgba(255, 215, 0, 0.08);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+        }
+        .call-chat .chat-input .gift-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+        }
 
         /* ===== أزرار التحكم ===== */
         .call-controls {
@@ -511,7 +752,10 @@
             justify-content: center;
             padding: 5px 0;
         }
-        .call-controls.active { display: flex; animation: fadeUp 0.4s ease; }
+        .call-controls.active {
+            display: flex;
+            animation: fadeUp 0.4s ease;
+        }
         .call-btn {
             padding: 10px 20px;
             border-radius: 12px;
@@ -519,93 +763,135 @@
             cursor: pointer;
             font-weight: 700;
             font-size: 0.75rem;
-            transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             min-width: 75px;
             justify-content: center;
         }
-        .call-btn:hover { transform: translateY(-3px); }
+        .call-btn:hover {
+            transform: translateY(-3px);
+        }
         .call-btn.mic-btn {
-            background: rgba(16,185,129,0.08);
-            border-color: rgba(16,185,129,0.1);
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.1);
             color: #10b981;
         }
-        .call-btn.mic-btn:hover { background: rgba(16,185,129,0.15); }
+        .call-btn.mic-btn:hover {
+            background: rgba(16, 185, 129, 0.15);
+        }
         .call-btn.mic-btn.muted {
-            background: rgba(239,68,68,0.08);
-            border-color: rgba(239,68,68,0.1);
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.1);
             color: #ef4444;
         }
-        .call-btn.mic-btn.muted:hover { background: rgba(239,68,68,0.15); }
+        .call-btn.mic-btn.muted:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
         .call-btn.end-call {
-            background: rgba(239,68,68,0.1);
-            border-color: rgba(239,68,68,0.15);
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.15);
             color: #ef4444;
         }
-        .call-btn.end-call:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .call-btn.end-call:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
         .call-btn.next-btn {
-            background: rgba(139,92,246,0.08);
-            border-color: rgba(139,92,246,0.1);
+            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(139, 92, 246, 0.1);
             color: #8b5cf6;
         }
-        .call-btn.next-btn:hover { background: rgba(139,92,246,0.15); }
+        .call-btn.next-btn:hover {
+            background: rgba(139, 92, 246, 0.15);
+        }
         .call-btn.next-btn.highlight {
-            background: rgba(139,92,246,0.2);
-            border-color: rgba(139,92,246,0.25);
-            box-shadow: 0 0 40px rgba(139,92,246,0.1);
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.25);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.1);
             animation: pulseGlow 1.5s ease-in-out infinite;
         }
         @keyframes pulseGlow {
-            0%,100% { box-shadow: 0 0 20px rgba(139,92,246,0.05); }
-            50% { box-shadow: 0 0 50px rgba(139,92,246,0.15); }
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.05);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(139, 92, 246, 0.15);
+            }
         }
         .call-btn.chat-toggle {
-            background: rgba(139,92,246,0.05);
-            border-color: rgba(139,92,246,0.05);
+            background: rgba(139, 92, 246, 0.05);
+            border-color: rgba(139, 92, 246, 0.05);
             color: #a78bfa;
         }
-        .call-btn.chat-toggle:hover { background: rgba(139,92,246,0.1); }
-        .call-btn.chat-toggle.active { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.1); }
+        .call-btn.chat-toggle:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        .call-btn.chat-toggle.active {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.1);
+        }
 
         /* ===== إشعارات ===== */
         .gift-notif {
             position: fixed;
             top: 75px;
             right: 20px;
-            background: rgba(16,185,129,0.95);
+            background: rgba(16, 185, 129, 0.95);
             backdrop-filter: blur(20px);
             padding: 12px 18px;
             border-radius: 14px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
             z-index: 99999;
             display: none;
             flex-direction: column;
             gap: 3px;
             max-width: 300px;
             min-width: 180px;
-            animation: slideRight 0.5s cubic-bezier(0.34,1.56,0.64,1);
-            border: 1px solid rgba(255,255,255,0.05);
+            animation: slideRight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .gift-notif.active { display: flex; }
-        .gift-notif .gift-emoji { font-size: 1.1rem; }
-        .gift-notif .gift-name { font-weight: 700; color: #ffd700; }
-        .gift-notif .gift-value { color: #fff; font-weight: 700; }
-        .gift-notif .time { font-size: 0.5rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .gift-notif.active {
+            display: flex;
+        }
+        .gift-notif .gift-emoji {
+            font-size: 1.1rem;
+        }
+        .gift-notif .gift-name {
+            font-weight: 700;
+            color: #ffd700;
+        }
+        .gift-notif .gift-value {
+            color: #fff;
+            font-weight: 700;
+        }
+        .gift-notif .time {
+            font-size: 0.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
         @keyframes slideRight {
-            from { opacity: 0; transform: translateX(50px) scale(0.9); }
-            to { opacity: 1; transform: translateX(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateX(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
         }
 
         /* ===== مودال طلب الإذن ===== */
         .perm-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0, 0, 0, 0.92);
             backdrop-filter: blur(20px);
             z-index: 99999;
             display: none;
@@ -615,14 +901,24 @@
             gap: 20px;
             padding: 30px;
         }
-        .perm-overlay.active { display: flex; animation: fadeUp 0.5s ease; }
+        .perm-overlay.active {
+            display: flex;
+            animation: fadeUp 0.5s ease;
+        }
         .perm-overlay .icon {
             font-size: 4.5rem;
             animation: pulseIcon 1.5s ease-in-out infinite;
         }
         @keyframes pulseIcon {
-            0%,100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
         }
         .perm-overlay .title {
             font-size: 1.4rem;
@@ -637,7 +933,10 @@
             max-width: 380px;
             line-height: 1.8;
         }
-        .perm-overlay .desc .hl { color: #ffd700; font-weight: 700; }
+        .perm-overlay .desc .hl {
+            color: #ffd700;
+            font-weight: 700;
+        }
         .perm-overlay .btn {
             padding: 14px 45px;
             border: none;
@@ -648,17 +947,24 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 40px rgba(139,92,246,0.15);
+            box-shadow: 0 4px 40px rgba(139, 92, 246, 0.15);
         }
-        .perm-overlay .btn:hover { transform: scale(1.05); box-shadow: 0 8px 60px rgba(139,92,246,0.2); }
-        .perm-overlay .btn:active { transform: scale(0.95); }
+        .perm-overlay .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 60px rgba(139, 92, 246, 0.2);
+        }
+        .perm-overlay .btn:active {
+            transform: scale(0.95);
+        }
         .perm-overlay .retry {
             font-size: 0.8rem;
             color: #666;
             cursor: pointer;
             transition: 0.3s;
         }
-        .perm-overlay .retry:hover { color: #94a3b8; }
+        .perm-overlay .retry:hover {
+            color: #94a3b8;
+        }
 
         /* ===== مودال الهدايا ===== */
         #giftModal {
@@ -666,56 +972,124 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%,-50%);
+            transform: translate(-50%, -50%);
             background: #1a1a2e;
             border-radius: 20px;
             padding: 25px;
-            border: 1px solid rgba(255,215,0,0.1);
+            border: 1px solid rgba(255, 215, 0, 0.1);
             z-index: 99998;
             min-width: 280px;
             max-width: 92%;
             max-height: 90vh;
             overflow-y: auto;
             backdrop-filter: blur(20px);
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
         }
-        #giftModal.active { display: block; animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-        @keyframes pop { from { opacity:0; transform:translate(-50%,-50%) scale(0.8); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
-        #giftModal h3 { color: #ffd700; text-align: center; margin-bottom: 15px; font-size: 1.1rem; }
+        #giftModal.active {
+            display: block;
+            animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        #giftModal h3 {
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
         #giftModal .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(70px,1fr));
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
             gap: 8px;
             margin-bottom: 15px;
         }
         #giftModal .grid .opt {
-            background: rgba(255,255,255,0.02);
-            border: 2px solid rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.04);
             border-radius: 12px;
             padding: 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        #giftModal .grid .opt:hover { border-color: #8b5cf6; transform: translateY(-2px); }
-        #giftModal .grid .opt.selected { border-color: #ffd700; background: rgba(255,215,0,0.05); }
-        #giftModal .grid .opt .emoji { font-size: 1.8rem; display: block; }
-        #giftModal .grid .opt .name { font-size: 0.5rem; color: #94a3b8; }
-        #giftModal .grid .opt .price { font-size: 0.5rem; color: #10b981; font-weight: 700; }
-        #giftModal .balance { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 12px; }
-        #giftModal .balance span { color: #10b981; font-weight: 700; }
-        #giftModal .actions { display: flex; gap: 8px; }
+        #giftModal .grid .opt:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+        #giftModal .grid .opt.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+        #giftModal .grid .opt .emoji {
+            font-size: 1.8rem;
+            display: block;
+        }
+        #giftModal .grid .opt .name {
+            font-size: 0.5rem;
+            color: #94a3b8;
+        }
+        #giftModal .grid .opt .price {
+            font-size: 0.5rem;
+            color: #10b981;
+            font-weight: 700;
+        }
+        #giftModal .balance {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+        #giftModal .balance span {
+            color: #10b981;
+            font-weight: 700;
+        }
+        #giftModal .actions {
+            display: flex;
+            gap: 8px;
+        }
         #giftModal .actions button {
-            flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 0.85rem;
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
         }
-        #giftModal .actions .send { background: linear-gradient(135deg, #8b5cf6, #4f46e5); color: #fff; }
-        #giftModal .actions .send:hover { transform: scale(1.02); }
-        #giftModal .actions .close { background: rgba(255,255,255,0.04); color: #94a3b8; }
-        #giftModal .actions .close:hover { background: rgba(255,255,255,0.08); }
+        #giftModal .actions .send {
+            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+            color: #fff;
+        }
+        #giftModal .actions .send:hover {
+            transform: scale(1.02);
+        }
+        #giftModal .actions .close {
+            background: rgba(255, 255, 255, 0.04);
+            color: #94a3b8;
+        }
+        #giftModal .actions .close:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
         #giftOverlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 99997;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 99997;
         }
-        #giftOverlay.active { display: block; }
+        #giftOverlay.active {
+            display: block;
+        }
 
         /* ===== توست ===== */
         .toast {
@@ -727,17 +1101,25 @@
             color: #fff;
             font-weight: 700;
             z-index: 100000;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-            animation: slideRight 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+            animation: slideRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             max-width: 320px;
             font-size: 0.85rem;
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
-        .toast.success { background: rgba(16,185,129,0.9); }
-        .toast.error { background: rgba(239,68,68,0.9); }
-        .toast.warning { background: rgba(245,158,11,0.9); }
-        .toast.info { background: rgba(59,130,246,0.9); }
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+        .toast.warning {
+            background: rgba(245, 158, 11, 0.9);
+        }
+        .toast.info {
+            background: rgba(59, 130, 246, 0.9);
+        }
 
         /* ===== شريط سفلي ===== */
         .bottom-nav {
@@ -746,46 +1128,138 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(10,10,30,0.95);
+            background: rgba(10, 10, 30, 0.95);
             backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,215,0,0.04);
+            border-top: 1px solid rgba(255, 215, 0, 0.04);
             padding: 8px 10px;
             justify-content: space-around;
             z-index: 99;
         }
         .bottom-nav .nav-btn {
-            flex: 1; justify-content: center; padding: 6px 0; font-size: 0.6rem; flex-direction: column; gap: 2px; border-radius: 8px;
+            flex: 1;
+            justify-content: center;
+            padding: 6px 0;
+            font-size: 0.6rem;
+            flex-direction: column;
+            gap: 2px;
+            border-radius: 8px;
         }
-        .bottom-nav .nav-btn i { font-size: 1.1rem; }
+        .bottom-nav .nav-btn i {
+            font-size: 1.1rem;
+        }
         @media(max-width:768px) {
-            .bottom-nav { display: flex; }
-            .main-container { padding-bottom: 75px; }
-            .match-btn { width: 200px; height: 200px; font-size: 3.8rem; }
-            .match-btn .btn-icon { font-size: 3.5rem; }
-            .match-btn .btn-label { font-size: 1.2rem; }
-            .partner-avatar { width: 130px; height: 130px; font-size: 3.2rem; }
-            .call-btn { padding: 8px 14px; font-size: 0.65rem; min-width: 60px; }
-            .call-timer { font-size: 1.3rem; }
-            .match-timer { font-size: 1.4rem; padding: 6px 18px; }
-            .match-timer .timer-value { font-size: 1.8rem; }
-            .call-chat { max-height: 160px; }
-            .call-chat .chat-messages { max-height: 90px; min-height: 35px; }
+            .bottom-nav {
+                display: flex;
+            }
+            .main-container {
+                padding-bottom: 75px;
+            }
+            .match-wrapper {
+                width: 260px;
+                height: 260px;
+            }
+            .match-btn {
+                width: 200px;
+                height: 200px;
+                font-size: 3.5rem;
+            }
+            .match-btn .btn-icon {
+                font-size: 3rem;
+            }
+            .match-btn .btn-label {
+                font-size: 1.1rem;
+            }
+            .partner-avatar {
+                width: 130px;
+                height: 130px;
+                font-size: 3.2rem;
+            }
+            .call-btn {
+                padding: 8px 14px;
+                font-size: 0.65rem;
+                min-width: 60px;
+            }
+            .call-timer {
+                font-size: 1.3rem;
+            }
+            .match-timer {
+                font-size: 1.4rem;
+                padding: 6px 18px;
+            }
+            .match-timer .timer-value {
+                font-size: 1.8rem;
+            }
+            .call-chat {
+                max-height: 160px;
+            }
+            .call-chat .chat-messages {
+                max-height: 90px;
+                min-height: 35px;
+            }
+            .rotating-stars .rs {
+                font-size: 0.9rem;
+            }
         }
         @media(max-width:480px) {
-            .match-btn { width: 160px; height: 160px; font-size: 3rem; }
-            .match-btn .btn-icon { font-size: 2.8rem; }
-            .match-btn .btn-label { font-size: 1rem; }
-            .match-btn .btn-sub { font-size: 0.6rem; }
-            .partner-avatar { width: 110px; height: 110px; font-size: 2.6rem; }
-            .partner-info .name { font-size: 1rem; }
-            .call-btn { padding: 6px 10px; font-size: 0.55rem; min-width: 45px; border-radius: 8px; }
-            .call-timer { font-size: 1.1rem; }
-            .match-timer { font-size: 1.1rem; padding: 4px 14px; }
-            .match-timer .timer-value { font-size: 1.4rem; }
-            .call-chat { max-height: 130px; }
-            .call-chat .chat-messages { max-height: 60px; min-height: 30px; }
-            #giftModal { padding: 18px; min-width: 220px; }
-            #giftModal .grid { grid-template-columns: repeat(auto-fill, minmax(55px,1fr)); }
+            .match-wrapper {
+                width: 200px;
+                height: 200px;
+            }
+            .match-btn {
+                width: 155px;
+                height: 155px;
+                font-size: 2.8rem;
+            }
+            .match-btn .btn-icon {
+                font-size: 2.5rem;
+            }
+            .match-btn .btn-label {
+                font-size: 0.9rem;
+            }
+            .match-btn .btn-sub {
+                font-size: 0.55rem;
+            }
+            .partner-avatar {
+                width: 110px;
+                height: 110px;
+                font-size: 2.6rem;
+            }
+            .partner-info .name {
+                font-size: 1rem;
+            }
+            .call-btn {
+                padding: 6px 10px;
+                font-size: 0.55rem;
+                min-width: 45px;
+                border-radius: 8px;
+            }
+            .call-timer {
+                font-size: 1.1rem;
+            }
+            .match-timer {
+                font-size: 1.1rem;
+                padding: 4px 14px;
+            }
+            .match-timer .timer-value {
+                font-size: 1.4rem;
+            }
+            .call-chat {
+                max-height: 130px;
+            }
+            .call-chat .chat-messages {
+                max-height: 60px;
+                min-height: 30px;
+            }
+            #giftModal {
+                padding: 18px;
+                min-width: 220px;
+            }
+            #giftModal .grid {
+                grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+            }
+            .rotating-stars .rs {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -853,14 +1327,30 @@
 
         <!-- ===== منطقة المطابقة ===== -->
         <div class="match-area" id="matchArea">
-            <button class="match-btn" id="matchBtn" onclick="startMatch()">
-                <span class="pulse-ring"></span>
-                <span class="pulse-ring"></span>
-                <span class="pulse-ring"></span>
-                <span class="btn-icon">🌌</span>
-                <span class="btn-label">كوكبة</span>
-                <span class="btn-sub">اضغط للمطابقة</span>
-            </button>
+
+            <!-- ===== زر المطابقة مع نجوم دوارة ===== -->
+            <div class="match-wrapper">
+                <div class="rotating-stars" id="rotatingStars">
+                    <span class="rs">⭐</span>
+                    <span class="rs">✨</span>
+                    <span class="rs">🌟</span>
+                    <span class="rs">⭐</span>
+                    <span class="rs">✨</span>
+                    <span class="rs">🌟</span>
+                    <span class="rs">⭐</span>
+                    <span class="rs">✨</span>
+                    <span class="rs">🌟</span>
+                    <span class="rs">⭐</span>
+                </div>
+                <button class="match-btn" id="matchBtn" onclick="startMatch()">
+                    <span class="pulse-ring"></span>
+                    <span class="pulse-ring"></span>
+                    <span class="pulse-ring"></span>
+                    <span class="btn-icon">🌌</span>
+                    <span class="btn-label">كوكبة</span>
+                    <span class="btn-sub">اضغط للمطابقة</span>
+                </button>
+            </div>
 
             <div class="match-timer" id="matchTimer">
                 <span class="timer-label">⏱️ وقت البحث</span>
@@ -958,7 +1448,7 @@
 
     <script>
         // ============================================================
-        // 🔥 الإعدادات الأساسية
+        // 🔥 الإعدادات الأساسية (نفس الكود الذي يعمل)
         // ============================================================
         const CONFIG = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -983,13 +1473,24 @@
         // 📋 المتغيرات العامة
         // ============================================================
         let db, peer, myPeerId, mediaStream;
-        let currentUser = null, currentFirebaseKey = null;
+        let currentUser = null,
+            currentFirebaseKey = null;
         let isMicMuted = false;
-        let isCallActive = false, isSearching = false, isMatching = false;
-        let callPartnerId = null, callPartnerName = null, callPartnerKey = null;
-        let callDuration = 0, callTimer = null, matchTimer = null, matchTime = 300;
-        let currentCall = null, waitingListener = null, shownGifts = new Set();
-        let isChatOpen = false, selectedGift = null;
+        let isCallActive = false,
+            isSearching = false,
+            isMatching = false;
+        let callPartnerId = null,
+            callPartnerName = null,
+            callPartnerKey = null;
+        let callDuration = 0,
+            callTimer = null,
+            matchTimer = null,
+            matchTime = 300;
+        let currentCall = null,
+            waitingListener = null,
+            shownGifts = new Set();
+        let isChatOpen = false,
+            selectedGift = null;
         let isPeerReady = false;
         let isPartnerDisconnected = false;
 
@@ -1089,7 +1590,7 @@
         }
 
         // ============================================================
-        // 🎙️ طلب الإذن
+        // 🎙️ طلب الإذن (مثل الكود الذي يعمل)
         // ============================================================
         async function requestPerms() {
             try {
@@ -1137,7 +1638,7 @@
         }
 
         // ============================================================
-        // 🔗 PeerJS
+        // 🔗 PeerJS (نفس الكود الذي يعمل)
         // ============================================================
         function initPeer() {
             if (!mediaStream) { setTimeout(initPeer, 1000); return; }
@@ -1185,7 +1686,7 @@
         }
 
         // ============================================================
-        // 📞 معالجة المكالمة الواردة
+        // 📞 معالجة المكالمة (نفس الكود الذي يعمل)
         // ============================================================
         function handleIncoming(call) {
             console.log('📞 مكالمة واردة من:', call.peer);
@@ -1300,7 +1801,6 @@
             }
             if (db && currentUser) db.ref('active_calls/' + currentUser.numericId).remove();
 
-            // إظهار زر التالي مع لمعان
             const nextBtn = document.getElementById('nextBtn');
             nextBtn.classList.add('highlight');
             nextBtn.innerHTML = '<i class="fas fa-forward"></i> بحث عن شريك';
@@ -1353,10 +1853,12 @@
                     <span class="btn-sub">جارٍ العثور على شريك</span>
                 `;
 
+            // تدوير النجوم بشكل أسرع أثناء البحث
+            document.getElementById('rotatingStars').style.animationDuration = '3s';
+
             document.getElementById('stopBtn').classList.add('active');
             document.getElementById('searchStatus').classList.add('active');
 
-            // إزالة اللمعان من زر التالي
             document.getElementById('nextBtn').classList.remove('highlight');
             document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
 
@@ -1387,6 +1889,9 @@
             resetMatchBtn();
             document.getElementById('stopBtn').classList.remove('active');
             document.getElementById('searchStatus').classList.remove('active');
+
+            // إعادة سرعة النجوم
+            document.getElementById('rotatingStars').style.animationDuration = '20s';
 
             toast('🛑 تم إيقاف البحث', 'info');
         }
@@ -1482,9 +1987,11 @@
                 document.getElementById('stopBtn').classList.remove('active');
                 document.getElementById('searchStatus').classList.remove('active');
 
-                // إزالة اللمعان من زر التالي
                 document.getElementById('nextBtn').classList.remove('highlight');
                 document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
+
+                // إعادة سرعة النجوم
+                document.getElementById('rotatingStars').style.animationDuration = '20s';
 
                 stopMatchTimer();
 
@@ -1687,6 +2194,8 @@
             document.getElementById('nextBtn').classList.remove('highlight');
             document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
 
+            document.getElementById('rotatingStars').style.animationDuration = '20s';
+
             resetMatchBtn();
         }
 
@@ -1695,10 +2204,6 @@
         // ============================================================
         function nextMatch() {
             if (isCallActive || isPartnerDisconnected) {
-                // إضافة المستخدم الحالي إلى قائمة المتطابقين لمنع التكرار
-                if (callPartnerId) {
-                    // لا نمنع التطابق مع نفس المستخدم، نسمح به
-                }
                 if (isCallActive) {
                     endCall();
                 }
@@ -1711,7 +2216,6 @@
 
                 toast('⏭️ جاري البحث عن شريك جديد...', 'info');
 
-                // إزالة اللمعان من زر التالي
                 document.getElementById('nextBtn').classList.remove('highlight');
                 document.getElementById('nextBtn').innerHTML = '<i class="fas fa-forward"></i> التالي';
 
@@ -1943,6 +2447,9 @@
 
             document.getElementById('stopBtn').classList.remove('active');
             document.getElementById('searchStatus').classList.remove('active');
+
+            // إعادة سرعة النجوم
+            document.getElementById('rotatingStars').style.animationDuration = '20s';
 
             if (db && currentUser) db.ref('waiting_users/' + currentUser.numericId).remove();
             if (waitingListener) { db.ref('waiting_users').off();
