@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👤 الملف الشخصي - كوكبة</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        /* ===== أنماط خاصة بالملف الشخصي ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0a1a, #1a1040, #0f0c29);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== شريط التنقل ===== */
+        .navbar {
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.6rem 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 65px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+        }
+
+        .nav-btn .badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.6rem;
+            padding: 1px 6px;
+            border-radius: 50%;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* ===== المحتوى الرئيسي ===== */
+        .main-container {
+            flex: 1;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ===== بطاقة الملف الشخصي ===== */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-card .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-card .avatar-container:hover {
+            border-color: #ffd700;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
+        }
+
+        .profile-card .avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-card .avatar-container .default-avatar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+        }
+
+        .profile-card .avatar-container .avatar-edit-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+
+        .profile-card .avatar-container .avatar-edit-btn:hover {
+            background: #8b5cf6;
+            transform: scale(1.1);
+        }
+
+        .profile-card .display-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .profile-card .display-name .vip-badge {
+            font-size: 0.7rem;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a1a2e;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .profile-card .username {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .profile-card .user-id {
+            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+            padding: 6px 18px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin: 10px auto;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-card .user-id:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-card .bio {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            max-width: 400px;
+            margin: 8px auto;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            min-height: 40px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .profile-card .bio:hover {
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .profile-card .bio .bio-placeholder {
+            color: #444;
+        }
+
+        /* ===== الإحصائيات ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .stats-grid .stat-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .stats-grid .stat-box:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(139, 92, 246, 0.15);
+        }
+
+        .stats-grid .stat-box .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .stats-grid .stat-box .label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        /* ===== الأرصدة ===== */
+        .balance-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 18px;
+            margin: 15px 0;
+        }
+
+        .balance-section .balance-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .balance-section .balance-row:last-child {
+            border-bottom: none;
+        }
+
+        .balance-section .balance-row .label {
+            color: #94a3b8;
+        }
+
+        .balance-section .balance-row .value {
+            font-weight: 700;
+        }
+
+        .balance-section .balance-row .value.egp {
+            color: #10b981;
+        }
+
+        .balance-section .balance-row .value.usd {
+            color: #60a5fa;
+        }
+
+        .balance-section .topup-btn {
+            margin-top: 12px;
+            padding: 10px;
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .balance-section .topup-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        /* ===== التبويبات ===== */
+        .profile-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 12px;
+        }
+
+        .profile-tabs .tab-btn {
+            padding: 8px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .profile-tabs .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .profile-tabs .tab-btn.active {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .profile-tabs .tab-btn .count {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.6rem;
+        }
+
+        .profile-tabs .tab-btn.active .count {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== قوائم داخل التبويبات ===== */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .item-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .item-card .item-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .item-card .item-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .item-card .item-status {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .item-card .item-status.active {
+            color: #10b981;
+        }
+
+        .item-card .item-status.inactive {
+            color: #666;
+        }
+
+        .item-card .item-status .expires {
+            color: #f59e0b;
+        }
+
+        .item-card .item-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .item-card .item-actions button {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .item-card .item-actions .btn-activate {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .item-card .item-actions .btn-activate:hover {
+            background: #7c3aed;
+            transform: scale(1.05);
+        }
+
+        .item-card .item-actions .btn-activate.active {
+            background: #10b981;
+        }
+
+        /* ===== إشعارات ===== */
+        .notification-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .notification-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .notification-item.unread {
+            border-right: 3px solid #8b5cf6;
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .notification-item .notif-content {
+            flex: 1;
+        }
+
+        .notification-item .notif-content .notif-text {
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .notification-item .notif-content .notif-date {
+            font-size: 0.6rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .notification-item .notif-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .notification-item .notif-actions button {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .notification-item .notif-actions .btn-mark-read {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .notification-item .notif-actions .btn-mark-read:hover {
+            background: rgba(16, 185, 129, 0.25);
+        }
+
+        .notification-item .notif-actions .btn-delete {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .notification-item .notif-actions .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .notification-item .notif-icon {
+            font-size: 1.2rem;
+            margin-left: 12px;
+            width: 35px;
+            text-align: center;
+        }
+
+        /* ===== هدايا ===== */
+        .gift-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .gift-item .gift-emoji {
+            font-size: 2rem;
+        }
+
+        .gift-item .gift-info {
+            flex: 1;
+        }
+
+        .gift-item .gift-info .gift-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .gift-item .gift-info .gift-sender {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+
+        .gift-item .gift-info .gift-value {
+            font-size: 0.7rem;
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .gift-item .gift-info .gift-date {
+            font-size: 0.6rem;
+            color: #666;
+        }
+
+        /* ===== توست ===== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 100000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            animation: slideIn 0.3s ease;
+            max-width: 320px;
+            font-size: 0.85rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+        .toast.warning {
+            background: rgba(245, 158, 11, 0.9);
+        }
+        .toast.info {
+            background: rgba(59, 130, 246, 0.9);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== مودال تعديل ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 450px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal .form-group label {
+            display: block;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .modal .form-group input,
+        .modal .form-group textarea,
+        .modal .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .modal .form-group input:focus,
+        .modal .form-group textarea:focus,
+        .modal .form-group select:focus {
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .modal .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal .form-group select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal .modal-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .modal .modal-actions .btn-save {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .modal .modal-actions .btn-save:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        .modal .modal-actions .btn-cancel {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+        }
+
+        .modal .modal-actions .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== تحميل ===== */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.03);
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.3;
+        }
+
+        /* ===== استجابة ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.6rem 2%;
+            }
+            .logo {
+                font-size: 0.9rem;
+            }
+            .logo i {
+                font-size: 1.2rem;
+            }
+            .nav-btn {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
+            .profile-card {
+                padding: 20px;
+            }
+            .profile-card .avatar-container {
+                width: 100px;
+                height: 100px;
+            }
+            .profile-card .display-name {
+                font-size: 1.2rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .items-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-card .avatar-container {
+                width: 80px;
+                height: 80px;
+            }
+            .profile-card .display-name {
+                font-size: 1rem;
+            }
+            .profile-tabs .tab-btn {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
+            .stats-grid .stat-box .number {
+                font-size: 1.2rem;
+            }
+            .items-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .modal {
+                padding: 18px;
+            }
+        }
+
+        /* ===== شريط التنقل السفلي ===== */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            padding: 8px;
+            justify-content: space-around;
+            z-index: 99;
+        }
+
+        .bottom-nav .nav-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 0;
+            font-size: 0.7rem;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bottom-nav .nav-btn i {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-nav {
+                display: flex;
+            }
+            .main-container {
+                padding-bottom: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== شريط التنقل ===== -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i class="fas fa-comet"></i>
+            كوكبة
+        </a>
+        <div class="nav-icons">
+            <a href="match.html" class="nav-btn">
+                <i class="fas fa-random"></i> مطابقة
+            </a>
+            <a href="friends.html" class="nav-btn">
+                <i class="fas fa-user-friends"></i> أصدقاء
+                <span class="badge" id="friendRequestsBadge">0</span>
+            </a>
+            <a href="profile.html" class="nav-btn active">
+                <i class="fas fa-user-circle"></i> حسابي
+            </a>
+            <button class="nav-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== المحتوى الرئيسي ===== -->
+    <div class="main-container">
+        <!-- ===== الملف الشخصي ===== -->
+        <div class="profile-card" id="profileCard">
+            <!-- الصورة -->
+            <div class="avatar-container" onclick="document.getElementById('avatarInput').click()">
+                <div class="default-avatar" id="profileAvatar">👤</div>
+                <div class="avatar-edit-btn">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+            </div>
+
+            <!-- الاسم -->
+            <div class="display-name">
+                <span id="displayName">مستخدم</span>
+                <span class="vip-badge" id="vipBadge" style="display:none;">👑 VIP</span>
+            </div>
+
+            <!-- اسم المستخدم -->
+            <div class="username" id="usernameDisplay">@username</div>
+
+            <!-- المعرف -->
+            <div class="user-id" onclick="copyId()" id="userIdDisplay">000000</div>
+
+            <!-- السيرة الذاتية -->
+            <div class="bio" id="bioDisplay" onclick="openEditBio()">
+                <span class="bio-placeholder">✏️ اضغط لتعديل السيرة الذاتية</span>
+            </div>
+        </div>
+
+        <!-- ===== الإحصائيات ===== -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="number" id="statFriends">0</div>
+                <div class="label">👥 أصدقاء</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="statGifts">0</div>
+                <div class="label">🎁 هدايا</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="statLikes">0</div>
+                <div class="label">❤️ إعجابات</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="statVisits">0</div>
+                <div class="label">👁️ زيارات</div>
+            </div>
+        </div>
+
+        <!-- ===== الأرصدة ===== -->
+        <div class="balance-section">
+            <div class="balance-row">
+                <span class="label">💰 رصيد جنيه مصري</span>
+                <span class="value egp" id="balanceEGP">0.00</span>
+            </div>
+            <div class="balance-row">
+                <span class="label">💵 رصيد دولار أمريكي</span>
+                <span class="value usd" id="balanceUSD">0.00</span>
+            </div>
+            <button class="topup-btn" onclick="openTopUp()">
+                <i class="fas fa-plus-circle"></i> شحن الرصيد
+            </button>
+        </div>
+
+        <!-- ===== التبويبات ===== -->
+        <div class="profile-tabs">
+            <button class="tab-btn active" onclick="switchProfileTab('vip')" id="tabVip">
+                <i class="fas fa-crown"></i> VIP
+            </button>
+            <button class="tab-btn" onclick="switchProfileTab('frames')" id="tabFrames">
+                <i class="fas fa-image"></i> أطارات
+            </button>
+            <button class="tab-btn" onclick="switchProfileTab('collectibles')" id="tabCollectibles">
+                <i class="fas fa-star"></i> مقتنيات
+            </button>
+            <button class="tab-btn" onclick="switchProfileTab('gifts')" id="tabGifts">
+                <i class="fas fa-gift"></i> هدايا
+                <span class="count" id="giftsCount">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchProfileTab('notifications')" id="tabNotifications">
+                <i class="fas fa-bell"></i> إشعارات
+                <span class="count" id="notifCount">0</span>
+            </button>
+        </div>
+
+        <!-- ===== تبويب VIP ===== -->
+        <div class="tab-content active" id="vipTab">
+            <div id="vipList">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="color:#94a3b8;">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== تبويب الأطارات ===== -->
+        <div class="tab-content" id="framesTab">
+            <div id="framesList">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="color:#94a3b8;">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== تبويب المقتنيات ===== -->
+        <div class="tab-content" id="collectiblesTab">
+            <div id="collectiblesList">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="color:#94a3b8;">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== تبويب الهدايا ===== -->
+        <div class="tab-content" id="giftsTab">
+            <div id="giftsList">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="color:#94a3b8;">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== تبويب الإشعارات ===== -->
+        <div class="tab-content" id="notificationsTab">
+            <div id="notificationsList">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="color:#94a3b8;">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== شريط التنقل السفلي ===== -->
+    <div class="bottom-nav">
+        <a href="match.html" class="nav-btn">
+            <i class="fas fa-random"></i>
+            مطابقة
+        </a>
+        <a href="friends.html" class="nav-btn">
+            <i class="fas fa-user-friends"></i>
+            أصدقاء
+            <span class="badge" id="bottomFriendBadge">0</span>
+        </a>
+        <a href="profile.html" class="nav-btn active">
+            <i class="fas fa-user-circle"></i>
+            حسابي
+        </a>
+    </div>
+
+    <!-- ===== مودال تعديل السيرة الذاتية ===== -->
+    <div class="modal-overlay" id="editBioModal">
+        <div class="modal">
+            <h3>✏️ تعديل السيرة الذاتية</h3>
+            <div class="form-group">
+                <label>السيرة الذاتية</label>
+                <textarea id="bioInput" placeholder="اكتب عن نفسك..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveBio()">💾 حفظ</button>
+                <button class="btn-cancel" onclick="closeEditBio()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== مودال الشحن ===== -->
+    <div class="modal-overlay" id="topUpModal">
+        <div class="modal">
+            <h3>💳 شحن الرصيد</h3>
+            <div class="form-group">
+                <label>العملة</label>
+                <select id="topUpCurrency" onchange="updateTopUpDetails()">
+                    <option value="EGP">جنيه مصري (EGP)</option>
+                    <option value="USD">دولار أمريكي (USD)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>طريقة الدفع</label>
+                <select id="topUpMethod" onchange="updateTopUpDetails()">
+                    <option value="vodafone">فودافون كاش</option>
+                    <option value="instapay">إنستا باي</option>
+                    <option value="binance">Binance Pay</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>المبلغ</label>
+                <input type="number" id="topUpAmount" placeholder="أدخل المبلغ..." oninput="calculateTopUp()">
+            </div>
+            <div id="topUpDetails" style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;margin-bottom:12px;display:none;">
+                <p style="font-size:0.8rem;color:#94a3b8;">المبلغ المطلوب: <b id="topUpRequired" style="color:#ffd700;">0</b></p>
+                <p style="font-size:0.7rem;color:#666;" id="topUpHint">حول إلى الرقم التالي:</p>
+                <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;margin-top:6px;">
+                    <b id="topUpWalletNumber">01022797043</b>
+                    <button onclick="copyWalletNumber()" style="background:#8b5cf6;border:none;color:white;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.7rem;">نسخ</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>إيصال الدفع (صورة)</label>
+                <input type="file" id="topUpReceipt" accept="image/*">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" onclick="submitTopUp()">📤 إرسال</button>
+                <button class="btn-cancel" onclick="closeTopUp()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+            authDomain: "stvipclub.firebaseapp.com",
+            databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "stvipclub",
+            storageBucket: "stvipclub.firebasestorage.app",
+            messagingSenderId: "526607326044",
+            appId: "1:526607326044:web:6af53db123ae02c7193f99",
+            measurementId: "G-QZQMQCH9N9"
+        };
+
+        // ============================================================
+        // 📋 المتغيرات العامة
+        // ============================================================
+        let database;
+        let currentUser = null;
+        let currentFirebaseUserId = null;
+        let userData = null;
+        let isSubmittingTopUp = false;
+
+        // بيانات من Firebase
+        const VIP_CONFIG = {
+            1: { level: 1, name: 'VIP 1', emoji: '🚗', title: 'VIP 1 - السيارة الرياضية', price: 500, duration: 30 },
+            2: { level: 2, name: 'VIP 2', emoji: '🦁', title: 'VIP 2 - هيبة الأسد', price: 700, duration: 30 },
+            3: { level: 3, name: 'VIP 3', emoji: '🔥', title: 'VIP 3 - النار', price: 1000, duration: 45 },
+            4: { level: 4, name: 'VIP 4', emoji: '⚡', title: 'VIP 4 - البرق', price: 1300, duration: 60 },
+            5: { level: 5, name: 'VIP 5', emoji: '🌟', title: 'VIP 5 - النجم', price: 1600, duration: 90 },
+            6: { level: 6, name: 'VIP 6', emoji: '💎', title: 'VIP 6 - الألماس', price: 1900, duration: 120 },
+            7: { level: 7, name: 'VIP 7', emoji: '👑', title: 'VIP 7 - الملك', price: 2200, duration: 150 },
+            8: { level: 8, name: 'VIP 8', emoji: '🐉', title: 'VIP 8 - التنين', price: 2500, duration: 180 },
+            9: { level: 9, name: 'VIP 9', emoji: '🦅', title: 'VIP 9 - النسر', price: 2800, duration: 200 },
+            10: { level: 10, name: 'VIP 10', emoji: '🌌', title: 'VIP 10 - المجرة', price: 3000, duration: 365 }
+        };
+
+        const FRAMES = [
+            { id: 'frame1', name: '🎁 إطار خاص', price: 0, duration: 30, isSpecial: true },
+            { id: 'frame_support', name: '🛡️ إطار الدعم', price: 0, duration: 30, isSpecial: true },
+            { id: 'frame_legend', name: '⚡ إطار الأسطورة', price: 200, duration: 45 },
+            { id: 'frame2', name: '⚔️ إطار المحارب', price: 50, duration: 30 },
+            { id: 'frame3', name: '👑 إطار VIP', price: 100, duration: 30 },
+            { id: 'frame4', name: '👸 إطار الملكة', price: 150, duration: 30 },
+            { id: 'frame5', name: '👑 إطار الملك', price: 200, duration: 45 },
+            { id: 'frame6', name: '⭐ إطار النخبة', price: 250, duration: 45 }
+        ];
+
+        const COLLECTIBLES = [
+            { id: 'collect_vip1', name: 'إطار VIP 1', source: 'VIP 1' },
+            { id: 'collect_vip2', name: 'إطار VIP 2', source: 'VIP 2' },
+            { id: 'collect_vip3', name: 'إطار VIP 3', source: 'VIP 3' },
+            { id: 'collect_vip4', name: 'إطار VIP 4', source: 'VIP 4' },
+            { id: 'collect_vip5', name: 'إطار VIP 5', source: 'VIP 5' },
+            { id: 'collect_vip6', name: 'إطار VIP 6', source: 'VIP 6' },
+            { id: 'collect_vip6pro', name: 'إطار VIP 6 Pro', source: 'VIP 6' },
+            { id: 'collect_vip7', name: 'إطار VIP 7', source: 'VIP 7' },
+            { id: 'collect_vip8', name: 'إطار VIP 8', source: 'VIP 8' },
+            { id: 'collect_vip9', name: 'إطار VIP 9', source: 'VIP 9' },
+            { id: 'collect_vip10', name: 'إطار VIP 10', source: 'VIP 10' }
+        ];
+
+        // ============================================================
+        // 🍞 توست
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: 'rgba(16,185,129,0.9)',
+                error: 'rgba(239,68,68,0.9)',
+                warning: 'rgba(245,158,11,0.9)',
+                info: 'rgba(59,130,246,0.9)'
+            };
+            const old = document.querySelector('.toast');
+            if (old) old.remove();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.style.background = colors[type] || colors.info;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================================
+        // 🔥 تهيئة Firebase
+        // ============================================================
+        async function initializeFirebase() {
+            try {
+                if (firebase.apps.length > 0) await firebase.app().delete();
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                console.log('✅ Firebase initialized');
+            } catch (error) {
+                console.error('❌ Firebase error:', error);
+            }
+        }
+
+        // ============================================================
+        // 👤 المستخدم
+        // ============================================================
+        function getStoredUser() {
+            try { return JSON.parse(localStorage.getItem('currentUser')); } catch (e) { return null; }
+        }
+
+        function isLoggedIn() { return getStoredUser() !== null; }
+
+        function generateNumericId() { return Math.floor(100000 + Math.random() * 900000); }
+
+        async function getCurrentUserFullData() {
+            try {
+                const stored = getStoredUser();
+                if (!stored) return null;
+                if (!database) return stored;
+                const numericId = stored.numericId || generateNumericId();
+                if (!stored.numericId) {
+                    stored.numericId = numericId;
+                    localStorage.setItem('currentUser', JSON.stringify(stored));
+                }
+                const snapshot = await database.ref('users')
+                    .orderByChild('numericId')
+                    .equalTo(numericId)
+                    .once('value');
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const firebaseKey = Object.keys(userData)[0];
+                    const fullUser = userData[firebaseKey];
+                    const merged = { ...stored, ...fullUser, numericId: numericId, firebaseKey: firebaseKey };
+                    localStorage.setItem('currentUser', JSON.stringify(merged));
+                    currentFirebaseUserId = firebaseKey;
+                    return merged;
+                }
+                return stored;
+            } catch (e) { return getStoredUser(); }
+        }
+
+        // ============================================================
+        // 📊 تحميل بيانات الملف الشخصي
+        // ============================================================
+        async function loadProfileData() {
+            if (!database || !currentUser) return;
+
+            try {
+                const snapshot = await database.ref('users/' + currentFirebaseUserId).once('value');
+                if (!snapshot.exists()) {
+                    showToast('❌ بيانات المستخدم غير موجودة', 'error');
+                    return;
+                }
+
+                userData = snapshot.val();
+
+                // تحديث الواجهة
+                updateProfileUI();
+
+                // تحميل التبويبات
+                await loadVIPData();
+                await loadFramesData();
+                await loadCollectiblesData();
+                await loadGiftsData();
+                await loadNotificationsData();
+
+                // تحديث العدادات
+                updateCounts();
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showToast('❌ حدث خطأ في تحميل البيانات', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ تحديث واجهة الملف الشخصي
+        // ============================================================
+        function updateProfileUI() {
+            if (!userData) return;
+
+            // الصورة
+            const avatarEl = document.getElementById('profileAvatar');
+            if (userData.avatar) {
+                avatarEl.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
+            } else {
+                avatarEl.innerHTML = '👤';
+                avatarEl.style.background = 'linear-gradient(135deg, #4f46e5, #8b5cf6)';
+                avatarEl.style.display = 'flex';
+                avatarEl.style.alignItems = 'center';
+                avatarEl.style.justifyContent = 'center';
+                avatarEl.style.fontSize = '3rem';
+            }
+
+            // الاسم
+            document.getElementById('displayName').textContent = userData.nickname || userData.username || 'مستخدم';
+            document.getElementById('usernameDisplay').textContent = '@' + (userData.username || 'username');
+
+            // المعرف
+            document.getElementById('userIdDisplay').textContent = String(userData.numericId || '000000').padStart(6, '0');
+
+            // السيرة الذاتية
+            const bioEl = document.getElementById('bioDisplay');
+            if (userData.bio) {
+                bioEl.innerHTML = userData.bio;
+            } else {
+                bioEl.innerHTML = '<span class="bio-placeholder">✏️ اضغط لتعديل السيرة الذاتية</span>';
+            }
+
+            // VIP
+            const vipBadge = document.getElementById('vipBadge');
+            if (userData.vip && userData.vip.active) {
+                const vipConfig = VIP_CONFIG[userData.vip.active];
+                if (vipConfig) {
+                    vipBadge.style.display = 'inline';
+                    vipBadge.textContent = `👑 ${vipConfig.emoji} ${vipConfig.name}`;
+                }
+            } else {
+                vipBadge.style.display = 'none';
+            }
+
+            // الإحصائيات
+            const friendsCount = userData.friends ? Object.keys(userData.friends).length : 0;
+            const giftsCount = userData.giftsList ? userData.giftsList.length : 0;
+            const likesCount = userData.likes || 0;
+            const visitsCount = userData.visits || 0;
+
+            document.getElementById('statFriends').textContent = friendsCount;
+            document.getElementById('statGifts').textContent = giftsCount;
+            document.getElementById('statLikes').textContent = likesCount;
+            document.getElementById('statVisits').textContent = visitsCount;
+
+            // الأرصدة
+            document.getElementById('balanceEGP').textContent = (userData.balanceEGP || 0).toFixed(2);
+            document.getElementById('balanceUSD').textContent = (userData.balanceUSD || 0).toFixed(2);
+        }
+
+        // ============================================================
+        // 👑 VIP
+        // ============================================================
+        async function loadVIPData() {
+            const container = document.getElementById('vipList');
+
+            const activeVIP = userData.vip?.active || null;
+            const vipPurchased = userData.vipPurchased || {};
+
+            let html = '<div class="items-grid">';
+
+            for (const level in VIP_CONFIG) {
+                const vip = VIP_CONFIG[level];
+                const isOwned = vipPurchased[level] && vipPurchased[level].owned;
+                const isActive = activeVIP == level;
+
+                let statusText = 'غير مملوك';
+                let statusClass = 'inactive';
+                let expiresText = '';
+
+                if (isOwned) {
+                    const expiresAt = vipPurchased[level].expiresAt ? new Date(vipPurchased[level].expiresAt) : null;
+                    if (expiresAt && expiresAt < new Date()) {
+                        statusText = '⏳ منتهي';
+                        statusClass = 'inactive';
+                    } else if (isActive) {
+                        statusText = '✅ مفعل';
+                        statusClass = 'active';
+                        if (expiresAt) {
+                            expiresText = ` (ينتهي ${expiresAt.toLocaleDateString('ar-EG')})`;
+                        }
+                    } else {
+                        statusText = '📦 مملوك';
+                        statusClass = 'inactive';
+                        if (expiresAt) {
+                            expiresText = ` (ينتهي ${expiresAt.toLocaleDateString('ar-EG')})`;
+                        }
+                    }
+                }
+
+                html += `
+                    <div class="item-card">
+                        <span class="item-emoji">${vip.emoji}</span>
+                        <div class="item-name">${vip.name}</div>
+                        <div class="item-status ${statusClass}">${statusText}${expiresText}</div>
+                        <div style="font-size:0.65rem;color:#94a3b8;">💰 ${vip.price} ج.م</div>
+                        <div style="font-size:0.55rem;color:#666;">⏱️ ${vip.duration} يوم</div>
+                        ${isOwned && !isActive && statusText !== '⏳ منتهي' ? `
+                            <div class="item-actions">
+                                <button class="btn-activate" onclick="activateVIP('${level}')">تفعيل</button>
+                            </div>
+                        ` : ''}
+                        ${!isOwned ? `
+                            <div class="item-actions">
+                                <button class="btn-activate" onclick="purchaseVIP('${level}')" style="background:#10b981;">شراء</button>
+                            </div>
+                        ` : ''}
+                        ${isActive ? `
+                            <div class="item-actions">
+                                <button class="btn-activate active" onclick="deactivateVIP()" style="background:#ef4444;">إلغاء التفعيل</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // 🖼️ الأطارات
+        // ============================================================
+        async function loadFramesData() {
+            const container = document.getElementById('framesList');
+
+            const activeFrame = userData.activeFrame || null;
+            const frames = userData.frames || {};
+
+            let html = '<div class="items-grid">';
+
+            for (const frame of FRAMES) {
+                const isOwned = frames[frame.id] && frames[frame.id].owned;
+                const isActive = activeFrame == frame.id;
+
+                let statusText = 'غير مملوك';
+                let statusClass = 'inactive';
+                let expiresText = '';
+
+                if (isOwned) {
+                    const expiresAt = frames[frame.id].expiresAt ? new Date(frames[frame.id].expiresAt) : null;
+                    if (expiresAt && expiresAt < new Date()) {
+                        statusText = '⏳ منتهي';
+                        statusClass = 'inactive';
+                    } else if (isActive) {
+                        statusText = '✅ مفعل';
+                        statusClass = 'active';
+                        if (expiresAt) {
+                            expiresText = ` (ينتهي ${expiresAt.toLocaleDateString('ar-EG')})`;
+                        }
+                    } else {
+                        statusText = '📦 مملوك';
+                        statusClass = 'inactive';
+                        if (expiresAt) {
+                            expiresText = ` (ينتهي ${expiresAt.toLocaleDateString('ar-EG')})`;
+                        }
+                    }
+                }
+
+                const priceText = frame.price === 0 ? '🎁 مجاني' : `💰 ${frame.price} ج.م`;
+
+                html += `
+                    <div class="item-card">
+                        <span class="item-emoji">${frame.name.split(' ')[0]}</span>
+                        <div class="item-name">${frame.name}</div>
+                        <div class="item-status ${statusClass}">${statusText}${expiresText}</div>
+                        <div style="font-size:0.65rem;color:#94a3b8;">${priceText}</div>
+                        <div style="font-size:0.55rem;color:#666;">⏱️ ${frame.duration} يوم</div>
+                        ${isOwned && !isActive && statusText !== '⏳ منتهي' ? `
+                            <div class="item-actions">
+                                <button class="btn-activate" onclick="activateFrame('${frame.id}')">تفعيل</button>
+                            </div>
+                        ` : ''}
+                        ${!isOwned ? `
+                            <div class="item-actions">
+                                <button class="btn-activate" onclick="purchaseFrame('${frame.id}')" style="background:#10b981;">${frame.price === 0 ? 'الحصول' : 'شراء'}</button>
+                            </div>
+                        ` : ''}
+                        ${isActive ? `
+                            <div class="item-actions">
+                                <button class="btn-activate active" onclick="deactivateFrame()" style="background:#ef4444;">إلغاء التفعيل</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // ⭐ المقتنيات
+        // ============================================================
+        async function loadCollectiblesData() {
+            const container = document.getElementById('collectiblesList');
+
+            const activeCollectible = userData.activeCollectible || null;
+            const collectibles = userData.collectibles || {};
+
+            let html = '<div class="items-grid">';
+
+            for (const collect of COLLECTIBLES) {
+                const isOwned = collectibles[collect.id] && collectibles[collect.id].owned;
+                const isActive = activeCollectible == collect.id;
+
+                let statusText = 'غير مملوك';
+                let statusClass = 'inactive';
+                let expiresText = '';
+
+                if (isOwned) {
+                    const expiresAt = collectibles[collect.id].expiresAt ? new Date(collectibles[collect.id].expiresAt) :
+                    null;
+                    if (expiresAt && expiresAt < new Date()) {
+                        statusText = '⏳ منتهي';
+                        statusClass = 'inactive';
+                    } else if (isActive) {
+                        statusText = '✅ مفعل';
+                        statusClass = 'active';
+                        if (expiresAt) {
+                            expiresText = ` (ينتهي ${expiresAt.toLocaleDateString('ar-EG')})`;
+                        }
+                    } else {
+                        statusText = '📦 مملوك';
+                        statusClass = 'inactive';
+                        if (expiresAt) {
+                            expiresText = ` (ينتهي ${expiresAt.toLocaleDateString('ar-EG')})`;
+                        }
+                    }
+                }
+
+                html += `
+                    <div class="item-card">
+                        <span class="item-emoji">⭐</span>
+                        <div class="item-name">${collect.name}</div>
+                        <div class="item-status ${statusClass}">${statusText}${expiresText}</div>
+                        <div style="font-size:0.55rem;color:#666;">مصدر: ${collect.source}</div>
+                        ${isOwned && !isActive && statusText !== '⏳ منتهي' ? `
+                            <div class="item-actions">
+                                <button class="btn-activate" onclick="activateCollectible('${collect.id}')">تفعيل</button>
+                            </div>
+                        ` : ''}
+                        ${isActive ? `
+                            <div class="item-actions">
+                                <button class="btn-activate active" onclick="deactivateCollectible()" style="background:#ef4444;">إلغاء التفعيل</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // 🎁 الهدايا
+        // ============================================================
+        async function loadGiftsData() {
+            const container = document.getElementById('giftsList');
+
+            const giftsList = userData.giftsList || [];
+
+            if (giftsList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">🎁</span>
+                        <p>لا توجد هدايا مستلمة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            // ترتيب من الأحدث
+            const sorted = [...giftsList].reverse();
+
+            for (const gift of sorted) {
+                html += `
+                    <div class="gift-item">
+                        <div class="gift-emoji">${gift.giftEmoji || '🎁'}</div>
+                        <div class="gift-info">
+                            <div class="gift-name">${gift.giftName || 'هدية'}</div>
+                            <div class="gift-sender">من: ${gift.senderName || 'مستخدم'}</div>
+                            <div class="gift-value">💰 ${gift.value || 0} ج.م</div>
+                            <div class="gift-date">📅 ${gift.date || ''}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            document.getElementById('giftsCount').textContent = giftsList.length;
+        }
+
+        // ============================================================
+        // 🔔 الإشعارات
+        // ============================================================
+        async function loadNotificationsData() {
+            const container = document.getElementById('notificationsList');
+
+            const notifications = userData.notifications || {};
+
+            const notifArray = [];
+            for (const key in notifications) {
+                notifArray.push({
+                    key: key,
+                    ...notifications[key]
+                });
+            }
+
+            if (notifArray.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">🔔</span>
+                        <p>لا توجد إشعارات</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // ترتيب من الأحدث
+            notifArray.sort((a, b) => (b.id || 0) - (a.id || 0));
+
+            let html = '';
+            let unreadCount = 0;
+
+            for (const notif of notifArray) {
+                const isUnread = !notif.read;
+                if (isUnread) unreadCount++;
+
+                const iconMap = {
+                    purchase_approved: '✅',
+                    purchase_rejected: '❌',
+                    deposit: '💰',
+                    gift_received: '🎁',
+                    vip_purchased: '👑',
+                    like: '❤️',
+                    friend_request: '👤',
+                    friend_accepted: '✅',
+                    general: '📌'
+                };
+
+                const icon = iconMap[notif.type] || '📌';
+
+                html += `
+                    <div class="notification-item ${isUnread ? 'unread' : ''}">
+                        <div class="notif-icon">${icon}</div>
+                        <div class="notif-content">
+                            <div class="notif-text">${notif.text || ''}</div>
+                            <div class="notif-date">📅 ${notif.date || ''}</div>
+                        </div>
+                        <div class="notif-actions">
+                            ${isUnread ? `
+                                <button class="btn-mark-read" onclick="markNotifRead('${notif.key}')">قراءة</button>
+                            ` : ''}
+                            <button class="btn-delete" onclick="deleteNotif('${notif.key}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            document.getElementById('notifCount').textContent = notifArray.length;
+            document.getElementById('notifCount').style.display = unreadCount > 0 ? 'inline' : 'none';
+        }
+
+        // ============================================================
+        // 📊 تحديث العدادات
+        // ============================================================
+        function updateCounts() {
+            const friendsCount = userData.friends ? Object.keys(userData.friends).length : 0;
+            const giftsCount = userData.giftsList ? userData.giftsList.length : 0;
+            const notifCount = userData.notifications ? Object.keys(userData.notifications).length : 0;
+
+            // تحديث شارات الأصدقاء في التنقل
+            document.getElementById('friendRequestsBadge').textContent = '0'; // سيتم تحديثها من friends.html
+            document.getElementById('bottomFriendBadge').textContent = '0';
+
+            // تحديث عدادات التبويبات
+            document.getElementById('giftsCount').textContent = giftsCount;
+            document.getElementById('notifCount').textContent = notifCount;
+        }
+
+        // ============================================================
+        // 🔄 تبديل التبويبات
+        // ============================================================
+        function switchProfileTab(tab) {
+            document.querySelectorAll('.profile-tabs .tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+
+        // ============================================================
+        // ✏️ تعديل السيرة الذاتية
+        // ============================================================
+        function openEditBio() {
+            document.getElementById('bioInput').value = userData.bio || '';
+            document.getElementById('editBioModal').classList.add('active');
+        }
+
+        function closeEditBio() {
+            document.getElementById('editBioModal').classList.remove('active');
+        }
+
+        async function saveBio() {
+            const bio = document.getElementById('bioInput').value.trim();
+
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/bio').set(bio);
+                userData.bio = bio;
+                updateProfileUI();
+                closeEditBio();
+                showToast('✅ تم تحديث السيرة الذاتية', 'success');
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 📷 رفع صورة الملف الشخصي
+        // ============================================================
+        async function uploadAvatar(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const imageData = e.target.result;
+
+                    // حفظ الصورة كـ base64 في Firebase (مؤقتاً)
+                    // في الإنتاج، يفضل استخدام Firebase Storage
+                    await database.ref('users/' + currentFirebaseUserId + '/avatar').set(imageData);
+                    userData.avatar = imageData;
+                    updateProfileUI();
+                    showToast('✅ تم تحديث الصورة', 'success');
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                showToast('❌ حدث خطأ في رفع الصورة', 'error');
+            }
+        }
+
+        // ============================================================
+        // 📋 نسخ المعرف
+        // ============================================================
+        function copyId() {
+            const id = document.getElementById('userIdDisplay').textContent;
+            navigator.clipboard.writeText(id).then(() => {
+                showToast('✅ تم نسخ المعرف: ' + id, 'success');
+            }).catch(() => {
+                showToast('❌ حدث خطأ في النسخ', 'error');
+            });
+        }
+
+        // ============================================================
+        // 👑 شراء VIP
+        // ============================================================
+        async function purchaseVIP(level) {
+            const vip = VIP_CONFIG[level];
+            if (!vip) return;
+
+            if (userData.balanceEGP < vip.price) {
+                showToast(`⚠️ رصيد غير كافٍ (تحتاج ${vip.price} ج.م)`, 'warning');
+                return;
+            }
+
+            if (!confirm(`شراء ${vip.emoji} ${vip.name} مقابل ${vip.price} ج.م؟`)) return;
+
+            try {
+                const newBalance = (userData.balanceEGP || 0) - vip.price;
+
+                // تحديث الرصيد
+                await database.ref('users/' + currentFirebaseUserId + '/balanceEGP').set(newBalance);
+                userData.balanceEGP = newBalance;
+
+                // إضافة VIP
+                const vipPurchased = userData.vipPurchased || {};
+                vipPurchased[level] = {
+                    owned: true,
+                    purchasedAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + vip.duration * 86400000).toISOString()
+                };
+                await database.ref('users/' + currentFirebaseUserId + '/vipPurchased').set(vipPurchased);
+                userData.vipPurchased = vipPurchased;
+
+                // تفعيل VIP تلقائياً
+                await database.ref('users/' + currentFirebaseUserId + '/vip/active').set(level);
+                await database.ref('users/' + currentFirebaseUserId + '/vip/expiresAt').set(new Date(Date.now() + vip
+                .duration * 86400000).toISOString());
+                userData.vip = { active: level, expiresAt: new Date(Date.now() + vip.duration * 86400000).toISOString() };
+
+                // إشعار
+                await database.ref('users/' + currentFirebaseUserId + '/notifications').push({
+                    id: Date.now(),
+                    text: `👑 تم شراء ${vip.emoji} ${vip.name} بنجاح!`,
+                    read: false,
+                    date: new Date().toLocaleString('ar-EG'),
+                    type: 'vip_purchased',
+                    createdAt: new Date().toISOString()
+                });
+
+                showToast(`✅ تم شراء ${vip.emoji} ${vip.name} بنجاح`, 'success');
+                await loadProfileData();
+
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 👑 تفعيل VIP
+        // ============================================================
+        async function activateVIP(level) {
+            const vip = VIP_CONFIG[level];
+            if (!vip) return;
+
+            try {
+                const vipPurchased = userData.vipPurchased || {};
+                const purchased = vipPurchased[level];
+                if (!purchased || !purchased.owned) {
+                    showToast('⚠️ هذا الـVIP غير مملوك', 'warning');
+                    return;
+                }
+
+                const expiresAt = purchased.expiresAt ? new Date(purchased.expiresAt) : null;
+                if (expiresAt && expiresAt < new Date()) {
+                    showToast('⏳ صلاحية هذا الـVIP منتهية', 'warning');
+                    return;
+                }
+
+                await database.ref('users/' + currentFirebaseUserId + '/vip/active').set(level);
+                await database.ref('users/' + currentFirebaseUserId + '/vip/expiresAt').set(purchased.expiresAt);
+                userData.vip = { active: level, expiresAt: purchased.expiresAt };
+
+                showToast(`✅ تم تفعيل ${vip.emoji} ${vip.name}`, 'success');
+                await loadProfileData();
+
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 👑 إلغاء تفعيل VIP
+        // ============================================================
+        async function deactivateVIP() {
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/vip/active').set(null);
+                userData.vip = { active: null, expiresAt: null };
+                showToast('✅ تم إلغاء تفعيل VIP', 'info');
+                await loadProfileData();
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ شراء إطار
+        // ============================================================
+        async function purchaseFrame(frameId) {
+            const frame = FRAMES.find(f => f.id === frameId);
+            if (!frame) return;
+
+            if (frame.price === 0) {
+                // مجاني - يتم منحه تلقائياً
+                try {
+                    const frames = userData.frames || {};
+                    frames[frameId] = {
+                        owned: true,
+                        purchasedAt: new Date().toISOString(),
+                        expiresAt: new Date(Date.now() + frame.duration * 86400000).toISOString()
+                    };
+                    await database.ref('users/' + currentFirebaseUserId + '/frames').set(frames);
+                    userData.frames = frames;
+                    showToast(`✅ تم الحصول على ${frame.name}`, 'success');
+                    await loadProfileData();
+                } catch (error) {
+                    showToast('❌ حدث خطأ', 'error');
+                }
+                return;
+            }
+
+            if (userData.balanceEGP < frame.price) {
+                showToast(`⚠️ رصيد غير كافٍ (تحتاج ${frame.price} ج.م)`, 'warning');
+                return;
+            }
+
+            if (!confirm(`شراء ${frame.name} مقابل ${frame.price} ج.م؟`)) return;
+
+            try {
+                const newBalance = (userData.balanceEGP || 0) - frame.price;
+                await database.ref('users/' + currentFirebaseUserId + '/balanceEGP').set(newBalance);
+                userData.balanceEGP = newBalance;
+
+                const frames = userData.frames || {};
+                frames[frameId] = {
+                    owned: true,
+                    purchasedAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + frame.duration * 86400000).toISOString()
+                };
+                await database.ref('users/' + currentFirebaseUserId + '/frames').set(frames);
+                userData.frames = frames;
+
+                showToast(`✅ تم شراء ${frame.name}`, 'success');
+                await loadProfileData();
+
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ تفعيل إطار
+        // ============================================================
+        async function activateFrame(frameId) {
+            try {
+                const frames = userData.frames || {};
+                const frame = frames[frameId];
+                if (!frame || !frame.owned) {
+                    showToast('⚠️ هذا الإطار غير مملوك', 'warning');
+                    return;
+                }
+
+                const expiresAt = frame.expiresAt ? new Date(frame.expiresAt) : null;
+                if (expiresAt && expiresAt < new Date()) {
+                    showToast('⏳ صلاحية هذا الإطار منتهية', 'warning');
+                    return;
+                }
+
+                await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(frameId);
+                userData.activeFrame = frameId;
+
+                showToast('✅ تم تفعيل الإطار', 'success');
+                await loadProfileData();
+
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🖼️ إلغاء تفعيل إطار
+        // ============================================================
+        async function deactivateFrame() {
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/activeFrame').set(null);
+                userData.activeFrame = null;
+                showToast('✅ تم إلغاء تفعيل الإطار', 'info');
+                await loadProfileData();
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // ⭐ تفعيل مقتنى
+        // ============================================================
+        async function activateCollectible(collectId) {
+            try {
+                const collectibles = userData.collectibles || {};
+                const collect = collectibles[collectId];
+                if (!collect || !collect.owned) {
+                    showToast('⚠️ هذا المقتنى غير مملوك', 'warning');
+                    return;
+                }
+
+                const expiresAt = collect.expiresAt ? new Date(collect.expiresAt) : null;
+                if (expiresAt && expiresAt < new Date()) {
+                    showToast('⏳ صلاحية هذا المقتنى منتهية', 'warning');
+                    return;
+                }
+
+                await database.ref('users/' + currentFirebaseUserId + '/activeCollectible').set(collectId);
+                userData.activeCollectible = collectId;
+
+                showToast('✅ تم تفعيل المقتنى', 'success');
+                await loadProfileData();
+
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // ⭐ إلغاء تفعيل مقتنى
+        // ============================================================
+        async function deactivateCollectible() {
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/activeCollectible').set(null);
+                userData.activeCollectible = null;
+                showToast('✅ تم إلغاء تفعيل المقتنى', 'info');
+                await loadProfileData();
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🔔 إشعارات - قراءة
+        // ============================================================
+        async function markNotifRead(notifKey) {
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/notifications/' + notifKey + '/read').set(true);
+                userData.notifications[notifKey].read = true;
+                await loadNotificationsData();
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🔔 إشعارات - حذف
+        // ============================================================
+        async function deleteNotif(notifKey) {
+            try {
+                await database.ref('users/' + currentFirebaseUserId + '/notifications/' + notifKey).remove();
+                delete userData.notifications[notifKey];
+                await loadNotificationsData();
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 💳 شحن الرصيد
+        // ============================================================
+        function openTopUp() {
+            document.getElementById('topUpModal').classList.add('active');
+            updateTopUpDetails();
+        }
+
+        function closeTopUp() {
+            document.getElementById('topUpModal').classList.remove('active');
+            document.getElementById('topUpAmount').value = '';
+            document.getElementById('topUpReceipt').value = '';
+            document.getElementById('topUpDetails').style.display = 'none';
+        }
+
+        function updateTopUpDetails() {
+            const currency = document.getElementById('topUpCurrency').value;
+            const method = document.getElementById('topUpMethod').value;
+            const hint = document.getElementById('topUpHint');
+            const wallet = document.getElementById('topUpWalletNumber');
+
+            if (method === 'binance') {
+                hint.textContent = 'بيانات الدفع عبر Binance Pay:';
+                wallet.textContent = '803045359 (iMrJoe)';
+            } else {
+                hint.textContent = 'حول إلى الرقم التالي:';
+                wallet.textContent = '01022797043';
+            }
+
+            calculateTopUp();
+        }
+
+        function calculateTopUp() {
+            const amount = parseFloat(document.getElementById('topUpAmount').value) || 0;
+            const currency = document.getElementById('topUpCurrency').value;
+            const method = document.getElementById('topUpMethod').value;
+            const details = document.getElementById('topUpDetails');
+
+            if (amount <= 0) {
+                details.style.display = 'none';
+                return;
+            }
+
+            details.style.display = 'block';
+
+            let required = amount;
+            if (currency === 'USD') {
+                required = method === 'binance' ? amount : amount * 50;
+            }
+
+            document.getElementById('topUpRequired').textContent = required + ' ' + (currency === 'USD' && method ===
+                'binance' ? 'USDT' : 'جنيه');
+        }
+
+        function copyWalletNumber() {
+            const text = document.getElementById('topUpWalletNumber').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ تم نسخ رقم المحفظة', 'success');
+            }).catch(() => {
+                showToast('❌ حدث خطأ في النسخ', 'error');
+            });
+        }
+
+        async function submitTopUp() {
+            if (isSubmittingTopUp) return;
+
+            const amount = document.getElementById('topUpAmount').value;
+            const currency = document.getElementById('topUpCurrency').value;
+            const method = document.getElementById('topUpMethod').value;
+            const fileInput = document.getElementById('topUpReceipt');
+
+            if (!amount || amount <= 0 || fileInput.files.length === 0) {
+                showToast('⚠️ يرجى ملء جميع الحقول', 'warning');
+                return;
+            }
+
+            isSubmittingTopUp = true;
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const methodNames = {
+                            vodafone: 'فودافون كاش',
+                            instapay: 'إنستا باي',
+                            binance: 'Binance Pay'
+                        };
+
+                        await database.ref('orders').push({
+                            orderId: 'DEP-' + Date.now(),
+                            userId: currentUser.numericId,
+                            username: currentUser.username,
+                            nickname: currentUser.nickname || currentUser.username,
+                            product: `إيداع ${currency} عبر ${methodNames[method] || method}`,
+                            price: `${amount} ${currency}`,
+                            paymentMethod: method,
+                            method: methodNames[method] || method,
+                            currency: currency,
+                            receipt: e.target.result,
+                            status: 'قيد المراجعة',
+                            type: 'deposit',
+                            createdAt: new Date().toISOString()
+                        });
+
+                        await database.ref('users/' + currentFirebaseUserId + '/notifications').push({
+                            id: Date.now(),
+                            text: `⏳ تم استلام إيصال الإيداع عبر ${methodNames[method] || method}. سيتم مراجعته قريباً.`,
+                            read: false,
+                            date: new Date().toLocaleString('ar-EG'),
+                            type: 'deposit',
+                            createdAt: new Date().toISOString()
+                        });
+
+                        showToast('✅ تم إرسال طلب الشحن', 'success');
+                        closeTopUp();
+
+                    } catch (error) {
+                        showToast('❌ حدث خطأ', 'error');
+                    } finally {
+                        isSubmittingTopUp = false;
+                    }
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+
+            } catch (error) {
+                showToast('❌ حدث خطأ', 'error');
+                isSubmittingTopUp = false;
+            }
+        }
+
+        // ============================================================
+        // 🚪 تسجيل الخروج
+        // ============================================================
+        async function logout() {
+            try { if (firebase.auth) await firebase.auth().signOut(); } catch (e) {}
+            localStorage.removeItem('currentUser');
+            window.location.reload();
+        }
+
+        // ============================================================
+        // 🔄 الاستماع للتحديثات في الوقت الفعلي
+        // ============================================================
+        function listenForRealtimeUpdates() {
+            if (!database || !currentUser) return;
+
+            database.ref('users/' + currentFirebaseUserId).on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    userData = snapshot.val();
+                    updateProfileUI();
+                    // إعادة تحميل التبويبات
+                    loadVIPData();
+                    loadFramesData();
+                    loadCollectiblesData();
+                    loadGiftsData();
+                    loadNotificationsData();
+                    updateCounts();
+                }
+            });
+        }
+
+        // ============================================================
+        // 🚀 التهيئة
+        // ============================================================
+        window.onload = async function() {
+            await initializeFirebase();
+
+            const user = await getCurrentUserFullData();
+            if (user) {
+                currentUser = user;
+                currentFirebaseUserId = user.firebaseKey;
+                console.log('✅ User loaded:', user.nickname || user.username);
+
+                // تحديث حالة المستخدم
+                if (database && currentFirebaseUserId) {
+                    database.ref('users/' + currentFirebaseUserId).update({
+                        isOnline: true,
+                        lastActive: new Date().toISOString()
+                    });
+
+                    window.addEventListener('beforeunload', function() {
+                        database.ref('users/' + currentFirebaseUserId).update({
+                            isOnline: false
+                        });
+                    });
+                }
+
+                // تحميل البيانات
+                await loadProfileData();
+
+                // الاستماع للتحديثات
+                listenForRealtimeUpdates();
+
+            } else {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            }
+
+            // إظهار التنقل السفلي للجوال
+            if (window.innerWidth <= 768) {
+                document.querySelector('.bottom-nav').style.display = 'flex';
+            }
+        };
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js">
+    </script>
+</body>
+</html>
