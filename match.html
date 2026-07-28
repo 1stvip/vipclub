@@ -110,24 +110,25 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 20px;
+            padding: 10px 15px;
             max-width: 1200px;
             margin: 0 auto;
             width: 100%;
-            gap: 15px;
+            gap: 10px;
             min-height: calc(100vh - 65px);
             padding-bottom: 30px;
         }
 
-        /* ===== زر المطابقة الكبير ===== */
+        /* ===== زر المطابقة الكبير (نصف الشاشة) ===== */
         .match-btn-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 15px;
-            padding: 20px;
+            padding: 10px;
             width: 100%;
+            min-height: 50vh;
             transition: all 0.5s ease;
         }
 
@@ -136,16 +137,16 @@
         }
 
         .match-btn {
-            width: 180px;
-            height: 180px;
+            width: 280px;
+            height: 280px;
             border-radius: 50%;
             border: none;
             background: linear-gradient(135deg, #8b5cf6, #4f46e5);
             color: white;
-            font-size: 4rem;
+            font-size: 5rem;
             cursor: pointer;
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 0 60px rgba(139, 92, 246, 0.3), inset 0 -4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 80px rgba(139, 92, 246, 0.3), inset 0 -4px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -174,8 +175,8 @@
         }
 
         .match-btn:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 80px rgba(139, 92, 246, 0.5);
+            transform: scale(1.05);
+            box-shadow: 0 0 100px rgba(139, 92, 246, 0.5);
         }
 
         .match-btn:active {
@@ -183,7 +184,7 @@
         }
 
         .match-btn .btn-icon {
-            font-size: 4rem;
+            font-size: 5rem;
             display: block;
             animation: floatIcon 3s ease-in-out infinite;
         }
@@ -194,18 +195,18 @@
                 transform: translateY(0);
             }
             50% {
-                transform: translateY(-8px);
+                transform: translateY(-10px);
             }
         }
 
         .match-btn .btn-label {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
         }
 
         .match-btn .btn-sub {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             opacity: 0.7;
             font-weight: 400;
         }
@@ -213,8 +214,8 @@
         .match-btn .pulse-ring {
             position: absolute;
             border-radius: 50%;
-            border: 2px solid rgba(255, 215, 0, 0.1);
-            animation: pulseRing 2s ease-out infinite;
+            border: 2px solid rgba(255, 215, 0, 0.15);
+            animation: pulseRing 2.5s ease-out infinite;
             pointer-events: none;
         }
 
@@ -227,13 +228,13 @@
         .match-btn .pulse-ring:nth-child(2) {
             width: 130%;
             height: 130%;
-            animation-delay: 0.6s;
+            animation-delay: 0.8s;
         }
 
         .match-btn .pulse-ring:nth-child(3) {
             width: 160%;
             height: 160%;
-            animation-delay: 1.2s;
+            animation-delay: 1.6s;
         }
 
         @keyframes pulseRing {
@@ -242,13 +243,13 @@
                 opacity: 1;
             }
             100% {
-                transform: scale(1.5);
+                transform: scale(1.6);
                 opacity: 0;
             }
         }
 
         .match-btn.searching {
-            animation: pulseSearch 1.5s ease-in-out infinite;
+            animation: pulseSearch 1.2s ease-in-out infinite;
             background: linear-gradient(135deg, #f59e0b, #ef4444);
         }
 
@@ -256,11 +257,11 @@
             0%,
             100% {
                 transform: scale(1);
-                box-shadow: 0 0 40px rgba(245, 158, 11, 0.3);
+                box-shadow: 0 0 60px rgba(245, 158, 11, 0.3);
             }
             50% {
                 transform: scale(1.05);
-                box-shadow: 0 0 80px rgba(245, 158, 11, 0.5);
+                box-shadow: 0 0 100px rgba(245, 158, 11, 0.5);
             }
         }
 
@@ -359,7 +360,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1;
             gap: 8px;
         }
@@ -619,16 +620,6 @@
         .call-btn.chat-toggle-btn.active {
             background: rgba(139, 92, 246, 0.2);
             border-color: rgba(139, 92, 246, 0.2);
-        }
-
-        .call-btn .badge-btn {
-            font-size: 0.6rem;
-            background: #ef4444;
-            color: white;
-            padding: 1px 6px;
-            border-radius: 50%;
-            min-width: 16px;
-            text-align: center;
         }
 
         /* ===== إشعار المكالمة ===== */
@@ -911,6 +902,95 @@
             display: block;
         }
 
+        /* ===== إشعار الهدية العائم ===== */
+        .floating-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(16, 185, 129, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 14px 20px;
+            border-radius: 14px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            max-width: 320px;
+            min-width: 200px;
+            animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .floating-notification.active {
+            display: flex;
+        }
+
+        .floating-notification .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .floating-notification .notif-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .floating-notification .notif-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+            padding: 0 4px;
+        }
+
+        .floating-notification .notif-close:hover {
+            color: #fff;
+        }
+
+        .floating-notification .notif-body {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .floating-notification .notif-body .gift-emoji {
+            font-size: 1.2rem;
+        }
+
+        .floating-notification .notif-body .gift-name {
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .floating-notification .notif-body .gift-value {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .floating-notification .notif-time {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
         /* ===== توست ===== */
         .toast {
             position: fixed;
@@ -952,30 +1032,6 @@
             }
         }
 
-        /* ===== تحميل ===== */
-        .loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            padding: 30px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.03);
-            border-top: 3px solid #8b5cf6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
         /* ===== استجابة ===== */
         @media (max-width: 768px) {
             .navbar {
@@ -997,15 +1053,15 @@
                 min-width: 14px;
             }
             .match-btn {
-                width: 140px;
-                height: 140px;
-                font-size: 3rem;
+                width: 200px;
+                height: 200px;
+                font-size: 3.5rem;
             }
             .match-btn .btn-icon {
-                font-size: 3rem;
+                font-size: 3.5rem;
             }
             .match-btn .btn-label {
-                font-size: 0.9rem;
+                font-size: 1.2rem;
             }
             .video-grid {
                 grid-template-columns: 1fr;
@@ -1036,26 +1092,33 @@
                 max-height: 80px;
                 min-height: 40px;
             }
+            .floating-notification {
+                top: 70px;
+                right: 10px;
+                left: 10px;
+                max-width: 100%;
+                padding: 12px 16px;
+            }
         }
 
         @media (max-width: 480px) {
             .main-container {
-                padding: 10px;
-                gap: 10px;
+                padding: 8px;
+                gap: 8px;
             }
             .match-btn {
-                width: 120px;
-                height: 120px;
-                font-size: 2.5rem;
+                width: 160px;
+                height: 160px;
+                font-size: 2.8rem;
             }
             .match-btn .btn-icon {
-                font-size: 2.5rem;
+                font-size: 2.8rem;
             }
             .match-btn .btn-label {
-                font-size: 0.8rem;
+                font-size: 1rem;
             }
             .match-btn .btn-sub {
-                font-size: 0.55rem;
+                font-size: 0.6rem;
             }
             .video-grid {
                 min-height: 250px;
@@ -1177,16 +1240,22 @@
         </div>
     </div>
 
-    <!-- ===== هدية واردة ===== -->
-    <div class="gift-popup" id="giftPopup">
-        <div class="gift-emoji-big" id="giftEmoji">🎁</div>
-        <div class="gift-text" id="giftText">تلقيت هدية!</div>
-        <div class="gift-sender" id="giftSender">من: مستخدم</div>
+    <!-- ===== إشعار الهدية العائم ===== -->
+    <div class="floating-notification" id="floatingNotif">
+        <div class="notif-header">
+            <span class="notif-title">🎁 هدية جديدة!</span>
+            <button class="notif-close" onclick="closeFloatingNotif()">✕</button>
+        </div>
+        <div class="notif-body" id="notifBody">
+            <span class="gift-emoji">🎁</span>
+            تلقيت <span class="gift-name">هدية</span> بقيمة <span class="gift-value">0</span> ج.م
+        </div>
+        <div class="notif-time" id="notifTime">الآن</div>
     </div>
 
     <!-- ===== المحتوى الرئيسي ===== -->
     <div class="main-container">
-        <!-- ===== زر المطابقة الكبير ===== -->
+        <!-- ===== زر المطابقة الكبير (نصف الشاشة) ===== -->
         <div class="match-btn-container" id="matchBtnContainer">
             <button class="match-btn" id="matchBtn" onclick="startMatching()">
                 <div class="pulse-ring"></div>
@@ -1338,6 +1407,7 @@
         let matchStartTime = null;
         let isWaitingForPartner = false;
         let matchCheckInterval = null;
+        let shownGiftIds = new Set(); // لمنع تكرار الإشعارات
 
         // ============================================================
         // 🍞 توست
@@ -1629,7 +1699,6 @@
                     remoteVideo.style.display = 'block';
                     document.getElementById('remoteStatus').classList.add('active');
 
-                    // تحديث حالة الشريك
                     document.getElementById('remoteStatusText').textContent = '🔴 جارية';
                     document.getElementById('remoteStatusText').className = 'status-text';
                 });
@@ -1784,110 +1853,47 @@
                     return;
                 }
 
-                // إرسال طلب مكالمة
-                const callId = 'call_' + Date.now();
-                const callType = 'video';
-
+                // تحديث حالة المستخدم
                 await database.ref('users/' + currentFirebaseUserId).update({
                     inCall: true,
                     callPartner: partner.numericId,
                     updatedAt: new Date().toISOString()
                 });
 
-                await database.ref('call_requests/' + partner.numericId + '/' + callId).set({
-                    callerId: currentUser.numericId,
-                    callerName: currentUser.nickname || currentUser.username || 'مستخدم',
-                    callerPeerId: myPeerId,
-                    type: callType,
-                    status: 'pending',
-                    createdAt: new Date().toISOString(),
-                    expiresAt: new Date(Date.now() + 60000).toISOString()
+                // إرسال طلب مكالمة مباشر بدون انتظار إشعار
+                const callId = 'call_' + Date.now();
+                const callType = 'video';
+
+                // تسجيل المكالمة النشطة
+                await database.ref('active_calls/' + currentUser.numericId).set({
+                    partnerId: partner.numericId,
+                    partnerName: partner.nickname || partner.username,
+                    startTime: new Date().toISOString(),
+                    callId: callId,
+                    type: callType
                 });
 
-                // تحديث زر البحث
-                const btn = document.getElementById('matchBtn');
-                btn.innerHTML = `
-                    <span class="btn-icon">📞</span>
-                    <span class="btn-label">في انتظار القبول</span>
-                    <span class="btn-sub">${partner.nickname || partner.username}</span>
-                `;
+                // بدء المكالمة مباشرة
+                document.getElementById('statusIcon').textContent = '📞';
+                document.getElementById('statusText').textContent = 'جاري الاتصال...';
+                document.getElementById('statusSub').textContent = `مع ${partner.nickname || partner.username}`;
 
-                // انتظار قبول المكالمة
-                let accepted = false;
-                let attempts = 0;
+                // بدء المكالمة مع الشريك
+                startCall(partner.numericId, partnerUser.peerId || partner.peerId, callType, true);
 
-                const checkInterval = setInterval(async () => {
-                    attempts++;
-                    try {
-                        const statusSnapshot = await database.ref('call_requests/' + partner.numericId + '/' + callId)
-                            .once('value');
-                        const statusData = statusSnapshot.val();
+                // تسجيل في سجل المكالمات
+                await database.ref('call_history/' + currentUser.numericId).push({
+                    partnerId: partner.numericId,
+                    partnerName: partner.nickname || partner.username,
+                    type: callType,
+                    startTime: new Date().toISOString(),
+                    status: 'initiated'
+                });
 
-                        if (!statusData || statusData.status === 'rejected' || statusData.status === 'expired') {
-                            clearInterval(checkInterval);
-                            clearInterval(matchCheckInterval);
-                            showToast('❌ لم يقبل الشريك المكالمة', 'warning');
-                            resetMatchButton();
-                            isMatching = false;
-                            isWaitingForPartner = false;
-                            // تحديث حالة المستخدم
-                            await database.ref('users/' + currentFirebaseUserId).update({
-                                inCall: false,
-                                callPartner: null
-                            });
-                            return;
-                        }
-
-                        if (statusData.status === 'accepted') {
-                            clearInterval(checkInterval);
-                            clearInterval(matchCheckInterval);
-                            accepted = true;
-                            isWaitingForPartner = false;
-                            // بدء المكالمة
-                            startCall(partner.numericId, partnerUser.peerId || partner.peerId, callType, true);
-                            database.ref('call_requests/' + partner.numericId + '/' + callId).remove();
-
-                            // تسجيل المكالمة النشطة
-                            await database.ref('active_calls/' + currentUser.numericId).set({
-                                partnerId: partner.numericId,
-                                partnerName: partner.nickname || partner.username,
-                                startTime: new Date().toISOString(),
-                                callId: callId,
-                                type: callType
-                            });
-
-                            // تسجيل في سجل المكالمات
-                            await database.ref('call_history/' + currentUser.numericId).push({
-                                partnerId: partner.numericId,
-                                partnerName: partner.nickname || partner.username,
-                                type: callType,
-                                startTime: new Date().toISOString(),
-                                status: 'initiated'
-                            });
-                        }
-
-                        if (attempts > 30) {
-                            clearInterval(checkInterval);
-                            clearInterval(matchCheckInterval);
-                            if (!accepted) {
-                                database.ref('call_requests/' + partner.numericId + '/' + callId).update({
-                                    status: 'expired',
-                                    expiredAt: new Date().toISOString()
-                                });
-                                showToast('⏰ انتهت مهلة الانتظار', 'warning');
-                                resetMatchButton();
-                                isMatching = false;
-                                isWaitingForPartner = false;
-                                await database.ref('users/' + currentFirebaseUserId).update({
-                                    inCall: false,
-                                    callPartner: null
-                                });
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Check error:', e);
-                    }
-                }, 2000);
+                // تنظيف
+                resetMatchButton();
+                isMatching = false;
+                isWaitingForPartner = false;
 
             } catch (error) {
                 console.error('Find partner error:', error);
@@ -1895,6 +1901,10 @@
                 resetMatchButton();
                 isMatching = false;
                 isWaitingForPartner = false;
+                await database.ref('users/' + currentFirebaseUserId).update({
+                    inCall: false,
+                    callPartner: null
+                });
             }
         }
 
@@ -1909,6 +1919,10 @@
                 <span class="btn-label">كوكبة</span>
                 <span class="btn-sub">اضغط للمطابقة</span>
             `;
+            if (matchCheckInterval) {
+                clearInterval(matchCheckInterval);
+                matchCheckInterval = null;
+            }
         }
 
         // ============================================================
@@ -1916,6 +1930,7 @@
         // ============================================================
         function handleIncomingCall(call) {
             // يتم التعامل معه من خلال Firebase
+            console.log('📞 Incoming call from:', call.peer);
         }
 
         // ============================================================
@@ -1982,7 +1997,6 @@
         // ============================================================
         function endCall() {
             if (!isCallActive) {
-                // إذا لم تكن هناك مكالمة نشطة، إعادة تعيين الواجهة
                 resetMatchButton();
                 isMatching = false;
                 isWaitingForPartner = false;
@@ -2279,7 +2293,7 @@
                             const user = userData[userKey];
 
                             const giftsList = user.giftsList || [];
-                            giftsList.push({
+                            const giftEntry = {
                                 senderId: currentUser.numericId,
                                 senderName: currentUser.nickname || currentUser.username || 'مستخدم',
                                 giftType: selectedCallGift.id,
@@ -2288,8 +2302,10 @@
                                 value: selectedCallGift.price,
                                 date: new Date().toLocaleString('ar-EG'),
                                 timestamp: new Date().toISOString(),
-                                fromCall: true
-                            });
+                                fromCall: true,
+                                _shown: false
+                            };
+                            giftsList.push(giftEntry);
 
                             await database.ref('users/' + userKey).update({
                                 giftsList: giftsList,
@@ -2297,13 +2313,26 @@
                                 updatedAt: new Date().toISOString()
                             });
 
+                            // إرسال إشعار للشريك (عبر push notification)
                             await database.ref('users/' + userKey + '/notifications').push({
                                 id: Date.now(),
                                 text: `🎁 تلقيت ${selectedCallGift.emoji} ${selectedCallGift.name} من ${currentUser.nickname || currentUser.username} أثناء المكالمة! 💰 ${selectedCallGift.price} ج.م`,
                                 read: false,
                                 date: new Date().toLocaleString('ar-EG'),
                                 type: 'gift_received',
-                                createdAt: new Date().toISOString()
+                                createdAt: new Date().toISOString(),
+                                giftEmoji: selectedCallGift.emoji,
+                                giftName: selectedCallGift.name,
+                                giftPrice: selectedCallGift.price,
+                                senderName: currentUser.nickname || currentUser.username || 'مستخدم'
+                            });
+
+                            // عرض الهدية للشريك فوراً
+                            showFloatingNotification({
+                                emoji: selectedCallGift.emoji,
+                                name: selectedCallGift.name,
+                                price: selectedCallGift.price,
+                                senderName: currentUser.nickname || currentUser.username || 'مستخدم'
                             });
                         }
                     });
@@ -2320,28 +2349,63 @@
         }
 
         // ============================================================
-        // 🎁 عرض الهدية الواردة
+        // 🎁 إشعار الهدية العائم (يظهر مرة واحدة فقط)
         // ============================================================
-        function showIncomingGift(giftData) {
-            const popup = document.getElementById('giftPopup');
-            document.getElementById('giftEmoji').textContent = giftData.emoji || '🎁';
-            document.getElementById('giftText').textContent = `تلقيت ${giftData.name || 'هدية'}! 💰 ${giftData.price || 0} ج.م`;
-            document.getElementById('giftSender').textContent = `من: ${giftData.senderName || 'مستخدم'}`;
-            popup.classList.add('active');
+        function showFloatingNotification(giftData) {
+            // إنشاء معرف فريد للهدية
+            const giftId = `${giftData.senderName}_${giftData.name}_${Date.now()}`;
 
+            // التحقق من عدم ظهور هذه الهدية من قبل
+            if (shownGiftIds.has(giftId)) {
+                console.log('⚠️ هذه الهدية ظهرت من قبل، تم تجاهلها');
+                return;
+            }
+
+            // إضافة المعرف إلى القائمة
+            shownGiftIds.add(giftId);
+
+            const notif = document.getElementById('floatingNotif');
+            document.getElementById('notifBody').innerHTML = `
+                <span class="gift-emoji">${giftData.emoji || '🎁'}</span>
+                تلقيت <span class="gift-name">${giftData.name || 'هدية'}</span>
+                بقيمة <span class="gift-value">${giftData.price || 0}</span> ج.م
+                من <span style="font-weight:700;color:#ffd700;">${giftData.senderName || 'مستخدم'}</span>
+            `;
+            document.getElementById('notifTime').textContent = new Date().toLocaleTimeString('ar-EG');
+
+            notif.classList.add('active');
+
+            // اختفاء تلقائي بعد 6 ثواني
             setTimeout(() => {
-                popup.classList.remove('active');
-            }, 5000);
+                closeFloatingNotif();
+            }, 6000);
         }
 
+        function closeFloatingNotif() {
+            document.getElementById('floatingNotif').classList.remove('active');
+        }
+
+        // ============================================================
+        // 📨 الاستماع للهدايا الواردة (من Firebase)
+        // ============================================================
         function listenForIncomingGifts() {
             if (!database || !currentUser) return;
 
             database.ref('users/' + currentFirebaseUserId + '/giftsList').on('child_added', (snapshot) => {
                 const gift = snapshot.val();
+                // التحقق من أن الهدية من مكالمة ولم تظهر من قبل
                 if (gift && gift.fromCall && !gift._shown) {
-                    gift._shown = true;
-                    showIncomingGift(gift);
+                    // تحديث الحالة في Firebase لمنع التكرار
+                    const giftKey = snapshot.key;
+                    database.ref('users/' + currentFirebaseUserId + '/giftsList/' + giftKey + '/_shown').set(true);
+
+                    // عرض الإشعار
+                    showFloatingNotification({
+                        emoji: gift.giftEmoji || '🎁',
+                        name: gift.giftName || 'هدية',
+                        price: gift.value || 0,
+                        senderName: gift.senderName || 'مستخدم'
+                    });
                 }
             });
         }
@@ -2369,7 +2433,6 @@
                 document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
                 document.getElementById('localMuteIndicator').style.display = 'block';
 
-                // إخفاء البلاسهولدر المحلي
                 document.getElementById('localPlaceholder').style.display = 'none';
                 document.getElementById('localVideo').style.display = 'block';
 
@@ -2461,7 +2524,6 @@
                 return;
             }
 
-            // تهيئة الصوت والفيديو
             const mediaReady = await initMedia();
 
             if (mediaReady) {
@@ -2470,7 +2532,6 @@
                 listenForIncomingGifts();
                 updateFriendRequestsBadge();
 
-                // عرض زر المطابقة
                 document.getElementById('matchBtnContainer').classList.remove('hidden');
             }
 
