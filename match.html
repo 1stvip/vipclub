@@ -119,7 +119,7 @@
             padding-bottom: 30px;
         }
 
-        /* ===== زر المطابقة الكبير (نصف الشاشة) ===== */
+        /* ===== زر المطابقة الكبير ===== */
         .match-btn-container {
             display: flex;
             flex-direction: column;
@@ -633,6 +633,16 @@
             color: #ef4444;
         }
 
+        .call-btn.flip-btn {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .call-btn.flip-btn:hover {
+            background: rgba(139, 92, 246, 0.25);
+        }
+
         .call-btn.end-call {
             background: rgba(239, 68, 68, 0.2);
             border-color: rgba(239, 68, 68, 0.3);
@@ -796,6 +806,222 @@
             }
         }
 
+        /* ===== طلب إذن الوسائط ===== */
+        .permission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .permission-overlay.active {
+            display: flex;
+        }
+
+        .permission-overlay .perm-icon {
+            font-size: 4rem;
+            animation: pulseIcon 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseIcon {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+        }
+
+        .permission-overlay .perm-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .permission-overlay .perm-desc {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .permission-overlay .perm-btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .permission-overlay .perm-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        .permission-overlay .perm-btn:active {
+            transform: scale(0.95);
+        }
+
+        .permission-overlay .perm-retry {
+            font-size: 0.8rem;
+            color: #666;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .permission-overlay .perm-retry:hover {
+            color: #94a3b8;
+        }
+
+        /* ===== هدايا المكالمة ===== */
+        #callGiftModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            z-index: 99998;
+            min-width: 280px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        #callGiftModal.active {
+            display: block;
+        }
+
+        #callGiftModal h3 {
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        #callGiftModal .gift-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        #callGiftModal .gift-grid .gift-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #callGiftModal .gift-grid .gift-option:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        #callGiftModal .gift-grid .gift-option.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        #callGiftModal .gift-grid .gift-option .emoji {
+            font-size: 1.8rem;
+            display: block;
+        }
+
+        #callGiftModal .gift-grid .gift-option .name {
+            font-size: 0.55rem;
+            color: #94a3b8;
+        }
+
+        #callGiftModal .gift-grid .gift-option .price {
+            font-size: 0.5rem;
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        #callGiftModal .gift-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        #callGiftModal .gift-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        #callGiftModal .gift-actions .btn-send {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        #callGiftModal .gift-actions .btn-send:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        #callGiftModal .gift-actions .btn-close {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+        }
+
+        #callGiftModal .gift-actions .btn-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #callGiftModal .balance-display {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        #callGiftModal .balance-display span {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        #callGiftOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99997;
+        }
+
+        #callGiftOverlay.active {
+            display: block;
+        }
+
         /* ===== استجابة ===== */
         @media (max-width: 768px) {
             .navbar {
@@ -954,92 +1180,6 @@
                 padding-bottom: 70px;
             }
         }
-
-        /* ===== طلب إذن الوسائط ===== */
-        .permission-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            z-index: 99999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .permission-overlay.active {
-            display: flex;
-        }
-
-        .permission-overlay .perm-icon {
-            font-size: 4rem;
-            animation: pulseIcon 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulseIcon {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.7;
-            }
-        }
-
-        .permission-overlay .perm-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #ffd700;
-            text-align: center;
-        }
-
-        .permission-overlay .perm-desc {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            text-align: center;
-            max-width: 400px;
-        }
-
-        .permission-overlay .perm-btn {
-            padding: 14px 40px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
-            color: white;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.3);
-        }
-
-        .permission-overlay .perm-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 50px rgba(139, 92, 246, 0.4);
-        }
-
-        .permission-overlay .perm-btn:active {
-            transform: scale(0.95);
-        }
-
-        .permission-overlay .perm-retry {
-            font-size: 0.8rem;
-            color: #666;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .permission-overlay .perm-retry:hover {
-            color: #94a3b8;
-        }
     </style>
 </head>
 <body>
@@ -1096,7 +1236,7 @@
 
     <!-- ===== المحتوى الرئيسي ===== -->
     <div class="main-container">
-        <!-- ===== زر المطابقة الكبير (نصف الشاشة) ===== -->
+        <!-- ===== زر المطابقة الكبير ===== -->
         <div class="match-btn-container" id="matchBtnContainer">
             <button class="match-btn" id="matchBtn" onclick="startMatching()">
                 <div class="pulse-ring"></div>
@@ -1114,7 +1254,7 @@
             <span class="timer-value" id="timerValue">5:00</span>
         </div>
 
-        <!-- ===== فيديو المكالمة - شاشة مقسمة بالطول ===== -->
+        <!-- ===== فيديو المكالمة ===== -->
         <div class="video-container" id="videoContainer">
             <div class="video-grid">
                 <div class="video-box" id="localVideoBox">
@@ -1169,6 +1309,9 @@
             <button class="call-btn video-btn" id="videoBtn" onclick="toggleVideo()">
                 <i class="fas fa-video"></i> كاميرا
             </button>
+            <button class="call-btn flip-btn" id="flipBtn" onclick="flipCamera()">
+                <i class="fas fa-sync-alt"></i> قلب
+            </button>
             <button class="call-btn end-call" onclick="endCall()">
                 <i class="fas fa-phone-slash"></i> إنهاء
             </button>
@@ -1195,7 +1338,7 @@
     </div>
     <div id="callGiftOverlay" onclick="closeCallGiftModal()"></div>
 
-    <!-- ===== شريط التنقل السفلي (للجوال) ===== -->
+    <!-- ===== شريط التنقل السفلي ===== -->
     <div class="bottom-nav" id="bottomNav">
         <a href="match.html" class="nav-btn active">
             <i class="fas fa-random"></i>
@@ -1254,9 +1397,11 @@
         let shownGiftIds = new Set();
         let mediaReady = false;
         let matchTimerInterval = null;
-        let matchTimeLeft = 300; // 5 دقائق بالثواني
+        let matchTimeLeft = 300;
         let isMatchTimerRunning = false;
         let matchStartTime = null;
+        let isFrontCamera = true;
+        let currentCall = null;
 
         // ============================================================
         // 🍞 توست
@@ -1336,27 +1481,24 @@
         }
 
         // ============================================================
-        // ⏱️ مؤقت المطابقة (5 دقائق)
+        // ⏱️ مؤقت المطابقة
         // ============================================================
         function startMatchTimer() {
-            matchTimeLeft = 300; // 5 دقائق
+            matchTimeLeft = 300;
             isMatchTimerRunning = true;
             const timerEl = document.getElementById('matchTimer');
             const valueEl = document.getElementById('timerValue');
             timerEl.classList.add('active');
             valueEl.classList.remove('warning');
-
             updateTimerDisplay();
 
             if (matchTimerInterval) clearInterval(matchTimerInterval);
             matchTimerInterval = setInterval(() => {
                 matchTimeLeft--;
                 updateTimerDisplay();
-
                 if (matchTimeLeft <= 30) {
                     valueEl.classList.add('warning');
                 }
-
                 if (matchTimeLeft <= 0) {
                     clearInterval(matchTimerInterval);
                     matchTimerInterval = null;
@@ -1365,7 +1507,6 @@
                     showToast('⏰ انتهى وقت البحث (5 دقائق)، حاول مرة أخرى', 'warning');
                     resetMatchButton();
                     isMatching = false;
-                    // إلغاء حالة البحث
                     if (matchCheckInterval) {
                         clearInterval(matchCheckInterval);
                         matchCheckInterval = null;
@@ -1391,14 +1532,13 @@
         }
 
         // ============================================================
-        // 🎙️ طلب إذن المايك والكاميرا (محسّن للهواتف)
+        // 🎙️ طلب إذن المايك والكاميرا
         // ============================================================
         async function requestMediaPermissions() {
             try {
                 const overlay = document.getElementById('permissionOverlay');
                 overlay.classList.remove('active');
 
-                // محاولة الحصول على الصوت والفيديو مع إعدادات محسّنة للهواتف
                 const constraints = {
                     audio: {
                         echoCancellation: true,
@@ -1416,6 +1556,7 @@
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 mediaStream = stream;
                 mediaReady = true;
+                isFrontCamera = true;
 
                 const localVideo = document.getElementById('localVideo');
                 localVideo.srcObject = stream;
@@ -1463,6 +1604,7 @@
                     document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
                     document.getElementById('localMuteIndicator').style.display = 'block';
                     document.getElementById('videoBtn').style.display = 'none';
+                    document.getElementById('flipBtn').style.display = 'none';
                     document.getElementById('localPlaceholder').style.display = 'none';
                     document.getElementById('localVideo').style.display = 'block';
 
@@ -1493,7 +1635,72 @@
         }
 
         // ============================================================
-        // 🔗 PeerJS مع دعم أفضل للاتصال بين الأجهزة
+        // 🔄 قلب الكاميرا (أمامية/خلفية)
+        // ============================================================
+        async function flipCamera() {
+            if (!mediaReady || !mediaStream) {
+                showToast('⚠️ لا توجد كاميرا', 'warning');
+                return;
+            }
+
+            try {
+                // إيقاف المسارات الحالية
+                mediaStream.getTracks().forEach(track => track.stop());
+
+                // تبديل وضع الكاميرا
+                isFrontCamera = !isFrontCamera;
+                const facingMode = isFrontCamera ? 'user' : 'environment';
+
+                const constraints = {
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    },
+                    video: {
+                        facingMode: facingMode,
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
+                    }
+                };
+
+                const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+                mediaStream = newStream;
+
+                const localVideo = document.getElementById('localVideo');
+                localVideo.srcObject = newStream;
+
+                // تحديث حالة الكتم
+                newStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+
+                // إعادة إرسال التيار إلى الشريك إذا كانت المكالمة نشطة
+                if (isCallActive && currentCall) {
+                    try {
+                        const sender = currentCall.peerConnection?.getSenders()?.find(s => s.track?.kind === 'video');
+                        if (sender) {
+                            const videoTrack = newStream.getVideoTracks()[0];
+                            if (videoTrack) {
+                                sender.replaceTrack(videoTrack);
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Could not replace track:', e);
+                    }
+                }
+
+                showToast(isFrontCamera ? '📷 الكاميرا الأمامية' : '📷 الكاميرا الخلفية', 'info');
+
+            } catch (error) {
+                console.error('❌ Flip camera error:', error);
+                showToast('⚠️ لا يمكن تبديل الكاميرا', 'warning');
+                // إعادة تشغيل الكاميرا الأمامية
+                isFrontCamera = true;
+            }
+        }
+
+        // ============================================================
+        // 🔗 PeerJS
         // ============================================================
         function initPeerJS() {
             if (!mediaReady) {
@@ -1513,17 +1720,7 @@
                             { urls: 'stun:stun3.l.google.com:19302' },
                             { urls: 'stun:stun4.l.google.com:19302' },
                             { urls: 'stun:stun.ekiga.net' },
-                            { urls: 'stun:stun.ideasip.com' },
-                            { urls: 'stun:stun.iptel.org' },
-                            { urls: 'stun:stun.rixtelecom.se' },
-                            { urls: 'stun:stun.schlund.de' },
-                            { urls: 'stun:stunserver.org' },
-                            { urls: 'stun:stun.softjoys.com' },
-                            { urls: 'stun:stun.voiparound.com' },
-                            { urls: 'stun:stun.voipbuster.com' },
-                            { urls: 'stun:stun.voipstunt.com' },
-                            { urls: 'stun:stun.voxgratia.org' },
-                            { urls: 'stun:stun.xten.com' }
+                            { urls: 'stun:stun.ideasip.com' }
                         ]
                     }
                 });
@@ -1534,8 +1731,7 @@
                         iceServers: [
                             { urls: 'stun:stun.l.google.com:19302' },
                             { urls: 'stun:stun1.l.google.com:19302' },
-                            { urls: 'stun:stun.ekiga.net' },
-                            { urls: 'stun:stun.ideasip.com' }
+                            { urls: 'stun:stun.ekiga.net' }
                         ]
                     }
                 });
@@ -1546,7 +1742,6 @@
             peer.on('open', (id) => {
                 myPeerId = id;
                 console.log('✅ PeerJS ready:', id);
-                // تحديث Peer ID في Firebase
                 database.ref('users/' + currentFirebaseUserId + '/peerId').set(id);
             });
 
@@ -1556,12 +1751,8 @@
 
             peer.on('error', (err) => {
                 console.error('Peer error:', err);
-                if (err.type === 'peer-unavailable') {
-                    showToast('⚠️ الشريك غير متاح حالياً', 'warning');
-                }
             });
 
-            // إعادة محاولة الاتصال إذا انقطع
             peer.on('disconnected', () => {
                 console.log('⚠️ Peer disconnected, reconnecting...');
                 setTimeout(() => {
@@ -1573,7 +1764,7 @@
         }
 
         // ============================================================
-        // 📞 معالجة المكالمة الواردة (من PeerJS)
+        // 📞 معالجة المكالمة الواردة
         // ============================================================
         function handleIncomingCall(call) {
             console.log('📞 Incoming call from:', call.peer);
@@ -1586,6 +1777,8 @@
 
             try {
                 call.answer(mediaStream);
+                currentCall = call;
+
                 call.on('stream', (remoteStream) => {
                     const remoteVideo = document.getElementById('remoteVideo');
                     remoteVideo.srcObject = remoteStream;
@@ -1593,37 +1786,24 @@
                     remoteVideo.style.display = 'block';
                     document.getElementById('remoteStatus').classList.add('active');
                 });
+
                 call.on('close', () => {
                     endCall();
                 });
+
                 call.on('error', (err) => {
                     console.error('Call error:', err);
                     endCall();
                 });
-                window._currentCall = call;
 
+                // بدء المكالمة
                 isCallActive = true;
                 document.getElementById('videoContainer').classList.add('active');
                 document.getElementById('callControls').classList.add('active');
                 document.getElementById('matchBtnContainer').classList.add('hidden');
                 stopMatchTimer();
 
-                callStartTime = Date.now();
-                callDurationSeconds = 0;
-                if (callTimerInterval) clearInterval(callTimerInterval);
-                callTimerInterval = setInterval(() => {
-                    callDurationSeconds++;
-                    const mins = Math.floor(callDurationSeconds / 60);
-                    const secs = callDurationSeconds % 60;
-                    document.getElementById('chatTimer').textContent =
-                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                }, 1000);
-
-                if (!isCallChatOpen) {
-                    toggleCallChat();
-                }
-
-                // جلب اسم الشريك من Firebase
+                // جلب اسم الشريك
                 const callerId = call.peer.replace('match_', '');
                 database.ref('users')
                     .orderByChild('numericId')
@@ -1643,6 +1823,22 @@
                             addCallChatMessage('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
                         }
                     });
+
+                // بدء مؤقت المكالمة
+                callStartTime = Date.now();
+                callDurationSeconds = 0;
+                if (callTimerInterval) clearInterval(callTimerInterval);
+                callTimerInterval = setInterval(() => {
+                    callDurationSeconds++;
+                    const mins = Math.floor(callDurationSeconds / 60);
+                    const secs = callDurationSeconds % 60;
+                    document.getElementById('chatTimer').textContent =
+                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+
+                if (!isCallChatOpen) {
+                    toggleCallChat();
+                }
 
                 showToast('✅ تم الاتصال بالشريك', 'success');
 
@@ -1668,7 +1864,6 @@
                 return;
             }
 
-            // التحقق من الرصيد
             if ((currentUser.balanceEGP || 0) < 10) {
                 showToast('⚠️ رصيد غير كافٍ (تحتاج 10 ج.م للدقيقة)', 'warning');
                 return;
@@ -1684,10 +1879,7 @@
                 <span class="btn-sub">جارٍ العثور على شريك</span>
             `;
 
-            // بدء مؤقت 5 دقائق
             startMatchTimer();
-
-            // بدء البحث
             findRandomPartner();
         }
 
@@ -1698,20 +1890,15 @@
             if (!database || !currentUser || !isMatching) return;
 
             try {
-                // جلب جميع المستخدمين
                 const snapshot = await database.ref('users').once('value');
                 if (!snapshot.exists()) {
-                    showToast('❌ لا يوجد مستخدمين متاحين', 'warning');
-                    resetMatchButton();
-                    isMatching = false;
-                    stopMatchTimer();
+                    setTimeout(findRandomPartner, 3000);
                     return;
                 }
 
                 const users = snapshot.val();
                 const availableUsers = [];
 
-                // جلب المستخدمين المتاحين
                 for (const key in users) {
                     const user = users[key];
                     const numericId = user.numericId;
@@ -1731,16 +1918,13 @@
                 }
 
                 if (availableUsers.length === 0) {
-                    // إذا لم يوجد مستخدمين، نستمر في البحث
                     setTimeout(findRandomPartner, 3000);
                     return;
                 }
 
-                // اختيار مستخدم عشوائي
                 const randomIndex = Math.floor(Math.random() * availableUsers.length);
                 const partner = availableUsers[randomIndex];
 
-                // التأكد من أن الشريك لا يزال متاحاً
                 const partnerSnapshot = await database.ref('users')
                     .orderByChild('numericId')
                     .equalTo(partner.numericId)
@@ -1760,7 +1944,6 @@
                     return;
                 }
 
-                // تحديث حالة المستخدم
                 await database.ref('users/' + currentFirebaseUserId).update({
                     inCall: true,
                     callPartner: partner.numericId,
@@ -1768,13 +1951,13 @@
                     updatedAt: new Date().toISOString()
                 });
 
-                // بدء المكالمة مع الشريك عبر PeerJS
                 const peerId = partnerUser.peerId || partner.peerId;
 
                 if (peer && peerId && mediaStream) {
                     try {
                         console.log(`📞 Calling peer: ${peerId}`);
                         const call = peer.call(peerId, mediaStream);
+                        currentCall = call;
 
                         if (call) {
                             call.on('stream', (remoteStream) => {
@@ -1786,18 +1969,17 @@
                             });
 
                             call.on('close', () => {
+                                // إعلام الشريك بأن المستخدم غير متصل
+                                if (callPartnerId) {
+                                    database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
+                                }
                                 endCall();
                             });
 
                             call.on('error', (err) => {
                                 console.error('Call error:', err);
-                                if (err.type === 'peer-unavailable') {
-                                    showToast('⚠️ الشريك غير متاح حالياً', 'warning');
-                                }
                                 endCall();
                             });
-
-                            window._currentCall = call;
 
                             // بدء المكالمة
                             isCallActive = true;
@@ -1813,10 +1995,8 @@
                             document.getElementById('callControls').classList.add('active');
                             document.getElementById('matchBtnContainer').classList.add('hidden');
 
-                            // إيقاف مؤقت المطابقة
                             stopMatchTimer();
 
-                            // بدء مؤقت المكالمة
                             callStartTime = Date.now();
                             callDurationSeconds = 0;
                             if (callTimerInterval) clearInterval(callTimerInterval);
@@ -1834,7 +2014,6 @@
 
                             addCallChatMessage('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
 
-                            // تسجيل المكالمة النشطة
                             await database.ref('active_calls/' + currentUser.numericId).set({
                                 partnerId: partner.numericId,
                                 partnerName: partner.nickname || partner.username,
@@ -1855,7 +2034,6 @@
                             resetMatchButton();
                             isMatching = false;
                         } else {
-                            // إذا فشل الاتصال، نعيد المحاولة
                             await database.ref('users/' + currentFirebaseUserId).update({
                                 inCall: false,
                                 callPartner: null
@@ -1872,7 +2050,6 @@
                         setTimeout(findRandomPartner, 2000);
                     }
                 } else {
-                    // إذا لم يكن هناك Peer ID، نعيد المحاولة
                     await database.ref('users/' + currentFirebaseUserId).update({
                         inCall: false,
                         callPartner: null
@@ -1882,7 +2059,6 @@
 
             } catch (error) {
                 console.error('Find partner error:', error);
-                showToast('❌ حدث خطأ', 'error');
                 resetMatchButton();
                 isMatching = false;
                 stopMatchTimer();
@@ -1963,9 +2139,15 @@
         }
 
         // ============================================================
-        // 📞 إنهاء المكالمة
+        // 📞 إنهاء المكالمة - إرسال إشعار للشريك
         // ============================================================
         function endCall() {
+            // إعلام الشريك بأن المستخدم أنهى المكالمة
+            if (callPartnerId) {
+                database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
+                database.ref('users/' + callPartnerId + '/partnerDisconnected').remove();
+            }
+
             if (!isCallActive) {
                 resetMatchButton();
                 isMatching = false;
@@ -2008,11 +2190,11 @@
                 }
             }
 
-            if (window._currentCall) {
+            if (currentCall) {
                 try {
-                    window._currentCall.close();
+                    currentCall.close();
                 } catch (e) {}
-                window._currentCall = null;
+                currentCall = null;
             }
 
             if (database && currentFirebaseUserId) {
@@ -2077,6 +2259,12 @@
         // ⏭️ الانتقال إلى الشريك التالي
         // ============================================================
         function nextMatch() {
+            // إعلام الشريك بأن المستخدم غير متصل
+            if (callPartnerId) {
+                database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
+                database.ref('users/' + callPartnerId + '/partnerDisconnected').remove();
+            }
+
             if (isCallActive) {
                 endCall();
                 showToast(`⏭️ جاري البحث عن شريك جديد...`, 'info');
@@ -2163,7 +2351,7 @@
         }
 
         // ============================================================
-        // 🎁 هدايا المكالمة
+        // 🎁 هدايا المكالمة (نظام الهدايا المعدل)
         // ============================================================
         const CALL_GIFTS = [
             { id: 'rose', emoji: '🌹', name: 'وردة', price: 10 },
@@ -2177,6 +2365,11 @@
         function openCallGiftModal() {
             if (!isCallActive) {
                 showToast('⚠️ لا توجد مكالمة نشطة', 'warning');
+                return;
+            }
+
+            if (!currentUser) {
+                showToast('⚠️ يرجى تسجيل الدخول', 'warning');
                 return;
             }
 
@@ -2232,50 +2425,66 @@
             }
 
             try {
+                // خصم الرصيد
                 const newBalance = (currentUser.balanceEGP || 0) - selectedCallGift.price;
                 await database.ref('users/' + currentFirebaseUserId + '/balanceEGP').set(newBalance);
                 currentUser.balanceEGP = newBalance;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-                await database.ref('users')
+                // إرسال الهدية إلى الشريك
+                const partnerSnapshot = await database.ref('users')
                     .orderByChild('numericId')
                     .equalTo(parseInt(callPartnerId))
-                    .once('value')
-                    .then(async (snapshot) => {
-                        if (snapshot.exists()) {
-                            const userData = snapshot.val();
-                            const userKey = Object.keys(userData)[0];
-                            const user = userData[userKey];
+                    .once('value');
 
-                            const giftsList = user.giftsList || [];
-                            const giftEntry = {
-                                senderId: currentUser.numericId,
-                                senderName: currentUser.nickname || currentUser.username || 'مستخدم',
-                                giftType: selectedCallGift.id,
-                                giftName: selectedCallGift.name,
-                                giftEmoji: selectedCallGift.emoji,
-                                value: selectedCallGift.price,
-                                date: new Date().toLocaleString('ar-EG'),
-                                timestamp: new Date().toISOString(),
-                                fromCall: true,
-                                _shown: false
-                            };
-                            giftsList.push(giftEntry);
+                if (partnerSnapshot.exists()) {
+                    const userData = partnerSnapshot.val();
+                    const userKey = Object.keys(userData)[0];
+                    const user = userData[userKey];
 
-                            await database.ref('users/' + userKey).update({
-                                giftsList: giftsList,
-                                gifts: (user.gifts || 0) + 1,
-                                updatedAt: new Date().toISOString()
-                            });
+                    const giftsList = user.giftsList || [];
+                    const giftEntry = {
+                        senderId: currentUser.numericId,
+                        senderName: currentUser.nickname || currentUser.username || 'مستخدم',
+                        giftType: selectedCallGift.id,
+                        giftName: selectedCallGift.name,
+                        giftEmoji: selectedCallGift.emoji,
+                        value: selectedCallGift.price,
+                        date: new Date().toLocaleString('ar-EG'),
+                        timestamp: new Date().toISOString(),
+                        fromCall: true,
+                        _shown: false
+                    };
+                    giftsList.push(giftEntry);
 
-                            showFloatingNotification({
-                                emoji: selectedCallGift.emoji,
-                                name: selectedCallGift.name,
-                                price: selectedCallGift.price,
-                                senderName: currentUser.nickname || currentUser.username || 'مستخدم'
-                            });
-                        }
+                    await database.ref('users/' + userKey).update({
+                        giftsList: giftsList,
+                        gifts: (user.gifts || 0) + 1,
+                        updatedAt: new Date().toISOString()
                     });
+
+                    // إرسال إشعار للشريك
+                    await database.ref('users/' + userKey + '/notifications').push({
+                        id: Date.now(),
+                        text: `🎁 تلقيت ${selectedCallGift.emoji} ${selectedCallGift.name} من ${currentUser.nickname || currentUser.username} أثناء المكالمة! 💰 ${selectedCallGift.price} ج.م`,
+                        read: false,
+                        date: new Date().toLocaleString('ar-EG'),
+                        type: 'gift_received',
+                        createdAt: new Date().toISOString(),
+                        giftEmoji: selectedCallGift.emoji,
+                        giftName: selectedCallGift.name,
+                        giftPrice: selectedCallGift.price,
+                        senderName: currentUser.nickname || currentUser.username || 'مستخدم'
+                    });
+
+                    // عرض الهدية فوراً
+                    showFloatingNotification({
+                        emoji: selectedCallGift.emoji,
+                        name: selectedCallGift.name,
+                        price: selectedCallGift.price,
+                        senderName: currentUser.nickname || currentUser.username || 'مستخدم'
+                    });
+                }
 
                 showToast(`✅ تم إرسال ${selectedCallGift.emoji} ${selectedCallGift.name}`, 'success');
                 addCallChatMessage('system', `🎁 ${currentUser.nickname || currentUser.username} أرسل ${selectedCallGift.emoji} ${selectedCallGift.name}`);
@@ -2366,6 +2575,25 @@
         }
 
         // ============================================================
+        // 📡 الاستماع لحالة انقطاع الشريك
+        // ============================================================
+        function listenForPartnerDisconnect() {
+            if (!database || !currentUser) return;
+
+            database.ref('users/' + currentUser.numericId + '/partnerDisconnected').on('value', (snapshot) => {
+                if (snapshot.val() === true) {
+                    showToast('⚠️ المستخدم الآخر غير متصل، جاري البحث عن شريك جديد...', 'warning');
+                    if (isCallActive) {
+                        endCall();
+                        setTimeout(() => {
+                            startMatching();
+                        }, 1500);
+                    }
+                }
+            });
+        }
+
+        // ============================================================
         // 🚀 التهيئة
         // ============================================================
         window.onload = async function() {
@@ -2397,6 +2625,9 @@
             }
 
             document.getElementById('permissionOverlay').classList.add('active');
+
+            // الاستماع لحالة انقطاع الشريك
+            listenForPartnerDisconnect();
 
             if (window.innerWidth <= 768) {
                 document.getElementById('bottomNav').style.display = 'flex';
