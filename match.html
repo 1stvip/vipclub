@@ -201,7 +201,6 @@
             padding-bottom: 80px;
         }
 
-        /* ===== زر المطابقة ===== */
         .match-area {
             display: flex;
             flex-direction: column;
@@ -332,7 +331,6 @@
             }
         }
 
-        /* ===== عداد 5 دقائق ===== */
         .match-timer {
             font-size: 2rem;
             font-weight: 900;
@@ -383,7 +381,6 @@
             }
         }
 
-        /* ===== زر إيقاف البحث ===== */
         .stop-btn {
             display: none;
             padding: 10px 28px;
@@ -405,7 +402,6 @@
             animation: fadeUp 0.4s ease;
         }
 
-        /* ===== حالة البحث ===== */
         .search-status {
             font-size: 0.85rem;
             color: #94a3b8;
@@ -421,7 +417,6 @@
             font-weight: 700;
         }
 
-        /* ===== واجهة المكالمة الصوتية ===== */
         .call-interface {
             display: none;
             width: 100%;
@@ -530,7 +525,6 @@
             text-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
         }
 
-        /* ===== شات المكالمة ===== */
         .call-chat {
             display: none;
             width: 100%;
@@ -652,7 +646,6 @@
             background: rgba(255, 215, 0, 0.15);
         }
 
-        /* ===== أزرار التحكم ===== */
         .call-controls {
             display: none;
             gap: 10px;
@@ -746,7 +739,6 @@
             border-color: rgba(139, 92, 246, 0.1);
         }
 
-        /* ===== إشعارات ===== */
         .gift-notif {
             position: fixed;
             top: 75px;
@@ -793,85 +785,6 @@
                 opacity: 1;
                 transform: translateX(0) scale(1);
             }
-        }
-
-        /* ===== مودال طلب الإذن ===== */
-        .perm-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(20px);
-            z-index: 99999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 20px;
-            padding: 30px;
-        }
-        .perm-overlay.active {
-            display: flex;
-            animation: fadeUp 0.5s ease;
-        }
-        .perm-overlay .icon {
-            font-size: 4rem;
-            animation: pulseIcon 1.5s ease-in-out infinite;
-        }
-        @keyframes pulseIcon {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.7;
-            }
-        }
-        .perm-overlay .title {
-            font-size: 1.3rem;
-            font-weight: 900;
-            color: #ffd700;
-            text-align: center;
-        }
-        .perm-overlay .desc {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            text-align: center;
-            max-width: 380px;
-            line-height: 1.8;
-        }
-        .perm-overlay .desc .hl {
-            color: #ffd700;
-            font-weight: 700;
-        }
-        .perm-overlay .btn {
-            padding: 14px 45px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 40px rgba(139, 92, 246, 0.15);
-        }
-        .perm-overlay .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 60px rgba(139, 92, 246, 0.2);
-        }
-        .perm-overlay .btn:active {
-            transform: scale(0.95);
-        }
-        .perm-overlay .retry {
-            font-size: 0.8rem;
-            color: #666;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .perm-overlay .retry:hover {
-            color: #94a3b8;
         }
 
         /* ===== مودال الهدايا ===== */
@@ -1189,6 +1102,7 @@
         </div>
     </nav>
 
+    <!-- ===== نافذة طلب الإذن ===== -->
     <div class="perm-overlay" id="permOverlay">
         <span class="icon">🎙️</span>
         <div class="title">نحتاج إلى إذنك!</div>
@@ -1315,7 +1229,7 @@
 
     <script>
         // ============================================================
-        // 🔥 الإعدادات الأساسية
+        // 🔥 الإعدادات الأساسية - نفس الكود الذي يعمل
         // ============================================================
         const CONFIG = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -1457,7 +1371,7 @@
         }
 
         // ============================================================
-        // 🎙️ طلب الميكروفون
+        // 🎙️ طلب الإذن - نظام الطلب القديم (نافذة منبثقة)
         // ============================================================
         async function requestPerms() {
             try {
@@ -2374,6 +2288,7 @@
 
             updateAuthUI();
 
+            // عرض نافذة طلب الإذن
             document.getElementById('permOverlay').classList.add('active');
 
             listenDisconnect();
