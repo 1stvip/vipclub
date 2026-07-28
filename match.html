@@ -453,10 +453,6 @@
             opacity: 1;
         }
 
-        .video-overlay-btn {
-            display: flex !important;
-        }
-
         .video-box .mute-indicator {
             position: absolute;
             top: 10px;
@@ -1159,122 +1155,6 @@
             display: block;
         }
 
-        .partner-profile-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #1a1a2e;
-            border-radius: 20px;
-            padding: 25px;
-            border: 2px solid rgba(255, 215, 0, 0.2);
-            z-index: 99998;
-            min-width: 300px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            text-align: center;
-        }
-
-        .partner-profile-modal.active {
-            display: block;
-        }
-
-        .partner-profile-modal .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: white;
-            margin: 0 auto 10px;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-        }
-
-        .partner-profile-modal .profile-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .partner-profile-modal .profile-id {
-            background: linear-gradient(90deg, #4f46e5, #8b5cf6);
-            padding: 6px 18px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            display: inline-block;
-            margin: 8px auto;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .partner-profile-modal .profile-id:hover {
-            transform: scale(1.05);
-        }
-
-        .partner-profile-modal .profile-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .partner-profile-modal .profile-actions button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.85rem;
-        }
-
-        .partner-profile-modal .profile-actions .btn-add-friend {
-            background: #8b5cf6;
-            color: white;
-        }
-
-        .partner-profile-modal .profile-actions .btn-add-friend:hover {
-            background: #7c3aed;
-            transform: scale(1.05);
-        }
-
-        .partner-profile-modal .profile-actions .btn-add-friend.added {
-            background: #10b981;
-            cursor: default;
-        }
-
-        .partner-profile-modal .profile-actions .btn-add-friend.added:hover {
-            transform: none;
-        }
-
-        .partner-profile-modal .profile-actions .btn-close-profile {
-            background: rgba(255, 255, 255, 0.05);
-            color: #94a3b8;
-        }
-
-        .partner-profile-modal .profile-actions .btn-close-profile:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .partner-profile-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99997;
-        }
-
-        .partner-profile-overlay.active {
-            display: block;
-        }
-
         @media (max-width: 768px) {
             .navbar {
                 padding: 0.4rem 2%;
@@ -1430,15 +1310,6 @@
                 padding: 3px 10px;
                 bottom: 35px;
             }
-            .partner-profile-modal {
-                padding: 18px;
-                min-width: 250px;
-            }
-            .partner-profile-modal .profile-avatar {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
-            }
         }
 
         .bottom-nav {
@@ -1522,19 +1393,6 @@
         <div class="notif-time" id="notifTime">الآن</div>
     </div>
 
-    <div class="partner-profile-overlay" id="partnerProfileOverlay" onclick="closePartnerProfile()"></div>
-    <div class="partner-profile-modal" id="partnerProfileModal">
-        <div class="profile-avatar" id="partnerProfileAvatar">👤</div>
-        <div class="profile-name" id="partnerProfileName">مستخدم</div>
-        <div class="profile-id" id="partnerProfileId" onclick="copyPartnerId()">000000</div>
-        <div class="profile-actions">
-            <button class="btn-add-friend" id="partnerAddFriendBtn" onclick="sendFriendRequestFromProfile()">
-                <i class="fas fa-user-plus"></i> إضافة صديق
-            </button>
-            <button class="btn-close-profile" onclick="closePartnerProfile()">إغلاق</button>
-        </div>
-    </div>
-
     <div class="main-container">
         <div class="match-btn-container" id="matchBtnContainer">
             <button class="match-btn" id="matchBtn" onclick="startMatching()">
@@ -1591,7 +1449,7 @@
 
                     <div class="remote-name-display" id="remoteNameDisplay" onclick="openPartnerProfile()">
                         <span id="remoteNameText">شريك</span>
-                        <span class="remote-status connected" id="remoteStatusText">🟢 متصل</span>
+                        <span class="remote-status searching" id="remoteStatusText">🔍 جاري البحث...</span>
                     </div>
 
                     <div class="mute-indicator" id="remoteMuteIndicator">🔇 مكتوم</div>
@@ -1690,7 +1548,7 @@
         let peer = null;
         let myPeerId = null;
         let mediaStream = null;
-        let isMicMuted = false;
+        let isMicMuted = false; // الميكروفون مفتوح تلقائياً
         let isVideoOff = false;
         let isCallActive = false;
         let callPartnerId = null;
@@ -1711,11 +1569,11 @@
         let currentCall = null;
         let isSearching = false;
         let waitingListener = null;
-        let partnerProfileData = null;
         let isPartnerDisconnected = false;
         let isPeerReady = false;
         let isCallInitiator = false;
         let remoteStreamReceived = false;
+        let waitingUsersRef = null;
 
         // ============================================================
         // 🍞 توست
@@ -1869,7 +1727,6 @@
                 const overlay = document.getElementById('permissionOverlay');
                 overlay.classList.remove('active');
 
-                // محاولة الحصول على الصوت والفيديو معاً
                 let stream;
                 let hasVideo = false;
 
@@ -1878,7 +1735,8 @@
                         audio: {
                             echoCancellation: true,
                             noiseSuppression: true,
-                            autoGainControl: true
+                            autoGainControl: true,
+                            sampleRate: 48000
                         },
                         video: {
                             facingMode: 'user',
@@ -1895,7 +1753,8 @@
                         audio: {
                             echoCancellation: true,
                             noiseSuppression: true,
-                            autoGainControl: true
+                            autoGainControl: true,
+                            sampleRate: 48000
                         }
                     };
                     stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
@@ -1910,8 +1769,11 @@
                 const localVideo = document.getElementById('localVideo');
                 localVideo.srcObject = stream;
 
-                // تفعيل الصوت
-                stream.getAudioTracks().forEach(track => track.enabled = true);
+                // تفعيل الصوت تلقائياً
+                stream.getAudioTracks().forEach(track => {
+                    track.enabled = true;
+                    console.log('🎤 تم تفعيل مسار الصوت');
+                });
                 isMicMuted = false;
 
                 // تحديث واجهة الميكروفون
@@ -1928,14 +1790,14 @@
                     document.getElementById('localPlaceholder').style.display = 'none';
                     document.getElementById('localVideoOverlayBtn').className = 'video-overlay-btn active';
                     document.getElementById('localVideoOverlayBtn').innerHTML = '<i class="fas fa-video"></i><span class="tooltip">كاميرا</span>';
-                    showToast('✅ تم الوصول إلى الميكروفون والكاميرا', 'success');
+                    showToast('✅ تم الوصول إلى الميكروفون والكاميرا (الميكروفون مفتوح)', 'success');
                 } else {
                     document.getElementById('localVideoOverlayBtn').style.display = 'none';
                     document.getElementById('localFlipOverlayBtn').style.display = 'none';
                     document.getElementById('localVideo').style.display = 'none';
                     document.getElementById('localPlaceholder').style.display = 'flex';
                     document.getElementById('localPlaceholderName').textContent = 'الكاميرا غير متاحة';
-                    showToast('✅ تم الوصول إلى الميكروفون فقط', 'success');
+                    showToast('✅ تم الوصول إلى الميكروفون فقط (الميكروفون مفتوح)', 'success');
                 }
 
                 initPeerJS();
@@ -2108,7 +1970,7 @@
         }
 
         // ============================================================
-        // 🔗 PeerJS - تحسين نقل الصوت والفيديو
+        // 🔗 PeerJS - تحسين نقل الصوت
         // ============================================================
         function initPeerJS() {
             if (!mediaReady) {
@@ -2127,7 +1989,8 @@
                             { urls: 'stun:stun.ekiga.net' },
                             { urls: 'stun:stun.ideasip.com' },
                             { urls: 'stun:stun.voipstunt.com' },
-                            { urls: 'stun:stun.voipbuster.com' }
+                            { urls: 'stun:stun.voipbuster.com' },
+                            { urls: 'stun:stun.schlund.de' }
                         ]
                     }
                 });
@@ -2178,7 +2041,7 @@
         }
 
         // ============================================================
-        // 📞 معالجة المكالمة الواردة - تحسين الصوت والفيديو
+        // 📞 معالجة المكالمة الواردة - قبول تلقائي
         // ============================================================
         function handleIncomingCall(call) {
             console.log('📞 Incoming call from:', call.peer);
@@ -2196,7 +2059,10 @@
 
             try {
                 // التأكد من تفعيل الصوت
-                mediaStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+                mediaStream.getAudioTracks().forEach(track => {
+                    track.enabled = !isMicMuted;
+                    console.log('🎤 حالة مسار الصوت:', track.enabled);
+                });
 
                 call.answer(mediaStream);
                 currentCall = call;
@@ -2207,13 +2073,10 @@
                     console.log('✅ Stream received from partner');
                     const remoteVideo = document.getElementById('remoteVideo');
                     remoteVideo.srcObject = remoteStream;
-
-                    // إخفاء البلاسهولدر وإظهار الفيديو
                     document.getElementById('remotePlaceholder').style.display = 'none';
                     remoteVideo.style.display = 'block';
                     document.getElementById('remoteStatus').classList.add('active');
 
-                    // تحديث اسم الشريك وحالته
                     const nameDisplay = document.getElementById('remoteNameDisplay');
                     nameDisplay.classList.add('active');
                     document.getElementById('remoteStatusText').className = 'remote-status connected';
@@ -2519,7 +2382,7 @@
         }
 
         // ============================================================
-        // 📞 بدء المكالمة مع مستخدم محدد - تحسين الصوت والفيديو
+        // 📞 بدء المكالمة مع مستخدم محدد
         // ============================================================
         function startCallWithUser(partnerId, partnerPeerId, partnerUsername) {
             if (!peer || !mediaStream || !isPeerReady) {
@@ -2531,7 +2394,10 @@
                 console.log(`📞 Calling peer: ${partnerPeerId}`);
 
                 // التأكد من تفعيل الصوت
-                mediaStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+                mediaStream.getAudioTracks().forEach(track => {
+                    track.enabled = !isMicMuted;
+                    console.log('🎤 حالة مسار الصوت:', track.enabled);
+                });
 
                 const call = peer.call(partnerPeerId, mediaStream);
                 currentCall = call;
@@ -2543,8 +2409,6 @@
                         console.log('✅ Stream received from partner');
                         const remoteVideo = document.getElementById('remoteVideo');
                         remoteVideo.srcObject = remoteStream;
-
-                        // إخفاء البلاسهولدر وإظهار الفيديو
                         document.getElementById('remotePlaceholder').style.display = 'none';
                         remoteVideo.style.display = 'block';
                         document.getElementById('remoteStatus').classList.add('active');
@@ -2608,7 +2472,6 @@
                             }
                         });
 
-                    // إظهار واجهة المكالمة
                     document.getElementById('videoContainer').classList.add('active');
                     document.getElementById('callControls').classList.add('active');
                     document.getElementById('matchBtnContainer').classList.add('hidden');
@@ -2617,7 +2480,6 @@
 
                     stopMatchTimer();
 
-                    // بدء مؤقت المكالمة
                     callStartTime = Date.now();
                     callDurationSeconds = 0;
                     if (callTimerInterval) clearInterval(callTimerInterval);
@@ -2633,7 +2495,6 @@
                         toggleCallChat();
                     }
 
-                    // تسجيل المكالمة
                     database.ref('active_calls/' + currentUser.numericId).set({
                         partnerId: partnerId,
                         partnerName: partnerUsername || 'شريك',
