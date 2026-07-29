@@ -1464,1270 +1464,1470 @@
         <button class="action-btn btn-primary" id="submitTopUpBtn" onclick="submitTopUp()" style="width:100%; padding:12px; border-radius:12px; border:none; cursor:pointer; font-weight:bold; transition:0.3s; background:var(--primary); color:white; font-size:0.95rem; margin-top:4px;">تأكيد وإرسال الإيصال</button>
         <button class="action-btn" onclick="closeAll()" style="width:100%; padding:10px; border-radius:12px; border:1px solid #334155; cursor:pointer; font-weight:bold; transition:0.3s; background:#1e293b; color:white; font-size:0.9rem; margin-top:6px;">إلغاء</button>
     </div>
-
     <script>
-        // ============================================================
-        // 🔥 الجزء الثاني: JavaScript
-        // ============================================================
-        // سيتم وضع الكود في الجزء التالي
-    </script>
-</body>
-</html>
-// ============================================================
-// 🔥 تكوين Firebase (نفس مشروع stvipclub)
-// ============================================================
-const firebaseConfig = {
-    apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
-    authDomain: "stvipclub.firebaseapp.com",
-    databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
-    projectId: "stvipclub",
-    storageBucket: "stvipclub.firebasestorage.app",
-    messagingSenderId: "526607326044",
-    appId: "1:526607326044:web:6af53db123ae02c7193f99"
-};
+    // ============================================================
+    // 🔥 تكوين Firebase (نفس مشروع stvipclub)
+    // ============================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
+        authDomain: "stvipclub.firebaseapp.com",
+        databaseURL: "https://stvipclub-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "stvipclub",
+        storageBucket: "stvipclub.firebasestorage.app",
+        messagingSenderId: "526607326044",
+        appId: "1:526607326044:web:6af53db123ae02c7193f99"
+    };
 
-// ============================================================
-// 📦 المتغيرات العامة
-// ============================================================
-let app, db, auth;
-let localStream = null;
-let currentRoom = null;
-let currentPartner = null;
-let isMatching = false;
-let isMicOn = true;
-let isCamOn = true;
-let currentUser = null;
-let isLoggedIn = false;
-let timerInterval = null;
-let callStartTime = null;
-let allAvailableUsers = [];
-let callMode = 'video'; // 'video', 'audio', 'audio-only'
-let permissionGranted = false;
-let isProcessingPurchase = false;
-let isSubmittingTopUp = false;
-let notificationTimers = {};
+    // ============================================================
+    // 📦 المتغيرات العامة
+    // ============================================================
+    let app, db, auth;
+    let localStream = null;
+    let currentRoom = null;
+    let currentPartner = null;
+    let isMatching = false;
+    let isMicOn = true;
+    let isCamOn = true;
+    let currentUser = null;
+    let isLoggedIn = false;
+    let timerInterval = null;
+    let callStartTime = null;
+    let allAvailableUsers = [];
+    let callMode = 'video';
+    let permissionGranted = false;
+    let isProcessingPurchase = false;
+    let isSubmittingTopUp = false;
+    let notificationTimers = {};
+    let selectedCurrency = 'EGP';
+    let notificationCooldown = false;
+    let desktopNotificationShown = false;
 
-// ============================================================
-// 🚀 تهيئة Firebase
-// ============================================================
-async function initFirebase() {
-    try {
-        if (firebase.apps.length > 0) {
-            await firebase.app().delete();
-        }
-        app = firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-        auth = firebase.auth();
+    // ============================================================
+    // 🚀 تهيئة Firebase
+    // ============================================================
+    async function initFirebase() {
+        try {
+            if (firebase.apps.length > 0) {
+                await firebase.app().delete();
+            }
+            app = firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            auth = firebase.auth();
 
-        // محاولة استعادة الجلسة من localStorage
-        const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+            const savedUser = JSON.parse(localStorage.getItem('currentUser'));
 
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = await fetchUserFromFirebase(user);
-                if (currentUser) {
-                    isLoggedIn = true;
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = await fetchUserFromFirebase(user);
+                    if (currentUser) {
+                        isLoggedIn = true;
+                        updateUI();
+                        listenNotifications();
+                        document.getElementById('authBtn').textContent = 'تسجيل الخروج';
+                        document.getElementById('authBtn').className = 'auth-btn logout-btn';
+                        loadAvailableUsers();
+                        if (currentUser.firebaseKey) {
+                            db.ref('users/' + currentUser.firebaseKey).update({
+                                isOnline: true,
+                                lastSeen: new Date().toISOString()
+                            });
+                        }
+                        showToast('👋', 'مرحباً ' + (currentUser.nickname || currentUser.username || ''));
+                        if (!permissionGranted) {
+                            document.getElementById('permissionModal').classList.add('active');
+                        }
+                    }
+                } else if (savedUser && savedUser.numericId) {
+                    try {
+                        await auth.signInAnonymously();
+                        return;
+                    } catch (e) {
+                        console.log('Auto-login failed');
+                    }
+                    isLoggedIn = false;
+                    currentUser = null;
                     updateUI();
-                    listenNotifications();
-                    document.getElementById('authBtn').textContent = 'تسجيل الخروج';
-                    document.getElementById('authBtn').className = 'auth-btn logout-btn';
-                    loadAvailableUsers();
-                    if (currentUser.firebaseKey) {
-                        db.ref('users/' + currentUser.firebaseKey).update({
-                            isOnline: true,
-                            lastSeen: new Date().toISOString()
-                        });
-                    }
-                    showToast('👋', 'مرحباً ' + (currentUser.nickname || currentUser.username || ''));
-                    // عرض نافذة الأذن إذا لم يتم منحها بعد
-                    if (!permissionGranted) {
-                        document.getElementById('permissionModal').classList.add('active');
-                    }
-                }
-            } else if (savedUser && savedUser.numericId) {
-                try {
-                    await auth.signInAnonymously();
-                    return;
-                } catch (e) {
-                    console.log('Auto-login failed');
-                }
-                isLoggedIn = false;
-                currentUser = null;
-                updateUI();
-                document.getElementById('authBtn').textContent = 'تسجيل الدخول';
-                document.getElementById('authBtn').className = 'auth-btn';
-                document.getElementById('matchBtn').disabled = true;
-                document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-                showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
-            } else {
-                isLoggedIn = false;
-                currentUser = null;
-                updateUI();
-                document.getElementById('authBtn').textContent = 'تسجيل الدخول';
-                document.getElementById('authBtn').className = 'auth-btn';
-                document.getElementById('matchBtn').disabled = true;
-                document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-                if (!savedUser) {
+                    document.getElementById('authBtn').textContent = 'تسجيل الدخول';
+                    document.getElementById('authBtn').className = 'auth-btn';
+                    document.getElementById('matchBtn').disabled = true;
+                    document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
                     showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
+                } else {
+                    isLoggedIn = false;
+                    currentUser = null;
+                    updateUI();
+                    document.getElementById('authBtn').textContent = 'تسجيل الدخول';
+                    document.getElementById('authBtn').className = 'auth-btn';
+                    document.getElementById('matchBtn').disabled = true;
+                    document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
+                    if (!savedUser) {
+                        showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
+                    }
                 }
-            }
-        });
-
-    } catch (error) {
-        console.error('Firebase init error:', error);
-        showToast('❌', 'خطأ في الاتصال بقاعدة البيانات');
-    }
-}
-
-// ============================================================
-// 👤 جلب بيانات المستخدم من Firebase
-// ============================================================
-async function fetchUserFromFirebase(user) {
-    try {
-        const snapshot = await db.ref('users').orderByChild('uid').equalTo(user.uid).once('value');
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            const key = Object.keys(data)[0];
-            const userData = { ...data[key], firebaseKey: key, uid: user.uid };
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            return userData;
-        }
-        const newUser = {
-            uid: user.uid,
-            nickname: user.displayName || 'مستخدم_' + Math.floor(Math.random() * 1000),
-            numericId: Math.floor(100000 + Math.random() * 900000),
-            balanceEGP: 0,
-            balanceUSD: 0,
-            createdAt: new Date().toISOString(),
-            isOnline: true,
-            lastSeen: new Date().toISOString()
-        };
-        const ref = db.ref('users').push();
-        await ref.set(newUser);
-        const savedUser = { ...newUser, firebaseKey: ref.key };
-        localStorage.setItem('currentUser', JSON.stringify(savedUser));
-        return savedUser;
-    } catch (e) {
-        console.error('Fetch user error:', e);
-        return null;
-    }
-}
-
-// ============================================================
-// 🎯 تحديث الواجهة
-// ============================================================
-function updateUI() {
-    if (isLoggedIn && currentUser) {
-        document.getElementById('localName').textContent = currentUser.nickname || currentUser.username || 'أنت';
-        document.getElementById('localId').textContent = String(currentUser.numericId || '000000').padStart(6, '0');
-        document.getElementById('matchBtn').disabled = false;
-        document.getElementById('matchStatus').textContent = 'انقر للبحث عن محادثة عشوائية';
-        document.getElementById('p_nickname').textContent = currentUser.nickname || currentUser.username || 'مستخدم';
-        document.getElementById('p_id').textContent = String(currentUser.numericId || '000000').padStart(6, '0');
-        document.getElementById('p_egp').textContent = currentUser.balanceEGP || '0';
-        document.getElementById('p_usd').textContent = currentUser.balanceUSD || '0';
-    } else {
-        document.getElementById('localName').textContent = 'غير مسجل';
-        document.getElementById('localId').textContent = '000000';
-        document.getElementById('matchBtn').disabled = true;
-        document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-        document.getElementById('p_nickname').textContent = 'زائر';
-        document.getElementById('p_id').textContent = '000000';
-        document.getElementById('p_egp').textContent = '0';
-        document.getElementById('p_usd').textContent = '0';
-    }
-    updateNotifBadge();
-}
-
-// ============================================================
-// 🔔 الإشعارات
-// ============================================================
-function listenNotifications() {
-    if (!currentUser || !db) return;
-    const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
-    notifRef.on('value', (snapshot) => {
-        let notifications = [];
-        let unreadCount = 0;
-        if (snapshot.exists()) {
-            const notifData = snapshot.val();
-            for (const key in notifData) {
-                const notif = notifData[key];
-                notifications.push({
-                    id: notif.id || key,
-                    text: notif.text || 'إشعار جديد',
-                    read: notif.read || false,
-                    date: notif.date || new Date().toLocaleString('ar-EG'),
-                    type: notif.type || 'general'
-                });
-                if (!notif.read) unreadCount++;
-            }
-            notifications.sort((a, b) => {
-                const idA = parseInt(a.id) || 0;
-                const idB = parseInt(b.id) || 0;
-                return idB - idA;
             });
+
+        } catch (error) {
+            console.error('Firebase init error:', error);
+            showToast('❌', 'خطأ في الاتصال بقاعدة البيانات');
         }
-        const badge = document.getElementById('notifBadge');
-        const unreadEl = document.getElementById('unreadCount');
-        if (notificationTimers.badgeUpdate) {
-            clearTimeout(notificationTimers.badgeUpdate);
+    }
+
+    // ============================================================
+    // 👤 جلب بيانات المستخدم من Firebase
+    // ============================================================
+    async function fetchUserFromFirebase(user) {
+        try {
+            const snapshot = await db.ref('users').orderByChild('uid').equalTo(user.uid).once('value');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const key = Object.keys(data)[0];
+                const userData = { ...data[key], firebaseKey: key, uid: user.uid };
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                return userData;
+            }
+            const newUser = {
+                uid: user.uid,
+                nickname: user.displayName || 'مستخدم_' + Math.floor(Math.random() * 1000),
+                numericId: Math.floor(100000 + Math.random() * 900000),
+                balanceEGP: 0,
+                balanceUSD: 0,
+                createdAt: new Date().toISOString(),
+                isOnline: true,
+                lastSeen: new Date().toISOString()
+            };
+            const ref = db.ref('users').push();
+            await ref.set(newUser);
+            const savedUser = { ...newUser, firebaseKey: ref.key };
+            localStorage.setItem('currentUser', JSON.stringify(savedUser));
+            return savedUser;
+        } catch (e) {
+            console.error('Fetch user error:', e);
+            return null;
         }
-        notificationTimers.badgeUpdate = setTimeout(() => {
-            badge.innerText = unreadCount;
-            badge.style.display = unreadCount > 0 ? 'block' : 'none';
-            unreadEl.innerText = unreadCount;
-        }, 100);
-        const list = document.getElementById('notifList');
-        if (notifications.length === 0) {
-            list.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">لا توجد إشعارات</div>';
+    }
+
+    // ============================================================
+    // 🎯 تحديث الواجهة
+    // ============================================================
+    function updateUI() {
+        if (isLoggedIn && currentUser) {
+            document.getElementById('localName').textContent = currentUser.nickname || currentUser.username || 'أنت';
+            document.getElementById('localId').textContent = String(currentUser.numericId || '000000').padStart(6, '0');
+            document.getElementById('matchBtn').disabled = false;
+            document.getElementById('matchStatus').textContent = 'انقر للبحث عن محادثة عشوائية';
+            document.getElementById('p_nickname').textContent = currentUser.nickname || currentUser.username || 'مستخدم';
+            document.getElementById('p_id').textContent = String(currentUser.numericId || '000000').padStart(6, '0');
+            document.getElementById('p_egp').textContent = currentUser.balanceEGP || '0';
+            document.getElementById('p_usd').textContent = currentUser.balanceUSD || '0';
         } else {
-            list.innerHTML = '';
-            notifications.forEach(n => {
-                const div = document.createElement('div');
-                div.className = `notif-item ${!n.read ? 'unread' : ''}`;
-                div.style.cssText = 'padding:10px 14px; border-bottom:1px solid #1e293b; font-size:0.85rem; display:flex; justify-content:space-between; align-items:center; gap:10px; transition:all 0.3s ease; border-radius:8px; margin-bottom:3px;' + (!n.read ? 'background:rgba(139,92,246,0.1); border-right:4px solid #8b5cf6;' : '');
-                div.innerHTML = `
-                    <div style="flex:1;">
-                        <div style="display:flex; align-items:flex-start; gap:8px;">
-                            <i class="fas fa-${n.type === 'purchase_approved' ? 'check-circle' : n.type === 'purchase_rejected' ? 'times-circle' : n.type === 'deposit' ? 'money-bill-wave' : 'info-circle'}" 
-                               style="color: ${n.type === 'purchase_approved' ? '#10b981' : n.type === 'purchase_rejected' ? '#ef4444' : n.type === 'deposit' ? '#6366f1' : '#94a3b8'}; margin-top:2px;"></i>
-                            <div style="flex:1;">
-                                ${n.text}<br>
-                                <small style="opacity:0.6; font-size:0.7rem;">${n.date}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <i class="fas fa-trash-alt delete-single-notif" onclick="deleteSingleNotif('${currentUser.firebaseKey}', '${n.id}')" 
-                       style="color:#ef4444; cursor:pointer; padding:5px; opacity:0.6; transition:0.3s; background:rgba(239,68,68,0.1); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center;"></i>
-                `;
-                list.appendChild(div);
-            });
+            document.getElementById('localName').textContent = 'غير مسجل';
+            document.getElementById('localId').textContent = '000000';
+            document.getElementById('matchBtn').disabled = true;
+            document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
+            document.getElementById('p_nickname').textContent = 'زائر';
+            document.getElementById('p_id').textContent = '000000';
+            document.getElementById('p_egp').textContent = '0';
+            document.getElementById('p_usd').textContent = '0';
         }
-    });
-}
+        updateNotifBadge();
+    }
 
-async function updateNotifBadge() {
-    try {
+    // ============================================================
+    // 🔔 الإشعارات
+    // ============================================================
+    function listenNotifications() {
         if (!currentUser || !db) return;
         const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
-        const snapshot = await notifRef.once('value');
-        let unreadCount = 0;
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            for (const key in data) {
-                if (!data[key].read) unreadCount++;
+        notifRef.on('value', (snapshot) => {
+            let notifications = [];
+            let unreadCount = 0;
+            if (snapshot.exists()) {
+                const notifData = snapshot.val();
+                for (const key in notifData) {
+                    const notif = notifData[key];
+                    notifications.push({
+                        id: notif.id || key,
+                        text: notif.text || 'إشعار جديد',
+                        read: notif.read || false,
+                        date: notif.date || new Date().toLocaleString('ar-EG'),
+                        type: notif.type || 'general'
+                    });
+                    if (!notif.read) unreadCount++;
+                }
+                notifications.sort((a, b) => {
+                    const idA = parseInt(a.id) || 0;
+                    const idB = parseInt(b.id) || 0;
+                    return idB - idA;
+                });
             }
-        }
-        const badge = document.getElementById('notifBadge');
-        if (unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.style.display = 'block';
-        } else {
-            badge.style.display = 'none';
-        }
-    } catch (e) {}
-}
+            const badge = document.getElementById('notifBadge');
+            const unreadEl = document.getElementById('unreadCount');
+            if (notificationTimers.badgeUpdate) {
+                clearTimeout(notificationTimers.badgeUpdate);
+            }
+            notificationTimers.badgeUpdate = setTimeout(() => {
+                badge.innerText = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'block' : 'none';
+                unreadEl.innerText = unreadCount;
+            }, 100);
+            const list = document.getElementById('notifList');
+            if (notifications.length === 0) {
+                list.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">لا توجد إشعارات</div>';
+            } else {
+                list.innerHTML = '';
+                notifications.forEach(n => {
+                    const div = document.createElement('div');
+                    div.className = `notif-item ${!n.read ? 'unread' : ''}`;
+                    div.style.cssText = 'padding:10px 14px; border-bottom:1px solid #1e293b; font-size:0.85rem; display:flex; justify-content:space-between; align-items:center; gap:10px; transition:all 0.3s ease; border-radius:8px; margin-bottom:3px;' + (!n.read ? 'background:rgba(139,92,246,0.1); border-right:4px solid #8b5cf6;' : '');
+                    div.innerHTML = `
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:flex-start; gap:8px;">
+                                <i class="fas fa-${n.type === 'purchase_approved' ? 'check-circle' : n.type === 'purchase_rejected' ? 'times-circle' : n.type === 'deposit' ? 'money-bill-wave' : 'info-circle'}" 
+                                   style="color: ${n.type === 'purchase_approved' ? '#10b981' : n.type === 'purchase_rejected' ? '#ef4444' : n.type === 'deposit' ? '#6366f1' : '#94a3b8'}; margin-top:2px;"></i>
+                                <div style="flex:1;">
+                                    ${n.text}<br>
+                                    <small style="opacity:0.6; font-size:0.7rem;">${n.date}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <i class="fas fa-trash-alt delete-single-notif" onclick="deleteSingleNotif('${currentUser.firebaseKey}', '${n.id}')" 
+                           style="color:#ef4444; cursor:pointer; padding:5px; opacity:0.6; transition:0.3s; background:rgba(239,68,68,0.1); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center;"></i>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        });
+    }
 
-async function deleteSingleNotif(userKey, notifId) {
-    try {
+    async function updateNotifBadge() {
+        try {
+            if (!currentUser || !db) return;
+            const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+            const snapshot = await notifRef.once('value');
+            let unreadCount = 0;
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                for (const key in data) {
+                    if (!data[key].read) unreadCount++;
+                }
+            }
+            const badge = document.getElementById('notifBadge');
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        } catch (e) {}
+    }
+
+    async function deleteSingleNotif(userKey, notifId) {
+        try {
+            if (!db) return;
+            const notifRef = db.ref('users/' + userKey + '/notifications');
+            const snapshot = await notifRef.once('value');
+            if (snapshot.exists()) {
+                const notifData = snapshot.val();
+                for (const key in notifData) {
+                    const notif = notifData[key];
+                    if ((notif.id && notif.id.toString() === notifId.toString()) || key === notifId) {
+                        await db.ref('users/' + userKey + '/notifications/' + key).remove();
+                        showToast('✅', 'تم حذف الإشعار');
+                        break;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Delete notification error:', error);
+            showToast('❌', 'خطأ في حذف الإشعار');
+        }
+    }
+
+    async function markAllRead() {
+        try {
+            if (!currentUser || !db || !currentUser.firebaseKey) return;
+            const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+            const snapshot = await notifRef.once('value');
+            if (snapshot.exists()) {
+                const updates = {};
+                const notifData = snapshot.val();
+                for (const key in notifData) {
+                    updates[key + '/read'] = true;
+                }
+                await notifRef.update(updates);
+                showToast('✅', 'تم تعيين جميع الإشعارات كمقروءة');
+            }
+        } catch (error) {
+            console.error('Mark all read error:', error);
+        }
+    }
+
+    async function deleteAllNotifs() {
+        if (!confirm("هل تريد حذف جميع الإشعارات؟")) return;
+        try {
+            if (!currentUser || !db || !currentUser.firebaseKey) return;
+            await db.ref('users/' + currentUser.firebaseKey + '/notifications').remove();
+            showToast('✅', 'تم حذف جميع الإشعارات');
+        } catch (error) {
+            console.error('Delete all notifications error:', error);
+        }
+    }
+
+    function refreshNotifications() {
+        const icon = document.getElementById('refreshIcon');
+        icon.classList.add('refreshing');
+        icon.style.transform = 'rotate(360deg)';
+        setTimeout(() => {
+            icon.classList.remove('refreshing');
+            icon.style.transform = 'rotate(0deg)';
+            listenNotifications();
+            showToast('🔄', 'تم تحديث الإشعارات');
+        }, 1000);
+    }
+
+    // ============================================================
+    // 📋 تحميل المستخدمين المتاحين
+    // ============================================================
+    async function loadAvailableUsers() {
         if (!db) return;
-        const notifRef = db.ref('users/' + userKey + '/notifications');
-        const snapshot = await notifRef.once('value');
-        if (snapshot.exists()) {
-            const notifData = snapshot.val();
-            for (const key in notifData) {
-                const notif = notifData[key];
-                if ((notif.id && notif.id.toString() === notifId.toString()) || key === notifId) {
-                    await db.ref('users/' + userKey + '/notifications/' + key).remove();
-                    showToast('✅', 'تم حذف الإشعار');
-                    break;
+        try {
+            const snapshot = await db.ref('users').orderByChild('isOnline').equalTo(true).once('value');
+            allAvailableUsers = [];
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                for (const key in data) {
+                    const user = data[key];
+                    if (user.numericId && user.numericId !== currentUser?.numericId) {
+                        allAvailableUsers.push({ ...user, firebaseKey: key });
+                    }
                 }
             }
+            renderAvailableUsers();
+        } catch (e) {
+            console.error('Error loading users:', e);
         }
-    } catch (error) {
-        console.error('Delete notification error:', error);
-        showToast('❌', 'خطأ في حذف الإشعار');
     }
-}
 
-async function markAllRead() {
-    try {
-        if (!currentUser || !db || !currentUser.firebaseKey) return;
-        const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
-        const snapshot = await notifRef.once('value');
-        if (snapshot.exists()) {
-            const updates = {};
-            const notifData = snapshot.val();
-            for (const key in notifData) {
-                updates[key + '/read'] = true;
-            }
-            await notifRef.update(updates);
-            showToast('✅', 'تم تعيين جميع الإشعارات كمقروءة');
-        }
-    } catch (error) {
-        console.error('Mark all read error:', error);
-    }
-}
-
-async function deleteAllNotifs() {
-    if (!confirm("هل تريد حذف جميع الإشعارات؟")) return;
-    try {
-        if (!currentUser || !db || !currentUser.firebaseKey) return;
-        await db.ref('users/' + currentUser.firebaseKey + '/notifications').remove();
-        showToast('✅', 'تم حذف جميع الإشعارات');
-    } catch (error) {
-        console.error('Delete all notifications error:', error);
-    }
-}
-
-function refreshNotifications() {
-    const icon = document.getElementById('refreshIcon');
-    icon.classList.add('refreshing');
-    icon.style.transform = 'rotate(360deg)';
-    setTimeout(() => {
-        icon.classList.remove('refreshing');
-        icon.style.transform = 'rotate(0deg)';
-        listenNotifications();
-        showToast('🔄', 'تم تحديث الإشعارات');
-    }, 1000);
-}
-
-// ============================================================
-// 📋 تحميل المستخدمين المتاحين
-// ============================================================
-async function loadAvailableUsers() {
-    if (!db) return;
-    try {
-        const snapshot = await db.ref('users').orderByChild('isOnline').equalTo(true).once('value');
-        allAvailableUsers = [];
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            for (const key in data) {
-                const user = data[key];
-                if (user.numericId && user.numericId !== currentUser?.numericId) {
-                    allAvailableUsers.push({ ...user, firebaseKey: key });
-                }
-            }
-        }
-        renderAvailableUsers();
-    } catch (e) {
-        console.error('Error loading users:', e);
-    }
-}
-
-function renderAvailableUsers() {
-    const container = document.getElementById('usersScroll');
-    if (allAvailableUsers.length === 0) {
-        container.innerHTML = '';
-        return;
-    }
-    const displayUsers = allAvailableUsers.slice(0, 7);
-    container.innerHTML = displayUsers.map(user => `
-        <div class="user-avatar-small-wrapper" onclick="viewUserProfile('${user.numericId}')" title="${user.nickname || user.username || 'مستخدم'}">
-            <div class="user-avatar-small">
-                ${user.avatar ? `<img src="${user.avatar}" alt="">` : (user.nickname ? user.nickname.charAt(0).toUpperCase() : (user.username ? user.username.charAt(0).toUpperCase() : '?'))}
-                <div class="status-dot ${user.inCall ? 'in-call' : 'online'}"></div>
-            </div>
-        </div>
-    `).join('');
-}
-
-async function viewUserProfile(numericId) {
-    try {
-        const snapshot = await db.ref('users').orderByChild('numericId').equalTo(parseInt(numericId)).once('value');
-        if (!snapshot.exists()) {
-            showToast('❌', 'المستخدم غير موجود');
+    function renderAvailableUsers() {
+        const container = document.getElementById('usersScroll');
+        if (allAvailableUsers.length === 0) {
+            container.innerHTML = '';
             return;
         }
-        const data = snapshot.val();
-        const userId = Object.keys(data)[0];
-        const user = data[userId];
-        showToast('👤', `الاسم: ${user.nickname || user.username || 'مستخدم'}\n🆔: ${user.numericId}\n💰 EGP: ${user.balanceEGP || 0}`);
-    } catch (e) {
-        showToast('❌', 'حدث خطأ');
+        const displayUsers = allAvailableUsers.slice(0, 7);
+        container.innerHTML = displayUsers.map(user => `
+            <div class="user-avatar-small-wrapper" onclick="viewUserProfile('${user.numericId}')" title="${user.nickname || user.username || 'مستخدم'}">
+                <div class="user-avatar-small">
+                    ${user.avatar ? `<img src="${user.avatar}" alt="">` : (user.nickname ? user.nickname.charAt(0).toUpperCase() : (user.username ? user.username.charAt(0).toUpperCase() : '?'))}
+                    <div class="status-dot ${user.inCall ? 'in-call' : 'online'}"></div>
+                </div>
+            </div>
+        `).join('');
     }
-}
 
-// ============================================================
-// 🎥 أذن الوصول للكاميرا والميكروفون
-// ============================================================
-function grantPermission() {
-    document.getElementById('permissionModal').classList.remove('active');
-    permissionGranted = true;
-    // محاولة الحصول على الوسائط فوراً
-    getMediaSilent();
-}
-
-function denyPermission() {
-    document.getElementById('permissionModal').classList.remove('active');
-    permissionGranted = false;
-    showToast('⚠️', 'تم رفض الوصول للكاميرا والميكروفون');
-}
-
-async function getMediaSilent() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-        });
-        localStream = stream;
-        document.getElementById('localVideo').srcObject = stream;
-        document.getElementById('localPlaceholder').style.display = 'none';
-        showToast('✅', 'تم الوصول للكاميرا والميكروفون بنجاح');
-        return true;
-    } catch (e) {
-        console.log('Media not available yet:', e);
-        return false;
+    async function viewUserProfile(numericId) {
+        try {
+            const snapshot = await db.ref('users').orderByChild('numericId').equalTo(parseInt(numericId)).once('value');
+            if (!snapshot.exists()) {
+                showToast('❌', 'المستخدم غير موجود');
+                return;
+            }
+            const data = snapshot.val();
+            const userId = Object.keys(data)[0];
+            const user = data[userId];
+            showToast('👤', `الاسم: ${user.nickname || user.username || 'مستخدم'}\n🆔: ${user.numericId}\n💰 EGP: ${user.balanceEGP || 0}`);
+        } catch (e) {
+            showToast('❌', 'حدث خطأ');
+        }
     }
-}
 
-async function getMedia() {
-    try {
-        // عرض نافذة الأذن إذا لم يتم منحها بعد
-        if (!permissionGranted) {
-            document.getElementById('permissionModal').classList.add('active');
-            return new Promise((resolve) => {
-                // انتظار قرار المستخدم
-                const checkPermission = setInterval(() => {
-                    if (permissionGranted) {
-                        clearInterval(checkPermission);
-                        getMediaActual().then(resolve);
-                    }
-                }, 500);
+    // ============================================================
+    // 🎥 أذن الوصول للكاميرا والميكروفون
+    // ============================================================
+    function grantPermission() {
+        document.getElementById('permissionModal').classList.remove('active');
+        permissionGranted = true;
+        getMediaSilent();
+    }
+
+    function denyPermission() {
+        document.getElementById('permissionModal').classList.remove('active');
+        permissionGranted = false;
+        showToast('⚠️', 'تم رفض الوصول للكاميرا والميكروفون');
+    }
+
+    async function getMediaSilent() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
             });
-        }
-        return await getMediaActual();
-    } catch (e) {
-        console.error('Media error:', e);
-        showToast('⚠️', 'تعذر الوصول إلى الكاميرا أو الميكروفون');
-        return null;
-    }
-}
-
-async function getMediaActual() {
-    try {
-        const constraints = {
-            video: callMode === 'audio' ? false : { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-            audio: true
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        return stream;
-    } catch (e) {
-        console.error('Media error:', e);
-        return null;
-    }
-}
-
-// ============================================================
-// 🎥 التحكم في الكاميرا والميكروفون ووضع المكالمة
-// ============================================================
-async function toggleMic() {
-    if (!localStream) {
-        showToast('⚠️', 'لا توجد مكالمة نشطة');
-        return;
-    }
-    isMicOn = !isMicOn;
-    localStream.getAudioTracks().forEach(track => track.enabled = isMicOn);
-    document.getElementById('micBtn').innerHTML = isMicOn ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash"></i>';
-    document.getElementById('micBtn').classList.toggle('muted', !isMicOn);
-}
-
-async function toggleCam() {
-    if (!localStream) {
-        showToast('⚠️', 'لا توجد مكالمة نشطة');
-        return;
-    }
-    isCamOn = !isCamOn;
-    localStream.getVideoTracks().forEach(track => track.enabled = isCamOn);
-    document.getElementById('camBtn').innerHTML = isCamOn ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
-    document.getElementById('camBtn').classList.toggle('muted', !isCamOn);
-}
-
-function toggleMode() {
-    const modes = ['video', 'audio', 'audio-only'];
-    const icons = ['fa-video', 'fa-microphone', 'fa-headphones'];
-    const labels = ['فيديو', 'صوت فقط', 'صوت فقط'];
-    
-    let currentIndex = modes.indexOf(callMode);
-    currentIndex = (currentIndex + 1) % modes.length;
-    callMode = modes[currentIndex];
-    
-    const btn = document.getElementById('modeBtn');
-    btn.innerHTML = `<i class="fas ${icons[currentIndex]}"></i>`;
-    btn.title = `وضع: ${labels[currentIndex]}`;
-    btn.classList.add('active-mode');
-    
-    showToast('🔄', `تم التبديل إلى وضع ${labels[currentIndex]}`);
-    
-    // تحديث تدفق الفيديو إذا لزم الأمر
-    if (localStream) {
-        const videoTrack = localStream.getVideoTracks()[0];
-        if (videoTrack) {
-            videoTrack.enabled = callMode !== 'audio' && callMode !== 'audio-only';
-        }
-        // إذا كان الوضع audio-only، نضيف مسار فيديو فارغ
-        if (callMode === 'audio-only' || callMode === 'audio') {
-            document.getElementById('localVideo').srcObject = localStream;
+            localStream = stream;
+            document.getElementById('localVideo').srcObject = stream;
+            document.getElementById('localPlaceholder').style.display = 'none';
+            showToast('✅', 'تم الوصول للكاميرا والميكروفون بنجاح');
+            return true;
+        } catch (e) {
+            console.log('Media not available yet:', e);
+            return false;
         }
     }
-}
 
-// ============================================================
-// 🔄 المطابقة العشوائية
-// ============================================================
-async function startMatch() {
-    if (!isLoggedIn || !currentUser) {
-        showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
-        return;
+    async function getMedia() {
+        try {
+            if (!permissionGranted) {
+                document.getElementById('permissionModal').classList.add('active');
+                return new Promise((resolve) => {
+                    const checkPermission = setInterval(() => {
+                        if (permissionGranted) {
+                            clearInterval(checkPermission);
+                            getMediaActual().then(resolve);
+                        }
+                    }, 500);
+                });
+            }
+            return await getMediaActual();
+        } catch (e) {
+            console.error('Media error:', e);
+            showToast('⚠️', 'تعذر الوصول إلى الكاميرا أو الميكروفون');
+            return null;
+        }
     }
-    if (isMatching) return;
 
-    const btn = document.getElementById('matchBtn');
-    const status = document.getElementById('matchStatus');
-    btn.disabled = true;
-    isMatching = true;
-    status.textContent = '⏳ جاري البحث عن شريك...';
+    async function getMediaActual() {
+        try {
+            const constraints = {
+                video: callMode === 'audio' ? false : { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                audio: true
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            return stream;
+        } catch (e) {
+            console.error('Media error:', e);
+            return null;
+        }
+    }
 
-    // الحصول على الوسائط
-    if (!localStream) {
-        const stream = await getMedia();
-        if (!stream) {
-            status.textContent = '❌ تعذر الوصول إلى الكاميرا أو الميكروفون';
+    // ============================================================
+    // 🎥 التحكم في الكاميرا والميكروفون ووضع المكالمة
+    // ============================================================
+    async function toggleMic() {
+        if (!localStream) {
+            showToast('⚠️', 'لا توجد مكالمة نشطة');
+            return;
+        }
+        isMicOn = !isMicOn;
+        localStream.getAudioTracks().forEach(track => track.enabled = isMicOn);
+        document.getElementById('micBtn').innerHTML = isMicOn ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash"></i>';
+        document.getElementById('micBtn').classList.toggle('muted', !isMicOn);
+    }
+
+    async function toggleCam() {
+        if (!localStream) {
+            showToast('⚠️', 'لا توجد مكالمة نشطة');
+            return;
+        }
+        isCamOn = !isCamOn;
+        localStream.getVideoTracks().forEach(track => track.enabled = isCamOn);
+        document.getElementById('camBtn').innerHTML = isCamOn ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+        document.getElementById('camBtn').classList.toggle('muted', !isCamOn);
+    }
+
+    function toggleMode() {
+        const modes = ['video', 'audio'];
+        const icons = ['fa-video', 'fa-microphone'];
+        const labels = ['فيديو', 'صوت فقط'];
+        
+        let currentIndex = modes.indexOf(callMode);
+        currentIndex = (currentIndex + 1) % modes.length;
+        callMode = modes[currentIndex];
+        
+        const btn = document.getElementById('modeBtn');
+        btn.innerHTML = `<i class="fas ${icons[currentIndex]}"></i>`;
+        btn.title = `وضع: ${labels[currentIndex]}`;
+        btn.classList.add('active-mode');
+        
+        showToast('🔄', `تم التبديل إلى وضع ${labels[currentIndex]}`);
+        
+        if (localStream) {
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.enabled = callMode !== 'audio';
+            }
+        }
+    }
+
+    // ============================================================
+    // 🔄 المطابقة العشوائية
+    // ============================================================
+    async function startMatch() {
+        if (!isLoggedIn || !currentUser) {
+            showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
+            return;
+        }
+        if (isMatching) return;
+
+        const btn = document.getElementById('matchBtn');
+        const status = document.getElementById('matchStatus');
+        btn.disabled = true;
+        isMatching = true;
+        status.textContent = '⏳ جاري البحث عن شريك...';
+
+        if (!localStream) {
+            const stream = await getMedia();
+            if (!stream) {
+                status.textContent = '❌ تعذر الوصول إلى الكاميرا أو الميكروفون';
+                btn.disabled = false;
+                isMatching = false;
+                return;
+            }
+            localStream = stream;
+            document.getElementById('localVideo').srcObject = stream;
+            document.getElementById('localPlaceholder').style.display = 'none';
+        }
+
+        const roomId = 'room_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+
+        try {
+            const roomRef = db.ref('rooms/' + roomId);
+            await roomRef.set({
+                host: currentUser.firebaseKey,
+                hostNickname: currentUser.nickname || currentUser.username,
+                hostId: currentUser.numericId,
+                status: 'waiting',
+                mode: callMode,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            roomRef.on('value', async (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.status === 'joined' && data.guest) {
+                    const guestRef = db.ref('users/' + data.guest);
+                    const guestSnap = await guestRef.once('value');
+                    const guestData = guestSnap.val();
+
+                    currentPartner = {
+                        firebaseKey: data.guest,
+                        nickname: guestData?.nickname || guestData?.username || 'شريك',
+                        numericId: guestData?.numericId || '000000',
+                        avatar: guestData?.avatar || ''
+                    };
+
+                    document.getElementById('remoteName').textContent = currentPartner.nickname;
+                    document.getElementById('remoteId').textContent = String(currentPartner.numericId).padStart(6, '0');
+                    document.getElementById('remoteOverlay').style.display = 'flex';
+                    document.getElementById('remotePlaceholder').style.display = 'none';
+                    status.textContent = '✅ متصل مع ' + currentPartner.nickname;
+                    btn.disabled = false;
+                    isMatching = false;
+                    currentRoom = roomId;
+
+                    showToast('🎉', 'تم العثور على شريك: ' + currentPartner.nickname);
+                    addChatMessage('system', '🎉 بدأت المحادثة مع ' + currentPartner.nickname);
+                    startTimer();
+                    listenMessages();
+                    listenGifts();
+                    listenRoomChanges();
+
+                    if (currentUser?.firebaseKey) {
+                        db.ref('users/' + currentUser.firebaseKey).update({
+                            inCall: true,
+                            currentRoom: roomId
+                        });
+                    }
+                }
+            });
+
+            setTimeout(async () => {
+                if (isMatching) {
+                    await findRealPartner(roomId);
+                }
+            }, 3000);
+
+            setTimeout(() => {
+                if (isMatching) {
+                    status.textContent = '❌ لم يتم العثور على شريك، حاول مرة أخرى';
+                    btn.disabled = false;
+                    isMatching = false;
+                    roomRef.remove();
+                    showToast('⏰', 'انتهى وقت البحث، حاول مرة أخرى');
+                }
+            }, 30000);
+
+        } catch (error) {
+            console.error('Match error:', error);
+            status.textContent = '❌ حدث خطأ، حاول مرة أخرى';
             btn.disabled = false;
             isMatching = false;
-            return;
+            showToast('❌', 'حدث خطأ في البحث');
         }
-        localStream = stream;
-        document.getElementById('localVideo').srcObject = stream;
-        document.getElementById('localPlaceholder').style.display = 'none';
     }
 
-    const roomId = 'room_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    // ============================================================
+    // 🔍 البحث عن شريك حقيقي
+    // ============================================================
+    async function findRealPartner(roomId) {
+        try {
+            const snapshot = await db.ref('users').orderByChild('isOnline').equalTo(true).once('value');
+            let availableUsers = [];
 
-    try {
-        const roomRef = db.ref('rooms/' + roomId);
-        await roomRef.set({
-            host: currentUser.firebaseKey,
-            hostNickname: currentUser.nickname || currentUser.username,
-            hostId: currentUser.numericId,
-            status: 'waiting',
-            mode: callMode,
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-        });
-
-        roomRef.on('value', async (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.status === 'joined' && data.guest) {
-                const guestRef = db.ref('users/' + data.guest);
-                const guestSnap = await guestRef.once('value');
-                const guestData = guestSnap.val();
-
-                currentPartner = {
-                    firebaseKey: data.guest,
-                    nickname: guestData?.nickname || guestData?.username || 'شريك',
-                    numericId: guestData?.numericId || '000000',
-                    avatar: guestData?.avatar || ''
-                };
-
-                document.getElementById('remoteName').textContent = currentPartner.nickname;
-                document.getElementById('remoteId').textContent = String(currentPartner.numericId).padStart(6, '0');
-                document.getElementById('remoteOverlay').style.display = 'flex';
-                document.getElementById('remotePlaceholder').style.display = 'none';
-                status.textContent = '✅ متصل مع ' + currentPartner.nickname;
-                btn.disabled = false;
-                isMatching = false;
-                currentRoom = roomId;
-
-                showToast('🎉', 'تم العثور على شريك: ' + currentPartner.nickname);
-                addChatMessage('system', '🎉 بدأت المحادثة مع ' + currentPartner.nickname);
-                startTimer();
-                listenMessages();
-                listenGifts();
-                listenRoomChanges();
-
-                if (currentUser?.firebaseKey) {
-                    db.ref('users/' + currentUser.firebaseKey).update({
-                        inCall: true,
-                        currentRoom: roomId
-                    });
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                for (const key in data) {
+                    const user = data[key];
+                    if (user.numericId &&
+                        user.numericId !== currentUser?.numericId &&
+                        !user.inCall) {
+                        availableUsers.push({ ...user, firebaseKey: key });
+                    }
                 }
             }
-        });
 
-        // البحث عن شريك حقيقي
-        setTimeout(async () => {
-            if (isMatching) {
-                await findRealPartner(roomId);
-            }
-        }, 3000);
+            if (availableUsers.length === 0) return;
 
-        setTimeout(() => {
-            if (isMatching) {
-                status.textContent = '❌ لم يتم العثور على شريك، حاول مرة أخرى';
-                btn.disabled = false;
-                isMatching = false;
-                roomRef.remove();
-                showToast('⏰', 'انتهى وقت البحث، حاول مرة أخرى');
-            }
-        }, 30000);
+            const randomIndex = Math.floor(Math.random() * availableUsers.length);
+            const partner = availableUsers[randomIndex];
 
-    } catch (error) {
-        console.error('Match error:', error);
-        status.textContent = '❌ حدث خطأ، حاول مرة أخرى';
-        btn.disabled = false;
-        isMatching = false;
-        showToast('❌', 'حدث خطأ في البحث');
-    }
-}
+            const roomRef = db.ref('rooms/' + roomId);
+            await roomRef.update({
+                guest: partner.firebaseKey,
+                guestNickname: partner.nickname || partner.username,
+                guestId: partner.numericId,
+                status: 'joined'
+            });
 
-// ============================================================
-// 🔍 البحث عن شريك حقيقي
-// ============================================================
-async function findRealPartner(roomId) {
-    try {
-        const snapshot = await db.ref('users').orderByChild('isOnline').equalTo(true).once('value');
-        let availableUsers = [];
+            await db.ref('users/' + partner.firebaseKey + '/notifications').push({
+                text: `📞 طلب مكالمة من ${currentUser.nickname || currentUser.username}`,
+                date: new Date().toLocaleString('ar-EG'),
+                read: false,
+                type: 'call_request',
+                roomId: roomId
+            });
 
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            for (const key in data) {
-                const user = data[key];
-                if (user.numericId &&
-                    user.numericId !== currentUser?.numericId &&
-                    !user.inCall) {
-                    availableUsers.push({ ...user, firebaseKey: key });
-                }
-            }
+            await db.ref('users/' + partner.firebaseKey).update({
+                inCall: true,
+                currentRoom: roomId
+            });
+
+        } catch (error) {
+            console.error('Error finding partner:', error);
         }
-
-        if (availableUsers.length === 0) return;
-
-        const randomIndex = Math.floor(Math.random() * availableUsers.length);
-        const partner = availableUsers[randomIndex];
-
-        const roomRef = db.ref('rooms/' + roomId);
-        await roomRef.update({
-            guest: partner.firebaseKey,
-            guestNickname: partner.nickname || partner.username,
-            guestId: partner.numericId,
-            status: 'joined'
-        });
-
-        await db.ref('users/' + partner.firebaseKey + '/notifications').push({
-            text: `📞 طلب مكالمة من ${currentUser.nickname || currentUser.username}`,
-            date: new Date().toLocaleString('ar-EG'),
-            read: false,
-            type: 'call_request',
-            roomId: roomId
-        });
-
-        await db.ref('users/' + partner.firebaseKey).update({
-            inCall: true,
-            currentRoom: roomId
-        });
-
-    } catch (error) {
-        console.error('Error finding partner:', error);
-    }
-}
-
-// ============================================================
-// ⏱️ عداد الوقت
-// ============================================================
-function startTimer() {
-    callStartTime = Date.now();
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-        const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
-        const secs = String(elapsed % 60).padStart(2, '0');
-        document.getElementById('timerDisplay').textContent = `⏱️ ${mins}:${secs}`;
-    }, 1000);
-}
-
-function stopTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-    document.getElementById('timerDisplay').textContent = '⏱️ 00:00';
-}
-
-// ============================================================
-// 📞 إنهاء المكالمة
-// ============================================================
-function endCall() {
-    if (currentRoom) {
-        const roomRef = db.ref('rooms/' + currentRoom);
-        roomRef.update({ status: 'ended' });
-        roomRef.off();
-        currentRoom = null;
     }
 
-    if (currentUser?.firebaseKey) {
-        db.ref('users/' + currentUser.firebaseKey).update({
-            inCall: false,
-            currentRoom: null
-        });
+    // ============================================================
+    // ⏱️ عداد الوقت
+    // ============================================================
+    function startTimer() {
+        callStartTime = Date.now();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+            const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const secs = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('timerDisplay').textContent = `⏱️ ${mins}:${secs}`;
+        }, 1000);
     }
 
-    currentPartner = null;
-    document.getElementById('remoteOverlay').style.display = 'none';
-    document.getElementById('remotePlaceholder').style.display = 'flex';
-    document.getElementById('matchBtn').disabled = false;
-    document.getElementById('matchStatus').textContent = 'انقر للبحث عن محادثة جديدة';
-    document.getElementById('chatMessages').innerHTML = '';
-    stopTimer();
-
-    isMicOn = true;
-    isCamOn = true;
-    document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i>';
-    document.getElementById('micBtn').classList.remove('muted');
-    document.getElementById('camBtn').innerHTML = '<i class="fas fa-video"></i>';
-    document.getElementById('camBtn').classList.remove('muted');
-
-    showToast('📞', 'تم إنهاء المكالمة');
-}
-
-// ============================================================
-// 💬 الدردشة
-// ============================================================
-function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text || !currentRoom || !currentPartner) {
-        if (!currentRoom) showToast('⚠️', 'لا توجد محادثة نشطة');
-        return;
-    }
-
-    addChatMessage('local', text);
-    const msgRef = db.ref('rooms/' + currentRoom + '/messages').push();
-    msgRef.set({
-        sender: currentUser.firebaseKey,
-        senderName: currentUser.nickname || currentUser.username,
-        text: text,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    });
-    input.value = '';
-}
-
-function addChatMessage(type, text, senderName) {
-    const container = document.getElementById('chatMessages');
-    const msg = document.createElement('div');
-    msg.className = 'chat-msg' + (type === 'system' ? ' system' : '');
-    const sender = type === 'local' ? 'أنت' : type === 'system' ? 'نظام' : (senderName || 'شريك');
-    msg.innerHTML = `<span class="msg-sender">${sender}</span><span class="msg-text">${text}</span>`;
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
-    while (container.children.length > 50) {
-        container.removeChild(container.firstChild);
-    }
-}
-
-function listenMessages() {
-    if (!currentRoom) return;
-    const msgRef = db.ref('rooms/' + currentRoom + '/messages');
-    msgRef.off();
-    msgRef.on('child_added', (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.sender !== currentUser.firebaseKey) {
-            addChatMessage('remote', data.text, data.senderName);
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
-    });
-}
-
-// ============================================================
-// 🎁 الهدايا
-// ============================================================
-function openGiftModal() {
-    if (!currentRoom || !currentPartner) {
-        showToast('⚠️', 'لا توجد محادثة نشطة');
-        return;
-    }
-    document.getElementById('giftModal').classList.add('active');
-}
-
-function closeGiftModal() {
-    document.getElementById('giftModal').classList.remove('active');
-}
-
-function sendGift(name, price) {
-    if (!currentRoom || !currentPartner) {
-        showToast('⚠️', 'لا توجد محادثة نشطة');
-        closeGiftModal();
-        return;
+        document.getElementById('timerDisplay').textContent = '⏱️ 00:00';
     }
 
-    if (currentUser.balanceEGP < price) {
-        showToast('⚠️', 'رصيدك غير كافٍ. تحتاج ' + price + ' EGP');
-        closeGiftModal();
-        return;
-    }
-
-    currentUser.balanceEGP -= price;
-    if (currentUser.firebaseKey) {
-        db.ref('users/' + currentUser.firebaseKey).update({
-            balanceEGP: currentUser.balanceEGP
-        });
-    }
-
-    addChatMessage('system', `🎁 أرسل ${name} 🎁`, 'أنت');
-    showToast('🎁', `تم إرسال ${name} إلى ${currentPartner.nickname}`);
-
-    const giftRef = db.ref('rooms/' + currentRoom + '/gifts').push();
-    giftRef.set({
-        from: currentUser.firebaseKey,
-        to: currentPartner.firebaseKey,
-        name: name,
-        price: price,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    });
-
-    closeGiftModal();
-}
-
-function listenGifts() {
-    if (!currentRoom) return;
-    const giftRef = db.ref('rooms/' + currentRoom + '/gifts');
-    giftRef.off();
-    giftRef.on('child_added', (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.from !== currentUser.firebaseKey) {
-            addChatMessage('system', `🎁 تلقيت هدية: ${data.name} 🎁`, 'نظام');
-            showToast('🎁', `تلقيت هدية ${data.name} من ${currentPartner.nickname}`);
+    // ============================================================
+    // 📞 إنهاء المكالمة
+    // ============================================================
+    function endCall() {
+        if (currentRoom) {
+            const roomRef = db.ref('rooms/' + currentRoom);
+            roomRef.update({ status: 'ended' });
+            roomRef.off();
+            currentRoom = null;
         }
-    });
-}
-
-function listenRoomChanges() {
-    if (!currentRoom) return;
-    const roomRef = db.ref('rooms/' + currentRoom);
-    roomRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (!data || data.status === 'ended') {
-            showToast('📞', 'أنهى الشريك المحادثة');
-            endCall();
-        }
-    });
-}
-
-// ============================================================
-// 🎯 طلب صداقة
-// ============================================================
-function sendFriendRequest() {
-    if (!currentPartner) {
-        showToast('⚠️', 'لا يوجد شريك حالي');
-        return;
-    }
-    showToast('✅', `تم إرسال طلب صداقة إلى ${currentPartner.nickname}`);
-}
-
-// ============================================================
-// 📋 نسخ المعرف
-// ============================================================
-function copyId(id) {
-    const text = document.getElementById(id).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        showToast('✅', 'تم نسخ المعرف: ' + text);
-    }).catch(() => {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('✅', 'تم نسخ المعرف');
-    });
-}
-
-function copyText(id) {
-    const text = document.getElementById(id).innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        showToast('✅', 'تم نسخ: ' + text);
-    }).catch(() => {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('✅', 'تم نسخ: ' + text);
-    });
-}
-
-// ============================================================
-// 🔔 الإشعارات (Toast)
-// ============================================================
-function showToast(title, message) {
-    const toast = document.getElementById('notificationToast');
-    document.getElementById('toastMessage').textContent = message || title;
-    toast.style.display = 'block';
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 4000);
-}
-
-function closeToast() {
-    document.getElementById('notificationToast').style.display = 'none';
-}
-
-// ============================================================
-// 🔐 تسجيل الخروج والدخول
-// ============================================================
-function handleAuth() {
-    if (isLoggedIn) {
-        logout();
-    } else {
-        window.location.href = 'login-match.html';
-    }
-}
-
-async function logout() {
-    try {
-        if (currentRoom) endCall();
 
         if (currentUser?.firebaseKey) {
-            await db.ref('users/' + currentUser.firebaseKey).update({
-                isOnline: false,
+            db.ref('users/' + currentUser.firebaseKey).update({
                 inCall: false,
-                currentRoom: null,
-                lastSeen: new Date().toISOString()
+                currentRoom: null
             });
         }
 
-        if (auth) {
-            await auth.signOut();
+        currentPartner = null;
+        document.getElementById('remoteOverlay').style.display = 'none';
+        document.getElementById('remotePlaceholder').style.display = 'flex';
+        document.getElementById('matchBtn').disabled = false;
+        document.getElementById('matchStatus').textContent = 'انقر للبحث عن محادثة جديدة';
+        document.getElementById('chatMessages').innerHTML = '';
+        stopTimer();
+
+        isMicOn = true;
+        isCamOn = true;
+        document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i>';
+        document.getElementById('micBtn').classList.remove('muted');
+        document.getElementById('camBtn').innerHTML = '<i class="fas fa-video"></i>';
+        document.getElementById('camBtn').classList.remove('muted');
+
+        showToast('📞', 'تم إنهاء المكالمة');
+    }
+
+    // ============================================================
+    // 💬 الدردشة
+    // ============================================================
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text || !currentRoom || !currentPartner) {
+            if (!currentRoom) showToast('⚠️', 'لا توجد محادثة نشطة');
+            return;
         }
 
-        localStorage.removeItem('currentUser');
-        isLoggedIn = false;
-        currentUser = null;
-
-        document.getElementById('authBtn').textContent = 'تسجيل الدخول';
-        document.getElementById('authBtn').className = 'auth-btn';
-        document.getElementById('matchBtn').disabled = true;
-        document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-        document.getElementById('localName').textContent = 'غير مسجل';
-        document.getElementById('localId').textContent = '000000';
-
-        showToast('👋', 'تم تسجيل الخروج بنجاح');
-        setTimeout(() => window.location.href = 'login-match.html', 1500);
-
-    } catch (error) {
-        console.error('Logout error:', error);
-        showToast('❌', 'حدث خطأ أثناء تسجيل الخروج');
+        addChatMessage('local', text);
+        const msgRef = db.ref('rooms/' + currentRoom + '/messages').push();
+        msgRef.set({
+            sender: currentUser.firebaseKey,
+            senderName: currentUser.nickname || currentUser.username,
+            text: text,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+        input.value = '';
     }
-}
 
-// ============================================================
-// 👤 الملف الشخصي والإشعارات
-// ============================================================
-function handleProfileClick() {
-    if (!isLoggedIn) {
-        showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
-        return;
+    function addChatMessage(type, text, senderName) {
+        const container = document.getElementById('chatMessages');
+        const msg = document.createElement('div');
+        msg.className = 'chat-msg' + (type === 'system' ? ' system' : '');
+        const sender = type === 'local' ? 'أنت' : type === 'system' ? 'نظام' : (senderName || 'شريك');
+        msg.innerHTML = `<span class="msg-sender">${sender}</span><span class="msg-text">${text}</span>`;
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
+        while (container.children.length > 50) {
+            container.removeChild(container.firstChild);
+        }
     }
-    const dropdown = document.getElementById('profileDropdown');
-    if (dropdown.style.display === 'flex') {
-        dropdown.style.display = 'none';
-    } else {
-        dropdown.style.display = 'flex';
-        // تحديث البيانات
-        updateUI();
-    }
-}
 
-function closeProfileDropdown() {
-    document.getElementById('profileDropdown').style.display = 'none';
-}
-
-function openMenu(id) {
-    if (!isLoggedIn) {
-        showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
-        return;
+    function listenMessages() {
+        if (!currentRoom) return;
+        const msgRef = db.ref('rooms/' + currentRoom + '/messages');
+        msgRef.off();
+        msgRef.on('child_added', (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.sender !== currentUser.firebaseKey) {
+                addChatMessage('remote', data.text, data.senderName);
+            }
+        });
     }
-    const target = document.getElementById(id);
-    if (target.style.display === 'flex') {
-        target.style.display = 'none';
-    } else {
-        // إغلاق الآخرين
+
+    // ============================================================
+    // 🎁 الهدايا
+    // ============================================================
+    function openGiftModal() {
+        if (!currentRoom || !currentPartner) {
+            showToast('⚠️', 'لا توجد محادثة نشطة');
+            return;
+        }
+        document.getElementById('giftModal').classList.add('active');
+    }
+
+    function closeGiftModal() {
+        document.getElementById('giftModal').classList.remove('active');
+    }
+
+    function sendGift(name, price) {
+        if (!currentRoom || !currentPartner) {
+            showToast('⚠️', 'لا توجد محادثة نشطة');
+            closeGiftModal();
+            return;
+        }
+
+        if (currentUser.balanceEGP < price) {
+            showToast('⚠️', 'رصيدك غير كافٍ. تحتاج ' + price + ' EGP');
+            closeGiftModal();
+            return;
+        }
+
+        currentUser.balanceEGP -= price;
+        if (currentUser.firebaseKey) {
+            db.ref('users/' + currentUser.firebaseKey).update({
+                balanceEGP: currentUser.balanceEGP
+            });
+        }
+
+        addChatMessage('system', `🎁 أرسل ${name} 🎁`, 'أنت');
+        showToast('🎁', `تم إرسال ${name} إلى ${currentPartner.nickname}`);
+
+        const giftRef = db.ref('rooms/' + currentRoom + '/gifts').push();
+        giftRef.set({
+            from: currentUser.firebaseKey,
+            to: currentPartner.firebaseKey,
+            name: name,
+            price: price,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        closeGiftModal();
+    }
+
+    function listenGifts() {
+        if (!currentRoom) return;
+        const giftRef = db.ref('rooms/' + currentRoom + '/gifts');
+        giftRef.off();
+        giftRef.on('child_added', (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.from !== currentUser.firebaseKey) {
+                addChatMessage('system', `🎁 تلقيت هدية: ${data.name} 🎁`, 'نظام');
+                showToast('🎁', `تلقيت هدية ${data.name} من ${currentPartner.nickname}`);
+            }
+        });
+    }
+
+    function listenRoomChanges() {
+        if (!currentRoom) return;
+        const roomRef = db.ref('rooms/' + currentRoom);
+        roomRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data || data.status === 'ended') {
+                showToast('📞', 'أنهى الشريك المحادثة');
+                endCall();
+            }
+        });
+    }
+
+    // ============================================================
+    // 🎯 طلب صداقة
+    // ============================================================
+    function sendFriendRequest() {
+        if (!currentPartner) {
+            showToast('⚠️', 'لا يوجد شريك حالي');
+            return;
+        }
+        showToast('✅', `تم إرسال طلب صداقة إلى ${currentPartner.nickname}`);
+    }
+
+    // ============================================================
+    // 📋 نسخ المعرف
+    // ============================================================
+    function copyId(id) {
+        const text = document.getElementById(id).textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('✅', 'تم نسخ المعرف: ' + text);
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('✅', 'تم نسخ المعرف');
+        });
+    }
+
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('✅', 'تم نسخ: ' + text);
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('✅', 'تم نسخ: ' + text);
+        });
+    }
+
+    // ============================================================
+    // 🔔 الإشعارات (Toast)
+    // ============================================================
+    function showToast(title, message) {
+        const toast = document.getElementById('notificationToast');
+        document.getElementById('toastMessage').textContent = message || title;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 4000);
+    }
+
+    function closeToast() {
+        document.getElementById('notificationToast').style.display = 'none';
+    }
+
+    // ============================================================
+    // 🔐 تسجيل الخروج والدخول
+    // ============================================================
+    function handleAuth() {
+        if (isLoggedIn) {
+            logout();
+        } else {
+            window.location.href = 'login-match.html';
+        }
+    }
+
+    async function logout() {
+        try {
+            if (currentRoom) endCall();
+
+            if (currentUser?.firebaseKey) {
+                await db.ref('users/' + currentUser.firebaseKey).update({
+                    isOnline: false,
+                    inCall: false,
+                    currentRoom: null,
+                    lastSeen: new Date().toISOString()
+                });
+            }
+
+            if (auth) {
+                await auth.signOut();
+            }
+
+            localStorage.removeItem('currentUser');
+            isLoggedIn = false;
+            currentUser = null;
+
+            document.getElementById('authBtn').textContent = 'تسجيل الدخول';
+            document.getElementById('authBtn').className = 'auth-btn';
+            document.getElementById('matchBtn').disabled = true;
+            document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
+            document.getElementById('localName').textContent = 'غير مسجل';
+            document.getElementById('localId').textContent = '000000';
+
+            showToast('👋', 'تم تسجيل الخروج بنجاح');
+            setTimeout(() => window.location.href = 'login-match.html', 1500);
+
+        } catch (error) {
+            console.error('Logout error:', error);
+            showToast('❌', 'حدث خطأ أثناء تسجيل الخروج');
+        }
+    }
+
+    // ============================================================
+    // 👤 الملف الشخصي والإشعارات
+    // ============================================================
+    function handleProfileClick() {
+        if (!isLoggedIn) {
+            showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
+            return;
+        }
+        const dropdown = document.getElementById('profileDropdown');
+        if (dropdown.style.display === 'flex') {
+            dropdown.style.display = 'none';
+        } else {
+            dropdown.style.display = 'flex';
+            updateUI();
+        }
+    }
+
+    function closeProfileDropdown() {
         document.getElementById('profileDropdown').style.display = 'none';
-        target.style.display = 'flex';
-        if (id === 'notifDropdown') {
-            listenNotifications();
+    }
+
+    function openMenu(id) {
+        if (!isLoggedIn) {
+            showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
+            return;
+        }
+        const target = document.getElementById(id);
+        if (target.style.display === 'flex') {
+            target.style.display = 'none';
+        } else {
+            document.getElementById('profileDropdown').style.display = 'none';
+            target.style.display = 'flex';
+            if (id === 'notifDropdown') {
+                listenNotifications();
+            }
         }
     }
-}
 
-function closeAll() {
-    document.getElementById('profileDropdown').style.display = 'none';
-    document.getElementById('notifDropdown').style.display = 'none';
-    document.getElementById('currencyModal').style.display = 'none';
-    document.getElementById('topUpModal').style.display = 'none';
-    document.getElementById('giftModal').classList.remove('active');
-}
-
-function handleSupportClick() {
-    if (!isLoggedIn) {
-        showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
-        return;
+    function closeAll() {
+        document.getElementById('profileDropdown').style.display = 'none';
+        document.getElementById('notifDropdown').style.display = 'none';
+        document.getElementById('currencyModal').style.display = 'none';
+        document.getElementById('topUpModal').style.display = 'none';
+        document.getElementById('giftModal').classList.remove('active');
     }
-    showToast('📞', 'سيتم توجيهك للدعم الفني قريباً');
-}
 
-// ============================================================
-// 💰 نظام الشحن والإيداع
-// ============================================================
-function openCurrencySelection() {
-    if (!isLoggedIn) {
-        showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
-        return;
+    function handleSupportClick() {
+        if (!isLoggedIn) {
+            showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
+            return;
+        }
+        showToast('📞', 'سيتم توجيهك للدعم الفني قريباً');
     }
-    closeAll();
-    document.getElementById('currencyModal').style.display = 'flex';
-}
 
-function updatePaymentMethodDisplay() {
-    const method = document.getElementById('paymentMethod').value;
-    const display = document.getElementById('selectedPaymentInfo');
-    const nameSpan = document.getElementById('paymentMethodName');
-    
-    const methodNames = {
-        'vodafone': 'فودافون كاش',
-        'instapay': 'إنستا باي',
-        'binance': 'Binance Pay'
-    };
-    
-    if(method && methodNames[method]) {
-        nameSpan.textContent = methodNames[method];
+    // ============================================================
+    // 💰 نظام الشحن والإيداع
+    // ============================================================
+    function openCurrencySelection() {
+        if (!isLoggedIn) {
+            showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
+            return;
+        }
+        closeAll();
+        document.getElementById('currencyModal').style.display = 'flex';
+    }
+
+    function updatePaymentMethodDisplay() {
+        const method = document.getElementById('paymentMethod').value;
+        const display = document.getElementById('selectedPaymentInfo');
+        const nameSpan = document.getElementById('paymentMethodName');
+        
+        const methodNames = {
+            'vodafone': 'فودافون كاش',
+            'instapay': 'إنستا باي',
+            'binance': 'Binance Pay'
+        };
+        
+        if(method && methodNames[method]) {
+            nameSpan.textContent = methodNames[method];
+            display.style.display = 'block';
+        } else {
+            display.style.display = 'none';
+        }
+    }
+
+    function handleCurrencyChoice(currency) {
+        if (!isLoggedIn) return;
+        
+        selectedCurrency = currency;
+        closeAll();
+        const methodSelect = document.getElementById('paymentMethod');
+        methodSelect.innerHTML = '';
+        document.getElementById('topUpAmount').value = '';
+        document.getElementById('finalRequiredAmount').innerText = '0';
+        document.getElementById('calculationDisplay').style.display = 'none';
+        document.getElementById('selectedPaymentInfo').style.display = 'none';
+        
+        if(currency === 'USD') {
+            document.getElementById('topUpTitle').innerText = "شحن رصيد (دولار)";
+            document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (USD):";
+            const options = [{val: 'binance', text: 'Binance Pay'}, {val: 'vodafone', text: 'فودافون كاش'}, {val: 'instapay', text: 'إنستا باي'}];
+            options.forEach(opt => { let el = document.createElement('option'); el.value = opt.val; el.innerText = opt.text; methodSelect.appendChild(el); });
+        } else {
+            document.getElementById('topUpTitle').innerText = "شحن رصيد (جنيه مصري)";
+            document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (EGP):";
+            const options = [{val: 'vodafone', text: 'فودافون كاش'}, {val: 'instapay', text: 'إنستا باي'}];
+            options.forEach(opt => { let el = document.createElement('option'); el.value = opt.val; el.innerText = opt.text; methodSelect.appendChild(el); });
+        }
+        updatePaymentDetails();
+        updatePaymentMethodDisplay();
+        document.getElementById('topUpModal').style.display = 'flex';
+    }
+
+    function calculateRequiredAmount() {
+        const amount = parseFloat(document.getElementById('topUpAmount').value) || 0;
+        const method = document.getElementById('paymentMethod').value;
+        const display = document.getElementById('calculationDisplay');
+        const finalLabel = document.getElementById('finalRequiredAmount');
+        if(amount <= 0) { display.style.display = 'none'; return; }
         display.style.display = 'block';
-    } else {
-        display.style.display = 'none';
+        if(selectedCurrency === 'USD') {
+            if(method === 'binance') finalLabel.innerText = amount + " USDT";
+            else finalLabel.innerText = (amount * 50) + " جنيه مصري";
+        } else { finalLabel.innerText = amount + " جنيه مصري"; }
     }
-}
 
-function handleCurrencyChoice(currency) {
-    if (!isLoggedIn) return;
-    
-    selectedCurrency = currency;
-    closeAll();
-    const methodSelect = document.getElementById('paymentMethod');
-    methodSelect.innerHTML = '';
-    document.getElementById('topUpAmount').value = '';
-    document.getElementById('finalRequiredAmount').innerText = '0';
-    document.getElementById('calculationDisplay').style.display = 'none';
-    document.getElementById('selectedPaymentInfo').style.display = 'none';
-    
-    if(currency === 'USD') {
-        document.getElementById('topUpTitle').innerText = "شحن رصيد (دولار)";
-        document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (USD):";
-        const options = [{val: 'binance', text: 'Binance Pay'}, {val: 'vodafone', text: 'فودافون كاش'}, {val: 'instapay', text: 'إنستا باي'}];
-        options.forEach(opt => { let el = document.createElement('option'); el.value = opt.val; el.innerText = opt.text; methodSelect.appendChild(el); });
-    } else {
-        document.getElementById('topUpTitle').innerText = "شحن رصيد (جنيه مصري)";
-        document.getElementById('amountLabel').innerText = "المبلغ المراد إيداعه (EGP):";
-        const options = [{val: 'vodafone', text: 'فودافون كاش'}, {val: 'instapay', text: 'إنستا باي'}];
-        options.forEach(opt => { let el = document.createElement('option'); el.value = opt.val; el.innerText = opt.text; methodSelect.appendChild(el); });
+    function updatePaymentDetails() {
+        const method = document.getElementById('paymentMethod').value;
+        const walletBox = document.getElementById('walletBox');
+        const binanceDetails = document.getElementById('binanceDetails');
+        const hint = document.getElementById('methodHint');
+        walletBox.style.display = 'none'; binanceDetails.style.display = 'none';
+        if(method === 'binance') { binanceDetails.style.display = 'block'; hint.innerText = "بيانات الدفع عبر Binance Pay:"; }
+        else { walletBox.style.display = 'flex'; hint.innerText = "حول للرقم التالي:"; document.getElementById('walletNumber').innerText = "01022797043"; }
+        calculateRequiredAmount();
+        updatePaymentMethodDisplay();
     }
-    updatePaymentDetails();
-    updatePaymentMethodDisplay();
-    document.getElementById('topUpModal').style.display = 'flex';
-}
 
-function calculateRequiredAmount() {
-    const amount = parseFloat(document.getElementById('topUpAmount').value) || 0;
-    const method = document.getElementById('paymentMethod').value;
-    const display = document.getElementById('calculationDisplay');
-    const finalLabel = document.getElementById('finalRequiredAmount');
-    if(amount <= 0) { display.style.display = 'none'; return; }
-    display.style.display = 'block';
-    if(selectedCurrency === 'USD') {
-        if(method === 'binance') finalLabel.innerText = amount + " USDT";
-        else finalLabel.innerText = (amount * 50) + " جنيه مصري";
-    } else { finalLabel.innerText = amount + " جنيه مصري"; }
-}
-
-function updatePaymentDetails() {
-    const method = document.getElementById('paymentMethod').value;
-    const walletBox = document.getElementById('walletBox');
-    const binanceDetails = document.getElementById('binanceDetails');
-    const hint = document.getElementById('methodHint');
-    walletBox.style.display = 'none'; binanceDetails.style.display = 'none';
-    if(method === 'binance') { binanceDetails.style.display = 'block'; hint.innerText = "بيانات الدفع عبر Binance Pay:"; }
-    else { walletBox.style.display = 'flex'; hint.innerText = "حول للرقم التالي:"; document.getElementById('walletNumber').innerText = "01022797043"; }
-    calculateRequiredAmount();
-    updatePaymentMethodDisplay();
-}
-
-async function submitTopUp() {
-    if (!isLoggedIn) {
-        showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
-        return;
-    }
-    
-    if (isSubmittingTopUp) {
-        showToast('⏳', 'جارٍ معالجة الطلب السابق...');
-        return;
-    }
-    
-    const amount = document.getElementById('topUpAmount').value;
-    const paymentMethod = document.getElementById('paymentMethod').value;
-    const fileInput = document.getElementById('topUpReceipt');
-    
-    if (!amount || amount <= 0) {
-        showToast('⚠️', 'أدخل مبلغاً صحيحاً');
-        return;
-    }
-    if (!paymentMethod) {
-        showToast('⚠️', 'يرجى اختيار وسيلة الدفع');
-        return;
-    }
-    if (fileInput.files.length === 0) {
-        showToast('⚠️', 'يرجى رفع صورة الإيصال');
-        return;
-    }
-    
-    isSubmittingTopUp = true;
-    const submitBtn = document.getElementById('submitTopUpBtn');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الإرسال...';
-    submitBtn.disabled = true;
-    
-    try {
-        const user = currentUser;
-        if (!user) {
-            showToast('❌', 'يجب تسجيل الدخول أولاً');
+    async function submitTopUp() {
+        if (!isLoggedIn) {
+            showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
             return;
         }
         
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            try {
-                const generatedId = "DEP-" + Date.now();
-                const methodNames = {
-                    'vodafone': 'فودافون كاش',
-                    'instapay': 'إنستا باي',
-                    'binance': 'Binance Pay'
-                };
-                const methodName = methodNames[paymentMethod] || paymentMethod;
-                
-                const orderData = {
-                    orderId: generatedId,
-                    userId: user.numericId,
-                    username: user.username,
-                    nickname: user.nickname || user.username,
-                    product: `إيداع ${selectedCurrency} عبر ${methodName}`,
-                    price: `${amount} ${selectedCurrency}`,
-                    paymentMethod: paymentMethod,
-                    method: methodName,
-                    currency: selectedCurrency,
-                    receipt: e.target.result,
-                    status: 'قيد المراجعة',
-                    type: 'deposit',
-                    createdAt: new Date().toISOString(),
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                };
-                
-                await db.ref('orders').push(orderData);
-                
-                const notification = {
-                    id: Date.now(),
-                    text: `⏳ تم استلام إيصال الإيداع عبر ${methodName}. معرف الطلب: ${generatedId}. برجاء الانتظار لحين اكتمال الطلب من قبل الإدارة.`,
-                    read: false,
-                    date: new Date().toLocaleString('ar-EG'),
-                    type: 'deposit',
-                    createdAt: new Date().toISOString()
-                };
-                
-                await db.ref('users/' + user.firebaseKey + '/notifications').push(notification);
-                
-                showToast('✅', `تم إرسال طلب الشحن عبر ${methodName} بنجاح`);
-                closeAll();
-                
-            } catch (error) {
-                console.error('Top-up processing error:', error);
-                showToast('❌', 'حدث خطأ أثناء معالجة الطلب');
-            } finally {
+        if (isSubmittingTopUp) {
+            showToast('⏳', 'جارٍ معالجة الطلب السابق...');
+            return;
+        }
+        
+        const amount = document.getElementById('topUpAmount').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const fileInput = document.getElementById('topUpReceipt');
+        
+        if (!amount || amount <= 0) {
+            showToast('⚠️', 'أدخل مبلغاً صحيحاً');
+            return;
+        }
+        if (!paymentMethod) {
+            showToast('⚠️', 'يرجى اختيار وسيلة الدفع');
+            return;
+        }
+        if (fileInput.files.length === 0) {
+            showToast('⚠️', 'يرجى رفع صورة الإيصال');
+            return;
+        }
+        
+        isSubmittingTopUp = true;
+        const submitBtn = document.getElementById('submitTopUpBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الإرسال...';
+        submitBtn.disabled = true;
+        
+        try {
+            const user = currentUser;
+            if (!user) {
+                showToast('❌', 'يجب تسجيل الدخول أولاً');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const generatedId = "DEP-" + Date.now();
+                    const methodNames = {
+                        'vodafone': 'فودافون كاش',
+                        'instapay': 'إنستا باي',
+                        'binance': 'Binance Pay'
+                    };
+                    const methodName = methodNames[paymentMethod] || paymentMethod;
+                    
+                    const orderData = {
+                        orderId: generatedId,
+                        userId: user.numericId,
+                        username: user.username,
+                        nickname: user.nickname || user.username,
+                        product: `إيداع ${selectedCurrency} عبر ${methodName}`,
+                        price: `${amount} ${selectedCurrency}`,
+                        paymentMethod: paymentMethod,
+                        method: methodName,
+                        currency: selectedCurrency,
+                        receipt: e.target.result,
+                        status: 'قيد المراجعة',
+                        type: 'deposit',
+                        createdAt: new Date().toISOString(),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    };
+                    
+                    await db.ref('orders').push(orderData);
+                    
+                    const notification = {
+                        id: Date.now(),
+                        text: `⏳ تم استلام إيصال الإيداع عبر ${methodName}. معرف الطلب: ${generatedId}. برجاء الانتظار لحين اكتمال الطلب من قبل الإدارة.`,
+                        read: false,
+                        date: new Date().toLocaleString('ar-EG'),
+                        type: 'deposit',
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    await db.ref('users/' + user.firebaseKey + '/notifications').push(notification);
+                    
+                    showToast('✅', `تم إرسال طلب الشحن عبر ${methodName} بنجاح`);
+                    closeAll();
+                    
+                } catch (error) {
+                    console.error('Top-up processing error:', error);
+                    showToast('❌', 'حدث خطأ أثناء معالجة الطلب');
+                } finally {
+                    isSubmittingTopUp = false;
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            };
+            
+            reader.onerror = function() {
+                showToast('❌', 'خطأ في قراءة ملف الإيصال');
                 isSubmittingTopUp = false;
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
-            }
-        };
-        
-        reader.onerror = function() {
-            showToast('❌', 'خطأ في قراءة ملف الإيصال');
+            };
+            
+            reader.readAsDataURL(fileInput.files[0]);
+            
+        } catch (error) {
+            console.error('Top-up error:', error);
+            showToast('❌', 'حدث خطأ أثناء إرسال الطلب');
             isSubmittingTopUp = false;
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-        };
-        
-        reader.readAsDataURL(fileInput.files[0]);
-        
-    } catch (error) {
-        console.error('Top-up error:', error);
-        showToast('❌', 'حدث خطأ أثناء إرسال الطلب');
-        isSubmittingTopUp = false;
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-}
-
-// ============================================================
-// 🧭 التنقل بين الصفحات
-// ============================================================
-function showHome() {
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('navHome').classList.add('active');
-    showToast('🏠', 'العودة إلى الرئيسية');
-}
-
-function showGames() {
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('navGames').classList.add('active');
-    showToast('🎮', 'سيتم إضافة الألعاب قريباً');
-}
-
-function showMessages() {
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('navMessages').classList.add('active');
-    showToast('💬', 'سيتم عرض الرسائل هنا');
-}
-
-// ============================================================
-// 🚀 التهيئة عند تحميل الصفحة
-// ============================================================
-window.onload = function() {
-    initFirebase();
-
-    // تحديث قائمة المستخدمين كل 10 ثواني
-    setInterval(() => {
-        if (isLoggedIn) {
-            loadAvailableUsers();
         }
-    }, 10000);
+    }
 
-    // تحديث حالة الاتصال
-    setInterval(() => {
-        if (isLoggedIn && currentUser?.firebaseKey && db) {
-            db.ref('users/' + currentUser.firebaseKey).update({
-                isOnline: true,
-                lastSeen: new Date().toISOString()
+    // ============================================================
+    // 🧭 التنقل بين الصفحات
+    // ============================================================
+    function showHome() {
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('navHome').classList.add('active');
+        showToast('🏠', 'العودة إلى الرئيسية');
+    }
+
+    function showGames() {
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('navGames').classList.add('active');
+        showToast('🎮', 'سيتم إضافة الألعاب قريباً');
+    }
+
+    function showMessages() {
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('navMessages').classList.add('active');
+        showToast('💬', 'سيتم عرض الرسائل هنا');
+    }
+
+    // ============================================================
+    // 🚀 التهيئة عند تحميل الصفحة
+    // ============================================================
+    window.onload = function() {
+        initFirebase();
+
+        setInterval(() => {
+            if (isLoggedIn) {
+                loadAvailableUsers();
+            }
+        }, 10000);
+
+        setInterval(() => {
+            if (isLoggedIn && currentUser?.firebaseKey && db) {
+                db.ref('users/' + currentUser.firebaseKey).update({
+                    isOnline: true,
+                    lastSeen: new Date().toISOString()
+                });
+            }
+        }, 30000);
+
+        setInterval(checkBanStatus, 30000);
+
+        setTimeout(async () => {
+            await listenForRealTimeNotifications();
+        }, 2000);
+
+        setInterval(async () => {
+            await refreshWalletData();
+        }, 60000);
+
+        if (db) {
+            db.ref('users').on('value', () => {
+                if (isLoggedIn) {
+                    loadAvailableUsers();
+                }
             });
         }
-    }, 30000);
 
-    console.log('🎙️ VIP Chat جاهز!');
-    console.log('✅ تقسيم الشاشة بالطول (يمين/يسار)');
-    console.log('✅ جميع بيانات المستخدم من Firebase');
-    console.log('✅ شريط الدردشة وأزرار التحكم في الأسفل');
-    console.log('✅ نافذة أذن الوصول للكاميرا والميكروفون');
-    console.log('✅ وضع المكالمة (فيديو/صوت فقط)');
-    
-    // إغلاق المودالات عند النقر خارجها
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.navbar') && !e.target.closest('.dropdown-overlay') && !e.target.closest('.permission-modal') && !e.target.closest('.gift-modal')) {
-            document.getElementById('profileDropdown').style.display = 'none';
-            document.getElementById('notifDropdown').style.display = 'none';
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.navbar') && !e.target.closest('.dropdown-overlay') && !e.target.closest('.permission-modal') && !e.target.closest('.gift-modal')) {
+                document.getElementById('profileDropdown').style.display = 'none';
+                document.getElementById('notifDropdown').style.display = 'none';
+            }
+        });
+
+        console.log('🎙️ VIP Chat جاهز!');
+        console.log('✅ جميع الميزات مفعلة');
+    };
+
+    // ============================================================
+    // 🔧 دوال إضافية للتوافق مع الكود الأصلي
+    // ============================================================
+    function getCurrentUserFromStorage() {
+        try {
+            return JSON.parse(localStorage.getItem('currentUser'));
+        } catch (error) {
+            return null;
         }
-    });
-};
+    }
+
+    async function refreshUserData() {
+        if (!currentUser || !currentUser.firebaseKey) return;
+        try {
+            const snapshot = await db.ref('users/' + currentUser.firebaseKey).once('value');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                currentUser = { ...currentUser, ...data };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUI();
+            }
+        } catch (e) {
+            console.error('Error refreshing user data:', e);
+        }
+    }
+
+    function showDesktopNotification(title, message, type = 'info') {
+        if (desktopNotificationShown) return;
+        if ("Notification" in window && Notification.permission === "granted") {
+            try {
+                const notif = new Notification(title, {
+                    body: message,
+                    icon: 'images/videoslogo/vip.png'
+                });
+                setTimeout(() => notif.close(), 5000);
+                return;
+            } catch (e) {
+                console.log('Notification error:', e);
+            }
+        }
+        showToast(title, message);
+        desktopNotificationShown = true;
+        setTimeout(() => {
+            desktopNotificationShown = false;
+        }, 5000);
+    }
+
+    function playNotificationSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            if ('vibrate' in navigator) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        } catch (error) {
+            console.log('Sound not available:', error);
+        }
+    }
+
+    async function checkBanStatus() {
+        if (!currentUser) return;
+        try {
+            const snapshot = await db.ref('users/' + currentUser.firebaseKey).once('value');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                if (data.isBanned) {
+                    if (window.isBanAlerting) return;
+                    window.isBanAlerting = true;
+                    let banDuration = "دائم";
+                    if (data.banExpiry && data.banExpiry !== 'permanent') {
+                        const expiryDate = new Date(data.banExpiry);
+                        const now = new Date();
+                        if (expiryDate > now) {
+                            const diffMs = expiryDate - now;
+                            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            banDuration = `${diffDays} يوم و ${diffHours} ساعة`;
+                        } else {
+                            banDuration = "منتهي";
+                        }
+                    }
+                    alert(`🚫 تم حظر حسابك من قبل الإدارة!\n\nالسبب: ${data.banReason || "غير محدد"}\nالمدة: ${banDuration}\n\nيرجى مراجعة الدعم الفني.`);
+                    await logout();
+                }
+            }
+        } catch (error) {
+            console.error('Error checking ban status:', error);
+        }
+    }
+
+    function generateNumericId() {
+        return Math.floor(100000 + Math.random() * 900000);
+    }
+
+    async function listenForRealTimeNotifications() {
+        if (!currentUser || !db || !currentUser.firebaseKey) return;
+        const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+        let lastProcessedId = localStorage.getItem('lastProcessedNotificationId') || null;
+        notifRef.orderByChild('createdAt').limitToLast(1).on('child_added', (snapshot) => {
+            const newNotif = snapshot.val();
+            const notifId = snapshot.key;
+            if (lastProcessedId === notifId) return;
+            if (newNotif && !newNotif.read) {
+                localStorage.setItem('lastProcessedNotificationId', notifId);
+                lastProcessedId = notifId;
+                if (notificationCooldown) return;
+                notificationCooldown = true;
+                if (newNotif.type === 'purchase_approved') {
+                    showDesktopNotification('✅ تم قبول طلبك', newNotif.text, 'success');
+                    showToast('🎉', 'تم قبول طلبك!');
+                } else if (newNotif.type === 'purchase_rejected') {
+                    showDesktopNotification('❌ تم رفض طلبك', newNotif.text, 'error');
+                    showToast('⚠️', 'تم رفض طلبك. تحقق من الإشعارات للتفاصيل');
+                } else if (newNotif.type === 'deposit') {
+                    showDesktopNotification('💰 تحديث في الإيداع', newNotif.text, 'success');
+                } else {
+                    showToast('🔔', newNotif.text);
+                }
+                setTimeout(() => {
+                    notificationCooldown = false;
+                }, 3000);
+            }
+        });
+    }
+
+    async function prepareForWallet() {
+        try {
+            if (!isLoggedIn || !currentUser) {
+                showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
+                return false;
+            }
+            const walletData = {
+                id: currentUser.numericId || currentUser.id,
+                nickname: currentUser.nickname || currentUser.username,
+                balanceEGP: currentUser.balanceEGP || "0",
+                balanceUSD: currentUser.balanceUSD || "0",
+                numericId: currentUser.numericId,
+                username: currentUser.username,
+                email: currentUser.email || '',
+                phone: currentUser.phone || '',
+                firebaseKey: currentUser.firebaseKey,
+                purchasedCards: currentUser.purchasedCards || []
+            };
+            localStorage.setItem('walletUserData', JSON.stringify(walletData));
+            const walletSession = {
+                timestamp: Date.now(),
+                userId: currentUser.numericId,
+                sessionId: 'wallet_' + Date.now()
+            };
+            localStorage.setItem('walletSession', JSON.stringify(walletSession));
+            showToast('✅', 'تم تحضير بيانات المحفظة');
+            return true;
+        } catch (error) {
+            console.error('Error preparing wallet data:', error);
+            showToast('❌', 'خطأ في تحضير بيانات المحفظة');
+            return false;
+        }
+    }
+
+    async function refreshWalletData() {
+        try {
+            if (!isLoggedIn || !currentUser) return false;
+            const walletData = {
+                id: currentUser.numericId || currentUser.id,
+                nickname: currentUser.nickname || currentUser.username,
+                balanceEGP: currentUser.balanceEGP || "0",
+                balanceUSD: currentUser.balanceUSD || "0",
+                numericId: currentUser.numericId,
+                username: currentUser.username,
+                email: currentUser.email || '',
+                phone: currentUser.phone || '',
+                firebaseKey: currentUser.firebaseKey,
+                purchasedCards: currentUser.purchasedCards || []
+            };
+            localStorage.setItem('walletUserData', JSON.stringify(walletData));
+            return true;
+        } catch (error) {
+            console.error('Error refreshing wallet data:', error);
+            return false;
+        }
+    }
+
+    function openProfileDropdown() {
+        if (!isLoggedIn) {
+            showToast('⚠️', 'يرجى تسجيل الدخول أولاً');
+            return;
+        }
+        const dropdown = document.getElementById('profileDropdown');
+        if (dropdown.style.display === 'flex') {
+            dropdown.style.display = 'none';
+        } else {
+            dropdown.style.display = 'flex';
+            updateUI();
+        }
+    }
+</script>
+</body>
+</html>
