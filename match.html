@@ -1481,7 +1481,7 @@
     // ============================================================
     // 📦 المتغيرات العامة
     // ============================================================
-    let app, db, auth;
+    let db;
     let localStream = null;
     let currentRoom = null;
     let currentPartner = null;
@@ -1503,68 +1503,19 @@
     let desktopNotificationShown = false;
 
     // ============================================================
-    // 🚀 تهيئة Firebase
+    // 🚀 تهيئة Firebase وقراءة المستخدم من localStorage
     // ============================================================
-    async function initFirebase() {
+    function initFirebase() {
         try {
             if (firebase.apps.length > 0) {
-                await firebase.app().delete();
+                firebase.app().delete();
             }
-            app = firebase.initializeApp(firebaseConfig);
+            firebase.initializeApp(firebaseConfig);
             db = firebase.database();
-            auth = firebase.auth();
+            console.log('✅ Firebase initialized');
 
-            const savedUser = JSON.parse(localStorage.getItem('currentUser'));
-
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = await fetchUserFromFirebase(user);
-                    if (currentUser) {
-                        isLoggedIn = true;
-                        updateUI();
-                        listenNotifications();
-                        document.getElementById('authBtn').textContent = 'تسجيل الخروج';
-                        document.getElementById('authBtn').className = 'auth-btn logout-btn';
-                        loadAvailableUsers();
-                        if (currentUser.firebaseKey) {
-                            db.ref('users/' + currentUser.firebaseKey).update({
-                                isOnline: true,
-                                lastSeen: new Date().toISOString()
-                            });
-                        }
-                        showToast('👋', 'مرحباً ' + (currentUser.nickname || currentUser.username || ''));
-                        if (!permissionGranted) {
-                            document.getElementById('permissionModal').classList.add('active');
-                        }
-                    }
-                } else if (savedUser && savedUser.numericId) {
-                    try {
-                        await auth.signInAnonymously();
-                        return;
-                    } catch (e) {
-                        console.log('Auto-login failed');
-                    }
-                    isLoggedIn = false;
-                    currentUser = null;
-                    updateUI();
-                    document.getElementById('authBtn').textContent = 'تسجيل الدخول';
-                    document.getElementById('authBtn').className = 'auth-btn';
-                    document.getElementById('matchBtn').disabled = true;
-                    document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-                    showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
-                } else {
-                    isLoggedIn = false;
-                    currentUser = null;
-                    updateUI();
-                    document.getElementById('authBtn').textContent = 'تسجيل الدخول';
-                    document.getElementById('authBtn').className = 'auth-btn';
-                    document.getElementById('matchBtn').disabled = true;
-                    document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-                    if (!savedUser) {
-                        showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
-                    }
-                }
-            });
+            // ===== قراءة بيانات المستخدم من localStorage =====
+            loadUserFromLocalStorage();
 
         } catch (error) {
             console.error('Firebase init error:', error);
@@ -1573,36 +1524,58 @@
     }
 
     // ============================================================
-    // 👤 جلب بيانات المستخدم من Firebase
+    // 👤 تحميل بيانات المستخدم من localStorage
     // ============================================================
-    async function fetchUserFromFirebase(user) {
+    function loadUserFromLocalStorage() {
         try {
-            const snapshot = await db.ref('users').orderByChild('uid').equalTo(user.uid).once('value');
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                const key = Object.keys(data)[0];
-                const userData = { ...data[key], firebaseKey: key, uid: user.uid };
-                localStorage.setItem('currentUser', JSON.stringify(userData));
-                return userData;
+            const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (savedUser && savedUser.numericId) {
+                currentUser = savedUser;
+                isLoggedIn = true;
+                console.log('✅ تم استعادة بيانات المستخدم:', currentUser.nickname || currentUser.username);
+
+                updateUI();
+                updateNotifBadge();
+
+                document.getElementById('authBtn').textContent = 'تسجيل الخروج';
+                document.getElementById('authBtn').className = 'auth-btn logout-btn';
+
+                loadAvailableUsers();
+                showToast('👋', 'مرحباً ' + (currentUser.nickname || currentUser.username || ''));
+
+                if (currentUser.firebaseKey) {
+                    db.ref('users/' + currentUser.firebaseKey).update({
+                        isOnline: true,
+                        lastSeen: new Date().toISOString()
+                    });
+                }
+
+                listenNotifications();
+
+                // عرض نافذة الأذن للكاميرا والميكروفون
+                if (!permissionGranted) {
+                    document.getElementById('permissionModal').classList.add('active');
+                }
+
+                return true;
+            } else {
+                console.log('⚠️ لا توجد بيانات مستخدم في localStorage');
+                isLoggedIn = false;
+                currentUser = null;
+                updateUI();
+                document.getElementById('authBtn').textContent = 'تسجيل الدخول';
+                document.getElementById('authBtn').className = 'auth-btn';
+                document.getElementById('matchBtn').disabled = true;
+                document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
+                return false;
             }
-            const newUser = {
-                uid: user.uid,
-                nickname: user.displayName || 'مستخدم_' + Math.floor(Math.random() * 1000),
-                numericId: Math.floor(100000 + Math.random() * 900000),
-                balanceEGP: 0,
-                balanceUSD: 0,
-                createdAt: new Date().toISOString(),
-                isOnline: true,
-                lastSeen: new Date().toISOString()
-            };
-            const ref = db.ref('users').push();
-            await ref.set(newUser);
-            const savedUser = { ...newUser, firebaseKey: ref.key };
-            localStorage.setItem('currentUser', JSON.stringify(savedUser));
-            return savedUser;
-        } catch (e) {
-            console.error('Fetch user error:', e);
-            return null;
+        } catch (error) {
+            console.error('Error loading user:', error);
+            isLoggedIn = false;
+            currentUser = null;
+            updateUI();
+            return false;
         }
     }
 
@@ -1637,7 +1610,10 @@
     // ============================================================
     function listenNotifications() {
         if (!currentUser || !db) return;
-        const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+        const userKey = currentUser.firebaseKey || currentUser.id;
+        if (!userKey) return;
+        
+        const notifRef = db.ref('users/' + userKey + '/notifications');
         notifRef.on('value', (snapshot) => {
             let notifications = [];
             let unreadCount = 0;
@@ -1690,7 +1666,7 @@
                                 </div>
                             </div>
                         </div>
-                        <i class="fas fa-trash-alt delete-single-notif" onclick="deleteSingleNotif('${currentUser.firebaseKey}', '${n.id}')" 
+                        <i class="fas fa-trash-alt delete-single-notif" onclick="deleteSingleNotif('${userKey}', '${n.id}')" 
                            style="color:#ef4444; cursor:pointer; padding:5px; opacity:0.6; transition:0.3s; background:rgba(239,68,68,0.1); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center;"></i>
                     `;
                     list.appendChild(div);
@@ -1702,7 +1678,10 @@
     async function updateNotifBadge() {
         try {
             if (!currentUser || !db) return;
-            const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+            const userKey = currentUser.firebaseKey || currentUser.id;
+            if (!userKey) return;
+            
+            const notifRef = db.ref('users/' + userKey + '/notifications');
             const snapshot = await notifRef.once('value');
             let unreadCount = 0;
             if (snapshot.exists()) {
@@ -1745,8 +1724,11 @@
 
     async function markAllRead() {
         try {
-            if (!currentUser || !db || !currentUser.firebaseKey) return;
-            const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+            if (!currentUser || !db) return;
+            const userKey = currentUser.firebaseKey || currentUser.id;
+            if (!userKey) return;
+            
+            const notifRef = db.ref('users/' + userKey + '/notifications');
             const snapshot = await notifRef.once('value');
             if (snapshot.exists()) {
                 const updates = {};
@@ -1765,8 +1747,11 @@
     async function deleteAllNotifs() {
         if (!confirm("هل تريد حذف جميع الإشعارات؟")) return;
         try {
-            if (!currentUser || !db || !currentUser.firebaseKey) return;
-            await db.ref('users/' + currentUser.firebaseKey + '/notifications').remove();
+            if (!currentUser || !db) return;
+            const userKey = currentUser.firebaseKey || currentUser.id;
+            if (!userKey) return;
+            
+            await db.ref('users/' + userKey + '/notifications').remove();
             showToast('✅', 'تم حذف جميع الإشعارات');
         } catch (error) {
             console.error('Delete all notifications error:', error);
@@ -1987,11 +1972,12 @@
         }
 
         const roomId = 'room_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        const userKey = currentUser.firebaseKey || currentUser.id;
 
         try {
             const roomRef = db.ref('rooms/' + roomId);
             await roomRef.set({
-                host: currentUser.firebaseKey,
+                host: userKey,
                 hostNickname: currentUser.nickname || currentUser.username,
                 hostId: currentUser.numericId,
                 status: 'waiting',
@@ -2029,8 +2015,8 @@
                     listenGifts();
                     listenRoomChanges();
 
-                    if (currentUser?.firebaseKey) {
-                        db.ref('users/' + currentUser.firebaseKey).update({
+                    if (userKey) {
+                        db.ref('users/' + userKey).update({
                             inCall: true,
                             currentRoom: roomId
                         });
@@ -2147,8 +2133,9 @@
             currentRoom = null;
         }
 
-        if (currentUser?.firebaseKey) {
-            db.ref('users/' + currentUser.firebaseKey).update({
+        const userKey = currentUser?.firebaseKey || currentUser?.id;
+        if (userKey) {
+            db.ref('users/' + userKey).update({
                 inCall: false,
                 currentRoom: null
             });
@@ -2185,8 +2172,9 @@
 
         addChatMessage('local', text);
         const msgRef = db.ref('rooms/' + currentRoom + '/messages').push();
+        const userKey = currentUser.firebaseKey || currentUser.id;
         msgRef.set({
-            sender: currentUser.firebaseKey,
+            sender: userKey,
             senderName: currentUser.nickname || currentUser.username,
             text: text,
             timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -2213,7 +2201,8 @@
         msgRef.off();
         msgRef.on('child_added', (snapshot) => {
             const data = snapshot.val();
-            if (data && data.sender !== currentUser.firebaseKey) {
+            const userKey = currentUser.firebaseKey || currentUser.id;
+            if (data && data.sender !== userKey) {
                 addChatMessage('remote', data.text, data.senderName);
             }
         });
@@ -2248,8 +2237,9 @@
         }
 
         currentUser.balanceEGP -= price;
-        if (currentUser.firebaseKey) {
-            db.ref('users/' + currentUser.firebaseKey).update({
+        const userKey = currentUser.firebaseKey || currentUser.id;
+        if (userKey) {
+            db.ref('users/' + userKey).update({
                 balanceEGP: currentUser.balanceEGP
             });
         }
@@ -2259,7 +2249,7 @@
 
         const giftRef = db.ref('rooms/' + currentRoom + '/gifts').push();
         giftRef.set({
-            from: currentUser.firebaseKey,
+            from: userKey,
             to: currentPartner.firebaseKey,
             name: name,
             price: price,
@@ -2275,7 +2265,8 @@
         giftRef.off();
         giftRef.on('child_added', (snapshot) => {
             const data = snapshot.val();
-            if (data && data.from !== currentUser.firebaseKey) {
+            const userKey = currentUser.firebaseKey || currentUser.id;
+            if (data && data.from !== userKey) {
                 addChatMessage('system', `🎁 تلقيت هدية: ${data.name} 🎁`, 'نظام');
                 showToast('🎁', `تلقيت هدية ${data.name} من ${currentPartner.nickname}`);
             }
@@ -2369,17 +2360,14 @@
         try {
             if (currentRoom) endCall();
 
-            if (currentUser?.firebaseKey) {
-                await db.ref('users/' + currentUser.firebaseKey).update({
+            const userKey = currentUser?.firebaseKey || currentUser?.id;
+            if (userKey) {
+                await db.ref('users/' + userKey).update({
                     isOnline: false,
                     inCall: false,
                     currentRoom: null,
                     lastSeen: new Date().toISOString()
                 });
-            }
-
-            if (auth) {
-                await auth.signOut();
             }
 
             localStorage.removeItem('currentUser');
@@ -2620,7 +2608,8 @@
                         createdAt: new Date().toISOString()
                     };
                     
-                    await db.ref('users/' + user.firebaseKey + '/notifications').push(notification);
+                    const userKey = user.firebaseKey || user.id;
+                    await db.ref('users/' + userKey + '/notifications').push(notification);
                     
                     showToast('✅', `تم إرسال طلب الشحن عبر ${methodName} بنجاح`);
                     closeAll();
@@ -2687,11 +2676,14 @@
         }, 10000);
 
         setInterval(() => {
-            if (isLoggedIn && currentUser?.firebaseKey && db) {
-                db.ref('users/' + currentUser.firebaseKey).update({
-                    isOnline: true,
-                    lastSeen: new Date().toISOString()
-                });
+            if (isLoggedIn && currentUser) {
+                const userKey = currentUser.firebaseKey || currentUser.id;
+                if (userKey) {
+                    db.ref('users/' + userKey).update({
+                        isOnline: true,
+                        lastSeen: new Date().toISOString()
+                    });
+                }
             }
         }, 30000);
 
@@ -2722,6 +2714,7 @@
 
         console.log('🎙️ VIP Chat جاهز!');
         console.log('✅ جميع الميزات مفعلة');
+        console.log('✅ تم إلغاء Firebase Auth والاعتماد على localStorage');
     };
 
     // ============================================================
@@ -2736,9 +2729,12 @@
     }
 
     async function refreshUserData() {
-        if (!currentUser || !currentUser.firebaseKey) return;
+        if (!currentUser) return;
+        const userKey = currentUser.firebaseKey || currentUser.id;
+        if (!userKey) return;
+        
         try {
-            const snapshot = await db.ref('users/' + currentUser.firebaseKey).once('value');
+            const snapshot = await db.ref('users/' + userKey).once('value');
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 currentUser = { ...currentUser, ...data };
@@ -2794,8 +2790,11 @@
 
     async function checkBanStatus() {
         if (!currentUser) return;
+        const userKey = currentUser.firebaseKey || currentUser.id;
+        if (!userKey) return;
+        
         try {
-            const snapshot = await db.ref('users/' + currentUser.firebaseKey).once('value');
+            const snapshot = await db.ref('users/' + userKey).once('value');
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 if (data.isBanned) {
@@ -2828,8 +2827,11 @@
     }
 
     async function listenForRealTimeNotifications() {
-        if (!currentUser || !db || !currentUser.firebaseKey) return;
-        const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+        if (!currentUser || !db) return;
+        const userKey = currentUser.firebaseKey || currentUser.id;
+        if (!userKey) return;
+        
+        const notifRef = db.ref('users/' + userKey + '/notifications');
         let lastProcessedId = localStorage.getItem('lastProcessedNotificationId') || null;
         notifRef.orderByChild('createdAt').limitToLast(1).on('child_added', (snapshot) => {
             const newNotif = snapshot.val();
