@@ -27,7 +27,8 @@
             --text-dim: #94a3b8;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             overflow: hidden;
         }
@@ -148,8 +149,6 @@
             position: relative;
             overflow: hidden;
             min-height: 0;
-            height: calc(100vh - 54px - 180px - 48px);
-            /* navbar + control-bottom + bottom-nav */
         }
 
         .video-wrapper {
@@ -813,9 +812,7 @@
         @media (max-width: 768px) {
             .video-grid {
                 flex-direction: column;
-                height: calc(100vh - 54px - 160px - 44px);
             }
-
             .video-wrapper {
                 border-left: none;
                 border-bottom: 1px solid #1e293b;
@@ -925,10 +922,6 @@
         }
 
         @media (max-width: 400px) {
-            .video-grid {
-                height: calc(100vh - 50px - 140px - 40px);
-            }
-
             .control-bottom {
                 min-height: 70px;
                 padding: 3px 6px 5px;
@@ -1215,7 +1208,7 @@
         let allAvailableUsers = [];
 
         // ============================================================
-        // 🚀 تهيئة Firebase وجلب بيانات المستخدم مباشرة
+        // 🚀 تهيئة Firebase
         // ============================================================
         async function initFirebase() {
             try {
@@ -1226,9 +1219,12 @@
                 db = firebase.database();
                 auth = firebase.auth();
 
+                // محاولة استعادة الجلسة من localStorage
+                const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
-                        // جلب بيانات المستخدم من Firebase مباشرة
+                        // جلب بيانات المستخدم من Firebase
                         currentUser = await fetchUserFromFirebase(user);
                         if (currentUser) {
                             isLoggedIn = true;
@@ -1237,7 +1233,6 @@
                             document.getElementById('authBtn').textContent = 'تسجيل الخروج';
                             document.getElementById('authBtn').className = 'auth-btn logout-btn';
                             loadAvailableUsers();
-                            // تحديث حالة الاتصال
                             if (currentUser.firebaseKey) {
                                 db.ref('users/' + currentUser.firebaseKey).update({
                                     isOnline: true,
@@ -1246,18 +1241,15 @@
                             }
                             showToast('👋', 'مرحباً ' + (currentUser.nickname || ''));
                         }
-                    } else {
-                        // محاولة استعادة الجلسة من localStorage
-                        const savedUser = JSON.parse(localStorage.getItem('currentUser'));
-                        if (savedUser && savedUser.numericId) {
-                            // محاولة تسجيل الدخول التلقائي
-                            try {
-                                await auth.signInAnonymously();
-                                return;
-                            } catch (e) {
-                                console.log('Auto-login failed');
-                            }
+                    } else if (savedUser && savedUser.numericId) {
+                        // محاولة تسجيل الدخول التلقائي
+                        try {
+                            await auth.signInAnonymously();
+                            return;
+                        } catch (e) {
+                            console.log('Auto-login failed');
                         }
+                        // إذا فشل تسجيل الدخول التلقائي، نعرض واجهة تسجيل الدخول
                         isLoggedIn = false;
                         currentUser = null;
                         updateUI();
@@ -1266,6 +1258,17 @@
                         document.getElementById('matchBtn').disabled = true;
                         document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
                         showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
+                    } else {
+                        isLoggedIn = false;
+                        currentUser = null;
+                        updateUI();
+                        document.getElementById('authBtn').textContent = 'تسجيل الدخول';
+                        document.getElementById('authBtn').className = 'auth-btn';
+                        document.getElementById('matchBtn').disabled = true;
+                        document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
+                        if (!savedUser) {
+                            showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
+                        }
                     }
                 });
 
@@ -1276,7 +1279,7 @@
         }
 
         // ============================================================
-        // 👤 جلب بيانات المستخدم من Firebase مباشرة
+        // 👤 جلب بيانات المستخدم من Firebase
         // ============================================================
         async function fetchUserFromFirebase(user) {
             try {
@@ -1391,7 +1394,7 @@
         }
 
         // ============================================================
-        // 📋 تحميل المستخدمين المتاحين من Firebase
+        // 📋 تحميل المستخدمين المتاحين
         // ============================================================
         async function loadAvailableUsers() {
             if (!db) return;
@@ -1588,7 +1591,7 @@
         }
 
         // ============================================================
-        // 🔍 البحث عن شريك حقيقي من Firebase
+        // 🔍 البحث عن شريك حقيقي
         // ============================================================
         async function findRealPartner(roomId) {
             try {
@@ -1936,15 +1939,7 @@
         // 🚀 التهيئة عند تحميل الصفحة
         // ============================================================
         window.onload = function() {
-            // التحقق من وجود بيانات مستخدم في localStorage
-            const savedUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (savedUser && savedUser.numericId) {
-                // محاولة استعادة الجلسة
-                initFirebase();
-            } else {
-                initFirebase();
-                showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
-            }
+            initFirebase();
 
             // تحديث قائمة المستخدمين كل 10 ثواني
             setInterval(() => {
