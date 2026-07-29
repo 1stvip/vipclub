@@ -7,7 +7,6 @@
     <link rel="shortcut icon" href="images/videoslogo/vip.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         * {
@@ -210,7 +209,7 @@
             font-size: 0.9rem;
         }
 
-        /* ===== تراكب معلومات المستخدم ===== */
+        /* ===== تراكب معلومات المستخدم (مع الصورة) ===== */
         .user-overlay {
             position: absolute;
             bottom: 10px;
@@ -218,13 +217,39 @@
             background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(10px);
             padding: 6px 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
+        }
+
+        .user-overlay .user-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .user-overlay .user-avatar-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-overlay .user-avatar-small .avatar-placeholder {
+            font-size: 0.9rem;
         }
 
         .user-overlay .username {
@@ -1009,6 +1034,11 @@
                 height: 8px;
             }
 
+            .user-overlay .user-avatar-small {
+                width: 26px;
+                height: 26px;
+            }
+
             .chat-messages {
                 max-width: 160px;
                 top: 8px;
@@ -1123,6 +1153,11 @@
             .user-avatar-small .status-dot {
                 width: 7px;
                 height: 7px;
+            }
+
+            .user-overlay .user-avatar-small {
+                width: 22px;
+                height: 22px;
             }
 
             .chat-messages {
@@ -1281,6 +1316,9 @@
                 </div>
             </div>
             <div class="user-overlay" id="localOverlay">
+                <div class="user-avatar-small" id="localAvatar">
+                    <span class="avatar-placeholder"><i class="fas fa-user"></i></span>
+                </div>
                 <span class="username" id="localName">...</span>
                 <span class="user-id" id="localId">000000</span>
                 <i class="fas fa-copy copy-id" onclick="copyId('localId')" title="نسخ المعرف"></i>
@@ -1297,6 +1335,9 @@
                 </div>
             </div>
             <div class="user-overlay" id="remoteOverlay" style="display:none;">
+                <div class="user-avatar-small" id="remoteAvatar">
+                    <span class="avatar-placeholder"><i class="fas fa-user"></i></span>
+                </div>
                 <span class="username" id="remoteName">شريك</span>
                 <span class="user-id" id="remoteId">000000</span>
                 <i class="fas fa-copy copy-id" onclick="copyId('remoteId')" title="نسخ المعرف"></i>
@@ -1483,6 +1524,8 @@
     // ============================================================
     let db;
     let localStream = null;
+    let remoteStream = null;
+    let peerConnection = null;
     let currentRoom = null;
     let currentPartner = null;
     let isMatching = false;
@@ -1493,7 +1536,7 @@
     let timerInterval = null;
     let callStartTime = null;
     let allAvailableUsers = [];
-    let callMode = 'video';
+    let callMode = 'video'; // 'video' or 'audio'
     let permissionGranted = false;
     let isProcessingPurchase = false;
     let isSubmittingTopUp = false;
@@ -1514,7 +1557,6 @@
             db = firebase.database();
             console.log('✅ Firebase initialized');
 
-            // ===== قراءة بيانات المستخدم من localStorage =====
             loadUserFromLocalStorage();
 
         } catch (error) {
@@ -1553,7 +1595,6 @@
 
                 listenNotifications();
 
-                // عرض نافذة الأذن للكاميرا والميكروفون
                 if (!permissionGranted) {
                     document.getElementById('permissionModal').classList.add('active');
                 }
@@ -1580,18 +1621,31 @@
     }
 
     // ============================================================
-    // 🎯 تحديث الواجهة
+    // 🎯 تحديث الواجهة مع صورة المستخدم
     // ============================================================
     function updateUI() {
         if (isLoggedIn && currentUser) {
-            document.getElementById('localName').textContent = currentUser.nickname || currentUser.username || 'أنت';
+            const displayName = currentUser.nickname || currentUser.username || 'أنت';
+            document.getElementById('localName').textContent = displayName;
             document.getElementById('localId').textContent = String(currentUser.numericId || '000000').padStart(6, '0');
             document.getElementById('matchBtn').disabled = false;
             document.getElementById('matchStatus').textContent = 'انقر للبحث عن محادثة عشوائية';
-            document.getElementById('p_nickname').textContent = currentUser.nickname || currentUser.username || 'مستخدم';
+            document.getElementById('p_nickname').textContent = displayName;
             document.getElementById('p_id').textContent = String(currentUser.numericId || '000000').padStart(6, '0');
             document.getElementById('p_egp').textContent = currentUser.balanceEGP || '0';
             document.getElementById('p_usd').textContent = currentUser.balanceUSD || '0';
+
+            // تحديث صورة المستخدم المحلي
+            updateUserAvatar('localAvatar', currentUser.avatar, displayName);
+
+            // تحديث صورة الملف الشخصي
+            const profileAvatar = document.getElementById('profileAvatarIcon');
+            if (currentUser.avatar) {
+                profileAvatar.innerHTML = `<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                profileAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+            }
+
         } else {
             document.getElementById('localName').textContent = 'غير مسجل';
             document.getElementById('localId').textContent = '000000';
@@ -1601,8 +1655,25 @@
             document.getElementById('p_id').textContent = '000000';
             document.getElementById('p_egp').textContent = '0';
             document.getElementById('p_usd').textContent = '0';
+            
+            // صورة افتراضية للمستخدم المحلي
+            const localAvatar = document.getElementById('localAvatar');
+            localAvatar.innerHTML = `<span class="avatar-placeholder"><i class="fas fa-user"></i></span>`;
         }
         updateNotifBadge();
+    }
+
+    // ============================================================
+    // 🖼️ تحديث صورة المستخدم
+    // ============================================================
+    function updateUserAvatar(elementId, avatarUrl, name) {
+        const container = document.getElementById(elementId);
+        if (avatarUrl) {
+            container.innerHTML = `<img src="${avatarUrl}" alt="${name || 'مستخدم'}">`;
+        } else {
+            const initial = name ? name.charAt(0).toUpperCase() : '?';
+            container.innerHTML = `<span class="avatar-placeholder" style="font-size:0.9rem;">${initial}</span>`;
+        }
     }
 
     // ============================================================
@@ -1827,7 +1898,7 @@
     }
 
     // ============================================================
-    // 🎥 أذن الوصول للكاميرا والميكروفون
+    // 🎥 أذن الوصول للكاميرا والميكروفون (محسّن)
     // ============================================================
     function grantPermission() {
         document.getElementById('permissionModal').classList.remove('active');
@@ -1843,17 +1914,19 @@
 
     async function getMediaSilent() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            });
+            const constraints = {
+                video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                audio: { echoCancellation: true, noiseSuppression: true }
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
             localStream = stream;
             document.getElementById('localVideo').srcObject = stream;
             document.getElementById('localPlaceholder').style.display = 'none';
             showToast('✅', 'تم الوصول للكاميرا والميكروفون بنجاح');
             return true;
         } catch (e) {
-            console.log('Media not available yet:', e);
+            console.error('Media error:', e);
+            showToast('⚠️', 'تعذر الوصول للكاميرا أو الميكروفون: ' + e.message);
             return false;
         }
     }
@@ -1882,13 +1955,35 @@
     async function getMediaActual() {
         try {
             const constraints = {
-                video: callMode === 'audio' ? false : { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-                audio: true
+                video: callMode === 'audio' ? false : { 
+                    facingMode: 'user', 
+                    width: { ideal: 640 }, 
+                    height: { ideal: 480 },
+                    frameRate: { ideal: 30 }
+                },
+                audio: { 
+                    echoCancellation: true, 
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
             };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             return stream;
         } catch (e) {
             console.error('Media error:', e);
+            // محاولة بدون فيديو إذا فشل
+            if (callMode !== 'audio') {
+                try {
+                    const audioOnly = await navigator.mediaDevices.getUserMedia({
+                        audio: { echoCancellation: true, noiseSuppression: true }
+                    });
+                    showToast('⚠️', 'تم الوصول للصوت فقط، الكاميرا غير متاحة');
+                    return audioOnly;
+                } catch (e2) {
+                    showToast('❌', 'تعذر الوصول للصوت والكاميرا');
+                    return null;
+                }
+            }
             return null;
         }
     }
@@ -1943,7 +2038,7 @@
     }
 
     // ============================================================
-    // 🔄 المطابقة العشوائية
+    // 🔄 المطابقة العشوائية مع WebRTC
     // ============================================================
     async function startMatch() {
         if (!isLoggedIn || !currentUser) {
@@ -1958,6 +2053,7 @@
         isMatching = true;
         status.textContent = '⏳ جاري البحث عن شريك...';
 
+        // الحصول على الوسائط
         if (!localStream) {
             const stream = await getMedia();
             if (!stream) {
@@ -1980,11 +2076,13 @@
                 host: userKey,
                 hostNickname: currentUser.nickname || currentUser.username,
                 hostId: currentUser.numericId,
+                hostAvatar: currentUser.avatar || '',
                 status: 'waiting',
                 mode: callMode,
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             });
 
+            // الاستماع لتغييرات الغرفة
             roomRef.on('value', async (snapshot) => {
                 const data = snapshot.val();
                 if (data && data.status === 'joined' && data.guest) {
@@ -2001,6 +2099,7 @@
 
                     document.getElementById('remoteName').textContent = currentPartner.nickname;
                     document.getElementById('remoteId').textContent = String(currentPartner.numericId).padStart(6, '0');
+                    updateUserAvatar('remoteAvatar', currentPartner.avatar, currentPartner.nickname);
                     document.getElementById('remoteOverlay').style.display = 'flex';
                     document.getElementById('remotePlaceholder').style.display = 'none';
                     status.textContent = '✅ متصل مع ' + currentPartner.nickname;
@@ -2015,6 +2114,9 @@
                     listenGifts();
                     listenRoomChanges();
 
+                    // بدء اتصال WebRTC
+                    await startWebRTC(roomId, false);
+
                     if (userKey) {
                         db.ref('users/' + userKey).update({
                             inCall: true,
@@ -2024,6 +2126,7 @@
                 }
             });
 
+            // البحث عن شريك حقيقي
             setTimeout(async () => {
                 if (isMatching) {
                     await findRealPartner(roomId);
@@ -2079,6 +2182,7 @@
                 guest: partner.firebaseKey,
                 guestNickname: partner.nickname || partner.username,
                 guestId: partner.numericId,
+                guestAvatar: partner.avatar || '',
                 status: 'joined'
             });
 
@@ -2095,8 +2199,119 @@
                 currentRoom: roomId
             });
 
+            // بدء اتصال WebRTC
+            await startWebRTC(roomId, true);
+
         } catch (error) {
             console.error('Error finding partner:', error);
+        }
+    }
+
+    // ============================================================
+    // 🌐 WebRTC - نقل الصوت والصورة بشكل متزامن
+    // ============================================================
+    async function startWebRTC(roomId, isInitiator) {
+        try {
+            // إعداد ICE servers
+            const configuration = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    {
+                        urls: 'turn:turn.anyfirewall.com:443?transport=tcp',
+                        username: 'webrtc',
+                        credential: 'webrtc'
+                    }
+                ]
+            };
+
+            peerConnection = new RTCPeerConnection(configuration);
+
+            // إضافة المسارات المحلية
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+            }
+
+            // استقبال المسارات البعيدة
+            peerConnection.ontrack = (event) => {
+                if (!remoteStream) {
+                    remoteStream = new MediaStream();
+                    document.getElementById('remoteVideo').srcObject = remoteStream;
+                }
+                remoteStream.addTrack(event.track);
+                document.getElementById('remotePlaceholder').style.display = 'none';
+            };
+
+            // معالجة الـ ICE candidates
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    db.ref('rooms/' + roomId + '/candidates').push({
+                        candidate: event.candidate,
+                        from: currentUser.firebaseKey || currentUser.id
+                    });
+                }
+            };
+
+            // الاستماع للـ candidates من الطرف الآخر
+            db.ref('rooms/' + roomId + '/candidates').on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.from !== (currentUser.firebaseKey || currentUser.id)) {
+                    if (data.candidate && peerConnection) {
+                        peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                    }
+                }
+            });
+
+            if (isInitiator) {
+                // إنشاء عرض (Offer)
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                await db.ref('rooms/' + roomId + '/offer').set({
+                    sdp: offer.sdp,
+                    type: offer.type,
+                    from: currentUser.firebaseKey || currentUser.id
+                });
+            } else {
+                // الاستماع للـ offer
+                db.ref('rooms/' + roomId + '/offer').on('value', async (snapshot) => {
+                    const data = snapshot.val();
+                    if (data && data.from !== (currentUser.firebaseKey || currentUser.id)) {
+                        const offer = new RTCSessionDescription({
+                            sdp: data.sdp,
+                            type: data.type
+                        });
+                        await peerConnection.setRemoteDescription(offer);
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        await db.ref('rooms/' + roomId + '/answer').set({
+                            sdp: answer.sdp,
+                            type: answer.type,
+                            from: currentUser.firebaseKey || currentUser.id
+                        });
+                    }
+                });
+
+                // الاستماع للـ answer
+                db.ref('rooms/' + roomId + '/answer').on('value', async (snapshot) => {
+                    const data = snapshot.val();
+                    if (data && data.from !== (currentUser.firebaseKey || currentUser.id)) {
+                        const answer = new RTCSessionDescription({
+                            sdp: data.sdp,
+                            type: data.type
+                        });
+                        await peerConnection.setRemoteDescription(answer);
+                    }
+                });
+            }
+
+            console.log('✅ WebRTC connection established for room:', roomId);
+
+        } catch (error) {
+            console.error('WebRTC error:', error);
+            showToast('❌', 'حدث خطأ في الاتصال: ' + error.message);
         }
     }
 
@@ -2126,6 +2341,16 @@
     // 📞 إنهاء المكالمة
     // ============================================================
     function endCall() {
+        // إغلاق اتصال WebRTC
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
+        }
+        if (remoteStream) {
+            remoteStream.getTracks().forEach(track => track.stop());
+            remoteStream = null;
+        }
+
         if (currentRoom) {
             const roomRef = db.ref('rooms/' + currentRoom);
             roomRef.update({ status: 'ended' });
@@ -2144,6 +2369,7 @@
         currentPartner = null;
         document.getElementById('remoteOverlay').style.display = 'none';
         document.getElementById('remotePlaceholder').style.display = 'flex';
+        document.getElementById('remoteVideo').srcObject = null;
         document.getElementById('matchBtn').disabled = false;
         document.getElementById('matchStatus').textContent = 'انقر للبحث عن محادثة جديدة';
         document.getElementById('chatMessages').innerHTML = '';
@@ -2714,11 +2940,12 @@
 
         console.log('🎙️ VIP Chat جاهز!');
         console.log('✅ جميع الميزات مفعلة');
-        console.log('✅ تم إلغاء Firebase Auth والاعتماد على localStorage');
+        console.log('✅ WebRTC لنقل الصوت والصورة');
+        console.log('✅ صور المستخدمين');
     };
 
     // ============================================================
-    // 🔧 دوال إضافية للتوافق مع الكود الأصلي
+    // 🔧 دوال إضافية للتوافق
     // ============================================================
     function getCurrentUserFromStorage() {
         try {
