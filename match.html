@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎯 كوكبة - المطابقة الصوتية</title>
+    <title>🎯 كوكبة - المطابقة العشوائية</title>
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -11,7 +11,7 @@
     <!-- PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        /* ===== أنماط خاصة بالمطابقة الصوتية ===== */
+        /* ===== أنماط خاصة بالمطابقة ===== */
         * {
             margin: 0;
             padding: 0;
@@ -335,74 +335,150 @@
             }
         }
 
-        /* ===== واجهة المكالمة الصوتية ===== */
-        .call-container {
+        /* ===== فيديو المكالمة ===== */
+        .video-container {
             display: none;
             width: 100%;
-            max-width: 600px;
+            max-width: 900px;
             flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 10px;
+            flex: 1;
+            min-height: 400px;
         }
 
-        .call-container.active {
+        .video-container.active {
             display: flex;
         }
 
-        .call-avatar {
-            width: 120px;
-            height: 120px;
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex: 1;
+            min-height: 350px;
+        }
+
+        .video-box {
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            aspect-ratio: 4/3;
+            min-height: 200px;
+        }
+
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #111;
+        }
+
+        .video-box .video-label {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            color: #fff;
+            backdrop-filter: blur(5px);
+            z-index: 2;
+        }
+
+        .video-box .video-label.remote {
+            left: auto;
+            right: 10px;
+        }
+
+        .video-box .mute-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.5rem;
+            color: #ef4444;
+            display: none;
+            z-index: 2;
+        }
+
+        .video-box .status-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.5rem;
+            color: #10b981;
+            display: none;
+            z-index: 2;
+        }
+
+        .video-box .status-indicator.active {
+            display: block;
+        }
+
+        .video-box .video-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            gap: 8px;
+        }
+
+        .video-box .video-placeholder .avatar {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: white;
-            box-shadow: 0 0 60px rgba(139, 92, 246, 0.3);
-            border: 3px solid rgba(255, 215, 0, 0.2);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
         }
 
-        .call-avatar .online-dot {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 18px;
-            height: 18px;
-            background: #10b981;
-            border-radius: 50%;
-            border: 2px solid #1a1a2e;
-        }
-
-        .call-partner-name {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #f8fafc;
-        }
-
-        .call-status {
+        .video-box .video-placeholder .name {
             font-size: 0.85rem;
+            font-weight: 600;
             color: #94a3b8;
         }
 
-        .call-duration {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #ffd700;
-            font-family: 'Courier New', monospace;
+        .video-box .video-placeholder .status-text {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .video-box .video-placeholder .status-text.connecting {
+            color: #f59e0b;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
 
         /* ===== شات المكالمة ===== */
         .call-chat {
             display: none;
             width: 100%;
-            max-width: 600px;
+            max-width: 900px;
             background: rgba(255, 255, 255, 0.02);
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -571,6 +647,28 @@
             color: #ef4444;
         }
 
+        .call-btn.video-btn {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .call-btn.video-btn.off {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .call-btn.flip-btn {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .call-btn.flip-btn:hover {
+            background: rgba(139, 92, 246, 0.25);
+        }
+
         .call-btn.end-call {
             background: rgba(239, 68, 68, 0.2);
             border-color: rgba(239, 68, 68, 0.3);
@@ -602,17 +700,6 @@
         .call-btn.chat-toggle-btn.active {
             background: rgba(139, 92, 246, 0.2);
             border-color: rgba(139, 92, 246, 0.2);
-        }
-
-        .call-btn.stop-search-btn {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-
-        .call-btn.stop-search-btn:hover {
-            background: #ef4444;
-            color: white;
         }
 
         /* ===== إشعار الهدية العائم ===== */
@@ -995,10 +1082,13 @@
             .match-btn .btn-sub {
                 font-size: 0.7rem;
             }
-            .call-avatar {
-                width: 90px;
-                height: 90px;
-                font-size: 2.5rem;
+            .video-grid {
+                grid-template-columns: 1fr;
+                min-height: 300px;
+            }
+            .video-box {
+                min-height: 180px;
+                aspect-ratio: 4/3;
             }
             .call-btn {
                 padding: 8px 12px;
@@ -1047,10 +1137,12 @@
             .match-btn .btn-sub {
                 font-size: 0.6rem;
             }
-            .call-avatar {
-                width: 70px;
-                height: 70px;
-                font-size: 2rem;
+            .video-grid {
+                min-height: 250px;
+            }
+            .video-box {
+                min-height: 150px;
+                aspect-ratio: 4/3;
             }
             .call-btn {
                 padding: 6px 10px;
@@ -1138,14 +1230,14 @@
         </div>
     </nav>
 
-    <!-- ===== طلب إذن المايك ===== -->
+    <!-- ===== طلب إذن المايك والكاميرا ===== -->
     <div class="permission-overlay" id="permissionOverlay">
-        <span class="perm-icon">🎙️</span>
+        <span class="perm-icon">🎙️📷</span>
         <div class="perm-title">نحتاج إلى إذنك!</div>
         <div class="perm-desc">
-            للاستمتاع بالمكالمات الصوتية، نحتاج إلى الوصول إلى الميكروفون.
+            للاستمتاع بالمكالمات، نحتاج إلى الوصول إلى الميكروفون والكاميرا.
             <br>
-            <small style="color:#666;">سيتم استخدامه فقط أثناء المكالمات</small>
+            <small style="color:#666;">سيتم استخدامها فقط أثناء المكالمات</small>
         </div>
         <button class="perm-btn" onclick="requestMediaPermissions()">
             <i class="fas fa-check-circle"></i> السماح بالوصول
@@ -1176,10 +1268,7 @@
                 <div class="pulse-ring"></div>
                 <span class="btn-icon">🌌</span>
                 <span class="btn-label">كوكبة</span>
-                <span class="btn-sub">اضغط للمطابقة الصوتية</span>
-            </button>
-            <button class="call-btn stop-search-btn" id="stopSearchBtn" onclick="stopSearching()" style="display:none;">
-                <i class="fas fa-stop-circle"></i> إيقاف البحث
+                <span class="btn-sub">اضغط للمطابقة</span>
             </button>
         </div>
 
@@ -1189,15 +1278,32 @@
             <span class="timer-value" id="timerValue">5:00</span>
         </div>
 
-        <!-- ===== واجهة المكالمة الصوتية ===== -->
-        <div class="call-container" id="callContainer">
-            <div class="call-avatar" id="callAvatar" style="position:relative;">
-                👤
-                <span class="online-dot"></span>
+        <!-- ===== فيديو المكالمة ===== -->
+        <div class="video-container" id="videoContainer">
+            <div class="video-grid">
+                <div class="video-box" id="localVideoBox">
+                    <video id="localVideo" autoplay playsinline muted></video>
+                    <div class="video-label">📹 أنت</div>
+                    <div class="mute-indicator" id="localMuteIndicator">🔇 مكتوم</div>
+                    <div class="status-indicator" id="localStatus">🔴 جارية</div>
+                    <div class="video-placeholder" id="localPlaceholder">
+                        <div class="avatar" id="localPlaceholderAvatar">👤</div>
+                        <div class="name" id="localPlaceholderName">أنت</div>
+                        <div class="status-text connecting">⏳ جاري الاتصال...</div>
+                    </div>
+                </div>
+                <div class="video-box" id="remoteVideoBox">
+                    <video id="remoteVideo" autoplay playsinline></video>
+                    <div class="video-label remote">👤 الشريك</div>
+                    <div class="mute-indicator" id="remoteMuteIndicator">🔇 مكتوم</div>
+                    <div class="status-indicator" id="remoteStatus">🔴 جارية</div>
+                    <div class="video-placeholder" id="remotePlaceholder">
+                        <div class="avatar" id="remotePlaceholderAvatar">👤</div>
+                        <div class="name" id="remotePlaceholderName">في انتظار شريك</div>
+                        <div class="status-text" id="remoteStatusText">🔍 جاري البحث...</div>
+                    </div>
+                </div>
             </div>
-            <div class="call-partner-name" id="callPartnerName">شريك</div>
-            <div class="call-status" id="callStatus">🔴 جاري الاتصال...</div>
-            <div class="call-duration" id="callDuration">00:00</div>
         </div>
 
         <!-- ===== شات المكالمة ===== -->
@@ -1205,6 +1311,7 @@
             <div class="chat-header">
                 <span>💬 شات المكالمة</span>
                 <span id="chatPartnerName">الشريك</span>
+                <span id="chatTimer" style="color:#ffd700;font-weight:700;">00:00</span>
             </div>
             <div class="chat-messages" id="callChatMessages"></div>
             <div class="chat-input">
@@ -1222,6 +1329,12 @@
         <div class="call-controls" id="callControls">
             <button class="call-btn mic-btn" id="micBtn" onclick="toggleMic()">
                 <i class="fas fa-microphone"></i> ميكروفون
+            </button>
+            <button class="call-btn video-btn" id="videoBtn" onclick="toggleVideo()">
+                <i class="fas fa-video"></i> كاميرا
+            </button>
+            <button class="call-btn flip-btn" id="flipBtn" onclick="flipCamera()">
+                <i class="fas fa-sync-alt"></i> قلب
             </button>
             <button class="call-btn end-call" onclick="endCall()">
                 <i class="fas fa-phone-slash"></i> إنهاء
@@ -1291,15 +1404,17 @@
         let myPeerId = null;
         let mediaStream = null;
         let isMicMuted = true;
+        let isVideoOff = false;
         let isCallActive = false;
+        let isCaller = false;
         let callPartnerId = null;
+        let callPartnerPeerId = null;
         let callPartnerName = null;
         let callStartTime = null;
         let callTimerInterval = null;
         let callDurationSeconds = 0;
         let isMatching = false;
-        let isSearching = false;
-        let callType = 'audio';
+        let callType = 'video';
         let isCallChatOpen = false;
         let selectedCallGift = null;
         let matchCheckInterval = null;
@@ -1307,7 +1422,11 @@
         let mediaReady = false;
         let matchTimerInterval = null;
         let matchTimeLeft = 300;
+        let isMatchTimerRunning = false;
+        let matchStartTime = null;
+        let isFrontCamera = true;
         let currentCall = null;
+        let isSearching = false;
 
         // ============================================================
         // 🍞 توست
@@ -1415,6 +1534,7 @@
         // ============================================================
         function startMatchTimer() {
             matchTimeLeft = 300;
+            isMatchTimerRunning = true;
             const timerEl = document.getElementById('matchTimer');
             const valueEl = document.getElementById('timerValue');
             timerEl.classList.add('active');
@@ -1431,12 +1551,12 @@
                 if (matchTimeLeft <= 0) {
                     clearInterval(matchTimerInterval);
                     matchTimerInterval = null;
+                    isMatchTimerRunning = false;
                     timerEl.classList.remove('active');
                     showToast('⏰ انتهى وقت البحث (5 دقائق)، حاول مرة أخرى', 'warning');
                     resetMatchButton();
                     isMatching = false;
                     isSearching = false;
-                    document.getElementById('stopSearchBtn').style.display = 'none';
                     if (matchCheckInterval) {
                         clearInterval(matchCheckInterval);
                         matchCheckInterval = null;
@@ -1456,37 +1576,56 @@
                 clearInterval(matchTimerInterval);
                 matchTimerInterval = null;
             }
+            isMatchTimerRunning = false;
             document.getElementById('matchTimer').classList.remove('active');
             document.getElementById('timerValue').classList.remove('warning');
         }
 
         // ============================================================
-        // 🎙️ طلب إذن المايك مع إصلاح للهواتف
+        // 🎙️ طلب إذن المايك والكاميرا مع إصلاح للهواتف
         // ============================================================
         async function requestMediaPermissions() {
             try {
                 const overlay = document.getElementById('permissionOverlay');
                 overlay.classList.remove('active');
 
+                // محاولة الحصول على الصوت والفيديو
                 const constraints = {
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
                         autoGainControl: true
+                    },
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
                     }
                 };
 
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 mediaStream = stream;
                 mediaReady = true;
+                isFrontCamera = true;
 
+                const localVideo = document.getElementById('localVideo');
+                localVideo.srcObject = stream;
+
+                // كتم الصوت افتراضياً
                 stream.getAudioTracks().forEach(track => track.enabled = false);
                 isMicMuted = true;
 
                 document.getElementById('micBtn').className = 'call-btn mic-btn muted';
                 document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
+                document.getElementById('localMuteIndicator').style.display = 'block';
+                document.getElementById('localPlaceholder').style.display = 'none';
+                document.getElementById('localVideo').style.display = 'block';
 
-                showToast('✅ تم الوصول إلى الميكروفون', 'success');
+                showToast('✅ تم الوصول إلى الميكروفون والكاميرا', 'success');
+
+                // تفعيل زر قلب الكاميرا
+                document.getElementById('flipBtn').style.display = 'flex';
 
                 initPeerJS();
                 listenForCallChatMessages();
@@ -1498,17 +1637,123 @@
 
             } catch (error) {
                 console.error('❌ Media permission error:', error);
-                const overlay = document.getElementById('permissionOverlay');
-                overlay.classList.add('active');
-                document.querySelector('.perm-desc').innerHTML = `
-                    ⚠️ تعذر الوصول إلى الميكروفون.
-                    <br>
-                    <small style="color:#ef4444;">${error.message || 'يرجى السماح بالوصول في إعدادات المتصفح'}</small>
-                    <br><br>
-                    <button class="perm-btn" onclick="requestMediaPermissions()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
-                        <i class="fas fa-redo"></i> إعادة المحاولة
-                    </button>
-                `;
+
+                // محاولة الحصول على الصوت فقط
+                try {
+                    const audioStream = await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    });
+
+                    mediaStream = audioStream;
+                    mediaReady = true;
+
+                    const localVideo = document.getElementById('localVideo');
+                    localVideo.srcObject = audioStream;
+
+                    audioStream.getAudioTracks().forEach(track => track.enabled = false);
+                    isMicMuted = true;
+
+                    document.getElementById('micBtn').className = 'call-btn mic-btn muted';
+                    document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
+                    document.getElementById('localMuteIndicator').style.display = 'block';
+                    document.getElementById('videoBtn').style.display = 'none';
+                    document.getElementById('flipBtn').style.display = 'none';
+                    document.getElementById('localPlaceholder').style.display = 'none';
+                    document.getElementById('localVideo').style.display = 'block';
+
+                    showToast('✅ تم الوصول إلى الميكروفون (الكاميرا غير متاحة)', 'success');
+
+                    initPeerJS();
+                    listenForCallChatMessages();
+                    listenForIncomingGifts();
+                    updateFriendRequestsBadge();
+                    updateAuthUI();
+                    document.getElementById('matchBtnContainer').classList.remove('hidden');
+
+                } catch (audioError) {
+                    console.error('❌ Audio only error:', audioError);
+
+                    const overlay = document.getElementById('permissionOverlay');
+                    overlay.classList.add('active');
+                    document.querySelector('.perm-desc').innerHTML = `
+                        ⚠️ تعذر الوصول إلى الميكروفون والكاميرا.
+                        <br>
+                        <small style="color:#ef4444;">${error.message || 'يرجى السماح بالوصول في إعدادات المتصفح'}</small>
+                        <br><br>
+                        <button class="perm-btn" onclick="requestMediaPermissions()" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
+                            <i class="fas fa-redo"></i> إعادة المحاولة
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        // ============================================================
+        // 🔄 قلب الكاميرا (أمامية/خلفية)
+        // ============================================================
+        async function flipCamera() {
+            if (!mediaReady || !mediaStream) {
+                showToast('⚠️ لا توجد كاميرا', 'warning');
+                return;
+            }
+
+            try {
+                // الحصول على مسار الفيديو الحالي
+                const videoTrack = mediaStream.getVideoTracks()[0];
+                if (!videoTrack) {
+                    showToast('⚠️ لا توجد كاميرا فيديو', 'warning');
+                    return;
+                }
+
+                // إيقاف المسار الحالي
+                videoTrack.stop();
+
+                // تبديل وضع الكاميرا
+                isFrontCamera = !isFrontCamera;
+                const facingMode = isFrontCamera ? 'user' : 'environment';
+
+                const constraints = {
+                    video: {
+                        facingMode: facingMode,
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
+                    }
+                };
+
+                const newVideoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const newVideoTrack = newVideoStream.getVideoTracks()[0];
+
+                // إضافة المسار الجديد إلى التيار الحالي
+                mediaStream.addTrack(newVideoTrack);
+
+                // تحديث الفيديو المحلي
+                const localVideo = document.getElementById('localVideo');
+                localVideo.srcObject = mediaStream;
+
+                // إعادة إرسال التيار إلى الشريك إذا كانت المكالمة نشطة
+                if (isCallActive && currentCall) {
+                    try {
+                        const sender = currentCall.peerConnection?.getSenders()?.find(s => s.track?.kind === 'video');
+                        if (sender) {
+                            sender.replaceTrack(newVideoTrack);
+                        }
+                    } catch (e) {
+                        console.log('Could not replace track:', e);
+                    }
+                }
+
+                showToast(isFrontCamera ? '📷 الكاميرا الأمامية' : '📷 الكاميرا الخلفية', 'info');
+
+            } catch (error) {
+                console.error('❌ Flip camera error:', error);
+                showToast('⚠️ لا يمكن تبديل الكاميرا', 'warning');
+                // إعادة تشغيل الكاميرا الأمامية
+                isFrontCamera = true;
             }
         }
 
@@ -1578,7 +1823,7 @@
         // 📞 معالجة المكالمة الواردة
         // ============================================================
         function handleIncomingCall(call) {
-            console.log('📞 Incoming audio call from:', call.peer);
+            console.log('📞 Incoming call from:', call.peer);
 
             if (!mediaReady || !mediaStream) {
                 console.log('❌ Media not ready, rejecting call');
@@ -1591,15 +1836,13 @@
                 currentCall = call;
 
                 call.on('stream', (remoteStream) => {
-                    // إضافة الصوت البعيد
-                    const audioElement = document.createElement('audio');
-                    audioElement.srcObject = remoteStream;
-                    audioElement.autoplay = true;
-                    document.body.appendChild(audioElement);
-
-                    // تحديث واجهة المكالمة
-                    document.getElementById('callStatus').textContent = '🔴 جارية';
-                    document.getElementById('callStatus').style.color = '#10b981';
+                    const remoteVideo = document.getElementById('remoteVideo');
+                    remoteVideo.srcObject = remoteStream;
+                    document.getElementById('remotePlaceholder').style.display = 'none';
+                    remoteVideo.style.display = 'block';
+                    document.getElementById('remoteStatus').classList.add('active');
+                    // إظهار الفيديو البعيد
+                    document.getElementById('remoteVideoBox').style.display = 'block';
                 });
 
                 call.on('close', () => {
@@ -1613,11 +1856,10 @@
 
                 // بدء المكالمة
                 isCallActive = true;
-                document.getElementById('callContainer').classList.add('active');
+                document.getElementById('videoContainer').classList.add('active');
                 document.getElementById('callControls').classList.add('active');
                 document.getElementById('matchBtnContainer').classList.add('hidden');
                 stopMatchTimer();
-                document.getElementById('stopSearchBtn').style.display = 'none';
 
                 // جلب اسم الشريك
                 const callerId = call.peer.replace('match_', '');
@@ -1632,12 +1874,10 @@
                             const user = userData[userKey];
                             callPartnerName = user.nickname || user.username || 'شريك';
                             callPartnerId = user.numericId;
-                            document.getElementById('callPartnerName').textContent = callPartnerName;
                             document.getElementById('chatPartnerName').textContent = callPartnerName;
-                            document.getElementById('callAvatar').innerHTML = `
-                                ${callPartnerName.charAt(0).toUpperCase()}
-                                <span class="online-dot"></span>
-                            `;
+                            document.getElementById('remotePlaceholderName').textContent = callPartnerName;
+                            document.getElementById('remotePlaceholderAvatar').textContent = callPartnerName
+                                .charAt(0).toUpperCase();
                             addCallChatMessage('system', `🔗 تم الاتصال بـ ${callPartnerName}`);
                         }
                     });
@@ -1650,7 +1890,7 @@
                     callDurationSeconds++;
                     const mins = Math.floor(callDurationSeconds / 60);
                     const secs = callDurationSeconds % 60;
-                    document.getElementById('callDuration').textContent =
+                    document.getElementById('chatTimer').textContent =
                         `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 }, 1000);
 
@@ -1667,7 +1907,7 @@
         }
 
         // ============================================================
-        // 🎯 بدء المطابقة العشوائية
+        // 🎯 بدء المطابقة العشوائية (بدون انتظار قبول)
         // ============================================================
         function startMatching() {
             if (isMatching || isCallActive || isSearching) return;
@@ -1678,7 +1918,7 @@
             }
 
             if (!mediaReady) {
-                showToast('⚠️ يرجى السماح بالوصول إلى المايك أولاً', 'warning');
+                showToast('⚠️ يرجى السماح بالوصول إلى المايك والكاميرا أولاً', 'warning');
                 document.getElementById('permissionOverlay').classList.add('active');
                 return;
             }
@@ -1690,14 +1930,13 @@
 
             isMatching = true;
             isSearching = true;
-            document.getElementById('stopSearchBtn').style.display = 'flex';
 
             const btn = document.getElementById('matchBtn');
             btn.classList.add('searching');
             btn.innerHTML = `
                 <span class="btn-icon">🔍</span>
                 <span class="btn-label">جاري البحث...</span>
-                <span class="btn-sub">جارٍ العثور على شريك صوتي</span>
+                <span class="btn-sub">جارٍ العثور على شريك</span>
             `;
 
             startMatchTimer();
@@ -1705,40 +1944,10 @@
         }
 
         // ============================================================
-        // 🛑 إيقاف البحث
-        // ============================================================
-        function stopSearching() {
-            if (!isSearching && !isMatching) return;
-
-            isSearching = false;
-            isMatching = false;
-            document.getElementById('stopSearchBtn').style.display = 'none';
-
-            if (matchCheckInterval) {
-                clearInterval(matchCheckInterval);
-                matchCheckInterval = null;
-            }
-
-            stopMatchTimer();
-            resetMatchButton();
-
-            // تحديث حالة المستخدم
-            if (database && currentFirebaseUserId) {
-                database.ref('users/' + currentFirebaseUserId).update({
-                    inCall: false,
-                    callPartner: null,
-                    updatedAt: new Date().toISOString()
-                });
-            }
-
-            showToast('⏹️ تم إيقاف البحث', 'info');
-        }
-
-        // ============================================================
-        // 🔍 البحث عن شريك عشوائي
+        // 🔍 البحث عن شريك عشوائي (مباشر بدون قبول)
         // ============================================================
         async function findRandomPartner() {
-            if (!database || !currentUser || !isMatching || !isSearching) return;
+            if (!database || !currentUser || !isMatching) return;
 
             try {
                 const snapshot = await database.ref('users').once('value');
@@ -1773,9 +1982,11 @@
                     return;
                 }
 
+                // اختيار مستخدم عشوائي
                 const randomIndex = Math.floor(Math.random() * availableUsers.length);
                 const partner = availableUsers[randomIndex];
 
+                // التحقق من أن الشريك لا يزال متاحاً
                 const partnerSnapshot = await database.ref('users')
                     .orderByChild('numericId')
                     .equalTo(partner.numericId)
@@ -1795,6 +2006,7 @@
                     return;
                 }
 
+                // تحديث حالة المستخدم
                 await database.ref('users/' + currentFirebaseUserId).update({
                     inCall: true,
                     callPartner: partner.numericId,
@@ -1812,13 +2024,13 @@
 
                         if (call) {
                             call.on('stream', (remoteStream) => {
-                                const audioElement = document.createElement('audio');
-                                audioElement.srcObject = remoteStream;
-                                audioElement.autoplay = true;
-                                document.body.appendChild(audioElement);
-
-                                document.getElementById('callStatus').textContent = '🔴 جارية';
-                                document.getElementById('callStatus').style.color = '#10b981';
+                                const remoteVideo = document.getElementById('remoteVideo');
+                                remoteVideo.srcObject = remoteStream;
+                                document.getElementById('remotePlaceholder').style.display = 'none';
+                                remoteVideo.style.display = 'block';
+                                document.getElementById('remoteStatus').classList.add('active');
+                                // إظهار الفيديو البعيد
+                                document.getElementById('remoteVideoBox').style.display = 'block';
                             });
 
                             call.on('close', () => {
@@ -1833,21 +2045,19 @@
                                 endCall();
                             });
 
+                            // بدء المكالمة
                             isCallActive = true;
                             callPartnerId = partner.numericId;
                             callPartnerName = partner.nickname || partner.username;
 
-                            document.getElementById('callPartnerName').textContent = callPartnerName;
                             document.getElementById('chatPartnerName').textContent = callPartnerName;
-                            document.getElementById('callAvatar').innerHTML = `
-                                ${callPartnerName.charAt(0).toUpperCase()}
-                                <span class="online-dot"></span>
-                            `;
+                            document.getElementById('remotePlaceholderName').textContent = callPartnerName;
+                            document.getElementById('remotePlaceholderAvatar').textContent = callPartnerName
+                                .charAt(0).toUpperCase();
 
-                            document.getElementById('callContainer').classList.add('active');
+                            document.getElementById('videoContainer').classList.add('active');
                             document.getElementById('callControls').classList.add('active');
                             document.getElementById('matchBtnContainer').classList.add('hidden');
-                            document.getElementById('stopSearchBtn').style.display = 'none';
 
                             stopMatchTimer();
 
@@ -1858,7 +2068,7 @@
                                 callDurationSeconds++;
                                 const mins = Math.floor(callDurationSeconds / 60);
                                 const secs = callDurationSeconds % 60;
-                                document.getElementById('callDuration').textContent =
+                                document.getElementById('chatTimer').textContent =
                                     `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                             }, 1000);
 
@@ -1872,18 +2082,18 @@
                                 partnerId: partner.numericId,
                                 partnerName: partner.nickname || partner.username,
                                 startTime: new Date().toISOString(),
-                                type: 'audio'
+                                type: 'video'
                             });
 
                             await database.ref('call_history/' + currentUser.numericId).push({
                                 partnerId: partner.numericId,
                                 partnerName: partner.nickname || partner.username,
-                                type: 'audio',
+                                type: 'video',
                                 startTime: new Date().toISOString(),
                                 status: 'initiated'
                             });
 
-                            showToast(`✅ بدأت المكالمة الصوتية مع ${callPartnerName}`, 'success');
+                            showToast(`✅ بدأت المكالمة مع ${callPartnerName}`, 'success');
 
                             resetMatchButton();
                             isMatching = false;
@@ -1917,7 +2127,6 @@
                 resetMatchButton();
                 isMatching = false;
                 isSearching = false;
-                document.getElementById('stopSearchBtn').style.display = 'none';
                 stopMatchTimer();
                 await database.ref('users/' + currentFirebaseUserId).update({
                     inCall: false,
@@ -1935,7 +2144,7 @@
             btn.innerHTML = `
                 <span class="btn-icon">🌌</span>
                 <span class="btn-label">كوكبة</span>
-                <span class="btn-sub">اضغط للمطابقة الصوتية</span>
+                <span class="btn-sub">اضغط للمطابقة</span>
             `;
             if (matchCheckInterval) {
                 clearInterval(matchCheckInterval);
@@ -1943,7 +2152,6 @@
             }
             stopMatchTimer();
             isSearching = false;
-            document.getElementById('stopSearchBtn').style.display = 'none';
         }
 
         // ============================================================
@@ -1961,9 +2169,39 @@
             if (isMicMuted) {
                 btn.className = 'call-btn mic-btn muted';
                 btn.innerHTML = '<i class="fas fa-microphone-slash"></i> مكتوم';
+                document.getElementById('localMuteIndicator').style.display = 'block';
             } else {
                 btn.className = 'call-btn mic-btn';
                 btn.innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
+                document.getElementById('localMuteIndicator').style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        // 📷 تبديل الكاميرا
+        // ============================================================
+        function toggleVideo() {
+            if (!mediaStream) {
+                showToast('⚠️ لا توجد كاميرا', 'warning');
+                return;
+            }
+            isVideoOff = !isVideoOff;
+            mediaStream.getVideoTracks().forEach(track => track.enabled = !isVideoOff);
+
+            const btn = document.getElementById('videoBtn');
+            const localVideo = document.getElementById('localVideo');
+
+            if (isVideoOff) {
+                btn.className = 'call-btn video-btn off';
+                btn.innerHTML = '<i class="fas fa-video-slash"></i> كاميرا';
+                localVideo.style.display = 'none';
+                document.getElementById('localPlaceholder').style.display = 'flex';
+                document.getElementById('localPlaceholderName').textContent = 'الكاميرا مغلقة';
+            } else {
+                btn.className = 'call-btn video-btn';
+                btn.innerHTML = '<i class="fas fa-video"></i> كاميرا';
+                localVideo.style.display = 'block';
+                document.getElementById('localPlaceholder').style.display = 'none';
             }
         }
 
@@ -1971,6 +2209,7 @@
         // 📞 إنهاء المكالمة
         // ============================================================
         function endCall() {
+            // إعلام الشريك بأن المستخدم أنهى المكالمة
             if (callPartnerId) {
                 database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
                 setTimeout(() => {
@@ -1982,11 +2221,10 @@
                 resetMatchButton();
                 isMatching = false;
                 isSearching = false;
-                document.getElementById('callContainer').classList.remove('active');
+                document.getElementById('videoContainer').classList.remove('active');
                 document.getElementById('callControls').classList.remove('active');
                 document.getElementById('callChat').classList.remove('active');
                 document.getElementById('matchBtnContainer').classList.remove('hidden');
-                document.getElementById('stopSearchBtn').style.display = 'none';
                 if (matchCheckInterval) clearInterval(matchCheckInterval);
                 if (callTimerInterval) clearInterval(callTimerInterval);
                 stopMatchTimer();
@@ -1996,7 +2234,6 @@
             isCallActive = false;
             isMatching = false;
             isSearching = false;
-            document.getElementById('stopSearchBtn').style.display = 'none';
 
             if (callTimerInterval) {
                 clearInterval(callTimerInterval);
@@ -2010,6 +2247,7 @@
 
             stopMatchTimer();
 
+            // حساب المدة والتكلفة
             const durationMinutes = Math.ceil(callDurationSeconds / 60);
             const cost = durationMinutes * 10;
 
@@ -2046,7 +2284,7 @@
                 database.ref('call_history/' + currentUser.numericId).push({
                     partnerId: callPartnerId,
                     partnerName: callPartnerName || 'شريك',
-                    type: 'audio',
+                    type: callType || 'video',
                     duration: callDurationSeconds,
                     cost: cost,
                     endTime: new Date().toISOString(),
@@ -2054,21 +2292,35 @@
                 });
             }
 
+            // إعادة تعيين المتغيرات
             callPartnerId = null;
+            callPartnerPeerId = null;
             callPartnerName = null;
             callDurationSeconds = 0;
 
-            document.getElementById('callContainer').classList.remove('active');
+            // إخفاء واجهة المكالمة
+            document.getElementById('videoContainer').classList.remove('active');
             document.getElementById('callControls').classList.remove('active');
             document.getElementById('callChat').classList.remove('active');
             document.getElementById('matchBtnContainer').classList.remove('hidden');
 
+            // إعادة تعيين حالة الفيديو
+            document.getElementById('localVideo').style.display = 'block';
+            document.getElementById('localPlaceholder').style.display = 'none';
+            document.getElementById('remoteVideo').style.display = 'none';
+            document.getElementById('remotePlaceholder').style.display = 'flex';
+            document.getElementById('remoteStatusText').textContent = '🔍 جاري البحث...';
+            document.getElementById('remoteStatusText').className = 'status-text';
+            document.getElementById('remoteStatus').classList.remove('active');
+            document.getElementById('remoteVideoBox').style.display = 'block';
+
+            // إعادة ضبط أزرار
             document.getElementById('micBtn').className = 'call-btn mic-btn';
             document.getElementById('micBtn').innerHTML = '<i class="fas fa-microphone"></i> ميكروفون';
-            document.getElementById('callDuration').textContent = '00:00';
-            document.getElementById('callStatus').textContent = '🔴 جاري الاتصال...';
-            document.getElementById('callStatus').style.color = '#94a3b8';
-            document.getElementById('callAvatar').innerHTML = '👤<span class="online-dot"></span>';
+            document.getElementById('videoBtn').className = 'call-btn video-btn';
+            document.getElementById('videoBtn').innerHTML = '<i class="fas fa-video"></i> كاميرا';
+            document.getElementById('localMuteIndicator').style.display = 'none';
+            document.getElementById('chatTimer').textContent = '00:00';
 
             resetMatchButton();
 
@@ -2079,6 +2331,7 @@
         // ⏭️ الانتقال إلى الشريك التالي
         // ============================================================
         function nextMatch() {
+            // إعلام الشريك بأن المستخدم غير متصل
             if (callPartnerId) {
                 database.ref('users/' + callPartnerId + '/partnerDisconnected').set(true);
                 setTimeout(() => {
@@ -2088,7 +2341,7 @@
 
             if (isCallActive) {
                 endCall();
-                showToast('⏭️ جاري البحث عن شريك جديد...', 'info');
+                showToast(`⏭️ جاري البحث عن شريك جديد...`, 'info');
                 setTimeout(() => {
                     startMatching();
                 }, 1500);
@@ -2385,7 +2638,6 @@
         // ============================================================
         async function logout() {
             if (isCallActive) endCall();
-            if (isSearching) stopSearching();
             try { if (firebase.auth) await firebase.auth().signOut(); } catch (e) {}
             localStorage.removeItem('currentUser');
             currentUser = null;
@@ -2410,6 +2662,7 @@
                         if (requests[key].status === 'pending') count++;
                     }
                 }
+                document.getElementById('friendRequestsBadge').textContent = count;
                 document.getElementById('bottomFriendBadge').textContent = count;
             } catch (e) {}
         }
@@ -2443,8 +2696,10 @@
 
             updateAuthUI();
 
+            // عرض طلب الإذن
             document.getElementById('permissionOverlay').classList.add('active');
 
+            // الاستماع لحالة انقطاع الشريك
             listenForPartnerDisconnect();
 
             if (window.innerWidth <= 768) {
@@ -2476,4 +2731,4 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js">
     </script>
 </body>
-</html>
+</html> 
