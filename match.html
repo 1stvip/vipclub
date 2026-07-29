@@ -6,7 +6,6 @@
     <title>VIP Chat - دردشة عشوائية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         * {
@@ -1179,7 +1178,7 @@
 
     <script>
         // ============================================================
-        // 🔥 تكوين Firebase (نفس مشروع stvipclub)
+        // 🔥 تكوين Firebase
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAX0jz_yOGagteO5R5ZHji1ZG44fk--Zvs",
@@ -1194,7 +1193,7 @@
         // ============================================================
         // 📦 المتغيرات العامة
         // ============================================================
-        let app, db, auth;
+        let database;
         let localStream = null;
         let currentRoom = null;
         let currentPartner = null;
@@ -1208,69 +1207,19 @@
         let allAvailableUsers = [];
 
         // ============================================================
-        // 🚀 تهيئة Firebase
+        // 🚀 تهيئة Firebase وقراءة بيانات المستخدم من localStorage
         // ============================================================
-        async function initFirebase() {
+        function initFirebase() {
             try {
                 if (firebase.apps.length > 0) {
-                    await firebase.app().delete();
+                    firebase.app().delete();
                 }
-                app = firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                auth = firebase.auth();
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                console.log('✅ Firebase initialized');
 
-                // محاولة استعادة الجلسة من localStorage
-                const savedUser = JSON.parse(localStorage.getItem('currentUser'));
-
-                auth.onAuthStateChanged(async (user) => {
-                    if (user) {
-                        // جلب بيانات المستخدم من Firebase
-                        currentUser = await fetchUserFromFirebase(user);
-                        if (currentUser) {
-                            isLoggedIn = true;
-                            updateUI();
-                            listenNotifications();
-                            document.getElementById('authBtn').textContent = 'تسجيل الخروج';
-                            document.getElementById('authBtn').className = 'auth-btn logout-btn';
-                            loadAvailableUsers();
-                            if (currentUser.firebaseKey) {
-                                db.ref('users/' + currentUser.firebaseKey).update({
-                                    isOnline: true,
-                                    lastSeen: new Date().toISOString()
-                                });
-                            }
-                            showToast('👋', 'مرحباً ' + (currentUser.nickname || ''));
-                        }
-                    } else if (savedUser && savedUser.numericId) {
-                        // محاولة تسجيل الدخول التلقائي
-                        try {
-                            await auth.signInAnonymously();
-                            return;
-                        } catch (e) {
-                            console.log('Auto-login failed');
-                        }
-                        // إذا فشل تسجيل الدخول التلقائي، نعرض واجهة تسجيل الدخول
-                        isLoggedIn = false;
-                        currentUser = null;
-                        updateUI();
-                        document.getElementById('authBtn').textContent = 'تسجيل الدخول';
-                        document.getElementById('authBtn').className = 'auth-btn';
-                        document.getElementById('matchBtn').disabled = true;
-                        document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-                        showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
-                    } else {
-                        isLoggedIn = false;
-                        currentUser = null;
-                        updateUI();
-                        document.getElementById('authBtn').textContent = 'تسجيل الدخول';
-                        document.getElementById('authBtn').className = 'auth-btn';
-                        document.getElementById('matchBtn').disabled = true;
-                        document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
-                        if (!savedUser) {
-                            showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
-                        }
-                    }
-                });
+                // ===== قراءة بيانات المستخدم من localStorage =====
+                loadUserFromLocalStorage();
 
             } catch (error) {
                 console.error('Firebase init error:', error);
@@ -1279,37 +1228,60 @@
         }
 
         // ============================================================
-        // 👤 جلب بيانات المستخدم من Firebase
+        // 👤 تحميل بيانات المستخدم من localStorage (نفس مفتاح login-match.html)
         // ============================================================
-        async function fetchUserFromFirebase(user) {
+        function loadUserFromLocalStorage() {
             try {
-                const snapshot = await db.ref('users').orderByChild('uid').equalTo(user.uid).once('value');
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const key = Object.keys(data)[0];
-                    const userData = { ...data[key], firebaseKey: key, uid: user.uid };
-                    localStorage.setItem('currentUser', JSON.stringify(userData));
-                    return userData;
+                const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+
+                if (savedUser && savedUser.numericId) {
+                    currentUser = savedUser;
+                    isLoggedIn = true;
+                    console.log('✅ تم استعادة بيانات المستخدم:', currentUser.nickname || currentUser.username);
+
+                    // تحديث الواجهة
+                    updateUI();
+                    updateNotifBadge();
+
+                    // تغيير زر تسجيل الدخول إلى تسجيل الخروج
+                    document.getElementById('authBtn').textContent = 'تسجيل الخروج';
+                    document.getElementById('authBtn').className = 'auth-btn logout-btn';
+
+                    // تحميل المستخدمين المتاحين
+                    loadAvailableUsers();
+
+                    // عرض رسالة ترحيب
+                    showToast('👋', 'مرحباً ' + (currentUser.nickname || currentUser.username || ''));
+
+                    // تحديث حالة المستخدم في Firebase
+                    if (currentUser.firebaseKey) {
+                        database.ref('users/' + currentUser.firebaseKey).update({
+                            isOnline: true,
+                            lastSeen: new Date().toISOString()
+                        });
+                    }
+
+                    // بدء الاستماع للإشعارات
+                    listenNotifications();
+
+                    return true;
+                } else {
+                    console.log('⚠️ لا توجد بيانات مستخدم في localStorage');
+                    isLoggedIn = false;
+                    currentUser = null;
+                    updateUI();
+                    document.getElementById('authBtn').textContent = 'تسجيل الدخول';
+                    document.getElementById('authBtn').className = 'auth-btn';
+                    document.getElementById('matchBtn').disabled = true;
+                    document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
+                    return false;
                 }
-                // إنشاء مستخدم جديد
-                const newUser = {
-                    uid: user.uid,
-                    nickname: user.displayName || 'مستخدم_' + Math.floor(Math.random() * 1000),
-                    numericId: Math.floor(100000 + Math.random() * 900000),
-                    balanceEGP: 0,
-                    balanceUSD: 0,
-                    createdAt: new Date().toISOString(),
-                    isOnline: true,
-                    lastSeen: new Date().toISOString()
-                };
-                const ref = db.ref('users').push();
-                await ref.set(newUser);
-                const savedUser = { ...newUser, firebaseKey: ref.key };
-                localStorage.setItem('currentUser', JSON.stringify(savedUser));
-                return savedUser;
-            } catch (e) {
-                console.error('Fetch user error:', e);
-                return null;
+            } catch (error) {
+                console.error('Error loading user:', error);
+                isLoggedIn = false;
+                currentUser = null;
+                updateUI();
+                return false;
             }
         }
 
@@ -1318,7 +1290,7 @@
         // ============================================================
         function updateUI() {
             if (isLoggedIn && currentUser) {
-                document.getElementById('localName').textContent = currentUser.nickname || 'أنت';
+                document.getElementById('localName').textContent = currentUser.nickname || currentUser.username || 'أنت';
                 document.getElementById('localId').textContent = String(currentUser.numericId || '000000').padStart(6, '0');
                 document.getElementById('matchBtn').disabled = false;
                 document.getElementById('matchStatus').textContent = 'انقر للبحث عن محادثة عشوائية';
@@ -1328,15 +1300,19 @@
                 document.getElementById('matchBtn').disabled = true;
                 document.getElementById('matchStatus').textContent = '🔒 يرجى تسجيل الدخول';
             }
-            updateNotifBadge();
         }
 
         // ============================================================
         // 🔔 الإشعارات
         // ============================================================
         function listenNotifications() {
-            if (!currentUser || !db) return;
-            const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+            if (!currentUser || !database) return;
+
+            // التحقق من وجود firebaseKey
+            const userKey = currentUser.firebaseKey || currentUser.id;
+            if (!userKey) return;
+
+            const notifRef = database.ref('users/' + userKey + '/notifications');
             notifRef.on('value', (snapshot) => {
                 let unreadCount = 0;
                 if (snapshot.exists()) {
@@ -1357,8 +1333,12 @@
 
         async function updateNotifBadge() {
             try {
-                if (!currentUser || !db) return;
-                const notifRef = db.ref('users/' + currentUser.firebaseKey + '/notifications');
+                if (!currentUser || !database) return;
+
+                const userKey = currentUser.firebaseKey || currentUser.id;
+                if (!userKey) return;
+
+                const notifRef = database.ref('users/' + userKey + '/notifications');
                 const snapshot = await notifRef.once('value');
                 let unreadCount = 0;
                 if (snapshot.exists()) {
@@ -1390,16 +1370,18 @@
                 showToast('⚠️', 'يرجى تسجيل الدخول');
                 return;
             }
-            showToast('👤', `الاسم: ${currentUser.nickname}\nالمعرف: ${String(currentUser.numericId).padStart(6, '0')}\nEGP: ${currentUser.balanceEGP || 0}\nUSD: ${currentUser.balanceUSD || 0}`);
+            showToast('👤',
+                `الاسم: ${currentUser.nickname || currentUser.username}\nالمعرف: ${String(currentUser.numericId).padStart(6, '0')}\nEGP: ${currentUser.balanceEGP || 0}\nUSD: ${currentUser.balanceUSD || 0}`
+                );
         }
 
         // ============================================================
         // 📋 تحميل المستخدمين المتاحين
         // ============================================================
         async function loadAvailableUsers() {
-            if (!db) return;
+            if (!database) return;
             try {
-                const snapshot = await db.ref('users').orderByChild('isOnline').equalTo(true).once('value');
+                const snapshot = await database.ref('users').orderByChild('isOnline').equalTo(true).once('value');
                 allAvailableUsers = [];
                 if (snapshot.exists()) {
                     const data = snapshot.val();
@@ -1424,9 +1406,9 @@
             }
             const displayUsers = allAvailableUsers.slice(0, 7);
             container.innerHTML = displayUsers.map(user => `
-                        <div class="user-avatar-small-wrapper" onclick="viewUserProfile('${user.numericId}')" title="${user.nickname || 'مستخدم'}">
+                        <div class="user-avatar-small-wrapper" onclick="viewUserProfile('${user.numericId}')" title="${user.nickname || user.username || 'مستخدم'}">
                             <div class="user-avatar-small">
-                                ${user.avatar ? `<img src="${user.avatar}" alt="">` : (user.nickname ? user.nickname.charAt(0).toUpperCase() : '?')}
+                                ${user.avatar ? `<img src="${user.avatar}" alt="">` : (user.nickname ? user.nickname.charAt(0).toUpperCase() : (user.username ? user.username.charAt(0).toUpperCase() : '?'))}
                                 <div class="status-dot ${user.inCall ? 'in-call' : 'online'}"></div>
                             </div>
                         </div>
@@ -1435,7 +1417,8 @@
 
         async function viewUserProfile(numericId) {
             try {
-                const snapshot = await db.ref('users').orderByChild('numericId').equalTo(parseInt(numericId)).once('value');
+                const snapshot = await database.ref('users').orderByChild('numericId').equalTo(parseInt(numericId)).once(
+                'value');
                 if (!snapshot.exists()) {
                     showToast('❌', 'المستخدم غير موجود');
                     return;
@@ -1443,7 +1426,9 @@
                 const data = snapshot.val();
                 const userId = Object.keys(data)[0];
                 const user = data[userId];
-                showToast('👤', `الاسم: ${user.nickname || 'مستخدم'}\n🆔: ${user.numericId}\n💰 EGP: ${user.balanceEGP || 0}`);
+                showToast('👤',
+                    `الاسم: ${user.nickname || user.username || 'مستخدم'}\n🆔: ${user.numericId}\n💰 EGP: ${user.balanceEGP || 0}`
+                    );
             } catch (e) {
                 showToast('❌', 'حدث خطأ');
             }
@@ -1515,10 +1500,14 @@
             const roomId = 'room_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
 
             try {
-                const roomRef = db.ref('rooms/' + roomId);
+                const roomRef = database.ref('rooms/' + roomId);
+
+                // استخدام currentUser.id أو currentUser.firebaseKey
+                const userKey = currentUser.firebaseKey || currentUser.id;
+
                 await roomRef.set({
-                    host: currentUser.firebaseKey,
-                    hostNickname: currentUser.nickname,
+                    host: userKey,
+                    hostNickname: currentUser.nickname || currentUser.username,
                     hostId: currentUser.numericId,
                     status: 'waiting',
                     createdAt: firebase.database.ServerValue.TIMESTAMP
@@ -1527,13 +1516,13 @@
                 roomRef.on('value', async (snapshot) => {
                     const data = snapshot.val();
                     if (data && data.status === 'joined' && data.guest) {
-                        const guestRef = db.ref('users/' + data.guest);
+                        const guestRef = database.ref('users/' + data.guest);
                         const guestSnap = await guestRef.once('value');
                         const guestData = guestSnap.val();
 
                         currentPartner = {
                             firebaseKey: data.guest,
-                            nickname: guestData?.nickname || 'شريك',
+                            nickname: guestData?.nickname || guestData?.username || 'شريك',
                             numericId: guestData?.numericId || '000000',
                             avatar: guestData?.avatar || ''
                         };
@@ -1555,8 +1544,8 @@
                         listenGifts();
                         listenRoomChanges();
 
-                        if (currentUser?.firebaseKey) {
-                            db.ref('users/' + currentUser.firebaseKey).update({
+                        if (userKey) {
+                            database.ref('users/' + userKey).update({
                                 inCall: true,
                                 currentRoom: roomId
                             });
@@ -1595,7 +1584,7 @@
         // ============================================================
         async function findRealPartner(roomId) {
             try {
-                const snapshot = await db.ref('users').orderByChild('isOnline').equalTo(true).once('value');
+                const snapshot = await database.ref('users').orderByChild('isOnline').equalTo(true).once('value');
                 let availableUsers = [];
 
                 if (snapshot.exists()) {
@@ -1615,23 +1604,23 @@
                 const randomIndex = Math.floor(Math.random() * availableUsers.length);
                 const partner = availableUsers[randomIndex];
 
-                const roomRef = db.ref('rooms/' + roomId);
+                const roomRef = database.ref('rooms/' + roomId);
                 await roomRef.update({
                     guest: partner.firebaseKey,
-                    guestNickname: partner.nickname,
+                    guestNickname: partner.nickname || partner.username,
                     guestId: partner.numericId,
                     status: 'joined'
                 });
 
-                await db.ref('users/' + partner.firebaseKey + '/notifications').push({
-                    text: `📞 طلب مكالمة من ${currentUser.nickname}`,
+                await database.ref('users/' + partner.firebaseKey + '/notifications').push({
+                    text: `📞 طلب مكالمة من ${currentUser.nickname || currentUser.username}`,
                     date: new Date().toLocaleString('ar-EG'),
                     read: false,
                     type: 'call_request',
                     roomId: roomId
                 });
 
-                await db.ref('users/' + partner.firebaseKey).update({
+                await database.ref('users/' + partner.firebaseKey).update({
                     inCall: true,
                     currentRoom: roomId
                 });
@@ -1668,14 +1657,15 @@
         // ============================================================
         function endCall() {
             if (currentRoom) {
-                const roomRef = db.ref('rooms/' + currentRoom);
+                const roomRef = database.ref('rooms/' + currentRoom);
                 roomRef.update({ status: 'ended' });
                 roomRef.off();
                 currentRoom = null;
             }
 
-            if (currentUser?.firebaseKey) {
-                db.ref('users/' + currentUser.firebaseKey).update({
+            const userKey = currentUser?.firebaseKey || currentUser?.id;
+            if (userKey) {
+                database.ref('users/' + userKey).update({
                     inCall: false,
                     currentRoom: null
                 });
@@ -1711,10 +1701,10 @@
             }
 
             addChatMessage('local', text);
-            const msgRef = db.ref('rooms/' + currentRoom + '/messages').push();
+            const msgRef = database.ref('rooms/' + currentRoom + '/messages').push();
             msgRef.set({
-                sender: currentUser.firebaseKey,
-                senderName: currentUser.nickname,
+                sender: currentUser.firebaseKey || currentUser.id,
+                senderName: currentUser.nickname || currentUser.username,
                 text: text,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
@@ -1736,11 +1726,12 @@
 
         function listenMessages() {
             if (!currentRoom) return;
-            const msgRef = db.ref('rooms/' + currentRoom + '/messages');
+            const msgRef = database.ref('rooms/' + currentRoom + '/messages');
             msgRef.off();
             msgRef.on('child_added', (snapshot) => {
                 const data = snapshot.val();
-                if (data && data.sender !== currentUser.firebaseKey) {
+                const userKey = currentUser.firebaseKey || currentUser.id;
+                if (data && data.sender !== userKey) {
                     addChatMessage('remote', data.text, data.senderName);
                 }
             });
@@ -1775,8 +1766,9 @@
             }
 
             currentUser.balanceEGP -= price;
-            if (currentUser.firebaseKey) {
-                db.ref('users/' + currentUser.firebaseKey).update({
+            const userKey = currentUser.firebaseKey || currentUser.id;
+            if (userKey) {
+                database.ref('users/' + userKey).update({
                     balanceEGP: currentUser.balanceEGP
                 });
             }
@@ -1784,9 +1776,9 @@
             addChatMessage('system', `🎁 أرسل ${name} 🎁`, 'أنت');
             showToast('🎁', `تم إرسال ${name} إلى ${currentPartner.nickname}`);
 
-            const giftRef = db.ref('rooms/' + currentRoom + '/gifts').push();
+            const giftRef = database.ref('rooms/' + currentRoom + '/gifts').push();
             giftRef.set({
-                from: currentUser.firebaseKey,
+                from: userKey,
                 to: currentPartner.firebaseKey,
                 name: name,
                 price: price,
@@ -1798,11 +1790,12 @@
 
         function listenGifts() {
             if (!currentRoom) return;
-            const giftRef = db.ref('rooms/' + currentRoom + '/gifts');
+            const giftRef = database.ref('rooms/' + currentRoom + '/gifts');
             giftRef.off();
             giftRef.on('child_added', (snapshot) => {
                 const data = snapshot.val();
-                if (data && data.from !== currentUser.firebaseKey) {
+                const userKey = currentUser.firebaseKey || currentUser.id;
+                if (data && data.from !== userKey) {
                     addChatMessage('system', `🎁 تلقيت هدية: ${data.name} 🎁`, 'نظام');
                     showToast('🎁', `تلقيت هدية ${data.name} من ${currentPartner.nickname}`);
                 }
@@ -1811,7 +1804,7 @@
 
         function listenRoomChanges() {
             if (!currentRoom) return;
-            const roomRef = db.ref('rooms/' + currentRoom);
+            const roomRef = database.ref('rooms/' + currentRoom);
             roomRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data || data.status === 'ended') {
@@ -1881,17 +1874,14 @@
             try {
                 if (currentRoom) endCall();
 
-                if (currentUser?.firebaseKey) {
-                    await db.ref('users/' + currentUser.firebaseKey).update({
+                const userKey = currentUser?.firebaseKey || currentUser?.id;
+                if (userKey) {
+                    await database.ref('users/' + userKey).update({
                         isOnline: false,
                         inCall: false,
                         currentRoom: null,
                         lastSeen: new Date().toISOString()
                     });
-                }
-
-                if (auth) {
-                    await auth.signOut();
                 }
 
                 localStorage.removeItem('currentUser');
@@ -1939,7 +1929,17 @@
         // 🚀 التهيئة عند تحميل الصفحة
         // ============================================================
         window.onload = function() {
+            // تهيئة Firebase أولاً
             initFirebase();
+
+            // محاولة تحميل المستخدم من localStorage (يتم استدعاؤها داخل initFirebase)
+            // إذا لم يتم تحميل المستخدم، نعرض رسالة
+
+            setTimeout(() => {
+                if (!isLoggedIn) {
+                    showToast('🔒', 'يرجى تسجيل الدخول للمتابعة');
+                }
+            }, 1000);
 
             // تحديث قائمة المستخدمين كل 10 ثواني
             setInterval(() => {
@@ -1950,20 +1950,22 @@
 
             // تحديث حالة الاتصال
             setInterval(() => {
-                if (isLoggedIn && currentUser?.firebaseKey && db) {
-                    db.ref('users/' + currentUser.firebaseKey).update({
-                        isOnline: true,
-                        lastSeen: new Date().toISOString()
-                    });
+                if (isLoggedIn && currentUser) {
+                    const userKey = currentUser.firebaseKey || currentUser.id;
+                    if (userKey) {
+                        database.ref('users/' + userKey).update({
+                            isOnline: true,
+                            lastSeen: new Date().toISOString()
+                        });
+                    }
                 }
             }, 30000);
 
             console.log('🎙️ VIP Chat جاهز!');
             console.log('✅ تقسيم الشاشة بالطول (يمين/يسار)');
-            console.log('✅ جميع بيانات المستخدم من Firebase');
+            console.log('✅ بيانات المستخدم من localStorage');
             console.log('✅ شريط الدردشة وأزرار التحكم في الأسفل');
         };
     </script>
-
 </body>
 </html>
