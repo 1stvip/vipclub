@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <style>
+        /* ===== جميع الأنماط السابقة تبقى كما هي ===== */
         * {
             margin: 0;
             padding: 0;
@@ -136,492 +137,8 @@
             font-weight: bold;
         }
 
-        /* ===== HERO BANNER ===== */
-        .hero-banner-wrapper {
-            position: relative;
-            margin: 12px 12px 16px;
-            border-radius: 16px;
-            overflow: hidden;
-            height: 180px;
-            background: #0a0a1a;
-        }
-
-        .hero-banner {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .hero-banner.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-        }
-
-        .hero-banner.visible {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
-
-        .hero-banner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-        }
-
-        .hero-dots {
-            position: absolute;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 10;
-        }
-
-        .hero-dots .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .hero-dots .dot.active {
-            background: #ffd700;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .hero-dots .dot:hover {
-            background: #ffd700;
-        }
-
-        .search-container {
-            padding: 0 16px 16px;
-        }
-
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background: #1e1e32;
-            border-radius: 30px;
-            padding: 0 18px;
-            border: 1px solid #2a2a4a;
-            transition: 0.3s;
-        }
-
-        .search-bar:focus-within {
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.06);
-        }
-
-        .search-bar i {
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        .search-bar input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 12px 14px;
-            color: #fff;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .search-bar input::placeholder {
-            color: #666;
-        }
-
-        .search-bar .search-btn {
-            background: linear-gradient(135deg, #ffd700, #f0c000);
-            border: none;
-            color: #1a1a2e;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .search-bar .search-btn:hover {
-            transform: scale(1.04);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .filter-tabs {
-            display: flex;
-            gap: 6px;
-            padding: 0 16px 14px;
-            overflow-x: auto;
-            flex-wrap: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .filter-tabs::-webkit-scrollbar {
-            height: 0;
-        }
-
-        .filter-tab {
-            background: #1a1a2e;
-            border: 1px solid #2a2a4a;
-            color: #aaa;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.3s;
-            font-weight: 500;
-        }
-
-        .filter-tab:hover {
-            border-color: #ffd700;
-            color: #fff;
-        }
-
-        .filter-tab.active {
-            background: #ffd700;
-            color: #1a1a2e;
-            border-color: #ffd700;
-            font-weight: 600;
-        }
-
-        .filter-tab i {
-            margin-left: 4px;
-        }
-
-        .rooms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-            padding: 0 16px 20px;
-            flex: 1;
-        }
-
-        .room-card {
-            background: #14142a;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid #1e1e3a;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .room-card:hover {
-            transform: translateY(-4px);
-            border-color: #ffd700;
-            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.06);
-        }
-
-        .room-card .room-banner {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/9;
-            overflow: hidden;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #1a1a2e;
-            flex-shrink: 0;
-        }
-
-        .room-card .room-banner .banner-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-
-        .room-card .room-banner .overlay-image {
-            position: absolute;
-            z-index: 4;
-            width: 35%;
-            height: auto;
-            max-height: 45%;
-            min-width: 60px;
-            max-width: 140px;
-            top: 8px;
-            right: 8px;
-            object-fit: contain;
-            pointer-events: none;
-            opacity: 0.9;
-            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
-            border-radius: 6px;
-            aspect-ratio: auto;
-            image-rendering: auto;
-        }
-
-        .room-card .room-banner .room-status {
-            position: absolute;
-            top: 8px;
-            left: 10px;
-            background: #10b981;
-            color: #fff;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.55rem;
-            font-weight: 600;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .room-card .room-banner .room-status i {
-            font-size: 0.4rem;
-        }
-
-        .room-card .room-body {
-            padding: 4px 14px 10px;
-            flex: 1;
-        }
-
-        .room-card .room-body .room-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 4px;
-            padding: 2px 0 2px 0;
-        }
-
-        .room-card .room-body .room-id {
-            font-size: 0.6rem;
-            color: #ffd700;
-            font-family: monospace;
-            background: rgba(255, 215, 0, 0.08);
-            padding: 2px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 215, 0, 0.1);
-            display: inline-block;
-            letter-spacing: 0.5px;
-        }
-
-        .room-card .room-body .room-privacy {
-            font-size: 0.6rem;
-            padding: 2px 10px;
-            border-radius: 10px;
-            display: inline-block;
-            font-weight: 600;
-        }
-
-        .room-card .room-body .room-privacy.private {
-            background: rgba(255, 215, 0, 0.12);
-            color: #ffd700;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-        }
-
-        .room-card .room-body .room-privacy.public {
-            background: rgba(16, 185, 129, 0.12);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.15);
-        }
-
-        .room-card .room-body .room-name {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-
-        .room-card .room-body .room-desc {
-            font-size: 0.75rem;
-            color: #999;
-            line-height: 1.4;
-            margin-bottom: 6px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .room-card .room-body .room-host {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding-top: 6px;
-            border-top: 1px solid #1e1e3a;
-        }
-
-        .room-card .room-body .room-host .host-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: #fff;
-            flex-shrink: 0;
-            overflow: hidden;
-            border: 2px solid rgba(255, 215, 0, 0.15);
-        }
-
-        .room-card .room-body .room-host .host-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .room-card .room-body .room-host .host-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .room-card .room-body .room-host .host-name {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 1px;
-        }
-
-        .room-card .room-body .room-host .host-id {
-            font-size: 0.55rem;
-            color: #888;
-            font-family: monospace;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1px 8px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        .room-card .room-footer {
-            padding: 6px 14px 10px;
-            background: #0f0f1f;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #1a1a30;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .room-card .room-footer .stats {
-            display: flex;
-            gap: 10px;
-            font-size: 0.65rem;
-            color: #777;
-            flex-wrap: wrap;
-        }
-
-        .room-card .room-footer .stats span {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .room-card .room-footer .join-btn {
-            background: linear-gradient(135deg, #ffd700, #f0c000);
-            border: none;
-            color: #1a1a2e;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .room-card .room-footer .join-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.25);
-        }
-
-        @media (max-width: 768px) {
-            .hero-banner-wrapper {
-                height: 160px;
-                margin: 10px 10px 14px;
-                border-radius: 14px;
-            }
-            
-            .hero-banner img {
-                object-fit: cover;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .hero-banner-wrapper {
-                height: 140px;
-                margin: 8px 8px 12px;
-                border-radius: 12px;
-            }
-            
-            .hero-banner {
-                border-radius: 12px;
-            }
-            
-            .hero-banner img {
-                object-fit: cover;
-                object-position: center;
-            }
-            
-            .hero-dots {
-                bottom: 8px;
-                gap: 6px;
-            }
-            
-            .hero-dots .dot {
-                width: 6px;
-                height: 6px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .hero-banner-wrapper {
-                height: 120px;
-                margin: 6px 6px 10px;
-                border-radius: 10px;
-            }
-            
-            .hero-banner {
-                border-radius: 10px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .room-card .room-banner .overlay-image {
-                width: 38%;
-                max-width: 120px;
-                top: 6px;
-                right: 6px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .room-card .room-banner .overlay-image {
-                width: 40%;
-                max-width: 100px;
-                top: 5px;
-                right: 5px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .room-card .room-banner .overlay-image {
-                width: 45%;
-                max-width: 80px;
-                top: 4px;
-                right: 4px;
-            }
-        }
-                .profile-dropdown {
+        /* ===== PROFILE DROPDOWN ===== */
+        .profile-dropdown {
             position: absolute;
             top: 55px;
             right: 10px;
@@ -657,7 +174,7 @@
             }
         }
 
-        /* ===== الصورة الشخصية المحسّنة ===== */
+        /* ===== الصورة الشخصية ===== */
         .profile-dropdown .profile-avatar-container {
             position: relative;
             width: 90px;
@@ -694,7 +211,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             padding: 6px;
             font-size: 0.65rem;
             color: white;
@@ -705,7 +222,12 @@
         }
 
         .profile-dropdown .profile-avatar-container .upload-overlay:hover {
-            background: rgba(139, 92, 246, 0.8);
+            background: rgba(139, 92, 246, 0.9);
+            transform: scale(1.05);
+        }
+
+        .profile-dropdown .profile-avatar-container .upload-overlay i {
+            margin-left: 4px;
         }
 
         .profile-dropdown .profile-name {
@@ -1099,126 +621,6 @@
             background: #7c3aed;
             transform: translateY(-2px);
         }
-                .notif-dropdown {
-            position: absolute;
-            top: 55px;
-            right: 10px;
-            width: 400px;
-            max-width: 92vw;
-            background: #1a1a2e;
-            border-radius: 20px;
-            border: 1px solid #333;
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8);
-            display: none;
-            flex-direction: column;
-            z-index: 1001;
-            overflow: hidden;
-            max-height: 80vh;
-        }
-
-        .notif-dropdown.active {
-            display: flex;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .notif-header {
-            padding: 15px 20px;
-            background: #16213e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .notif-header h3 {
-            color: #ffd700;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .notif-actions {
-            display: flex;
-            gap: 12px;
-            font-size: 0.8rem;
-        }
-
-        .notif-actions span {
-            cursor: pointer;
-            color: #aaa;
-            transition: 0.3s;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .notif-actions span:hover {
-            color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        .notif-actions .delete-all:hover {
-            color: #ff4757;
-            background: rgba(255, 71, 87, 0.1);
-        }
-
-        #notifList {
-            overflow-y: auto;
-            max-height: 350px;
-            min-height: 100px;
-        }
-
-        .notif-item {
-            padding: 14px 20px;
-            border-bottom: 1px solid #2a2a3e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            transition: 0.2s;
-            cursor: default;
-        }
-
-        .notif-item:hover {
-            background: #2a2a3e;
-        }
-
-        .notif-item.unread {
-            background: #1e2a4a;
-            border-right: 4px solid #ffd700;
-        }
-
-        .notif-item .notif-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .notif-item .notif-text {
-            color: #eee;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            word-break: break-word;
-        }
-
-        .notif-item .notif-time {
-            color: #777;
-            font-size: 0.7rem;
-            margin-top: 3px;
-        }
-
-        .empty-notif {
-            padding: 40px 20px;
-            text-align: center;
-            color: #666;
-        }
-
-        .empty-notif i {
-            font-size: 2.5rem;
-            color: #444;
-            margin-bottom: 10px;
-        }
 
         /* ===== CROP MODAL ===== */
         .crop-modal {
@@ -1260,12 +662,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            background: #0f0f1f;
         }
 
         .crop-modal .crop-container .crop-image-container img {
             width: 100%;
             height: auto;
             display: block;
+            max-height: 400px;
+            object-fit: contain;
         }
 
         .crop-modal .crop-container .crop-actions {
@@ -1303,450 +708,462 @@
             background: #444;
         }
 
-        /* ===== GIFTS MODAL ===== */
-        .gifts-modal {
-            display: none;
+        /* ===== TOAST ===== */
+        .toast {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .gifts-modal.active {
-            display: flex;
-        }
-
-        .gifts-modal .gifts-container {
+            top: 80px;
+            right: 16px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease-out;
+            max-width: 90vw;
+            font-size: 0.85rem;
             background: #1a1a2e;
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            border: 1px solid #333;
+            border: 1px solid #2a2a4a;
         }
 
-        .gifts-modal .gifts-container h2 {
-            color: #ffd700;
-            text-align: center;
-            margin-bottom: 20px;
+        .toast.success {
+            border-right: 4px solid #10b981;
+        }
+        .toast.error {
+            border-right: 4px solid #ef4444;
+        }
+        .toast.info {
+            border-right: 4px solid #3b82f6;
+        }
+        .toast.warning {
+            border-right: 4px solid #f59e0b;
+        }
+
+        /* ===== باقي الأنماط ===== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .search-container {
+            padding: 0 16px 16px;
+        }
+
+        .search-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .gifts-modal .gifts-container .gift-total {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ffd700;
-            font-size: 1.1rem;
-        }
-
-        .gifts-modal .gifts-container .gift-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid #2a2a3e;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
+            background: #1e1e32;
+            border-radius: 30px;
+            padding: 0 18px;
+            border: 1px solid #2a2a4a;
             transition: 0.3s;
         }
 
-        .gifts-modal .gifts-container .gift-item:hover {
-            border-color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.05);
+        .search-bar:focus-within {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.06);
         }
 
-        .gifts-modal .gifts-container .gift-item .gift-sender {
+        .search-bar i {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 14px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-bar input::placeholder {
+            color: #666;
+        }
+
+        .search-bar .search-btn {
+            background: linear-gradient(135deg, #ffd700, #f0c000);
+            border: none;
+            color: #1a1a2e;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .search-bar .search-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 0 16px 14px;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-tabs::-webkit-scrollbar {
+            height: 0;
+        }
+
+        .filter-tab {
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+            color: #aaa;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .filter-tab:hover {
+            border-color: #ffd700;
+            color: #fff;
+        }
+
+        .filter-tab.active {
+            background: #ffd700;
+            color: #1a1a2e;
+            border-color: #ffd700;
+            font-weight: 600;
+        }
+
+        .filter-tab i {
+            margin-left: 4px;
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 0 16px 20px;
+            flex: 1;
+        }
+
+        /* ===== باقي الأنماط من الكود الأصلي ===== */
+        .hero-banner-wrapper {
+            position: relative;
+            margin: 12px 12px 16px;
+            border-radius: 16px;
+            overflow: hidden;
+            height: 180px;
+            background: #0a0a1a;
+        }
+
+        .hero-banner {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .hero-banner.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .hero-banner.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .hero-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .hero-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .hero-dots .dot.active {
+            background: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .hero-dots .dot:hover {
+            background: #ffd700;
+        }
+
+        .room-card {
+            background: #14142a;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #1e1e3a;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .room-card:hover {
+            transform: translateY(-4px);
+            border-color: #ffd700;
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.06);
+        }
+
+        .room-card .room-banner {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #1a1a2e;
+            flex-shrink: 0;
+        }
+
+        .room-card .room-banner .banner-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .room-card .room-banner .overlay-image {
+            position: absolute;
+            z-index: 4;
+            width: 35%;
+            height: auto;
+            max-height: 45%;
+            min-width: 60px;
+            max-width: 140px;
+            top: 8px;
+            right: 8px;
+            object-fit: contain;
+            pointer-events: none;
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+            border-radius: 6px;
+            aspect-ratio: auto;
+            image-rendering: auto;
+        }
+
+        .room-card .room-banner .room-status {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            background: #10b981;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.55rem;
+            font-weight: 600;
+            z-index: 10;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 5px;
+            gap: 4px;
         }
 
-        .gifts-modal .gifts-container .gift-item .gift-sender .sender-avatar {
-            width: 30px;
-            height: 30px;
+        .room-card .room-banner .room-status i {
+            font-size: 0.4rem;
+        }
+
+        .room-card .room-body {
+            padding: 4px 14px 10px;
+            flex: 1;
+        }
+
+        .room-card .room-body .room-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+            padding: 2px 0 2px 0;
+        }
+
+        .room-card .room-body .room-id {
+            font-size: 0.6rem;
+            color: #ffd700;
+            font-family: monospace;
+            background: rgba(255, 215, 0, 0.08);
+            padding: 2px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .room-card .room-body .room-privacy {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .room-card .room-body .room-privacy.private {
+            background: rgba(255, 215, 0, 0.12);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+        }
+
+        .room-card .room-body .room-privacy.public {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .room-card .room-body .room-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .room-card .room-body .room-desc {
+            font-size: 0.75rem;
+            color: #999;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .room-card .room-body .room-host {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 6px;
+            border-top: 1px solid #1e1e3a;
+        }
+
+        .room-card .room-body .room-host .host-avatar {
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: linear-gradient(135deg, #4f46e5, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            font-size: 0.75rem;
             font-weight: bold;
-            font-size: 0.7rem;
+            color: #fff;
+            flex-shrink: 0;
             overflow: hidden;
+            border: 2px solid rgba(255, 215, 0, 0.15);
         }
 
-        .gifts-modal .gifts-container .gift-item .gift-sender .sender-avatar img {
+        .room-card .room-body .room-host .host-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .gifts-modal .gifts-container .gift-item .gift-sender .sender-name {
+        .room-card .room-body .room-host .host-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .room-card .room-body .room-host .host-name {
+            font-size: 0.8rem;
+            font-weight: 700;
             color: #fff;
-            font-weight: bold;
+            margin-bottom: 1px;
         }
 
-        .gifts-modal .gifts-container .gift-item .gift-sender .sender-id {
-            color: #666;
-            font-size: 0.7rem;
+        .room-card .room-body .room-host .host-id {
+            font-size: 0.55rem;
+            color: #888;
             font-family: monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1px 8px;
+            border-radius: 4px;
+            display: inline-block;
         }
 
-        .gifts-modal .gifts-container .gift-item .gift-details {
+        .room-card .room-footer {
+            padding: 6px 14px 10px;
+            background: #0f0f1f;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 8px;
+            border-top: 1px solid #1a1a30;
+            flex-shrink: 0;
             flex-wrap: wrap;
             gap: 5px;
         }
 
-        .gifts-modal .gifts-container .gift-item .gift-details .gift-value {
-            color: #10b981;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .gifts-modal .gifts-container .gift-item .gift-details .gift-time {
-            color: #666;
-            font-size: 0.75rem;
-        }
-
-        .gifts-modal .gifts-container .gift-item .gift-reason {
-            color: #94a3b8;
-            font-size: 0.8rem;
-            margin-top: 5px;
-            padding: 5px 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
-        }
-
-        .gifts-modal .gifts-container .no-gifts {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-
-        .gifts-modal .gifts-container .no-gifts i {
-            font-size: 3rem;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .gifts-modal .gifts-container .close-gifts {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #333;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .gifts-modal .gifts-container .close-gifts:hover {
-            background: #444;
-        }
-
-        /* ===== REPORT MODAL ===== */
-        .report-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .report-modal.active {
-            display: flex;
-        }
-
-        .report-modal .report-container {
-            background: #1a1a2e;
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 450px;
-            width: 100%;
-            border: 1px solid #333;
-        }
-
-        .report-modal .report-container h2 {
-            color: #ffd700;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .report-modal .report-container .form-group {
-            margin-bottom: 15px;
-        }
-
-        .report-modal .report-container .form-group label {
-            display: block;
-            color: #aaa;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-        }
-
-        .report-modal .report-container .form-group select,
-        .report-modal .report-container .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 2px solid #1e293b;
-            background: #0f172a;
-            color: white;
-            font-size: 0.95rem;
-            font-family: inherit;
-        }
-
-        .report-modal .report-container .form-group select:focus,
-        .report-modal .report-container .form-group textarea:focus {
-            outline: none;
-            border-color: #8b5cf6;
-        }
-
-        .report-modal .report-container .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .report-modal .report-container .report-actions {
+        .room-card .room-footer .stats {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
-        }
-
-        .report-modal .report-container .report-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .report-modal .report-container .report-actions .btn-report-submit {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .report-modal .report-container .report-actions .btn-report-submit:hover {
-            background: #d97706;
-            transform: translateY(-2px);
-        }
-
-        .report-modal .report-container .report-actions .btn-report-cancel {
-            background: #333;
-            color: white;
-        }
-
-        .report-modal .report-container .report-actions .btn-report-cancel:hover {
-            background: #444;
-        }
-
-        /* ===== PAGES ===== */
-        .messages-page {
-            display: none;
-            flex-direction: column;
-            padding: 16px;
-            flex: 1;
-        }
-
-        .messages-page.active {
-            display: flex;
-        }
-
-        .messages-page .msg-header {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ffd700;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid #2a2a4a;
-            padding-bottom: 12px;
-        }
-
-        .messages-page .msg-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            flex: 1;
-        }
-
-        .messages-page .msg-item {
-            background: #14142a;
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 1px solid #1e1e3a;
-            transition: 0.3s;
-        }
-
-        .messages-page .msg-item:hover {
-            border-color: #ffd700;
-        }
-
-        .messages-page .msg-item .msg-sender {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
-        }
-
-        .messages-page .msg-item .msg-sender .sender-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.7rem;
-            color: white;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .messages-page .msg-item .msg-sender .sender-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .messages-page .msg-item .msg-sender .sender-name {
-            font-weight: 600;
-            color: #fff;
-            font-size: 0.9rem;
-        }
-
-        .messages-page .msg-item .msg-sender .sender-id {
-            color: #666;
             font-size: 0.65rem;
-            font-family: monospace;
+            color: #777;
+            flex-wrap: wrap;
         }
 
-        .messages-page .msg-item .msg-text {
-            color: #aaa;
-            font-size: 0.85rem;
-            line-height: 1.6;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            margin-top: 4px;
-        }
-
-        .messages-page .msg-item .msg-time {
-            color: #555;
-            font-size: 0.6rem;
-            margin-top: 6px;
-            text-align: left;
-        }
-
-        .messages-page .msg-item.welcome {
-            border-color: rgba(255, 215, 0, 0.3);
-            background: rgba(255, 215, 0, 0.04);
-        }
-
-        .messages-page .msg-item.welcome .msg-text {
-            color: #ffd700;
-        }
-
-        .messages-page .back-btn {
-            background: #2a2a4a;
-            border: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-bottom: 12px;
-            align-self: flex-start;
-        }
-
-        .messages-page .back-btn:hover {
-            background: #3a3a5a;
-        }
-
-        .games-page {
-            display: none;
-            flex-direction: column;
-            padding: 16px;
-            flex: 1;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .games-page.active {
+        .room-card .room-footer .stats span {
             display: flex;
+            align-items: center;
+            gap: 3px;
         }
 
-        .games-page .games-placeholder {
-            text-align: center;
-            color: #666;
-        }
-
-        .games-page .games-placeholder i {
-            font-size: 4rem;
-            color: #333;
-            margin-bottom: 16px;
-        }
-
-        .games-page .games-placeholder h2 {
-            color: #888;
-            font-size: 1.2rem;
-        }
-
-        .games-page .games-placeholder p {
-            font-size: 0.85rem;
-            margin-top: 8px;
-        }
-
-        .games-page .back-btn {
-            background: #2a2a4a;
+        .room-card .room-footer .join-btn {
+            background: linear-gradient(135deg, #ffd700, #f0c000);
             border: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
+            color: #1a1a2e;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.7rem;
             cursor: pointer;
             transition: 0.3s;
-            margin-bottom: 20px;
-            align-self: flex-start;
         }
 
-        .games-page .back-btn:hover {
-            background: #3a3a5a;
+        .room-card .room-footer .join-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.25);
         }
 
-        /* ===== FLOATING BUTTONS ===== */
         .floating-support {
             position: fixed;
             bottom: 24px;
@@ -1854,221 +1271,6 @@
             }
         }
 
-        /* ===== CREATE ROOM MODAL ===== */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            backdrop-filter: blur(8px);
-        }
-
-        .modal.active {
-            display: flex;
-            animation: modalFadeIn 0.3s ease;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .modal-content {
-            background: #1a1a2e;
-            border-radius: 20px;
-            padding: 25px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-            color: #fff;
-            border: 1px solid #2a2a4a;
-        }
-
-        .modal-content h2 {
-            color: #ffd700;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 2px solid #ffd700;
-            padding-bottom: 12px;
-            font-size: 1.2rem;
-        }
-
-        .modal-content .form-group {
-            margin-bottom: 14px;
-        }
-
-        .modal-content .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #ddd;
-            margin-bottom: 4px;
-            font-size: 0.85rem;
-        }
-
-        .modal-content .form-group input,
-        .modal-content .form-group textarea,
-        .modal-content .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #2a2a4a;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: border-color 0.3s ease;
-            outline: none;
-            background: #0f0f1f;
-            color: #fff;
-        }
-
-        .modal-content .form-group input:focus,
-        .modal-content .form-group textarea:focus {
-            border-color: #ffd700;
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
-        }
-
-        .modal-content .form-group textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .modal-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .modal-actions .btn-submit {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white;
-        }
-
-        .modal-actions .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-        }
-
-        .modal-actions .btn-cancel {
-            background: #2a2a4a;
-            color: #aaa;
-        }
-
-        .modal-actions .btn-cancel:hover {
-            background: #3a3a5a;
-        }
-
-        .card-preview {
-            background: #0f0f1f;
-            border-radius: 12px;
-            margin: 10px 0;
-            border: 1px solid #2a2a4a;
-            position: relative;
-            min-height: 150px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            width: 100%;
-            aspect-ratio: 16/9;
-            background-color: #1a1a2e;
-        }
-
-        .card-preview .preview-overlay-image {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 35%;
-            height: auto;
-            max-height: 45%;
-            min-width: 60px;
-            max-width: 140px;
-            object-fit: contain;
-            pointer-events: none;
-            z-index: 4;
-            opacity: 0.9;
-            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
-            border-radius: 6px;
-            aspect-ratio: auto;
-        }
-
-        .card-preview .preview-text {
-            position: relative;
-            z-index: 3;
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 1.4rem;
-            text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-            letter-spacing: 3px;
-        }
-
-        .card-preview .preview-placeholder {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #444;
-            font-size: 0.8rem;
-            z-index: 1;
-        }
-
-        @media (max-width: 768px) {
-            .card-preview .preview-overlay-image {
-                width: 38%;
-                max-width: 120px;
-                top: 6px;
-                right: 6px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .card-preview .preview-overlay-image {
-                width: 40%;
-                max-width: 100px;
-                top: 5px;
-                right: 5px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .card-preview .preview-overlay-image {
-                width: 45%;
-                max-width: 80px;
-                top: 4px;
-                right: 4px;
-            }
-        }
-
-        /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             background: #14142a;
             border-top: 1px solid #1e1e3a;
@@ -2123,90 +1325,22 @@
             border: 1px solid #14142a;
         }
 
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            top: 80px;
-            right: 16px;
-            padding: 10px 20px;
-            border-radius: 10px;
-            color: #fff;
-            font-weight: 600;
-            z-index: 9999;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: slideDown 0.3s ease-out;
-            max-width: 90vw;
-            font-size: 0.85rem;
-            background: #1a1a2e;
-            border: 1px solid #2a2a4a;
-        }
-
-        .toast.success {
-            border-right: 4px solid #10b981;
-        }
-        .toast.error {
-            border-right: 4px solid #ef4444;
-        }
-        .toast.info {
-            border-right: 4px solid #3b82f6;
-        }
-        .toast.warning {
-            border-right: 4px solid #f59e0b;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .page {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .page.active {
-            display: flex;
-        }
-
-        /* ===== PASSWORD ERROR MODAL ===== */
-        #passwordErrorModal .modal-content {
-            max-width: 400px;
-            text-align: center;
-        }
-
-        #passwordErrorModal .modal-content h2 {
-            color: #ff4757;
-            border-bottom: none;
-        }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
-            .header-center .logo {
-                font-size: 1.1rem;
+            .profile-dropdown {
+                width: 340px;
+                max-width: 92vw;
+                right: 5px;
+                padding: 18px;
             }
-            .header-center .logo i {
-                font-size: 1.2rem;
+            .profile-dropdown .profile-avatar-container {
+                width: 70px;
+                height: 70px;
             }
-            .header-left .icon-btn,
-            .header-right .icon-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 0.9rem;
+            .profile-dropdown .profile-avatar-container .default-avatar {
+                font-size: 2rem;
             }
             .rooms-grid {
                 grid-template-columns: 1fr;
-                gap: 12px;
-                padding: 0 12px 16px;
-            }
-            .filter-tabs {
-                padding: 0 12px 12px;
-                gap: 4px;
-            }
-            .filter-tab {
-                font-size: 0.65rem;
-                padding: 4px 12px;
             }
             .floating-support,
             .floating-create-room {
@@ -2228,139 +1362,21 @@
                 top: -3px;
                 right: -3px;
             }
-            .bottom-nav .nav-item {
-                font-size: 0.5rem;
-            }
-            .bottom-nav .nav-item i {
-                font-size: 1rem;
-            }
-            .search-container {
-                padding: 0 12px 12px;
-            }
-            .search-bar input {
-                font-size: 0.8rem;
-                padding: 10px 10px;
-            }
-            .search-bar .search-btn {
-                font-size: 0.65rem;
-                padding: 4px 12px;
-            }
-            .profile-dropdown {
-                width: 340px;
-                max-width: 92vw;
-                right: 5px;
-                padding: 18px;
-            }
-            .notif-dropdown {
-                width: 340px;
-                max-width: 92vw;
-                right: 5px;
-            }
-            .room-card .room-body .room-host {
-                gap: 10px;
-            }
-            .room-card .room-body .room-host .host-avatar {
-                width: 30px;
-                height: 30px;
-                font-size: 0.7rem;
-            }
-            .room-card .room-body .room-host .host-name {
-                font-size: 0.75rem;
-            }
-            .room-card .room-body .room-meta {
-                gap: 6px;
-                padding: 1px 0 1px 0;
-            }
-            .room-card .room-body .room-id {
-                font-size: 0.55rem;
-                padding: 1px 8px;
-            }
-            .room-card .room-body .room-privacy {
-                font-size: 0.55rem;
-                padding: 1px 8px;
-            }
-            .room-card .room-body {
-                padding: 2px 12px 8px;
-            }
-            .room-card .room-banner {
-                min-height: 80px;
-            }
-            .card-preview {
-                min-height: 120px;
-            }
-            .card-preview .preview-text {
-                font-size: 1rem;
-            }
         }
 
         @media (max-width: 400px) {
-            .header {
-                padding: 6px 10px;
-            }
-            .header-center .logo {
-                font-size: 0.95rem;
-            }
-            .header-left .icon-btn,
-            .header-right .icon-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 0.75rem;
-            }
             .profile-dropdown {
                 width: 300px;
                 max-width: 95vw;
                 padding: 15px;
-                right: 0;
-            }
-            .notif-dropdown {
-                width: 300px;
-                max-width: 95vw;
                 right: 0;
             }
             .profile-dropdown .profile-avatar-container {
                 width: 60px;
                 height: 60px;
             }
-            .profile-dropdown .user-id-numeric {
-                font-size: 0.9rem;
-                padding: 8px 15px;
-                min-width: 100px;
-            }
-            .modal-content {
-                padding: 15px;
-                max-width: 98%;
-            }
-            .room-card .room-body .room-host {
-                gap: 8px;
-            }
-            .room-card .room-body .room-host .host-avatar {
-                width: 26px;
-                height: 26px;
-                font-size: 0.6rem;
-            }
-            .room-card .room-body .room-meta {
-                gap: 4px;
-                padding: 1px 0;
-            }
-            .room-card .room-body .room-id {
-                font-size: 0.5rem;
-                padding: 1px 6px;
-            }
-            .room-card .room-body .room-privacy {
-                font-size: 0.5rem;
-                padding: 1px 6px;
-            }
-            .room-card .room-body {
-                padding: 2px 10px 6px;
-            }
-            .room-card .room-banner {
-                min-height: 70px;
-            }
-            .card-preview {
-                min-height: 100px;
-            }
-            .card-preview .preview-text {
-                font-size: 0.9rem;
+            .profile-dropdown .profile-avatar-container .default-avatar {
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -2392,12 +1408,12 @@
 
         <!-- ===== PROFILE DROPDOWN ===== -->
         <div id="profileDropdown" class="profile-dropdown">
-            <div class="profile-avatar-container" onclick="document.getElementById('avatarInput').click()">
+            <div class="profile-avatar-container" id="avatarContainer" onclick="document.getElementById('avatarInput').click()">
                 <div id="profileAvatarDisplay" class="default-avatar">
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="upload-overlay">
-                    <i class="fas fa-camera"></i> تغيير
+                    <i class="fas fa-camera"></i> تغيير الصورة
                 </div>
                 <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
             </div>
@@ -2495,7 +1511,8 @@
             </div>
         </div>
     </header>
-        <!-- ===== MAIN CONTENT ===== -->
+
+    <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
 
         <!-- ===== HOME PAGE ===== -->
@@ -2562,7 +1579,8 @@
         </div>
 
     </div>
-        <!-- ===== CROP MODAL ===== -->
+
+    <!-- ===== CROP MODAL ===== -->
     <div id="cropModal" class="crop-modal">
         <div class="crop-container">
             <h3 style="color:white; text-align:center; margin-bottom:15px;">📐 قص الصورة</h3>
@@ -2570,167 +1588,11 @@
                 <img id="cropImage" src="" alt="صورة للقص">
             </div>
             <div style="text-align:center; color:#aaa; font-size:0.8rem; margin:10px 0;">
-                سيتم قص الصورة بشكل دائري تلقائياً
+                سيتم قص الصورة بشكل مربع تلقائياً
             </div>
             <div class="crop-actions">
                 <button class="btn-crop" onclick="cropImage()">✅ قص وحفظ</button>
                 <button class="btn-cancel-crop" onclick="closeCropModal()">❌ إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== GIFTS MODAL ===== -->
-    <div id="giftsModal" class="gifts-modal">
-        <div class="gifts-container">
-            <h2><i class="fas fa-gift" style="color:#ffd700;"></i> الهدايا المتلقاة</h2>
-            <div class="gift-total" id="giftTotal">
-                مجموع قيمة الهدايا: <span id="totalGiftValue">0</span> 💰
-            </div>
-            <div id="giftsList">
-                <div class="no-gifts">
-                    <i class="fas fa-gift"></i>
-                    <p>لا توجد هدايا حتى الآن</p>
-                </div>
-            </div>
-            <button class="close-gifts" onclick="closeGiftsModal()">إغلاق</button>
-        </div>
-    </div>
-
-    <!-- ===== REPORT MODAL ===== -->
-    <div id="reportModal" class="report-modal">
-        <div class="report-container">
-            <h2><i class="fas fa-flag" style="color:#f59e0b;"></i> الإبلاغ عن الملف الشخصي</h2>
-            <p style="color:#aaa; text-align:center; margin-bottom:15px; font-size:0.85rem;">
-                سيتم إرسال البلاغ إلى الإدارة للتحقيق
-            </p>
-            <div class="form-group">
-                <label>نوع البلاغ</label>
-                <select id="reportType">
-                    <option value="محتوى غير لائق">محتوى غير لائق</option>
-                    <option value="تحريض على العنف">تحريض على العنف</option>
-                    <option value="انتحال شخصية">انتحال شخصية</option>
-                    <option value="مضايقة">مضايقة</option>
-                    <option value="صور غير لائقة">صور غير لائقة</option>
-                    <option value="أخرى">أخرى</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>وصف البلاغ</label>
-                <textarea id="reportDescription" placeholder="أدخل تفاصيل البلاغ..."></textarea>
-            </div>
-            <div class="report-actions">
-                <button class="btn-report-submit" onclick="submitReport()">
-                    <i class="fas fa-paper-plane"></i> إرسال البلاغ
-                </button>
-                <button class="btn-report-cancel" onclick="closeReportModal()">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL: إنشاء غرفة ===== -->
-    <div id="createRoomModal" class="modal">
-        <div class="modal-content">
-            <h2><i class="fas fa-home" style="color: #ffd700;"></i> إنشاء غرفة جديدة</h2>
-
-            <div class="form-group">
-                <label>اسم الغرفة *</label>
-                <input type="text" id="roomNameInput" placeholder="أدخل اسم الغرفة" maxlength="50">
-            </div>
-
-            <div class="form-group">
-                <label>وصف الغرفة</label>
-                <textarea id="roomDescInput" placeholder="أدخل وصفاً للغرفة..." rows="3"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>🎨 خلفية البطاقة</label>
-                <select id="roomBackground" onchange="updateCardPreview()">
-                    <option value="default">الخلفية الافتراضية</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>🖼️ الصورة العلوية (اختياري)</label>
-                <select id="roomOverlay" onchange="updateCardPreview()">
-                    <option value="none">بدون صورة علوية</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>🪑 عدد المقاعد</label>
-                <select id="roomMaxSlots">
-                    <option value="2">2 مقاعد</option>
-                    <option value="3">3 مقاعد</option>
-                    <option value="4">4 مقاعد</option>
-                    <option value="5">5 مقاعد</option>
-                    <option value="6">6 مقاعد</option>
-                    <option value="7">7 مقاعد</option>
-                    <option value="8">8 مقاعد</option>
-                    <option value="9">9 مقاعد</option>
-                    <option value="10" selected>10 مقاعد</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>🔑 كلمة مرور الغرفة (اختياري)</label>
-                <div style="display: flex; align-items: center; gap: 8px; background: #0f0f1f; border: 2px solid #2a2a4a; border-radius: 10px; padding: 0 12px;">
-                    <input type="password" id="roomPasswordInput" placeholder="أدخل كلمة مرور للغرفة (اختياري)" maxlength="20" style="flex: 1; background: transparent; border: none; padding: 10px 0; color: #fff; outline: none; font-size: 0.95rem;">
-                    <button type="button" onclick="togglePasswordVisibility()" style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 1.1rem; padding: 8px;">
-                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>📋 معاينة البطاقة</label>
-                <div class="card-preview" id="cardPreview">
-                    <div class="preview-placeholder">🎙️ VipChat</div>
-                </div>
-            </div>
-
-            <div class="form-group" style="background: rgba(255,215,0,0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,215,0,0.1);">
-                <p style="font-size: 0.85rem; color: #aaa;">
-                    <i class="fas fa-info-circle" style="color: #ffd700;"></i>
-                    سيتم إرسال طلبك إلى الإدارة للموافقة عليه.
-                </p>
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn-submit" onclick="submitRoomRequest()">
-                    <i class="fas fa-paper-plane"></i> إرسال
-                </button>
-                <button class="btn-cancel" onclick="closeModal('createRoomModal')">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== نافذة خطأ كلمة المرور ===== -->
-    <div id="passwordErrorModal" class="modal">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <h2 style="color: #ff4757; border-bottom: none;">
-                <i class="fas fa-lock"></i> كلمة المرور غير صحيحة
-            </h2>
-            <p style="color: #ff6b81; font-size: 1.1rem; margin: 20px 0;">
-                ❌ كلمة المرور غير صحيحة
-            </p>
-            <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">
-                يرجى التأكد من كلمة المرور والمحاولة مرة أخرى
-            </p>
-            <button onclick="closePasswordError()" style="background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem;">
-                <i class="fas fa-redo"></i> حاول مرة أخرى
-            </button>
-        </div>
-    </div>
-
-    <!-- ===== MODAL: عرض الملف الشخصي الكامل ===== -->
-    <div id="fullProfileModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <h2><i class="fas fa-id-card" style="color: #ffd700;"></i> الملف الشخصي الكامل</h2>
-            <div id="fullProfileContent">
-                <!-- سيتم تحميل المحتوى ديناميكياً -->
-            </div>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal('fullProfileModal')">إغلاق</button>
             </div>
         </div>
     </div>
@@ -2829,21 +1691,6 @@
         ];
 
         // ============================================================
-        // 📁 قائمة الصور المتاحة
-        // ============================================================
-        const bgImages = [];
-        const overlayImages = [];
-
-        // خلفيات البطاقات (0-10) - من مجلد roomsbg
-        for (let i = 0; i <= 10; i++) {
-            bgImages.push(`roomsbg/roommk (${i}).png`);
-        }
-
-        // الصور العلوية (1-28) - من مجلد roomsmk
-        for (let i = 1; i <= 28; i++) {
-            overlayImages.push(`roomsmk/roomsmk (${i}).png`);
-        }
-                    // ============================================================
         // 🚀 INITIALIZE FIREBASE
         // ============================================================
         try {
@@ -2907,206 +1754,8 @@
             }
             return true;
         }
-
-        // ============================================================
-        // 🎨 UPDATE CARD PREVIEW
-        // ============================================================
-        function updateCardPreview() {
-            const preview = document.getElementById('cardPreview');
-            const bgSelect = document.getElementById('roomBackground');
-            const overlaySelect = document.getElementById('roomOverlay');
-
-            const bgValue = bgSelect.value;
-            const overlayValue = overlaySelect.value;
-
-            // إزالة جميع العناصر السابقة
-            preview.innerHTML = '';
-
-            // ===== تعيين الخلفية =====
-            if (bgValue && bgValue !== 'default') {
-                preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
-                preview.style.backgroundSize = 'contain';
-                preview.style.backgroundPosition = 'center';
-                preview.style.backgroundRepeat = 'no-repeat';
-                preview.style.backgroundColor = '#1a1a2e';
-            } else {
-                preview.style.backgroundImage = `url('images/chathtml/roomsbg/roommk (0).png')`;
-                preview.style.backgroundSize = 'contain';
-                preview.style.backgroundPosition = 'center';
-                preview.style.backgroundRepeat = 'no-repeat';
-                preview.style.backgroundColor = '#1a1a2e';
-            }
-
-            // ===== إضافة النص الافتراضي في المنتصف =====
-            const textDiv = document.createElement('div');
-            textDiv.className = 'preview-text';
-            textDiv.textContent = '🎙️ VIP CHAT';
-            preview.appendChild(textDiv);
-
-            // ===== إضافة الصورة العلوية في أعلى اليمين =====
-            if (overlayValue && overlayValue !== 'none') {
-                const overlayImg = document.createElement('img');
-                overlayImg.className = 'preview-overlay-image';
-                overlayImg.src = `images/chathtml/${overlayValue}`;
-                overlayImg.alt = 'صورة علوية';
-                overlayImg.onerror = function() {
-                    console.log('❌ فشل تحميل الصورة العلوية:', overlayValue);
-                    this.style.display = 'none';
-                };
-                preview.appendChild(overlayImg);
-            }
-        }
-
-        // ============================================================
-        // 📋 LOAD IMAGES INTO SELECTS
-        // ============================================================
-        function loadImageSelects() {
-            const bgSelect = document.getElementById('roomBackground');
-            const overlaySelect = document.getElementById('roomOverlay');
-
-            // تحميل الخلفيات
-            bgImages.forEach(img => {
-                const option = document.createElement('option');
-                option.value = img;
-                const match = img.match(/\((\d+)\)/);
-                const num = match ? match[1] : '0';
-                option.textContent = `خلفية ${num}`;
-                bgSelect.appendChild(option);
-            });
-
-            // تحميل الصور العلوية
-            overlayImages.forEach(img => {
-                const option = document.createElement('option');
-                option.value = img;
-                const match = img.match(/\((\d+)\)/);
-                const num = match ? match[1] : '0';
-                option.textContent = `صورة ${num}`;
-                overlaySelect.appendChild(option);
-            });
-
-            updateCardPreview();
-        }
-
-        // ============================================================
-        // 👁️ إظهار/إخفاء كلمة المرور
-        // ============================================================
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('roomPasswordInput');
-            const toggleIcon = document.getElementById('passwordToggleIcon');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.className = 'fas fa-eye-slash';
-                toggleIcon.style.color = '#ffd700';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.className = 'fas fa-eye';
-                toggleIcon.style.color = '#888';
-            }
-        }
                     // ============================================================
-        // 📝 SUBMIT ROOM REQUEST
-        // ============================================================
-        async function submitRoomRequest() {
-            if (!requireLogin('submitRoomRequest')) return;
-
-            const name = document.getElementById('roomNameInput').value.trim();
-            const description = document.getElementById('roomDescInput').value.trim();
-            const background = document.getElementById('roomBackground').value;
-            const overlay = document.getElementById('roomOverlay').value;
-            const maxSlots = parseInt(document.getElementById('roomMaxSlots').value);
-            const password = document.getElementById('roomPasswordInput').value.trim();
-
-            if (!name) {
-                showToast('⚠️ يرجى إدخال اسم الغرفة', 'warning');
-                return;
-            }
-
-            const user = getCurrentUser();
-            const roomId = generateRoomId();
-
-            const requestData = {
-                roomId: roomId,
-                name: name,
-                description: description || 'لا يوجد وصف',
-                creatorId: user.numericId || 'GUEST',
-                creatorName: user.nickname || user.username || 'زائر',
-                creatorAvatar: user.avatar || '',
-                background: background || 'default',
-                overlayImage: overlay || 'none',
-                maxSlots: maxSlots || 10,
-                password: password ? btoa(password) : '',
-                hasPassword: !!password,
-                status: 'pending',
-                vip: false,
-                tag: 'all',
-                createdAt: new Date().toISOString(),
-                members: 0,
-                isActive: false
-            };
-
-            try {
-                await database.ref('room_requests/' + roomId).set(requestData);
-
-                await database.ref('admin_notifications').push({
-                    type: 'new_room_request',
-                    roomId: roomId,
-                    roomName: name,
-                    creatorName: requestData.creatorName,
-                    creatorId: requestData.creatorId,
-                    hasPassword: requestData.hasPassword,
-                    maxSlots: requestData.maxSlots,
-                    read: false,
-                    createdAt: new Date().toISOString()
-                });
-
-                if (user && user.numericId) {
-                    await sendNotification(
-                        user.numericId,
-                        `✅ تم استلام طلب إنشاء غرفة "${name}"`,
-                        `معرف الطلب: ${roomId}\nسيتم مراجعة طلبك من قبل الإدارة.`
-                    );
-                }
-
-                showToast('✅ تم إرسال الطلب بنجاح! سيتم مراجعته من قبل الإدارة.', 'success');
-                closeModal('createRoomModal');
-                document.getElementById('roomNameInput').value = '';
-                document.getElementById('roomDescInput').value = '';
-                document.getElementById('roomPasswordInput').value = '';
-
-                const toggleIcon = document.getElementById('passwordToggleIcon');
-                toggleIcon.className = 'fas fa-eye';
-                toggleIcon.style.color = '#888';
-                document.getElementById('roomPasswordInput').type = 'password';
-
-                setTimeout(() => loadRooms(), 500);
-
-            } catch (error) {
-                console.error('Error submitting room request:', error);
-                showToast('❌ حدث خطأ. حاول مرة أخرى.', 'error');
-            }
-        }
-
-        // ============================================================
-        // 🔧 HELPER FUNCTIONS
-        // ============================================================
-        function generateRoomId() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 8; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        function getRoomTag(room) {
-            if (room.vip) return 'vip';
-            if (room.tag) return room.tag;
-            return 'all';
-        }
-
-        // ============================================================
-        // 📋 LOAD ROOMS (مع تصحيح البحث)
+        // 📋 LOAD ROOMS
         // ============================================================
         async function loadRooms() {
             if (!database) {
@@ -3223,6 +1872,12 @@
             renderRooms(filtered);
         }
 
+        function getRoomTag(room) {
+            if (room.vip) return 'vip';
+            if (room.tag) return room.tag;
+            return 'all';
+        }
+
         function renderRooms(rooms) {
             const grid = document.getElementById('roomsGrid');
 
@@ -3309,7 +1964,357 @@
             el.classList.add('active');
             applyFiltersAndSearch();
         }
+
+        // ============================================================
+        // 🎯 JOIN ROOM
+        // ============================================================
+        async function joinRoom(roomId) {
+            if (!requireLogin('joinRoom')) return;
+
+            try {
+                const snapshot = await database.ref('rooms/' + roomId).once('value');
+                const room = snapshot.val();
+
+                if (!room) {
+                    showToast('❌ الغرفة غير موجودة', 'error');
+                    return;
+                }
+
+                if (room.hasPassword && room.password) {
+                    showPasswordPrompt(roomId, room);
+                    return;
+                }
+
+                window.location.href = `voice-room.html?room=${roomId}`;
+
+            } catch (error) {
+                console.error('Error joining room:', error);
+                showToast('❌ حدث خطأ في الدخول إلى الغرفة', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🔐 نافذة إدخال كلمة المرور (مختصرة)
+        // ============================================================
+        function showPasswordPrompt(roomId, room) {
+            const existingPrompt = document.getElementById('passwordPrompt');
+            if (existingPrompt) existingPrompt.remove();
+
+            const promptHTML = `
+                        <div id="passwordPrompt" class="modal active" style="z-index: 5000; display:flex; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);">
+                            <div style="background:#1a1a2e; border-radius:20px; padding:25px; max-width:400px; width:95%; border:1px solid #333; text-align:center;">
+                                <h2 style="color: #ffd700; border-bottom: none;">
+                                    <i class="fas fa-lock"></i> غرفة محمية بكلمة مرور
+                                </h2>
+                                <p style="color: #aaa; margin: 15px 0; font-size: 0.9rem;">
+                                    الغرفة <strong style="color: #ffd700;">${room.name}</strong> محمية بكلمة مرور
+                                </p>
+                                <div style="margin-bottom:15px; text-align:right;">
+                                    <label style="color:#ddd; display:block; margin-bottom:5px;">🔑 أدخل كلمة المرور</label>
+                                    <div style="display:flex; align-items:center; gap:8px; background:#0f0f1f; border-radius:10px; border:2px solid #2a2a4a; padding:0 12px;">
+                                        <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور..." style="flex:1; background:transparent; border:none; padding:12px 0; color:#fff; outline:none; font-size:1rem;">
+                                        <button type="button" onclick="togglePromptPassword()" style="background:transparent; border:none; color:#888; cursor:pointer; font-size:1.1rem; padding:8px;">
+                                            <i class="fas fa-eye" id="promptToggleIcon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="passwordError" style="color: #ff4757; font-size: 0.9rem; margin-top: 10px; display: none;">
+                                    ❌ كلمة المرور غير صحيحة
+                                </div>
+                                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                    <button onclick="verifyPassword('${roomId}')" style="flex:1; padding:12px; background:linear-gradient(135deg,#ffd700,#f0c000); color:#1a1a2e; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:1rem;">
+                                        <i class="fas fa-unlock"></i> دخول
+                                    </button>
+                                    <button onclick="closePasswordPrompt()" style="flex:1; padding:12px; background:#2a2a4a; color:#aaa; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:1rem;">
+                                        إلغاء
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+            document.body.insertAdjacentHTML('beforeend', promptHTML);
+
+            setTimeout(() => {
+                const input = document.getElementById('passwordInput');
+                if (input) input.focus();
+            }, 300);
+        }
+
+        function togglePromptPassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('promptToggleIcon');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+                icon.style.color = '#ffd700';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+                icon.style.color = '#888';
+            }
+        }
+
+        async function verifyPassword(roomId) {
+            const input = document.getElementById('passwordInput');
+            const errorDiv = document.getElementById('passwordError');
+
+            if (!input || !input.value.trim()) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = '⚠️ يرجى إدخال كلمة المرور';
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('rooms/' + roomId).once('value');
+                const room = snapshot.val();
+
+                if (!room) {
+                    showToast('❌ الغرفة غير موجودة', 'error');
+                    return;
+                }
+
+                const storedPassword = room.password ? atob(room.password) : '';
+
+                if (input.value.trim() === storedPassword) {
+                    closePasswordPrompt();
+                    window.location.href = `voice-room.html?room=${roomId}`;
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = '❌ كلمة المرور غير صحيحة';
+                    input.value = '';
+                    input.focus();
+                }
+
+            } catch (error) {
+                console.error('Error verifying password:', error);
+                showToast('❌ حدث خطأ في التحقق من كلمة المرور', 'error');
+            }
+        }
+
+        function closePasswordPrompt() {
+            const prompt = document.getElementById('passwordPrompt');
+            if (prompt) prompt.remove();
+        }
                     // ============================================================
+        // 📋 LOAD ROOMS
+        // ============================================================
+        async function loadRooms() {
+            if (!database) {
+                console.error('Database not initialized');
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('rooms').once('value');
+                const roomsGrid = document.getElementById('roomsGrid');
+
+                if (!snapshot.exists()) {
+                    roomsGrid.innerHTML = `
+                                <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
+                                    <i class="fas fa-microphone-slash" style="font-size:3.5rem; color:#333; margin-bottom:15px;"></i>
+                                    <h3 style="color:#888;">لا توجد غرف حالياً</h3>
+                                    <p style="font-size:0.9rem;">اضغط على أيقونة <strong style="color:#ffd700;">🏠+</strong> لإنشاء غرفة جديدة</p>
+                                </div>
+                            `;
+                    return;
+                }
+
+                const roomsData = snapshot.val();
+                const rooms = [];
+
+                for (const roomId in roomsData) {
+                    const room = roomsData[roomId];
+                    if (room.status !== 'approved' && room.status !== 'active') continue;
+
+                    rooms.push({
+                        id: roomId,
+                        name: room.name || 'غرفة بدون اسم',
+                        desc: room.description || 'لا يوجد وصف',
+                        host: room.creatorName || 'مستخدم',
+                        hostId: room.creatorId || '---',
+                        creatorAvatar: room.creatorAvatar || '',
+                        members: room.members || 0,
+                        maxSlots: room.maxSlots || 10,
+                        status: room.isActive ? 'live' : 'pending',
+                        vip: room.vip || false,
+                        tag: room.tag || 'all',
+                        background: room.background || 'default',
+                        overlayImage: room.overlayImage || 'none',
+                        hasPassword: room.hasPassword || false,
+                        password: room.password || '',
+                        createdAt: room.createdAt || new Date().toISOString()
+                    });
+                }
+
+                allRooms = rooms;
+                applyFiltersAndSearch();
+
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                document.getElementById('roomsGrid').innerHTML = `
+                            <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
+                                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#ff4757; margin-bottom:15px;"></i>
+                                <h3 style="color:#888;">خطأ في تحميل الغرف</h3>
+                                <p style="font-size:0.9rem;">يرجى تحديث الصفحة</p>
+                                <button onclick="loadRooms()" style="margin-top:15px; padding:8px 20px; background:#ffd700; color:#1a1a2e; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+                                    <i class="fas fa-sync-alt"></i> إعادة تحميل
+                                </button>
+                            </div>
+                        `;
+            }
+        }
+
+        // ============================================================
+        // 🔍 APPLY FILTERS AND SEARCH (مصححة بالكامل)
+        // ============================================================
+        function applyFiltersAndSearch() {
+            let filtered = [...allRooms];
+
+            // ترتيب الغرف: الغرفة رقم 1 في المقدمة
+            filtered.sort((a, b) => {
+                const aNum = parseInt(a.id);
+                const bNum = parseInt(b.id);
+                if (aNum === 1) return -1;
+                if (bNum === 1) return 1;
+                return aNum - bNum;
+            });
+
+            // تطبيق الفلتر
+            if (currentFilter === 'all') {
+                // لا شيء
+            } else if (currentFilter === 'vip') {
+                filtered = filtered.filter(room => room.vip === true);
+            } else if (currentFilter === 'password') {
+                filtered = filtered.filter(room => room.hasPassword === true);
+            } else if (currentFilter === 'public') {
+                filtered = filtered.filter(room => room.hasPassword === false);
+            } else {
+                filtered = filtered.filter(room => getRoomTag(room) === currentFilter);
+            }
+
+            // ===== تطبيق البحث (مصحح بالكامل) =====
+            if (currentSearch) {
+                const search = currentSearch.toLowerCase().trim();
+                filtered = filtered.filter(room => {
+                    // البحث في اسم الغرفة
+                    if (room.name.toLowerCase().includes(search)) return true;
+                    // البحث في معرف الغرفة
+                    if (room.id.toLowerCase().includes(search)) return true;
+                    // البحث في اسم المضيف
+                    if (room.host.toLowerCase().includes(search)) return true;
+                    // البحث في معرف المضيف
+                    if (room.hostId.toString().includes(search)) return true;
+                    // البحث في وصف الغرفة
+                    if (room.desc.toLowerCase().includes(search)) return true;
+                    return false;
+                });
+            }
+
+            renderRooms(filtered);
+        }
+
+        function getRoomTag(room) {
+            if (room.vip) return 'vip';
+            if (room.tag) return room.tag;
+            return 'all';
+        }
+
+        // ============================================================
+        // 🖼️ RENDER ROOMS
+        // ============================================================
+        function renderRooms(rooms) {
+            const grid = document.getElementById('roomsGrid');
+
+            if (rooms.length === 0) {
+                grid.innerHTML = `
+                            <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
+                                <i class="fas fa-microphone-slash" style="font-size:3rem; color:#333; margin-bottom:12px;"></i>
+                                <h3 style="color:#888;">لا توجد غرف مطابقة</h3>
+                                <p style="font-size:0.85rem;">جرب تغيير البحث أو التصفية</p>
+                            </div>
+                        `;
+                return;
+            }
+
+            grid.innerHTML = rooms.map(room => {
+                let bgStyle = '';
+                if (room.background && room.background !== 'default') {
+                    bgStyle =
+                        `background-image: url('images/chathtml/${room.background}'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
+                } else {
+                    bgStyle =
+                        `background-image: url('images/chathtml/roomsbg/roommk (0).png'); background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #1a1a2e;`;
+                }
+
+                let overlayImg = '';
+                if (room.overlayImage && room.overlayImage !== 'none') {
+                    overlayImg =
+                        `<img src="images/chathtml/${room.overlayImage}" class="overlay-image" alt="صورة الغرفة" onerror="this.style.display='none'">`;
+                }
+
+                const privacyClass = room.hasPassword ? 'private' : 'public';
+                const privacyText = room.hasPassword ? '🔒 محمية' : '🔓 عامة';
+
+                const slotsText = `${room.members}/${room.maxSlots}`;
+                const vipIcon = room.vip ? '👑' : '';
+
+                return `
+                            <div class="room-card" onclick="joinRoom('${room.id}')" data-room-id="${room.id}">
+                                <div class="room-banner" style="${bgStyle}">
+                                    <div class="banner-overlay"></div>
+                                    ${overlayImg}
+                                    <div class="room-status"><i class="fas fa-circle"></i> مباشر</div>
+                                </div>
+                                <div class="room-body">
+                                    <div class="room-meta">
+                                        <span class="room-id">🔑 ${room.id}</span>
+                                        <span class="room-privacy ${privacyClass}">${privacyText}</span>
+                                    </div>
+                                    <div class="room-name">${vipIcon} ${room.name}</div>
+                                    <div class="room-desc">${room.desc}</div>
+                                    <div class="room-host">
+                                        <div class="host-avatar">
+                                            ${room.creatorAvatar ? `<img src="${room.creatorAvatar}" alt="">` : room.host.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div class="host-info">
+                                            <div class="host-name">${room.host}</div>
+                                            <div class="host-id">🆔 ${room.hostId}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="room-footer">
+                                    <div class="stats">
+                                        <span><i class="fas fa-users"></i> ${slotsText}</span>
+                                        ${room.vip ? '<span><i class="fas fa-crown" style="color:#ffd700;"></i> VIP</span>' : ''}
+                                    </div>
+                                    <button class="join-btn" onclick="event.stopPropagation(); joinRoom('${room.id}')">
+                                        <i class="fas fa-sign-in-alt"></i> دخول
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+            }).join('');
+        }
+
+        // ============================================================
+        // 🔍 FILTER ROOMS
+        // ============================================================
+        function filterRooms() {
+            const search = document.getElementById('searchInput').value.trim();
+            currentSearch = search;
+            applyFiltersAndSearch();
+        }
+
+        function setFilter(filter, el) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+            el.classList.add('active');
+            applyFiltersAndSearch();
+        }
+
+        // ============================================================
         // 🎯 JOIN ROOM
         // ============================================================
         async function joinRoom(roomId) {
@@ -3345,19 +2350,19 @@
             if (existingPrompt) existingPrompt.remove();
 
             const promptHTML = `
-                        <div id="passwordPrompt" class="modal active" style="z-index: 5000;">
-                            <div class="modal-content" style="max-width: 400px; text-align: center;">
+                        <div id="passwordPrompt" class="modal active" style="z-index: 5000; display:flex; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);">
+                            <div style="background:#1a1a2e; border-radius:20px; padding:25px; max-width:400px; width:95%; border:1px solid #333; text-align:center;">
                                 <h2 style="color: #ffd700; border-bottom: none;">
                                     <i class="fas fa-lock"></i> غرفة محمية بكلمة مرور
                                 </h2>
                                 <p style="color: #aaa; margin: 15px 0; font-size: 0.9rem;">
                                     الغرفة <strong style="color: #ffd700;">${room.name}</strong> محمية بكلمة مرور
                                 </p>
-                                <div class="form-group" style="text-align: right;">
-                                    <label style="color: #ddd; text-align: right; display: block;">🔑 أدخل كلمة المرور</label>
-                                    <div style="display: flex; align-items: center; gap: 8px; background: #0f0f1f; border-radius: 10px; border: 2px solid #2a2a4a; padding: 0 12px;">
-                                        <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور..." style="flex: 1; background: transparent; border: none; padding: 12px 0; color: #fff; outline: none; font-size: 1rem;">
-                                        <button type="button" onclick="togglePromptPassword()" style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 1.1rem; padding: 8px;">
+                                <div style="margin-bottom:15px; text-align:right;">
+                                    <label style="color:#ddd; display:block; margin-bottom:5px;">🔑 أدخل كلمة المرور</label>
+                                    <div style="display:flex; align-items:center; gap:8px; background:#0f0f1f; border-radius:10px; border:2px solid #2a2a4a; padding:0 12px;">
+                                        <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور..." style="flex:1; background:transparent; border:none; padding:12px 0; color:#fff; outline:none; font-size:1rem;">
+                                        <button type="button" onclick="togglePromptPassword()" style="background:transparent; border:none; color:#888; cursor:pointer; font-size:1.1rem; padding:8px;">
                                             <i class="fas fa-eye" id="promptToggleIcon"></i>
                                         </button>
                                     </div>
@@ -3366,10 +2371,10 @@
                                     ❌ كلمة المرور غير صحيحة
                                 </div>
                                 <div style="display: flex; gap: 10px; margin-top: 20px;">
-                                    <button onclick="verifyPassword('${roomId}')" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #ffd700, #f0c000); color: #1a1a2e; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                                    <button onclick="verifyPassword('${roomId}')" style="flex:1; padding:12px; background:linear-gradient(135deg,#ffd700,#f0c000); color:#1a1a2e; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:1rem;">
                                         <i class="fas fa-unlock"></i> دخول
                                     </button>
-                                    <button onclick="closePasswordPrompt()" style="flex: 1; padding: 12px; background: #2a2a4a; color: #aaa; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                                    <button onclick="closePasswordPrompt()" style="flex:1; padding:12px; background:#2a2a4a; color:#aaa; border:none; border-radius:10px; font-weight:bold; cursor:pointer; font-size:1rem;">
                                         إلغاء
                                     </button>
                                 </div>
@@ -3463,37 +2468,548 @@
         function closePasswordError() {
             document.getElementById('passwordErrorModal').classList.remove('active');
         }
+            // ============================================================
+// 📷 رفع الصور الشخصية - الحل المحسّن
+// ============================================================
 
-        // ============================================================
-        // 🔔 NOTIFICATIONS
-        // ============================================================
-        async function sendNotification(userId, title, message) {
-            if (!database) return;
+function handleFileSelect(event) {
+    console.log('🖱️ handleFileSelect تم استدعاؤها');
+    
+    if (!requireLogin('handleFileSelect')) {
+        event.target.value = '';
+        return;
+    }
+
+    const file = event.target.files[0];
+    if (!file) {
+        console.log('❌ لم يتم اختيار ملف');
+        return;
+    }
+
+    console.log('📁 تم اختيار ملف:', file.name, file.type, file.size);
+
+    if (!file.type.startsWith('image/')) {
+        showToast('❌ يرجى اختيار صورة صالحة (JPG, PNG, GIF, WebP)', 'error');
+        event.target.value = '';
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('❌ حجم الصورة كبير جداً (الحد الأقصى 5 ميجابايت)', 'error');
+        event.target.value = '';
+        return;
+    }
+
+    selectedFile = file;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        console.log('✅ تم قراءة الملف بنجاح');
+        const cropImage = document.getElementById('cropImage');
+        cropImage.src = e.target.result;
+        document.getElementById('cropModal').classList.add('active');
+    };
+    reader.onerror = function(e) {
+        console.error('❌ خطأ في قراءة الملف:', e);
+        showToast('❌ حدث خطأ في قراءة الصورة', 'error');
+    };
+    reader.readAsDataURL(file);
+}
+
+function closeCropModal() {
+    document.getElementById('cropModal').classList.remove('active');
+    selectedFile = null;
+    document.getElementById('avatarInput').value = '';
+}
+
+function cropImage() {
+    console.log('✂️ cropImage تم استدعاؤها');
+    
+    if (!requireLogin('cropImage')) {
+        closeCropModal();
+        return;
+    }
+
+    const img = document.getElementById('cropImage');
+    if (!img || !img.src) {
+        showToast('❌ لا توجد صورة للقص', 'error');
+        return;
+    }
+
+    try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const imgWidth = img.naturalWidth || img.width;
+        const imgHeight = img.naturalHeight || img.height;
+        
+        console.log('📐 أبعاد الصورة:', imgWidth, 'x', imgHeight);
+
+        const size = Math.min(imgWidth, imgHeight);
+        const x = (imgWidth - size) / 2;
+        const y = (imgHeight - size) / 2;
+
+        canvas.width = size;
+        canvas.height = size;
+
+        ctx.drawImage(img, x, y, size, size, 0, 0, size, size);
+
+        canvas.toBlob(async function(blob) {
+            if (!blob) {
+                showToast('❌ فشل في قص الصورة', 'error');
+                return;
+            }
+
+            console.log('📦 حجم Blob:', blob.size, 'bytes');
 
             try {
+                await uploadCroppedImage(blob);
+            } catch (error) {
+                console.error('❌ خطأ في رفع الصورة:', error);
+                showToast('❌ حدث خطأ في رفع الصورة: ' + error.message, 'error');
+            }
+        }, 'image/jpeg', 0.9);
+
+        closeCropModal();
+
+    } catch (error) {
+        console.error('❌ خطأ في قص الصورة:', error);
+        showToast('❌ حدث خطأ في قص الصورة', 'error');
+        closeCropModal();
+    }
+}
+
+async function uploadCroppedImage(blob) {
+    console.log('📤 uploadCroppedImage تم استدعاؤها');
+    
+    const user = getCurrentUser();
+    if (!user || !user.numericId) {
+        showToast('❌ يرجى تسجيل الدخول أولاً', 'error');
+        return;
+    }
+
+    if (!storage) {
+        showToast('❌ Firebase Storage غير مهيأ', 'error');
+        return;
+    }
+
+    showToast('⏳ جاري رفع الصورة...', 'info');
+
+    try {
+        const timestamp = Date.now();
+        const fileName = `${user.numericId}_${timestamp}.jpg`;
+        const path = `avatars/${fileName}`;
+        
+        console.log('📁 مسار الرفع:', path);
+
+        const storageRef = storage.ref(path);
+        const uploadTask = await storageRef.put(blob);
+        
+        console.log('✅ تم رفع الملف بنجاح');
+
+        const downloadURL = await uploadTask.ref.getDownloadURL();
+        console.log('🔗 رابط التحميل:', downloadURL);
+
+        const usersRef = database.ref('users');
+        const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            const userId = Object.keys(userData)[0];
+            
+            await database.ref('users/' + userId).update({
+                avatar: downloadURL
+            });
+            
+            console.log('✅ تم تحديث الصورة في قاعدة البيانات');
+
+            user.avatar = downloadURL;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+
+            const avatarDisplay = document.getElementById('profileAvatarDisplay');
+            avatarDisplay.innerHTML = `<img src="${downloadURL}" style="width:100%;height:100%;object-fit:cover;">`;
+            
+            showToast('✅ تم تحديث الصورة الشخصية بنجاح!', 'success');
+        } else {
+            showToast('❌ المستخدم غير موجود في قاعدة البيانات', 'error');
+        }
+
+    } catch (error) {
+        console.error('❌ خطأ في رفع الصورة:', error);
+        showToast('❌ حدث خطأ في رفع الصورة: ' + error.message, 'error');
+    }
+}
+                    // ============================================================
+        // 👤 PROFILE FUNCTIONS
+        // ============================================================
+        async function toggleProfileDropdown() {
+            if (!checkLoginStatus()) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                setTimeout(() => redirectToLogin(), 1500);
+                return;
+            }
+
+            const dropdown = document.getElementById('profileDropdown');
+            const isOpen = dropdown.classList.contains('active');
+
+            document.getElementById('notifDropdown').classList.remove('active');
+
+            if (isOpen) {
+                dropdown.classList.remove('active');
+            } else {
+                dropdown.classList.add('active');
+                await loadProfileData();
+                await checkIfLiked();
+            }
+        }
+
+        async function loadProfileData() {
+            const user = getCurrentUser();
+            if (!user) return;
+
+            try {
+                if (database && user.numericId) {
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0];
+                        const fullUser = userData[userId];
+                        currentUserId = userId;
+
+                        Object.assign(user, fullUser);
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                    }
+                }
+
+                document.getElementById('p_nickname').innerText = user.nickname || user.username || 'مستخدم';
+                document.getElementById('p_bio').innerText = user.bio || 'اضغط لتعديل السيرة الذاتية';
+                document.getElementById('p_flag_emoji').textContent = user.flag || '🌍';
+                document.getElementById('p_country_name').textContent = user.countryName || 'العالم';
+                document.getElementById('p_id').innerText = String(user.numericId || '000000').padStart(6, '0');
+                document.getElementById('p_egp').innerText = user.balanceEGP || '0';
+                document.getElementById('p_usd').innerText = user.balanceUSD || '0';
+                document.getElementById('p_likes').innerText = user.likes || 0;
+                document.getElementById('p_gifts').innerText = user.gifts || 0;
+                document.getElementById('p_visits').innerText = user.visits || 0;
+
+                const badgesContainer = document.getElementById('p_badges');
+                if (user.badges && user.badges.length > 0) {
+                    badgesContainer.innerHTML = user.badges.map(b => `<span class="badge-item">${b}</span>`).join('');
+                }
+
+                // تحديث الصورة الشخصية
+                const avatarDisplay = document.getElementById('profileAvatarDisplay');
+                if (user.avatar) {
+                    avatarDisplay.innerHTML = `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
+                } else {
+                    avatarDisplay.innerHTML = `<i class="fas fa-user"></i>`;
+                }
+
+                const visitorsList = document.getElementById('visitorsList');
+                const recentVisitors = user.recentVisitors || [];
+
+                if (recentVisitors.length === 0) {
+                    visitorsList.innerHTML =
+                        '<div style="color:#666; font-size:0.7rem; width:100%; text-align:center;">لا توجد زيارات</div>';
+                } else {
+                    visitorsList.innerHTML = recentVisitors.map(visitor => `
+                                <div class="visitor-item" onclick="viewVisitorProfile('${visitor.numericId}')" title="${visitor.name}">
+                                    ${visitor.avatar ? `<img src="${visitor.avatar}" alt="${visitor.name}">` : `<div class="visitor-placeholder">${visitor.name.charAt(0).toUpperCase()}</div>`}
+                                    <div class="visitor-tooltip">${visitor.name}</div>
+                                </div>
+                            `).join('');
+                }
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        async function checkIfLiked() {
+            try {
+                const user = getCurrentUser();
+                if (!user || !user.numericId) {
+                    hasLiked = false;
+                    document.getElementById('likeButton').classList.remove('liked');
+                    document.getElementById('likeButton').innerHTML = '<i class="fas fa-heart"></i> إعجاب';
+                    return;
+                }
+
                 const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(userId).once('value');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const userId = Object.keys(userData)[0];
+                    const fullUser = userData[userId];
+
+                    const likedBy = fullUser.likedBy || [];
+                    const currentUserNumericId = user.numericId;
+
+                    hasLiked = likedBy.includes(currentUserNumericId);
+
+                    const likeBtn = document.getElementById('likeButton');
+                    if (hasLiked) {
+                        likeBtn.classList.add('liked');
+                        likeBtn.innerHTML = '<i class="fas fa-heart" style="color:#ff4757;"></i> تم الإعجاب';
+                    } else {
+                        likeBtn.classList.remove('liked');
+                        likeBtn.innerHTML = '<i class="fas fa-heart"></i> إعجاب';
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking like status:', error);
+            }
+        }
+
+        async function updateProfileBio() {
+            if (!requireLogin('updateProfileBio')) return;
+
+            const bio = document.getElementById('p_bio').innerText;
+
+            try {
+                const user = getCurrentUser();
+                if (database && user.numericId) {
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0];
+                        await database.ref('users/' + userId).update({ bio: bio });
+                        user.bio = bio;
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        showToast('✅ تم تحديث السيرة الذاتية', 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating bio:', error);
+                showToast('❌ حدث خطأ في تحديث السيرة', 'error');
+            }
+        }
+
+        function copyProfileId() {
+            if (!requireLogin('copyProfileId')) return;
+
+            const idText = document.getElementById('p_id').innerText;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(idText).then(() => {
+                    showToast('✅ تم نسخ المعرف: ' + idText, 'success');
+                }).catch(() => {
+                    copyTextFallback(idText);
+                });
+            } else {
+                copyTextFallback(idText);
+            }
+        }
+
+        function copyTextFallback(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('✅ تم نسخ المعرف', 'success');
+            } catch (err) {
+                showToast('❌ فشل نسخ المعرف', 'error');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        async function viewVisitorProfile(numericId) {
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(numericId)).once('value');
 
                 if (!snapshot.exists()) {
-                    console.warn('User not found:', userId);
+                    showToast('❌ المستخدم غير موجود', 'error');
                     return;
                 }
 
                 const userData = snapshot.val();
-                const userKey = Object.keys(userData)[0];
+                const userId = Object.keys(userData)[0];
+                const visitor = userData[userId];
 
-                await database.ref('users/' + userKey + '/notifications').push({
-                    text: `${title}\n${message}`,
-                    date: new Date().toLocaleString('ar-EG'),
-                    read: false,
-                    type: 'general'
-                });
+                alert(
+                    `👤 ملف المستخدم\n\nالاسم: ${visitor.nickname || visitor.username}\n🆔: ${visitor.numericId}\n🏷️ الألقاب: ${(visitor.badges || []).join(', ') || 'لا يوجد'}\n❤️ إعجابات: ${visitor.likes || 0}\n🎁 هدايا: ${visitor.gifts || 0}`
+                    );
 
             } catch (error) {
-                console.error('Error sending notification:', error);
+                console.error('Error viewing visitor:', error);
+                showToast('❌ حدث خطأ', 'error');
             }
         }
 
+        // ============================================================
+        // ❤️ LIKE FUNCTION
+        // ============================================================
+        async function sendLike() {
+            if (!requireLogin('sendLike')) return;
+            showToast('⚠️ لا يمكنك الإعجاب بملفك الشخصي', 'warning');
+        }
+
+        // ============================================================
+        // 🎁 GIFTS MODAL
+        // ============================================================
+        async function showGiftsModal() {
+            if (!requireLogin('showGiftsModal')) return;
+
+            const modal = document.getElementById('giftsModal');
+            modal.classList.add('active');
+
+            try {
+                const user = getCurrentUser();
+                const giftsList = document.getElementById('giftsList');
+                const totalSpan = document.getElementById('totalGiftValue');
+
+                let gifts = user.giftsList || [];
+                let total = 0;
+
+                if (database && user.numericId) {
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0];
+                        const fullUser = userData[userId];
+                        gifts = fullUser.giftsList || [];
+                        total = gifts.reduce((sum, g) => sum + (g.value || 0), 0);
+                    }
+                }
+
+                totalSpan.textContent = total;
+
+                if (gifts.length === 0) {
+                    giftsList.innerHTML = `
+                                <div class="no-gifts">
+                                    <i class="fas fa-gift"></i>
+                                    <p>لا توجد هدايا حتى الآن</p>
+                                </div>
+                            `;
+                    return;
+                }
+
+                giftsList.innerHTML = gifts.map(gift => `
+                            <div class="gift-item">
+                                <div class="gift-sender">
+                                    <div class="sender-avatar">
+                                        ${gift.senderAvatar ? `<img src="${gift.senderAvatar}" alt="">` : gift.senderName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <div class="sender-name">${gift.senderName || 'غير معروف'}</div>
+                                        <div class="sender-id">🆔 ${gift.senderId || '---'}</div>
+                                    </div>
+                                </div>
+                                <div class="gift-details">
+                                    <span class="gift-value">💰 ${gift.value || 0}</span>
+                                    <span class="gift-time">📅 ${gift.date || new Date().toLocaleString('ar-EG')}</span>
+                                </div>
+                                ${gift.reason ? `<div class="gift-reason">📝 ${gift.reason}</div>` : ''}
+                            </div>
+                        `).join('');
+
+            } catch (error) {
+                console.error('Error loading gifts:', error);
+                showToast('❌ حدث خطأ في تحميل الهدايا', 'error');
+            }
+        }
+
+        function closeGiftsModal() {
+            document.getElementById('giftsModal').classList.remove('active');
+        }
+
+        // ============================================================
+        // 📝 REPORT MODAL
+        // ============================================================
+        function openReportModal() {
+            showToast('⚠️ لا يمكنك الإبلاغ عن ملفك الشخصي', 'warning');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+            document.getElementById('reportDescription').value = '';
+        }
+
+        function submitReport() {
+            showToast('⚠️ لا يمكنك الإبلاغ عن ملفك الشخصي', 'warning');
+            closeReportModal();
+        }
+
+        // ============================================================
+        // 🌍 FLAG SELECTOR
+        // ============================================================
+        function initFlagSelector() {
+            const flagList = document.getElementById('flagList');
+            flagList.innerHTML = countries.map(c => `
+                        <div class="flag-item" onclick="selectCountry('${c.emoji}', '${c.name}')">
+                            <span class="flag-emoji">${c.emoji}</span>
+                            <span class="flag-name">${c.name}</span>
+                        </div>
+                    `).join('');
+        }
+
+        function toggleFlagSearch() {
+            if (!checkLoginStatus()) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                return;
+            }
+            const dropdown = document.getElementById('flagSearchDropdown');
+            dropdown.classList.toggle('active');
+            if (dropdown.classList.contains('active')) {
+                document.getElementById('flagSearchInput').value = '';
+                document.getElementById('flagSearchInput').focus();
+                filterFlags();
+            }
+        }
+
+        function filterFlags() {
+            const query = document.getElementById('flagSearchInput').value.toLowerCase();
+            const items = document.querySelectorAll('#flagList .flag-item');
+            items.forEach(item => {
+                const name = item.querySelector('.flag-name').textContent.toLowerCase();
+                item.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        async function selectCountry(emoji, name) {
+            if (!requireLogin('selectCountry')) return;
+
+            document.getElementById('p_flag_emoji').textContent = emoji;
+            document.getElementById('p_country_name').textContent = name;
+            document.getElementById('flagSearchDropdown').classList.remove('active');
+
+            try {
+                const user = getCurrentUser();
+                if (database && user.numericId) {
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
+
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0];
+                        await database.ref('users/' + userId).update({
+                            flag: emoji,
+                            countryName: name
+                        });
+                        user.flag = emoji;
+                        user.countryName = name;
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        showToast(`✅ تم اختيار ${name} ${emoji}`, 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Error selecting country:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
+        // 🔔 NOTIFICATIONS
+        // ============================================================
         async function loadNotifications() {
             if (!requireLogin('loadNotifications')) {
                 document.getElementById('notifList').innerHTML = `
@@ -3601,7 +3117,7 @@
                 await database.ref('users/' + userId + '/notifications/' + notifKey).update({ read: true });
                 await loadNotifications();
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error marking as read:', error);
             }
         }
 
@@ -3632,7 +3148,8 @@
                 showToast('✅ تم تعيين الكل كمقروء', 'success');
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error marking all as read:', error);
+                showToast('❌ حدث خطأ', 'error');
             }
         }
 
@@ -3643,7 +3160,7 @@
                 await database.ref('users/' + userId + '/notifications/' + notifKey).remove();
                 await loadNotifications();
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error deleting notification:', error);
             }
         }
 
@@ -3667,584 +3184,8 @@
                 showToast('✅ تم حذف الكل', 'success');
 
             } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-                    // ============================================================
-        // 🌍 FLAG SELECTOR
-        // ============================================================
-        function initFlagSelector() {
-            const flagList = document.getElementById('flagList');
-            flagList.innerHTML = countries.map(c => `
-                        <div class="flag-item" onclick="selectCountry('${c.emoji}', '${c.name}')">
-                            <span class="flag-emoji">${c.emoji}</span>
-                            <span class="flag-name">${c.name}</span>
-                        </div>
-                    `).join('');
-        }
-
-        function toggleFlagSearch() {
-            if (!checkLoginStatus()) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                return;
-            }
-            const dropdown = document.getElementById('flagSearchDropdown');
-            dropdown.classList.toggle('active');
-            if (dropdown.classList.contains('active')) {
-                document.getElementById('flagSearchInput').value = '';
-                document.getElementById('flagSearchInput').focus();
-                filterFlags();
-            }
-        }
-
-        function filterFlags() {
-            const query = document.getElementById('flagSearchInput').value.toLowerCase();
-            const items = document.querySelectorAll('#flagList .flag-item');
-            items.forEach(item => {
-                const name = item.querySelector('.flag-name').textContent.toLowerCase();
-                item.style.display = name.includes(query) ? 'flex' : 'none';
-            });
-        }
-
-        async function selectCountry(emoji, name) {
-            if (!requireLogin('selectCountry')) return;
-
-            document.getElementById('p_flag_emoji').textContent = emoji;
-            document.getElementById('p_country_name').textContent = name;
-            document.getElementById('flagSearchDropdown').classList.remove('active');
-
-            try {
-                const user = getCurrentUser();
-                if (database && user.numericId) {
-                    const usersRef = database.ref('users');
-                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        const userId = Object.keys(userData)[0];
-                        await database.ref('users/' + userId).update({
-                            flag: emoji,
-                            countryName: name
-                        });
-                        user.flag = emoji;
-                        user.countryName = name;
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                        showToast(`✅ تم اختيار ${name} ${emoji}`, 'success');
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
+                console.error('Error deleting all notifications:', error);
                 showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        // ============================================================
-        // 👤 PROFILE FUNCTIONS - مع خاصية رفع الصور المحسّنة
-        // ============================================================
-        function handleFileSelect(event) {
-            if (!requireLogin('handleFileSelect')) {
-                event.target.value = '';
-                return;
-            }
-
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (!file.type.startsWith('image/')) {
-                showToast('❌ يرجى اختيار صورة صالحة', 'error');
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('❌ حجم الصورة كبير جداً (حد أقصى 5 ميجابايت)', 'error');
-                return;
-            }
-
-            selectedFile = file;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('cropImage').src = e.target.result;
-                document.getElementById('cropModal').classList.add('active');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function closeCropModal() {
-            document.getElementById('cropModal').classList.remove('active');
-            selectedFile = null;
-            document.getElementById('avatarInput').value = '';
-        }
-
-        function cropImage() {
-            if (!requireLogin('cropImage')) return;
-
-            const img = document.getElementById('cropImage');
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            const size = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height);
-            const x = ((img.naturalWidth || img.width) - size) / 2;
-            const y = ((img.naturalHeight || img.height) - size) / 2;
-
-            canvas.width = size;
-            canvas.height = size;
-
-            ctx.drawImage(img, x, y, size, size, 0, 0, size, size);
-
-            canvas.toBlob(async function(blob) {
-                if (!blob) {
-                    showToast('❌ فشل في قص الصورة', 'error');
-                    return;
-                }
-
-                try {
-                    await uploadCroppedImage(blob);
-                } catch (error) {
-                    console.error('Error uploading cropped image:', error);
-                    showToast('❌ حدث خطأ في رفع الصورة', 'error');
-                }
-            }, 'image/jpeg', 0.9);
-
-            closeCropModal();
-        }
-
-        async function uploadCroppedImage(blob) {
-            const user = getCurrentUser();
-            if (!user || !user.numericId) {
-                showToast('❌ يرجى تسجيل الدخول أولاً', 'error');
-                return;
-            }
-
-            showToast('⏳ جاري رفع الصورة...', 'info');
-
-            try {
-                // رفع الصورة إلى Firebase Storage
-                const storageRef = storage.ref('avatars/' + user.numericId + '/' + Date.now() + '.jpg');
-                const uploadTask = await storageRef.put(blob);
-                const downloadURL = await uploadTask.ref.getDownloadURL();
-
-                // حفظ الرابط في Realtime Database
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    const userId = Object.keys(userData)[0];
-                    await database.ref('users/' + userId).update({
-                        avatar: downloadURL
-                    });
-                    user.avatar = downloadURL;
-                    localStorage.setItem('currentUser', JSON.stringify(user));
-
-                    // تحديث الصورة في الواجهة
-                    document.getElementById('profileAvatarDisplay').innerHTML =
-                        `<img src="${downloadURL}" style="width:100%;height:100%;object-fit:cover;">`;
-                    showToast('✅ تم تحديث الصورة الشخصية!', 'success');
-                }
-            } catch (error) {
-                console.error('Error uploading:', error);
-                showToast('❌ حدث خطأ في رفع الصورة', 'error');
-            }
-        }
-
-        // ============================================================
-        // 👤 TOGGLE PROFILE DROPDOWN
-        // ============================================================
-        async function toggleProfileDropdown() {
-            if (!checkLoginStatus()) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                setTimeout(() => redirectToLogin(), 1500);
-                return;
-            }
-
-            const dropdown = document.getElementById('profileDropdown');
-            const isOpen = dropdown.classList.contains('active');
-
-            document.getElementById('notifDropdown').classList.remove('active');
-
-            if (isOpen) {
-                dropdown.classList.remove('active');
-            } else {
-                dropdown.classList.add('active');
-                await loadProfileData();
-                await checkIfLiked();
-            }
-        }
-
-        async function loadProfileData() {
-            const user = getCurrentUser();
-            if (!user) return;
-
-            try {
-                if (database && user.numericId) {
-                    const usersRef = database.ref('users');
-                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        const userId = Object.keys(userData)[0];
-                        const fullUser = userData[userId];
-                        currentUserId = userId;
-
-                        Object.assign(user, fullUser);
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                    }
-                }
-
-                document.getElementById('p_nickname').innerText = user.nickname || user.username || 'مستخدم';
-                document.getElementById('p_bio').innerText = user.bio || 'اضغط لتعديل السيرة الذاتية';
-                document.getElementById('p_flag_emoji').textContent = user.flag || '🌍';
-                document.getElementById('p_country_name').textContent = user.countryName || 'العالم';
-                document.getElementById('p_id').innerText = String(user.numericId || '000000').padStart(6, '0');
-                document.getElementById('p_egp').innerText = user.balanceEGP || '0';
-                document.getElementById('p_usd').innerText = user.balanceUSD || '0';
-                document.getElementById('p_likes').innerText = user.likes || 0;
-                document.getElementById('p_gifts').innerText = user.gifts || 0;
-                document.getElementById('p_visits').innerText = user.visits || 0;
-
-                const badgesContainer = document.getElementById('p_badges');
-                if (user.badges && user.badges.length > 0) {
-                    badgesContainer.innerHTML = user.badges.map(b => `<span class="badge-item">${b}</span>`).join('');
-                }
-
-                if (user.avatar) {
-                    document.getElementById('profileAvatarDisplay').innerHTML =
-                        `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
-                } else {
-                    document.getElementById('profileAvatarDisplay').innerHTML = `<i class="fas fa-user"></i>`;
-                }
-
-                const visitorsList = document.getElementById('visitorsList');
-                const recentVisitors = user.recentVisitors || [];
-
-                if (recentVisitors.length === 0) {
-                    visitorsList.innerHTML =
-                        '<div style="color:#666; font-size:0.7rem; width:100%; text-align:center;">لا توجد زيارات</div>';
-                } else {
-                    visitorsList.innerHTML = recentVisitors.map(visitor => `
-                                <div class="visitor-item" onclick="viewVisitorProfile('${visitor.numericId}')" title="${visitor.name}">
-                                    ${visitor.avatar ? `<img src="${visitor.avatar}" alt="${visitor.name}">` : `<div class="visitor-placeholder">${visitor.name.charAt(0).toUpperCase()}</div>`}
-                                    <div class="visitor-tooltip">${visitor.name}</div>
-                                </div>
-                            `).join('');
-                }
-
-            } catch (error) {
-                console.error('Error loading profile:', error);
-            }
-        }
-
-        async function checkIfLiked() {
-            try {
-                const user = getCurrentUser();
-                if (!user || !user.numericId) {
-                    hasLiked = false;
-                    document.getElementById('likeButton').classList.remove('liked');
-                    document.getElementById('likeButton').innerHTML = '<i class="fas fa-heart"></i> إعجاب';
-                    return;
-                }
-
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    const userId = Object.keys(userData)[0];
-                    const fullUser = userData[userId];
-
-                    const likedBy = fullUser.likedBy || [];
-                    const currentUserNumericId = user.numericId;
-
-                    hasLiked = likedBy.includes(currentUserNumericId);
-
-                    const likeBtn = document.getElementById('likeButton');
-                    if (hasLiked) {
-                        likeBtn.classList.add('liked');
-                        likeBtn.innerHTML = '<i class="fas fa-heart" style="color:#ff4757;"></i> تم الإعجاب';
-                    } else {
-                        likeBtn.classList.remove('liked');
-                        likeBtn.innerHTML = '<i class="fas fa-heart"></i> إعجاب';
-                    }
-                }
-            } catch (error) {
-                console.error('Error checking like status:', error);
-            }
-        }
-
-        async function viewVisitorProfile(numericId) {
-            try {
-                const usersRef = database.ref('users');
-                const snapshot = await usersRef.orderByChild('numericId').equalTo(parseInt(numericId)).once('value');
-
-                if (!snapshot.exists()) {
-                    showToast('❌ المستخدم غير موجود', 'error');
-                    return;
-                }
-
-                const userData = snapshot.val();
-                const userId = Object.keys(userData)[0];
-                const visitor = userData[userId];
-
-                alert(
-                    `👤 ملف المستخدم\n\nالاسم: ${visitor.nickname || visitor.username}\n🆔: ${visitor.numericId}\n🏷️ الألقاب: ${(visitor.badges || []).join(', ') || 'لا يوجد'}\n❤️ إعجابات: ${visitor.likes || 0}\n🎁 هدايا: ${visitor.gifts || 0}`
-                    );
-
-            } catch (error) {
-                console.error('Error viewing visitor:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
-        }
-
-        async function updateProfileBio() {
-            if (!requireLogin('updateProfileBio')) return;
-
-            const bio = document.getElementById('p_bio').innerText;
-
-            try {
-                const user = getCurrentUser();
-                if (database && user.numericId) {
-                    const usersRef = database.ref('users');
-                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        const userId = Object.keys(userData)[0];
-                        await database.ref('users/' + userId).update({ bio: bio });
-                        user.bio = bio;
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                        showToast('✅ تم تحديث السيرة الذاتية', 'success');
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        function copyProfileId() {
-            if (!requireLogin('copyProfileId')) return;
-
-            const idText = document.getElementById('p_id').innerText;
-
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(idText).then(() => {
-                    showToast('✅ تم نسخ المعرف: ' + idText, 'success');
-                }).catch(() => {
-                    copyTextFallback(idText);
-                });
-            } else {
-                copyTextFallback(idText);
-            }
-        }
-
-        function copyTextFallback(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                showToast('✅ تم نسخ المعرف', 'success');
-            } catch (err) {
-                showToast('❌ فشل نسخ المعرف', 'error');
-            }
-            document.body.removeChild(textArea);
-        }
-                    // ============================================================
-        // ❤️ LIKE FUNCTION
-        // ============================================================
-        async function sendLike() {
-            if (!requireLogin('sendLike')) return;
-            showToast('⚠️ لا يمكنك الإعجاب بملفك الشخصي', 'warning');
-        }
-
-        // ============================================================
-        // 🎁 GIFTS MODAL
-        // ============================================================
-        async function showGiftsModal() {
-            if (!requireLogin('showGiftsModal')) return;
-
-            const modal = document.getElementById('giftsModal');
-            modal.classList.add('active');
-
-            try {
-                const user = getCurrentUser();
-                const giftsList = document.getElementById('giftsList');
-                const totalSpan = document.getElementById('totalGiftValue');
-
-                let gifts = user.giftsList || [];
-                let total = 0;
-
-                if (database && user.numericId) {
-                    const usersRef = database.ref('users');
-                    const snapshot = await usersRef.orderByChild('numericId').equalTo(user.numericId).once('value');
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        const userId = Object.keys(userData)[0];
-                        const fullUser = userData[userId];
-                        gifts = fullUser.giftsList || [];
-                        total = gifts.reduce((sum, g) => sum + (g.value || 0), 0);
-                    }
-                }
-
-                totalSpan.textContent = total;
-
-                if (gifts.length === 0) {
-                    giftsList.innerHTML = `
-                                <div class="no-gifts">
-                                    <i class="fas fa-gift"></i>
-                                    <p>لا توجد هدايا حتى الآن</p>
-                                </div>
-                            `;
-                    return;
-                }
-
-                giftsList.innerHTML = gifts.map(gift => `
-                            <div class="gift-item">
-                                <div class="gift-sender">
-                                    <div class="sender-avatar">
-                                        ${gift.senderAvatar ? `<img src="${gift.senderAvatar}" alt="">` : gift.senderName.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <div class="sender-name">${gift.senderName || 'غير معروف'}</div>
-                                        <div class="sender-id">🆔 ${gift.senderId || '---'}</div>
-                                    </div>
-                                </div>
-                                <div class="gift-details">
-                                    <span class="gift-value">💰 ${gift.value || 0}</span>
-                                    <span class="gift-time">📅 ${gift.date || new Date().toLocaleString('ar-EG')}</span>
-                                </div>
-                                ${gift.reason ? `<div class="gift-reason">📝 ${gift.reason}</div>` : ''}
-                            </div>
-                        `).join('');
-
-            } catch (error) {
-                console.error('Error loading gifts:', error);
-                showToast('❌ حدث خطأ في تحميل الهدايا', 'error');
-            }
-        }
-
-        function closeGiftsModal() {
-            document.getElementById('giftsModal').classList.remove('active');
-        }
-
-        // ============================================================
-        // 📝 REPORT MODAL
-        // ============================================================
-        function openReportModal() {
-            showToast('⚠️ لا يمكنك الإبلاغ عن ملفك الشخصي', 'warning');
-        }
-
-        function closeReportModal() {
-            document.getElementById('reportModal').classList.remove('active');
-            document.getElementById('reportDescription').value = '';
-        }
-
-        function submitReport() {
-            showToast('⚠️ لا يمكنك الإبلاغ عن ملفك الشخصي', 'warning');
-            closeReportModal();
-        }
-
-        // ============================================================
-        // 🖥️ FULL PROFILE VIEW
-        // ============================================================
-        async function viewFullProfile() {
-            if (!requireLogin('viewFullProfile')) return;
-
-            const modal = document.getElementById('fullProfileModal');
-            modal.classList.add('active');
-
-            try {
-                const user = getCurrentUser();
-                const content = document.getElementById('fullProfileContent');
-
-                let userPosts = [];
-                if (database && user.numericId) {
-                    const postsRef = database.ref('posts');
-                    const snapshot = await postsRef.orderByChild('userId').equalTo(user.numericId).once('value');
-                    if (snapshot.exists()) {
-                        const postsData = snapshot.val();
-                        userPosts = Object.values(postsData);
-                    }
-                }
-
-                const recentVisitors = user.recentVisitors || [];
-                const gifts = user.giftsList || [];
-                const totalGifts = gifts.reduce((sum, g) => sum + (g.value || 0), 0);
-
-                content.innerHTML = `
-                            <div style="text-align:center; margin-bottom:15px;">
-                                <div style="width:100px; height:100px; border-radius:50%; margin:0 auto 12px; overflow:hidden; border:3px solid #ffd700;">
-                                    ${user.avatar ? `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:linear-gradient(135deg,#4f46e5,#8b5cf6);color:white;"><i class="fas fa-user"></i></div>`}
-                                </div>
-                                <h3 style="color:#fff; font-size:1.1rem;">${user.nickname || user.username}</h3>
-                                <div style="font-size:1.8rem;">${user.flag || '🌍'} ${user.countryName || ''}</div>
-                                <p style="color:#888; margin:8px 0; font-size:0.9rem;">${user.bio || 'لا توجد سيرة ذاتية'}</p>
-                                <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:8px 0;">
-                                    ${(user.badges || []).map(b => `<span style="background:linear-gradient(135deg,#4f46e5,#8b5cf6); color:white; padding:4px 10px; border-radius:16px; font-size:0.75rem;">${b}</span>`).join('')}
-                                </div>
-                                <div style="display:flex; justify-content:space-around; margin:12px 0; padding:12px; background:#0f0f1f; border-radius:10px; flex-wrap:wrap; gap:5px;">
-                                    <div><div style="font-weight:bold; color:#ffd700;">${user.likes || 0}</div><div style="font-size:0.7rem; color:#666;">❤️ إعجابات</div></div>
-                                    <div><div style="font-weight:bold; color:#ffd700;">${user.gifts || 0}</div><div style="font-size:0.7rem; color:#666;">🎁 هدايا</div></div>
-                                    <div><div style="font-weight:bold; color:#ffd700;">${user.visits || 0}</div><div style="font-size:0.7rem; color:#666;">👁️ زيارات</div></div>
-                                </div>
-                                ${recentVisitors.length > 0 ? `
-                                    <div style="margin:10px 0; padding:10px; background:rgba(139,92,246,0.05); border-radius:10px;">
-                                        <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:6px;">👥 آخر الزوار</div>
-                                        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
-                                            ${recentVisitors.map(v => `
-                                                <div style="width:35px; height:35px; border-radius:50%; overflow:hidden; border:2px solid #8b5cf6; cursor:pointer;" onclick="viewVisitorProfile('${v.numericId}')" title="${v.name}">
-                                                    ${v.avatar ? `<img src="${v.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#8b5cf6);color:white;font-size:0.7rem;font-weight:bold;">${v.name.charAt(0).toUpperCase()}</div>`}
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                ${gifts.length > 0 ? `
-                                    <div style="margin:10px 0; padding:10px; background:rgba(16,185,129,0.05); border-radius:10px; border:1px solid rgba(16,185,129,0.1);">
-                                        <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:6px;">🎁 الهدايا المتلقاة (${gifts.length}) - المجموع: ${totalGifts}</div>
-                                        <div style="max-height:150px; overflow-y:auto;">
-                                            ${gifts.slice(0, 5).map(g => `
-                                                <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.75rem;">
-                                                    <span style="color:#aaa;">${g.senderName || 'غير معروف'}</span>
-                                                    <span style="color:#10b981;">💰 ${g.value || 0}</span>
-                                                </div>
-                                            `).join('')}
-                                            ${gifts.length > 5 ? `<div style="text-align:center; color:#666; font-size:0.7rem; margin-top:4px;">+ ${gifts.length - 5} هدايا أخرى</div>` : ''}
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                <div style="background:rgba(255,215,0,0.05); padding:12px; border-radius:10px; margin:10px 0; border:1px solid rgba(255,215,0,0.1);">
-                                    <div style="display:flex; justify-content:space-between; margin:3px 0; font-size:0.85rem;">
-                                        <span style="color:#aaa;">💰 رصيد EGP</span>
-                                        <span style="color:#10b981; font-weight:bold;">${user.balanceEGP || 0}</span>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; margin:3px 0; font-size:0.85rem;">
-                                        <span style="color:#aaa;">💰 رصيد USD</span>
-                                        <span style="color:#60a5fa; font-weight:bold;">${user.balanceUSD || 0}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            ${userPosts.length > 0 ? `
-                                <div style="margin-top:15px; border-top:1px solid #2a2a4a; padding-top:15px;">
-                                    <h4 style="color:#fff; margin-bottom:10px; font-size:0.95rem;">📸 الصور المنشورة (${userPosts.length})</h4>
-                                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:8px;">
-                                        ${userPosts.map(post => `
-                                            <div style="position:relative; border-radius:10px; overflow:hidden; aspect-ratio:1;">
-                                                <img src="${post.image}" style="width:100%;height:100%;object-fit:cover;">
-                                                <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.7); padding:3px; font-size:0.6rem; color:white; text-align:center;">
-                                                    ${post.createdAt ? new Date(post.createdAt).toLocaleDateString('ar-EG') : ''}
-                                                </div>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            ` : ''}
-                        `;
-
-            } catch (error) {
-                console.error('Error loading full profile:', error);
-                document.getElementById('fullProfileContent').innerHTML = '<p style="color:#ef4444; text-align:center;">❌ حدث خطأ</p>';
             }
         }
 
@@ -4275,163 +3216,6 @@
             document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('navGames').classList.add('active');
             stopBannerSlider();
-        }
-                    // ============================================================
-        // 🖥️ HERO BANNER SLIDER
-        // ============================================================
-        function startBannerSlider() {
-            stopBannerSlider();
-            currentBanner = 0;
-            showBanner(currentBanner);
-            bannerInterval = setInterval(() => {
-                currentBanner = (currentBanner + 1) % 3;
-                showBanner(currentBanner);
-            }, 4000);
-        }
-
-        function stopBannerSlider() {
-            if (bannerInterval) {
-                clearInterval(bannerInterval);
-                bannerInterval = null;
-            }
-        }
-
-        function showBanner(index) {
-            const banners = [
-                document.getElementById('banner1'),
-                document.getElementById('banner2'),
-                document.getElementById('banner3')
-            ];
-            const dots = document.querySelectorAll('.hero-dots .dot');
-
-            banners.forEach((banner, i) => {
-                if (i === index) {
-                    banner.classList.remove('hidden');
-                    banner.classList.add('visible');
-                } else {
-                    banner.classList.remove('visible');
-                    banner.classList.add('hidden');
-                }
-            });
-
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
-        }
-
-        function goToBanner(index) {
-            currentBanner = index;
-            showBanner(index);
-            stopBannerSlider();
-            bannerInterval = setInterval(() => {
-                currentBanner = (currentBanner + 1) % 3;
-                showBanner(currentBanner);
-            }, 4000);
-        }
-
-        // ============================================================
-        // 🖥️ MODAL FUNCTIONS
-        // ============================================================
-        function openCreateRoomModal() {
-            if (!requireLogin('openCreateRoomModal')) return;
-            document.getElementById('createRoomModal').classList.add('active');
-            loadImageSelects();
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
-        });
-
-        // ============================================================
-        // 🔔 TOAST SYSTEM
-        // ============================================================
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(30px)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        // ============================================================
-        // 🚀 NAVIGATION FUNCTIONS
-        // ============================================================
-        function handleSupportClick() {
-            if (!requireLogin('handleSupportClick')) return;
-            window.location.href = 'support.html';
-        }
-
-        function toggleNotifs() {
-            if (!checkLoginStatus()) {
-                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
-                setTimeout(() => redirectToLogin(), 1500);
-                return;
-            }
-
-            const dropdown = document.getElementById('notifDropdown');
-            const isOpen = dropdown.classList.contains('active');
-
-            document.getElementById('profileDropdown').classList.remove('active');
-
-            if (isOpen) {
-                dropdown.classList.remove('active');
-            } else {
-                dropdown.classList.add('active');
-                loadNotifications();
-            }
-        }
-
-        document.addEventListener('click', function(event) {
-            const header = document.querySelector('.header');
-            if (!header.contains(event.target)) {
-                document.getElementById('profileDropdown').classList.remove('active');
-                document.getElementById('notifDropdown').classList.remove('active');
-                document.getElementById('flagSearchDropdown').classList.remove('active');
-            }
-        });
-
-        // ============================================================
-        // 🚀 LOGOUT
-        // ============================================================
-        async function logout() {
-            const user = getCurrentUser();
-            if (!user) {
-                redirectToLogin();
-                return;
-            }
-
-            try {
-                localStorage.removeItem('currentUser');
-                isLoggedIn = false;
-                currentUser = null;
-
-                document.getElementById('profileDropdown').classList.remove('active');
-
-                const logoutBtn = document.getElementById('logoutBtn');
-                logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                logoutBtn.className = 'action-btn btn-profile';
-                logoutBtn.onclick = function() { redirectToLogin(); };
-
-                showToast('👋 تم تسجيل الخروج بنجاح', 'success');
-                setTimeout(() => location.reload(), 1000);
-            } catch (error) {
-                console.error('Logout error:', error);
-                showToast('❌ حدث خطأ', 'error');
-            }
         }
 
         // ============================================================
@@ -4509,6 +3293,347 @@
         }
 
         // ============================================================
+        // 🖥️ HERO BANNER SLIDER
+        // ============================================================
+        function startBannerSlider() {
+            stopBannerSlider();
+            currentBanner = 0;
+            showBanner(currentBanner);
+            bannerInterval = setInterval(() => {
+                currentBanner = (currentBanner + 1) % 3;
+                showBanner(currentBanner);
+            }, 4000);
+        }
+
+        function stopBannerSlider() {
+            if (bannerInterval) {
+                clearInterval(bannerInterval);
+                bannerInterval = null;
+            }
+        }
+
+        function showBanner(index) {
+            const banners = [
+                document.getElementById('banner1'),
+                document.getElementById('banner2'),
+                document.getElementById('banner3')
+            ];
+            const dots = document.querySelectorAll('.hero-dots .dot');
+
+            banners.forEach((banner, i) => {
+                if (i === index) {
+                    banner.classList.remove('hidden');
+                    banner.classList.add('visible');
+                } else {
+                    banner.classList.remove('visible');
+                    banner.classList.add('hidden');
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function goToBanner(index) {
+            currentBanner = index;
+            showBanner(index);
+            stopBannerSlider();
+            bannerInterval = setInterval(() => {
+                currentBanner = (currentBanner + 1) % 3;
+                showBanner(currentBanner);
+            }, 4000);
+        }
+
+        // ============================================================
+        // 🖥️ MODAL FUNCTIONS
+        // ============================================================
+        function openCreateRoomModal() {
+            if (!requireLogin('openCreateRoomModal')) return;
+            document.getElementById('createRoomModal').classList.add('active');
+            loadImageSelects();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // ============================================================
+        // 📋 LOAD IMAGES INTO SELECTS
+        // ============================================================
+        const bgImages = [];
+        const overlayImages = [];
+
+        for (let i = 0; i <= 10; i++) {
+            bgImages.push(`roomsbg/roommk (${i}).png`);
+        }
+
+        for (let i = 1; i <= 28; i++) {
+            overlayImages.push(`roomsmk/roomsmk (${i}).png`);
+        }
+
+        function loadImageSelects() {
+            const bgSelect = document.getElementById('roomBackground');
+            const overlaySelect = document.getElementById('roomOverlay');
+
+            // مسح الخيارات القديمة مع الاحتفاظ بالخيار الافتراضي
+            bgSelect.innerHTML = '<option value="default">الخلفية الافتراضية</option>';
+            overlaySelect.innerHTML = '<option value="none">بدون صورة علوية</option>';
+
+            bgImages.forEach(img => {
+                const option = document.createElement('option');
+                option.value = img;
+                const match = img.match(/\((\d+)\)/);
+                const num = match ? match[1] : '0';
+                option.textContent = `خلفية ${num}`;
+                bgSelect.appendChild(option);
+            });
+
+            overlayImages.forEach(img => {
+                const option = document.createElement('option');
+                option.value = img;
+                const match = img.match(/\((\d+)\)/);
+                const num = match ? match[1] : '0';
+                option.textContent = `صورة ${num}`;
+                overlaySelect.appendChild(option);
+            });
+
+            updateCardPreview();
+        }
+
+        function updateCardPreview() {
+            const preview = document.getElementById('cardPreview');
+            const bgSelect = document.getElementById('roomBackground');
+            const overlaySelect = document.getElementById('roomOverlay');
+
+            const bgValue = bgSelect.value;
+            const overlayValue = overlaySelect.value;
+
+            preview.innerHTML = '';
+
+            if (bgValue && bgValue !== 'default') {
+                preview.style.backgroundImage = `url('images/chathtml/${bgValue}')`;
+                preview.style.backgroundSize = 'contain';
+                preview.style.backgroundPosition = 'center';
+                preview.style.backgroundRepeat = 'no-repeat';
+                preview.style.backgroundColor = '#1a1a2e';
+            } else {
+                preview.style.backgroundImage = `url('images/chathtml/roomsbg/roommk (0).png')`;
+                preview.style.backgroundSize = 'contain';
+                preview.style.backgroundPosition = 'center';
+                preview.style.backgroundRepeat = 'no-repeat';
+                preview.style.backgroundColor = '#1a1a2e';
+            }
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'preview-text';
+            textDiv.textContent = '🎙️ VIP CHAT';
+            preview.appendChild(textDiv);
+
+            if (overlayValue && overlayValue !== 'none') {
+                const overlayImg = document.createElement('img');
+                overlayImg.className = 'preview-overlay-image';
+                overlayImg.src = `images/chathtml/${overlayValue}`;
+                overlayImg.alt = 'صورة علوية';
+                overlayImg.onerror = function() {
+                    this.style.display = 'none';
+                };
+                preview.appendChild(overlayImg);
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('roomPasswordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+                toggleIcon.style.color = '#ffd700';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+                toggleIcon.style.color = '#888';
+            }
+        }
+
+        // ============================================================
+        // 📝 SUBMIT ROOM REQUEST
+        // ============================================================
+        async function submitRoomRequest() {
+            if (!requireLogin('submitRoomRequest')) return;
+
+            const name = document.getElementById('roomNameInput').value.trim();
+            const description = document.getElementById('roomDescInput').value.trim();
+            const background = document.getElementById('roomBackground').value;
+            const overlay = document.getElementById('roomOverlay').value;
+            const maxSlots = parseInt(document.getElementById('roomMaxSlots').value);
+            const password = document.getElementById('roomPasswordInput').value.trim();
+
+            if (!name) {
+                showToast('⚠️ يرجى إدخال اسم الغرفة', 'warning');
+                return;
+            }
+
+            const user = getCurrentUser();
+            const roomId = generateRoomId();
+
+            const requestData = {
+                roomId: roomId,
+                name: name,
+                description: description || 'لا يوجد وصف',
+                creatorId: user.numericId || 'GUEST',
+                creatorName: user.nickname || user.username || 'زائر',
+                creatorAvatar: user.avatar || '',
+                background: background || 'default',
+                overlayImage: overlay || 'none',
+                maxSlots: maxSlots || 10,
+                password: password ? btoa(password) : '',
+                hasPassword: !!password,
+                status: 'pending',
+                vip: false,
+                tag: 'all',
+                createdAt: new Date().toISOString(),
+                members: 0,
+                isActive: false
+            };
+
+            try {
+                await database.ref('room_requests/' + roomId).set(requestData);
+
+                await database.ref('admin_notifications').push({
+                    type: 'new_room_request',
+                    roomId: roomId,
+                    roomName: name,
+                    creatorName: requestData.creatorName,
+                    creatorId: requestData.creatorId,
+                    hasPassword: requestData.hasPassword,
+                    maxSlots: requestData.maxSlots,
+                    read: false,
+                    createdAt: new Date().toISOString()
+                });
+
+                showToast('✅ تم إرسال الطلب بنجاح! سيتم مراجعته من قبل الإدارة.', 'success');
+                closeModal('createRoomModal');
+                document.getElementById('roomNameInput').value = '';
+                document.getElementById('roomDescInput').value = '';
+                document.getElementById('roomPasswordInput').value = '';
+
+                const toggleIcon = document.getElementById('passwordToggleIcon');
+                toggleIcon.className = 'fas fa-eye';
+                toggleIcon.style.color = '#888';
+                document.getElementById('roomPasswordInput').type = 'password';
+
+                setTimeout(() => loadRooms(), 500);
+
+            } catch (error) {
+                console.error('Error submitting room request:', error);
+                showToast('❌ حدث خطأ. حاول مرة أخرى.', 'error');
+            }
+        }
+
+        function generateRoomId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // ============================================================
+        // 🚀 NAVIGATION FUNCTIONS
+        // ============================================================
+        function handleSupportClick() {
+            if (!requireLogin('handleSupportClick')) return;
+            window.location.href = 'support.html';
+        }
+
+        function toggleNotifs() {
+            if (!checkLoginStatus()) {
+                showToast('⚠️ يرجى تسجيل الدخول أولاً', 'warning');
+                setTimeout(() => redirectToLogin(), 1500);
+                return;
+            }
+
+            const dropdown = document.getElementById('notifDropdown');
+            const isOpen = dropdown.classList.contains('active');
+
+            document.getElementById('profileDropdown').classList.remove('active');
+
+            if (isOpen) {
+                dropdown.classList.remove('active');
+            } else {
+                dropdown.classList.add('active');
+                loadNotifications();
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const header = document.querySelector('.header');
+            if (!header.contains(event.target)) {
+                document.getElementById('profileDropdown').classList.remove('active');
+                document.getElementById('notifDropdown').classList.remove('active');
+                document.getElementById('flagSearchDropdown').classList.remove('active');
+            }
+        });
+
+        // ============================================================
+        // 🔔 TOAST SYSTEM
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================================
+        // 🚀 LOGOUT
+        // ============================================================
+        async function logout() {
+            const user = getCurrentUser();
+            if (!user) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                localStorage.removeItem('currentUser');
+                isLoggedIn = false;
+                currentUser = null;
+
+                document.getElementById('profileDropdown').classList.remove('active');
+
+                const logoutBtn = document.getElementById('logoutBtn');
+                logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+                logoutBtn.className = 'action-btn btn-profile';
+                logoutBtn.onclick = function() { redirectToLogin(); };
+
+                showToast('👋 تم تسجيل الخروج بنجاح', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } catch (error) {
+                console.error('Logout error:', error);
+                showToast('❌ حدث خطأ', 'error');
+            }
+        }
+
+        // ============================================================
         // 🔔 UPDATE NOTIFICATION BADGE
         // ============================================================
         async function updateNotifBadge() {
@@ -4559,10 +3684,13 @@
         // 🚀 INIT ON PAGE LOAD
         // ============================================================
         window.onload = async function() {
+            console.log('🚀 VipChat جاري التحميل...');
+            
             checkLoginStatus();
 
             if (isLoggedIn) {
                 currentUser = getCurrentUser();
+                console.log('👤 المستخدم:', currentUser?.nickname || currentUser?.username);
                 initFlagSelector();
 
                 if (database) {
@@ -4581,6 +3709,7 @@
                     updateNotifBadge();
                 }
             } else {
+                console.log('⚠️ المستخدم غير مسجل الدخول');
                 document.getElementById('roomsGrid').innerHTML = `
                             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#666;">
                                 <i class="fas fa-sign-in-alt" style="font-size:3.5rem; color:#333; margin-bottom:15px;"></i>
@@ -4597,16 +3726,9 @@
 
             console.log('🎙️ VipChat جاهز!');
             console.log('✅ قاعدة البيانات: stvipclub');
-            console.log('✅ تم إضافة نظام تسجيل الدخول الإجباري');
-            console.log('✅ تم إضافة خلفيات وصور علوية للبطاقات');
-            console.log('✅ تم إضافة عدد المقاعد (2-10)');
-            console.log('✅ تم إضافة كلمة المرور مع إظهار/إخفاء');
-            console.log('✅ تم إضافة رسالة خطأ مخصصة');
-            console.log('✅ تم تحسين البنرات العلوية للهواتف');
-            console.log('✅ تم تحسين حجم الصور العلوية');
-            console.log('✅ تم ترتيب الغرف (رقم 1 في المقدمة)');
+            console.log('✅ تم تحسين خاصية رفع الصور مع Firebase Storage');
             console.log('✅ تم إصلاح خاصية البحث (الاسم، المعرف، المضيف، الوصف)');
-            console.log('✅ تم تحسين خاصية رفع الصور الشخصية مع القص');
+            console.log('✅ تم إضافة نافذة قص الصور');
         };
 
         document.addEventListener('keydown', function(e) {
@@ -4617,17 +3739,8 @@
                 document.querySelectorAll('.crop-modal.active').forEach(modal => {
                     modal.classList.remove('active');
                 });
-                document.querySelectorAll('.gifts-modal.active').forEach(modal => {
-                    modal.classList.remove('active');
-                });
-                document.querySelectorAll('.report-modal.active').forEach(modal => {
-                    modal.classList.remove('active');
-                });
                 document.getElementById('profileDropdown').classList.remove('active');
                 document.getElementById('notifDropdown').classList.remove('active');
                 document.getElementById('flagSearchDropdown').classList.remove('active');
             }
         });
-    </script>
-</body>
-</html>
